@@ -3,6 +3,7 @@
 -- PCORNetLoader Script
 -- Current version will not transform: Death, Death_Condition, PCORnet_Trial, PRO_CM 
 -- Contributors: Jeff Klann, PhD; Aaron Abend; Arturo Torres
+-- Version 6.1, speed optimizations and prescribing/dispensing bugfixes, 12/10/15
 --Version 6, release to SCILHS, 10/15/15
 --Version 5.5, added Prescribing and Dispensing and new report
 --Version 5.4, added Condition
@@ -144,11 +145,11 @@ CREATE TABLE [dbo].[pmnVITAL](
 	[MEASURE_DATE] [datetime] NULL,
 	[MEASURE_TIME] [varchar](5) NULL,
 	[VITAL_SOURCE] [varchar](2) NULL,
-    [HT] [numeric](8, 0) NULL,
-	[WT] [numeric](8, 0) NULL,
-	[DIASTOLIC] [numeric](4, 0) NULL,
-	[SYSTOLIC] [numeric](4, 0) NULL,
-    [ORIGINAL_BMI] [numeric](8,0) NULL,
+    [HT] [numeric](18, 0) NULL, -- 8,0
+	[WT] [numeric](18, 0) NULL, -- 8,0
+	[DIASTOLIC] [numeric](18, 0) NULL, --  4,0
+	[SYSTOLIC] [numeric](18, 0) NULL, -- 4,0
+    [ORIGINAL_BMI] [numeric](18,0) NULL, -- 8,0
 	[BP_POSITION] [varchar](2) NULL,
 	[SMOKING] [varchar] (2),
 	[TOBACCO] [varchar] (2),
@@ -1019,9 +1020,10 @@ go
 
 ----------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------------
--- 3. Diagnosis - v6 by Aaron Abend and Jeff Klann
+-- 3. Diagnosis - v6.1 by Aaron Abend and Jeff Klann
 --   new: removed factline cache
 --        now ignores facts with a condition modifier
+--        6.1. optimized for temp tables
 ----------------------------------------------------------------------------------------------------------------------------------------
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'PCORNetDiagnosis') AND type in (N'P', N'PC')) DROP PROCEDURE PCORNetDiagnosis
 go
@@ -1030,23 +1032,19 @@ create procedure PCORNetDiagnosis as
 declare @sqltext nvarchar(4000)
 begin
 
-exec sp_executesql N'IF  EXISTS (SELECT * FROM sys.views WHERE object_id = OBJECT_ID(N''sourcefact'')) DROP VIEW sourcefact'
-set @sqltext = N'create view sourcefact as '+
-	N'select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode dxsource, dxsource.c_fullname '+
-	N'from i2b2fact factline '+
-    N'inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num '+
-    N'inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode '+  
-	N'where dxsource.c_fullname like ''\PCORI_MOD\CONDITION_OR_DX\%'''
-exec sp_executesql @sqltext
+-- Optimized to use temp tables, not views. Also removed the distinct for speed.
+select  patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode dxsource, dxsource.c_fullname
+ into #sourcefact
+from i2b2fact factline
+inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num
+inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode  
+where dxsource.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\%'
 
-exec sp_executesql N'IF  EXISTS (SELECT * FROM sys.views WHERE object_id = OBJECT_ID(N''pdxfact'')) DROP VIEW pdxfact'
-set @sqltext = N'create view pdxfact as '+
-	N'select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode pdxsource,dxsource.c_fullname  '+ 
-	N'from i2b2fact factline '+
-    N'inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num '+
-    N'inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode '+  
-	N'and dxsource.c_fullname like ''\PCORI_MOD\PDX\%'''
-exec sp_executesql @sqltext
+select  patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode pdxsource,dxsource.c_fullname 
+into #pdxfact from i2b2fact factline 
+inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num 
+inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode  
+and dxsource.c_fullname like '\PCORI_MOD\PDX\%'
 
 insert into pmndiagnosis (patid,			encounterid,	enc_type, admit_date, providerid, dx, dx_type, dx_source, pdx)
 select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, factline.start_date, factline.provider_id, diag.pcori_basecode, 
@@ -1055,28 +1053,28 @@ substring(diag.c_fullname,18,2) dxtype,
 	isnull(substring(pdxsource,charindex(':',pdxsource)+1,2),'NI') -- jgk bugfix 9/28/15 
 from i2b2fact factline
 inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num
- left outer join sourcefact
-on	factline.patient_num=sourcefact.patient_num
-and factline.encounter_num=sourcefact.encounter_num
-and factline.provider_id=sourcefact.provider_id
-and factline.concept_cd=sourcefact.concept_Cd
-and factline.start_date=sourcefact.start_Date 
-left outer join pdxfact
-on	factline.patient_num=pdxfact.patient_num
-and factline.encounter_num=pdxfact.encounter_num
-and factline.provider_id=pdxfact.provider_id
-and factline.concept_cd=pdxfact.concept_cd
-and factline.start_date=pdxfact.start_Date
+ left outer join #sourcefact sf
+on	factline.patient_num=sf.patient_num
+and factline.encounter_num=sf.encounter_num
+and factline.provider_id=sf.provider_id
+and factline.concept_cd=sf.concept_Cd
+and factline.start_date=sf.start_Date 
+left outer join #pdxfact pf
+on	factline.patient_num=pf.patient_num
+and factline.encounter_num=pf.encounter_num
+and factline.provider_id=pf.provider_id
+and factline.concept_cd=pf.concept_cd
+and factline.start_date=pf.start_Date
 inner join pcornet_diag diag on diag.c_basecode  = factline.concept_cd
 where diag.c_fullname like '\PCORI\DIAGNOSIS\%'
-and (sourcefact.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\%' or sourcefact.c_fullname is null)
+and (sf.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\%' or sf.c_fullname is null)
 
 end
 go
 
 ----------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------------
--- 3a. Condition - v6 by Jeff Klann, derived from Diagnosis above
+-- 3a. Condition - v6.1 by Jeff Klann, derived from Diagnosis above
 -- Notes: in the current version condition_status is imputed from resolve_date (which is derived from end_date) 
 --  and onset_date is not supported
 ----------------------------------------------------------------------------------------------------------------------------------------
@@ -1087,14 +1085,13 @@ create procedure PCORNetCondition as
 declare @sqltext nvarchar(4000)
 begin
 
-exec sp_executesql N'IF  EXISTS (SELECT * FROM sys.views WHERE object_id = OBJECT_ID(N''sourcefact'')) DROP VIEW sourcefact'
-set @sqltext = N'create view sourcefact as '+
-	N'select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode dxsource, dxsource.c_fullname '+
-	N'from i2b2fact factline '+
-    N'inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num '+
-    N'inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode '+  
-	N'where dxsource.c_fullname like ''\PCORI_MOD\CONDITION_OR_DX\%'''
-exec sp_executesql @sqltext
+-- Optimized to use a temp table; also removed "distinct" 12/9/15
+-- TODO: Could be further optimized to use the same temp table as diagnosis
+select  patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode dxsource, dxsource.c_fullname
+into #sourcefact from i2b2fact factline 
+inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num
+inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode 
+where dxsource.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\%'
 
 insert into pmncondition (patid, encounterid, report_date, resolve_date, condition, condition_type, condition_status, condition_source)
 select distinct factline.patient_num, min(factline.encounter_num) encounterid, min(factline.start_date) report_date, isnull(max(factline.end_date),null) resolve_date, diag.pcori_basecode, 
@@ -1104,14 +1101,14 @@ substring(diag.c_fullname,18,2) condition_type,
 from i2b2fact factline
 inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num
 inner join pcornet_diag diag on diag.c_basecode  = factline.concept_cd   
- left outer join sourcefact
-on	factline.patient_num=sourcefact.patient_num
-and factline.encounter_num=sourcefact.encounter_num
-and factline.provider_id=sourcefact.provider_id
-and factline.concept_cd=sourcefact.concept_Cd
-and factline.start_date=sourcefact.start_Date  
+ left outer join #sourcefact sf
+on	factline.patient_num=sf.patient_num
+and factline.encounter_num=sf.encounter_num
+and factline.provider_id=sf.provider_id
+and factline.concept_cd=sf.concept_Cd
+and factline.start_date=sf.start_Date  
 where diag.c_fullname like '\PCORI\DIAGNOSIS\%'
-and sourcefact.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\CONDITION_SOURCE\%'
+and sf.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\CONDITION_SOURCE\%'
 group by factline.patient_num, diag.pcori_basecode, diag.c_fullname
 end
 go
@@ -1260,17 +1257,31 @@ go
 
 ----------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------------
--- 7. LAB_RESULT_CM - v6
+-- 7. LAB_RESULT_CM - v6.1
 ----------------------------------------------------------------------------------------------------------------------------------------
 ------------------------- LAB_RESULT_CM------------------------------------------------ 
 -- 8/14/2015 - first version
 -- 9/24/15 - Removed factline cache and optimized
+-- 12/9/15 - Optimized to use temp tables
 -- Written by Jeff Klann, PhD and Arturo Torres
 
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'PCORNetLabResultCM') AND type in (N'P', N'PC')) DROP PROCEDURE PCORNetLabResultCM;
 GO
 create procedure PCORNetLabResultCM as
 begin
+
+-- Optimized to use temp tables; also, removed "distinct" - much faster and seems unnecessary - 12/9/15
+select patient_num, encounter_num, provider_id, concept_cd, start_date, lsource.pcori_basecode  PRIORITY 
+into #priority from i2b2fact
+inner join pmnENCOUNTER enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num
+inner join pcornet_lab lsource on i2b2fact.modifier_cd =lsource.c_basecode
+where c_fullname LIKE '\PCORI_MOD\PRIORITY\%'
+ 
+select  patient_num, encounter_num, provider_id, concept_cd, start_date, lsource.pcori_basecode  RESULT_LOC
+into #location from i2b2fact
+inner join pmnENCOUNTER enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num
+inner join pcornet_lab lsource on i2b2fact.modifier_cd =lsource.c_basecode
+where c_fullname LIKE '\PCORI_MOD\RESULT_LOC\%'
 
 INSERT INTO dbo.[pmnlabresults_cm]
       ([PATID]
@@ -1343,12 +1354,7 @@ inner JOIN pcornet_lab ont_parent on lab.c_path=ont_parent.c_fullname
 inner join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
 
 LEFT OUTER JOIN
-(select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, lsource.pcori_basecode  PRIORITY 
-from i2b2fact
-inner join pmnENCOUNTER enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num
-inner join pcornet_lab lsource on i2b2fact.modifier_cd =lsource.c_basecode
-where c_fullname LIKE '\PCORI_MOD\PRIORITY\%') p
- 
+#priority p
 ON  M.patient_num=p.patient_num
 and M.encounter_num=p.encounter_num
 and M.provider_id=p.provider_id
@@ -1356,12 +1362,7 @@ and M.concept_cd=p.concept_Cd
 and M.start_date=p.start_Date
  
 LEFT OUTER JOIN
-(select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, lsource.pcori_basecode  RESULT_LOC
-from i2b2fact
-inner join pmnENCOUNTER enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num
-inner join pcornet_lab lsource on i2b2fact.modifier_cd =lsource.c_basecode
-where c_fullname LIKE '\PCORI_MOD\RESULT_LOC\%') l
- 
+#location l
 ON  M.patient_num=l.patient_num
 and M.encounter_num=l.encounter_num
 and M.provider_id=l.provider_id
@@ -1395,9 +1396,9 @@ GO
 
 ----------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------------
--- 9. Prescribing - v6
+-- 9. Prescribing - v6.1
 ----------------------------------------------------------------------------------------------------------------------------------------
--- Written by Aaron Abend and Jeff Klann, PhD 
+-- Written by Aaron Abend and Jeff Klann, PhD with optimizations by Griffin Weber, MD, PhD
 -- You must have run the meds_schemachange proc to create the PCORI_NDC and PCORI_CUI columns
 -- TODO: The first encounter inner join seems to slow things down
 
@@ -1405,6 +1406,47 @@ IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'PCORNetPresc
 GO
 create procedure PCORNetPrescribing as
 begin
+
+-- Griffin's optimization: use temp tables rather than left joining directly - 12/9/15
+    select pcori_basecode,c_fullname,encounter_num,concept_cd 
+		into #basis
+		from i2b2fact basis
+			inner join pmnENCOUNTER enc on enc.patid = basis.patient_num and enc.encounterid = basis.encounter_Num
+		 join pcornet_med basiscode 
+			on basis.modifier_cd = basiscode.c_basecode
+			and basiscode.c_fullname like '\PCORI_MOD\RX_BASIS\%'
+
+    select pcori_basecode,encounter_num,concept_cd 
+		into #freq
+		from i2b2fact freq
+			inner join pmnENCOUNTER enc on enc.patid = freq.patient_num and enc.encounterid = freq.encounter_Num
+		 join pcornet_med freqcode 
+			on freq.modifier_cd = freqcode.c_basecode
+			and freqcode.c_fullname like '\PCORI_MOD\RX_FREQUENCY\%'
+
+    select nval_num,encounter_num,concept_cd 
+		into #quantity
+		from i2b2fact quantity
+			inner join pmnENCOUNTER enc on enc.patid = quantity.patient_num and enc.encounterid = quantity.encounter_Num
+		 join pcornet_med quantitycode 
+			on quantity.modifier_cd = quantitycode.c_basecode
+			and quantitycode.c_fullname like '\PCORI_MOD\RX_QUANTITY\'
+
+	select nval_num,encounter_num,concept_cd 
+		into #refills
+		from i2b2fact refills
+			inner join pmnENCOUNTER enc on enc.patid = refills.patient_num and enc.encounterid = refills.encounter_Num
+		 join pcornet_med refillscode 
+			on refills.modifier_cd = refillscode.c_basecode
+			and refillscode.c_fullname like '\PCORI_MOD\RX_REFILLS\'
+
+    select nval_num,encounter_num,concept_cd 
+		into #supply
+		from i2b2fact supply
+			inner join pmnENCOUNTER enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num
+		 join pcornet_med supplycode 
+			on supply.modifier_cd = supplycode.c_basecode
+			and supplycode.c_fullname like '\PCORI_MOD\RX_DAYS_SUPPLY\'
 
 -- insert data with outer joins to ensure all records are included even if some data elements are missing
 insert into pmnprescribing (
@@ -1431,47 +1473,27 @@ select distinct  m.patient_num, m.Encounter_Num,m.provider_id,  m.start_date ord
 inner join pmnENCOUNTER enc on enc.encounterid = m.encounter_Num
 -- TODO: This join adds several minutes to the load - must be debugged
 
-    left join (select pcori_basecode,c_fullname,encounter_num,concept_cd from i2b2fact basis
-        inner join pmnENCOUNTER enc on enc.patid = basis.patient_num and enc.encounterid = basis.encounter_Num
-     join pcornet_med basiscode 
-        on basis.modifier_cd = basiscode.c_basecode
-        and basiscode.c_fullname like '\PCORI_MOD\RX_BASIS\%') basis
+    left join #basis basis
     on m.encounter_num = basis.encounter_num
     and m.concept_cd = basis.concept_Cd
 
-    left join (select pcori_basecode,encounter_num,concept_cd from i2b2fact freq
-        inner join pmnENCOUNTER enc on enc.patid = freq.patient_num and enc.encounterid = freq.encounter_Num
-     join pcornet_med freqcode 
-        on freq.modifier_cd = freqcode.c_basecode
-        and freqcode.c_fullname like '\PCORI_MOD\RX_FREQUENCY\%') freq
+    left join #freq freq
     on m.encounter_num = freq.encounter_num
     and m.concept_cd = freq.concept_Cd
 
-    left join (select nval_num,encounter_num,concept_cd from i2b2fact quantity
-        inner join pmnENCOUNTER enc on enc.patid = quantity.patient_num and enc.encounterid = quantity.encounter_Num
-     join pcornet_med quantitycode 
-        on quantity.modifier_cd = quantitycode.c_basecode
-        and quantitycode.c_fullname like '\PCORI_MOD\RX_QUANTITY\') quantity 
+    left join #quantity quantity 
     on m.encounter_num = quantity.encounter_num
     and m.concept_cd = quantity.concept_Cd
 
-    left join (select nval_num,encounter_num,concept_cd from i2b2fact refills
-        inner join pmnENCOUNTER enc on enc.patid = refills.patient_num and enc.encounterid = refills.encounter_Num
-     join pcornet_med refillscode 
-        on refills.modifier_cd = refillscode.c_basecode
-        and refillscode.c_fullname like '\PCORI_MOD\RX_REFILLS\') refills
+    left join #refills refills
     on m.encounter_num = refills.encounter_num
     and m.concept_cd = refills.concept_Cd
 
-    left join (select nval_num,encounter_num,concept_cd from i2b2fact supply
-        inner join pmnENCOUNTER enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num
-     join pcornet_med supplycode 
-        on supply.modifier_cd = supplycode.c_basecode
-        and supplycode.c_fullname like '\PCORI_MOD\RX_DAYS_SUPPLY\') supply
+    left join #supply supply
     on m.encounter_num = supply.encounter_num
     and m.concept_cd = supply.concept_Cd
 
-where (basis.c_fullname is null or basis.c_fullname= '\PCORI_MOD\RX_BASIS\DI\')
+where (basis.c_fullname is null or basis.c_fullname like '\PCORI_MOD\RX_BASIS\PR\%') -- jgk 11/2 bugfix: filter for PR, not DI
 
 end
 GO
@@ -1486,6 +1508,22 @@ IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'PCORNetDispe
 GO
 create procedure PCORNetDispensing as
 begin
+
+-- Griffin's optimizations - 12/9/15
+select nval_num,encounter_num,concept_cd 
+    into #supply
+    from i2b2fact supply
+        inner join pmnENCOUNTER enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num
+      join pcornet_med supplycode 
+        on supply.modifier_cd = supplycode.c_basecode
+        and supplycode.c_fullname like '\PCORI_MOD\RX_DAYS_SUPPLY\'
+
+select nval_num,encounter_num,concept_cd 
+    into #amount
+    from i2b2fact amount
+     join pcornet_med amountcode
+        on amount.modifier_cd = amountcode.c_basecode
+        and amountcode.c_fullname like '\PCORI_MOD\RX_QUANTITY\'
 
 -- insert data with outer joins to ensure all records are included even if some data elements are missing
 
@@ -1504,19 +1542,20 @@ from i2b2fact m inner join pcornet_med mo
 on m.concept_cd = mo.c_basecode
 inner join pmnENCOUNTER enc on enc.encounterid = m.encounter_Num
 
-    left join (select nval_num,encounter_num,concept_cd from i2b2fact supply
-        inner join pmnENCOUNTER enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num
-      join pcornet_med supplycode 
-        on supply.modifier_cd = supplycode.c_basecode
-        and supplycode.c_fullname like '\PCORI_MOD\RX_DAYS_SUPPLY\' ) supply
+    -- jgk bugfix 11/2 - we weren't filtering dispensing events
+    inner join (select pcori_basecode,c_fullname,encounter_num,concept_cd from i2b2fact basis
+        inner join pmnENCOUNTER enc on enc.patid = basis.patient_num and enc.encounterid = basis.encounter_Num
+     join pcornet_med basiscode 
+        on basis.modifier_cd = basiscode.c_basecode
+        and basiscode.c_fullname='\PCORI_MOD\RX_BASIS\DI\') basis
+    on m.encounter_num = basis.encounter_num
+    and m.concept_cd = basis.concept_Cd 
+
+    left join #supply supply
     on m.encounter_num = supply.encounter_num
     and m.concept_cd = supply.concept_Cd
 
-
-    left join (select nval_num,encounter_num,concept_cd from i2b2fact amount
-     join pcornet_med amountcode
-        on amount.modifier_cd = amountcode.c_basecode
-        and amountcode.c_fullname like '\PCORI_MOD\RX_QUANTITY\') amount
+    left join #amount amount
     on m.encounter_num = amount.encounter_num
     and m.concept_cd = amount.concept_Cd
 
