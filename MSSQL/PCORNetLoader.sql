@@ -3,6 +3,8 @@
 -- PCORNetLoader Script
 -- Current version will not transform: Death, Death_Condition, PCORnet_Trial, PRO_CM 
 -- Contributors: Jeff Klann, PhD; Aaron Abend; Arturo Torres
+-- Version 0.6.2, bugfix in tobbaco_type logic in vitals, 12/17/15
+-- Version 6.1 became 0.6.1, 12/17/15
 -- Version 6.1, speed optimizations and prescribing/dispensing bugfixes, 12/10/15
 --Version 6, release to SCILHS, 10/15/15
 --Version 5.5, added Prescribing and Dispensing and new report
@@ -1161,11 +1163,12 @@ select patid, encounterid, measure_date, measure_time,vital_source,ht, wt, diast
 case when tobacco in ('02','03','04') then -- no tobacco
     case when smoking in ('03','04') then '04' -- no smoking
         when smoking in ('01','02','07','08') then '01' -- smoking
-        else 'NI' end
- when tobacco='01' then
+        else 'NI' end -- (no tobacco, unknown smoking)
+ when tobacco='01' then -- tobacco
     case when smoking in ('03','04') then '02' -- no smoking
         when smoking in ('01','02','07','08') then '03' -- smoking
-        else '05' end
+        else 'OT' end -- (tobacco, unknown smoking)
+  when tobacco in ('NI','OT','UN') and smoking in ('01','02','07','08') then '05'  -- (unknown tobacco w/ smoking) jgk bugfix 12/17/15
  else 'NI' end tobacco_type 
 from
 (select patid, encounterid, measure_date, measure_time, isnull(max(vital_source),'HC') vital_source, -- jgk: not in the spec, so I took it out  admit_date,
