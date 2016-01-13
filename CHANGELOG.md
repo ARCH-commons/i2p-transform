@@ -65,9 +65,4 @@
 - Wrong data type found in pmnprescribing (RX_FREQUENCY)
 - tobbaco_type logic in vitals was faulty
 
-- : Enrollment	Basis	Enr_basis
-Vital	Vitaliid	Vitalid
-Harvest	Speciment_date_mgmt	Specimen_date_mgmt
-Pcornet_trial	Trial_id	Trialid
--- Version 6.1 became 0.6.1, 12/17/15
--- Version 6.1, speed optimizations and prescribing/dispensing bugfixes, 12/10/15
+
