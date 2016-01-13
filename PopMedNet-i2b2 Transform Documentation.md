@@ -1,5 +1,4 @@
 # PopMedNet-i2b2 Transform documentation - for SCILHS sites
-### Version 6.10 - 12/10/15
 ###Jeff Klann, PhD
 
 # Included Files
