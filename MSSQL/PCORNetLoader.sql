@@ -3,6 +3,7 @@
 -- PCORNetLoader Script
 -- Current version will not transform: Death, Death_Condition, PCORnet_Trial, PRO_CM 
 -- Contributors: Jeff Klann, PhD; Aaron Abend; Arturo Torres
+-- Version 0.6.3, typos found in field names in trial, enrollment, vital, and harvest tables - 1/11/16
 -- Version 0.6.2, bugfix in tobbaco_type logic in vitals, 12/17/15
 -- Version 6.1 became 0.6.1, 12/17/15
 -- Version 6.1, speed optimizations and prescribing/dispensing bugfixes, 12/10/15
@@ -124,14 +125,14 @@ CREATE TABLE [dbo].[pmnENROLLMENT](
 	[ENR_START_DATE] [datetime] NOT NULL,
 	[ENR_END_DATE] [datetime] NULL,
 	[CHART] [varchar](1) NULL,
-	[BASIS] [varchar](1) NOT NULL,
+	[ENR_BASIS] [varchar](1) NOT NULL, -- jgk fixed 1/11/16 should be ENR_BASIS, not BASIS
 	[RAW_CHART] [varchar](50) NULL,
 	[RAW_BASIS] [varchar](50) NULL,
  CONSTRAINT [PK_pmnENROLLMENT] PRIMARY KEY CLUSTERED 
 (
 	[PATID] ASC,
 	[ENR_START_DATE] ASC,
-	[BASIS] ASC
+	[ENR_BASIS] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 
@@ -141,7 +142,7 @@ IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[pmnvi
 DROP TABLE [dbo].[pmnvital]
 GO
 CREATE TABLE [dbo].[pmnVITAL](
-	[VITALIID] [bigint]  IDENTITY (1,1) NOT NULL,
+	[VITALID] [bigint]  IDENTITY (1,1) NOT NULL, /* Fixed typo 1/11/16 jgk */
 	[PATID] [varchar](50) NULL,
 	[ENCOUNTERID] [varchar](50) NULL,
 	[MEASURE_DATE] [datetime] NULL,
@@ -167,7 +168,7 @@ CREATE TABLE [dbo].[pmnVITAL](
 	[Raw_TOBACCO_TYPE] [varchar] (50),
  CONSTRAINT [PK_pmnVITAL] PRIMARY KEY CLUSTERED 
 (
-	[VITALIID] ASC
+	[VITALID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 
@@ -392,7 +393,7 @@ CREATE TABLE [dbo].[pmnprescribing](
 	[RX_QUANTITY] [int] NULL,
 	[RX_REFILLS] [int] NULL,
 	[RX_DAYS_SUPPLY] [int] NULL,
-	[RX_FREQUENCY] [int] NULL,
+	[RX_FREQUENCY] [varchar] (2) NULL, -- Data type error, fixed 1/11/16 jgk
 	[RX_BASIS] [varchar] (2) NULL,
 	[RXNORM_CUI] [int] NULL,
 	[RAW_RX_MED_NAME] [varchar] (50) NULL,
@@ -411,7 +412,7 @@ DROP TABLE [dbo].[pmnpcornet_trial]
 GO 
 CREATE TABLE [dbo].[pmnpcornet_trial](
 	[PATID] [varchar](50) NOT NULL,
-	[TRIAL_ID] [varchar](20) NOT NULL,
+	[TRIALID] [varchar](20) NOT NULL, /* Name mistake - fix 1/11/16 jgk */
 	[PARTICIPANTID] [varchar](50) NOT NULL,
 	[TRIAL_SITEID] [varchar](50) NULL,
 	[TRIAL_ENROLL_DATE] [datetime] NULL,
@@ -421,7 +422,7 @@ CREATE TABLE [dbo].[pmnpcornet_trial](
  CONSTRAINT [PK_pcornet_trial] PRIMARY KEY CLUSTERED 
 (
 	[PATID] ASC,
-	[TRIAL_ID] ASC,
+	[TRIALID] ASC,
 	[PARTICIPANTID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
@@ -501,7 +502,7 @@ CREATE TABLE [dbo].[pmnharvest](
 	[RX_END_DATE_MGMT] [varchar](2) NULL,
 	[DISPENSE_DATE_MGMT] [varchar](2) NULL,
 	[LAB_ORDER_DATE_MGMT] [varchar](2) NULL,
-	[SPECIMENT_DATE_MGMT] [varchar](2) NULL,
+	[SPECIMEN_DATE_MGMT] [varchar](2) NULL, /* Typo fixed 1/16/15 jgk */
 	[RESULT_DATE_MGMT] [varchar](2) NULL,
 	[MEASURE_DATE_MGMT] [varchar](2) NULL,
 	[ONSET_DATE_MGMT] [varchar](2) NULL,
@@ -1241,6 +1242,7 @@ go
 ------------------------- Enrollment Code ------------------------------------------------ 
 -- Written by Jeff Klann, PhD
 -- v6 Updated 9/30/15 - now supports loyalty cohort (be sure view at the top of the script is updated)
+-- Bugfix 1/11/16 - BASIS should be called ENR_BASIS
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'PCORNetEnroll') AND type in (N'P', N'PC'))
 DROP PROCEDURE PCORNetEnroll
 GO
@@ -1248,10 +1250,10 @@ GO
 create procedure PCORNetEnroll as
 begin
 
-INSERT INTO [pmnENROLLMENT]([PATID], [ENR_START_DATE], [ENR_END_DATE], [CHART], [BASIS]) 
+INSERT INTO [pmnENROLLMENT]([PATID], [ENR_START_DATE], [ENR_END_DATE], [CHART], [ENR_BASIS]) 
     select x.patient_num patid, case when l.patient_num is not null then l.period_start else enr_start end enr_start_date
     , case when l.patient_num is not null then l.period_end when enr_end_end>enr_end then enr_end_end else enr_end end enr_end_date 
-    , 'Y' chart, case when l.patient_num is not null then 'A' else 'E' end basis from 
+    , 'Y' chart, case when l.patient_num is not null then 'A' else 'E' end enr_basis from 
     (select patient_num, min(start_date) enr_start,max(start_date) enr_end,max(end_date) enr_end_end from i2b2visit where patient_num in (select patid from pmndemographic) group by patient_num) x
     left outer join i2b2loyalty_patients l on l.patient_num=x.patient_num
 
@@ -1391,7 +1393,7 @@ GO
 create procedure PCORNetHarvest as
 begin
 
-INSERT INTO [dbo].[pmnharvest]([NETWORKID], [NETWORK_NAME], [DATAMARTID], [DATAMART_NAME], [DATAMART_PLATFORM], [CDM_VERSION], [DATAMART_CLAIMS], [DATAMART_EHR], [BIRTH_DATE_MGMT], [ENR_START_DATE_MGMT], [ENR_END_DATE_MGMT], [ADMIT_DATE_MGMT], [DISCHARGE_DATE_MGMT], [PX_DATE_MGMT], [RX_ORDER_DATE_MGMT], [RX_START_DATE_MGMT], [RX_END_DATE_MGMT], [DISPENSE_DATE_MGMT], [LAB_ORDER_DATE_MGMT], [SPECIMENT_DATE_MGMT], [RESULT_DATE_MGMT], [MEASURE_DATE_MGMT], [ONSET_DATE_MGMT], [REPORT_DATE_MGMT], [RESOLVE_DATE_MGMT], [PRO_DATE_MGMT], [REFRESH_DEMOGRAPHIC_DATE], [REFRESH_ENROLLMENT_DATE], [REFRESH_ENCOUNTER_DATE], [REFRESH_DIAGNOSIS_DATE], [REFRESH_PROCEDURES_DATE], [REFRESH_VITAL_DATE], [REFRESH_DISPENSING_DATE], [REFRESH_LAB_RESULT_CM_DATE], [REFRESH_CONDITION_DATE], [REFRESH_PRO_CM_DATE], [REFRESH_PRESCRIBING_DATE], [REFRESH_PCORNET_TRIAL_DATE], [REFRESH_DEATH_DATE], [REFRESH_DEATH_CAUSE_DATE]) 
+INSERT INTO [dbo].[pmnharvest]([NETWORKID], [NETWORK_NAME], [DATAMARTID], [DATAMART_NAME], [DATAMART_PLATFORM], [CDM_VERSION], [DATAMART_CLAIMS], [DATAMART_EHR], [BIRTH_DATE_MGMT], [ENR_START_DATE_MGMT], [ENR_END_DATE_MGMT], [ADMIT_DATE_MGMT], [DISCHARGE_DATE_MGMT], [PX_DATE_MGMT], [RX_ORDER_DATE_MGMT], [RX_START_DATE_MGMT], [RX_END_DATE_MGMT], [DISPENSE_DATE_MGMT], [LAB_ORDER_DATE_MGMT], [SPECIMEN_DATE_MGMT], [RESULT_DATE_MGMT], [MEASURE_DATE_MGMT], [ONSET_DATE_MGMT], [REPORT_DATE_MGMT], [RESOLVE_DATE_MGMT], [PRO_DATE_MGMT], [REFRESH_DEMOGRAPHIC_DATE], [REFRESH_ENROLLMENT_DATE], [REFRESH_ENCOUNTER_DATE], [REFRESH_DIAGNOSIS_DATE], [REFRESH_PROCEDURES_DATE], [REFRESH_VITAL_DATE], [REFRESH_DISPENSING_DATE], [REFRESH_LAB_RESULT_CM_DATE], [REFRESH_CONDITION_DATE], [REFRESH_PRO_CM_DATE], [REFRESH_PRESCRIBING_DATE], [REFRESH_PCORNET_TRIAL_DATE], [REFRESH_DEATH_DATE], [REFRESH_DEATH_CAUSE_DATE]) 
 	VALUES('SCILHS', 'SCILHS', dbo.getDataMartID(), dbo.getDataMartName(), dbo.getDataMartPlatform(), 3, 01, 02, 1,1,2,1,2,1,2,1,2,1,1,2,2,1,1,1,2,1,getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),null,getdate(),null,null,null)
 
 end
@@ -1671,6 +1673,16 @@ select @pmndispensings =count(*)  from pmndispensing
 select @runid = max(runid) from i2pReport
 set @runid = @runid + 1
 insert into i2pReport select @runid, getdate(), 'Pats',			@i2b2pats,		@pmnpats,			@i2b2pats-@pmnpats
+insert into i2pReport select @runid, getdate(), 'Enrollment',	@i2b2pats,		@pmnenroll,			@i2b2pats-@pmnpats
+
+insert into i2pReport select @runid, getdate(), 'Encounters',	@i2b2Encounters,@pmnEncounters,		@i2b2encounters-@pmnencounters
+insert into i2pReport select @runid, getdate(), 'DX',		null,		@pmndx,	null
+insert into i2pReport select @runid, getdate(), 'PX',		null,		@pmnprocs,	null
+insert into i2pReport select @runid, getdate(), 'Condition',		null,		@pmncond,	null
+insert into i2pReport select @runid, getdate(), 'Vital',		null,		@pmnvital,	null
+insert into i2pReport select @runid, getdate(), 'Labs',		null,		@pmnlabs,	null
+insert into i2pReport select @runid, getdate(), 'Prescribing',		null,	@pmnprescribings,	null
+insert into i2pReport select @runid, getdate(), 'Dispensing',		null,	@pmndispensings,	nullinsert into i2pReport select @runid, getdate(), 'Pats',			@i2b2pats,		@pmnpats,			@i2b2pats-@pmnpats
 insert into i2pReport select @runid, getdate(), 'Enrollment',	@i2b2pats,		@pmnenroll,			@i2b2pats-@pmnpats
 
 insert into i2pReport select @runid, getdate(), 'Encounters',	@i2b2Encounters,@pmnEncounters,		@i2b2encounters-@pmnencounters
