@@ -1,8 +1,9 @@
 -------------------------------------------------------------------------------------------
 -- PCORNetLoader Script
 -- Orignal MSSQL Verion Contributors: Jeff Klann, PhD; Aaron Abend; Arturo Torres
--- Version 6.01, release to SCILHS, 10/15/15
 -- Translate to Oracle version: by Kun Wei(Wake Forest)
+-- Version 0.6.2, bugfix release, 1/6/16 (create table and pcornetreport bugs)
+-- Version 6.01, release to SCILHS, 10/15/15
 -- Prescribing/dispensing bugfixes (untested) inserted by Jeff Klann 12/10/15
 --
 --
@@ -63,7 +64,11 @@ PMN_DROPSQL('DROP TABLE i2b2patient_list');
 END;
 /
 
-CREATE table i2b2patient_list as select DISTINCT PATIENT_NUM from I2B2FACT where START_DATE > to_date('01-Jan-2010','dd-mon-rrrr') and ROWNUM<100000000
+CREATE table i2b2patient_list as 
+select * from
+(
+select DISTINCT PATIENT_NUM from I2B2FACT where START_DATE > to_date('01-Jan-2010','dd-mon-rrrr')
+) where ROWNUM<100000000
 /
 
 create or replace VIEW i2b2patient as select * from I2B2DEMODATA.PATIENT_DIMENSION where PATIENT_NUM in (select PATIENT_NUM from i2b2patient_list)
@@ -1182,22 +1187,30 @@ end PCORNetEnroll;
 
 
 create or replace procedure PCORNetLabResultCM as
+sqltext varchar2(4000);
 begin
 PMN_DROPSQL('DROP TABLE priority');
-create table priority as
-(select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, lsource.pcori_basecode  PRIORITY 
-from i2b2fact
-inner join pmnENCOUNTER enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num
-inner join pcornet_lab lsource on i2b2fact.modifier_cd =lsource.c_basecode
-where c_fullname LIKE '\PCORI_MOD\PRIORITY\%');
+
+sqltext := 'create table priority as '||
+'(select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, lsource.pcori_basecode  PRIORITY  '||
+'from i2b2fact '||
+'inner join pmnENCOUNTER enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num '||
+'inner join pcornet_lab lsource on i2b2fact.modifier_cd =lsource.c_basecode '||
+'where c_fullname LIKE ''\PCORI_MOD\PRIORITY\%'') ';
+
+PMN_EXECUATESQL(sqltext);
+
 
 PMN_DROPSQL('DROP TABLE location');
-create table location as
-(select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, lsource.pcori_basecode  RESULT_LOC
-from i2b2fact
-inner join pmnENCOUNTER enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num
-inner join pcornet_lab lsource on i2b2fact.modifier_cd =lsource.c_basecode
-where c_fullname LIKE '\PCORI_MOD\RESULT_LOC\%');
+sqltext := 'create table location as '||
+'(select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, lsource.pcori_basecode  RESULT_LOC '||
+'from i2b2fact '||
+'inner join pmnENCOUNTER enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num '||
+'inner join pcornet_lab lsource on i2b2fact.modifier_cd =lsource.c_basecode '||
+'where c_fullname LIKE ''\PCORI_MOD\RESULT_LOC\%'') ';
+
+PMN_EXECUATESQL(sqltext);
+
 
 INSERT INTO pmnlabresults_cm
       (PATID
@@ -1311,48 +1324,55 @@ end PCORNetHarvest;
 
 
 create or replace procedure PCORNetPrescribing as
+sqltext varchar2(4000);
 begin
 
 PMN_DROPSQL('DROP TABLE basis');
-create table basis as
-(select pcori_basecode,c_fullname,encounter_num,concept_cd from i2b2fact basis
-        inner join pmnENCOUNTER enc on enc.patid = basis.patient_num and enc.encounterid = basis.encounter_Num
-     join pcornet_med basiscode 
-        on basis.modifier_cd = basiscode.c_basecode
-        and basiscode.c_fullname like '\PCORI_MOD\RX_BASIS\%') ;
+sqltext := 'create table basis as '||
+'(select pcori_basecode,c_fullname,encounter_num,concept_cd from i2b2fact basis '||
+'        inner join pmnENCOUNTER enc on enc.patid = basis.patient_num and enc.encounterid = basis.encounter_Num '||
+'     join pcornet_med basiscode  '||
+'        on basis.modifier_cd = basiscode.c_basecode '||
+'        and basiscode.c_fullname like ''\PCORI_MOD\RX_BASIS\%'') ';
+PMN_EXECUATESQL(sqltext);
 
 PMN_DROPSQL('DROP TABLE freq');
-create table freq as
-(select pcori_basecode,encounter_num,concept_cd from i2b2fact freq
-        inner join pmnENCOUNTER enc on enc.patid = freq.patient_num and enc.encounterid = freq.encounter_Num
-     join pcornet_med freqcode 
-        on freq.modifier_cd = freqcode.c_basecode
-        and freqcode.c_fullname like '\PCORI_MOD\RX_FREQUENCY\%') ;
+sqltext := 'create table freq as '||
+'(select pcori_basecode,encounter_num,concept_cd from i2b2fact freq '||
+'        inner join pmnENCOUNTER enc on enc.patid = freq.patient_num and enc.encounterid = freq.encounter_Num '||
+'     join pcornet_med freqcode  '||
+'        on freq.modifier_cd = freqcode.c_basecode '||
+'        and freqcode.c_fullname like ''\PCORI_MOD\RX_FREQUENCY\%'') ';
+PMN_EXECUATESQL(sqltext);
 
 PMN_DROPSQL('DROP TABLE quantity');
-create table quantity as
-(select nval_num,encounter_num,concept_cd from i2b2fact quantity
-        inner join pmnENCOUNTER enc on enc.patid = quantity.patient_num and enc.encounterid = quantity.encounter_Num
-     join pcornet_med quantitycode 
-        on quantity.modifier_cd = quantitycode.c_basecode
-        and quantitycode.c_fullname like '\PCORI_MOD\RX_QUANTITY\');
+sqltext := 'create table quantity as '||
+'(select nval_num,encounter_num,concept_cd from i2b2fact quantity '||
+'        inner join pmnENCOUNTER enc on enc.patid = quantity.patient_num and enc.encounterid = quantity.encounter_Num '||
+'     join pcornet_med quantitycode  '||
+'        on quantity.modifier_cd = quantitycode.c_basecode '||
+'        and quantitycode.c_fullname like ''\PCORI_MOD\RX_QUANTITY\'') ';
+
+PMN_EXECUATESQL(sqltext);
         
 PMN_DROPSQL('DROP TABLE refills');
-create table refills as   
-(select nval_num,encounter_num,concept_cd from i2b2fact refills
-        inner join pmnENCOUNTER enc on enc.patid = refills.patient_num and enc.encounterid = refills.encounter_Num
-     join pcornet_med refillscode 
-        on refills.modifier_cd = refillscode.c_basecode
-        and refillscode.c_fullname like '\PCORI_MOD\RX_REFILLS\');
+sqltext := 'create table refills as   '||
+'(select nval_num,encounter_num,concept_cd from i2b2fact refills '||
+'        inner join pmnENCOUNTER enc on enc.patid = refills.patient_num and enc.encounterid = refills.encounter_Num '||
+'     join pcornet_med refillscode  '||
+'        on refills.modifier_cd = refillscode.c_basecode '||
+'        and refillscode.c_fullname like ''\PCORI_MOD\RX_REFILLS\'') ';
+PMN_EXECUATESQL(sqltext);
 
 PMN_DROPSQL('DROP TABLE supply');  
-create table supply as  
-(select nval_num,encounter_num,concept_cd from i2b2fact supply
-        inner join pmnENCOUNTER enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num
-     join pcornet_med supplycode 
-        on supply.modifier_cd = supplycode.c_basecode
-        and supplycode.c_fullname like '\PCORI_MOD\RX_DAYS_SUPPLY\') ;
-        
+sqltext := 'create table supply as  '||
+'(select nval_num,encounter_num,concept_cd from i2b2fact supply '||
+'        inner join pmnENCOUNTER enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num '||
+'     join pcornet_med supplycode  '||
+'        on supply.modifier_cd = supplycode.c_basecode '||
+'        and supplycode.c_fullname like ''\PCORI_MOD\RX_DAYS_SUPPLY\'')  ';
+PMN_EXECUATESQL(sqltext);
+
 
 -- insert data with outer joins to ensure all records are included even if some data elements are missing
 insert into pmnprescribing (
@@ -1407,22 +1427,25 @@ end PCORNetPrescribing;
 
 
 create or replace procedure PCORNetDispensing as
+sqltext varchar2(4000);
 begin
 PMN_DROPSQL('DROP TABLE supply');
-create table supply as
-(select nval_num,encounter_num,concept_cd from i2b2fact supply
-        inner join pmnENCOUNTER enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num
-      join pcornet_med supplycode 
-        on supply.modifier_cd = supplycode.c_basecode
-        and supplycode.c_fullname like '\PCORI_MOD\RX_DAYS_SUPPLY\' );
+sqltext := 'create table supply as '||
+'(select nval_num,encounter_num,concept_cd from i2b2fact supply '||
+'        inner join pmnENCOUNTER enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num '||
+'      join pcornet_med supplycode  '||
+'        on supply.modifier_cd = supplycode.c_basecode '||
+'        and supplycode.c_fullname like ''\PCORI_MOD\RX_DAYS_SUPPLY\'' ) ';
+PMN_EXECUATESQL(sqltext);
 
 
 PMN_DROPSQL('DROP TABLE amount');
-create table amount as        
-(select nval_num,encounter_num,concept_cd from i2b2fact amount
-     join pcornet_med amountcode
-        on amount.modifier_cd = amountcode.c_basecode
-        and amountcode.c_fullname like '\PCORI_MOD\RX_QUANTITY\');
+sqltext := 'create table amount as '||
+'(select nval_num,encounter_num,concept_cd from i2b2fact amount '||
+'     join pcornet_med amountcode '||
+'        on amount.modifier_cd = amountcode.c_basecode '||
+'        and amountcode.c_fullname like ''\PCORI_MOD\RX_QUANTITY\'') ';
+PMN_EXECUATESQL(sqltext);
         
 -- insert data with outer joins to ensure all records are included even if some data elements are missing
 
@@ -1516,7 +1539,7 @@ select count(*) into pmndispensings from pmndispensing;
 select max(runid) into v_runid from i2pReport;
 v_runid := v_runid + 1;
 insert into i2pReport values( v_runid, SYSDATE, 'Pats', i2b2pats, pmnpats, i2b2pats-pmnpats);
-insert into i2pReport values( v_runid, SYSDATE, 'Enrollment', i2b2pats, pmnenroll, i2b2pats-pmnenroll);
+insert into i2pReport values( v_runid, SYSDATE, 'Enrollment', i2b2pats, pmnenroll, i2b2pats-pmnpats);
 
 insert into i2pReport values(v_runid, SYSDATE, 'Encounters', i2b2Encounters, pmnEncounters, i2b2encounters-pmnencounters);
 insert into i2pReport values(v_runid, SYSDATE, 'DX',		null,		pmndx,		null);
