@@ -44,3 +44,30 @@
 - MSSQL and Oracle: Bug fixes in prescribing/dispensing - please re-run
 - MSSQL: Speed optimizations in prescribing, dispensing, labs, condition, and diagnosis. Now each transform runs on 2m patients at Partners in <30m.
 - Note that the Oracle version was adapted by colleagues at Wake Forest and has not been tested by SCILHS Central.
+
+# Version 0.6.1 for MSSQL and Oracle (12/17/15)
+
+- MSSQL and Oracle versions are once again equivalent. 
+- Versioning schema changed from 6.x to 0.6.x
+- Migrated to GitHub
+
+# Version 0.6.2 for Oracle (1/6/15)
+
+- Minor bugs fixed in translation from MSSQL to Oracle
+
+# Version 0.6.3 for MSSQL (1/13/15)
+
+- Typos found in field names in trial, enrollment, vital, and harvest tables 
+ - Enrollment:	Basis	-> Enr_basis
+ - Vital:	Vitaliid	-> Vitalid
+ - Harvest:	Speciment_date_mgmt	-> Specimen_date_mgmt
+ - Pcornet_trial:	Trial_id ->	Trialid
+- Wrong data type found in pmnprescribing (RX_FREQUENCY)
+- tobbaco_type logic in vitals was faulty
+
+- : Enrollment	Basis	Enr_basis
+Vital	Vitaliid	Vitalid
+Harvest	Speciment_date_mgmt	Specimen_date_mgmt
+Pcornet_trial	Trial_id	Trialid
+-- Version 6.1 became 0.6.1, 12/17/15
+-- Version 6.1, speed optimizations and prescribing/dispensing bugfixes, 12/10/15
