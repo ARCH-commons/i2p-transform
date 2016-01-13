@@ -69,7 +69,9 @@ grant all on visit_dimension to username;
  * (loyalty cohort date range - you will probably not need to change this - by the time the range has changed we will release a new version that does not require manual entry)
 
 5. This script will delete your existing PopMedNet tables. If you do not want this behavior, please back them up.
+
 6. Run the script.
+
 7. Verify that you have 15 tables (pmndemographic, pmndiagnosis, pmnencounter, pmnenrollment, pmnprocedure, pmnvital, pmnlabresults_cm, pmndispensing, pmncondition, pmnprescribing, pmndeath, pmndeath_cause ,pmnharvest, pmnpcornet_trial, pmnpro_cm), that there were no errors, and that the pcornet_codelist table has some data (demographics code lists).
 
 ## Running the transform
@@ -114,7 +116,7 @@ Instructions:
 4. Edit the environment variables you selected in config.ini with your username (or domain\username) and password. In Windows, the SET command does this.
 5. If you are using Oracle, uncomment the line 'import cx_Oracle' in query.py. No other Python changes should be needed, but you will need to alter the SQL Script.
 6. Run python populate_spreadsheet.py config.ini -- hopefully this will run without error, which should take 5-10 minutes.
-7. The Excel file that ends with _SITE should now contain your summary data of the PopMedNet tables. **Send that to us by 3/30/15.**
+7. The Excel file that ends with _SITE should now contain your summary data of the PopMedNet tables. 
 
 (*) Note: We have not modified the Oracle scripts to work with SCILHS. The Greater Plains Collaborative version is included for reference, but you will need to make changes. In particular, our table names begin with 'pmn', which will have to be appended, and our enrollment start date column has a different name. 
 
