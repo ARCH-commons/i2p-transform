@@ -1,6 +1,6 @@
 # PopMedNet-i2b2 Transform documentation - for SCILHS sites
-## Version 6.10 - 12/10/15
-##Jeff Klann, PhD
+### Version 6.10 - 12/10/15
+###Jeff Klann, PhD
 
 # Included Files
 
@@ -119,7 +119,7 @@ Instructions:
 
 (*) Note: We have not modified the Oracle scripts to work with SCILHS. The Greater Plains Collaborative version is included for reference, but you will need to make changes. In particular, our table names begin with 'pmn', which will have to be appended, and our enrollment start date column has a different name. 
 
-## Known Issues and Limitations
+# Known Issues and Limitations
 
 The following features have not been developed yet:
 
