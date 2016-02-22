@@ -12,6 +12,20 @@
 --     (please see the original MSSQL version script.)
 -------------------------------------------------------------------------------------------
 
+--For undefining data/meta schema variables (SQLDeveloper at least)
+--undef i2b2_data_schema;
+--undef i2b2_meta_schema;
+
+/* Create the loyalty cohort summary table if it doesn't exist.
+TODO: Determine the side effects of doing so - I don't quite know what this 
+table means or how having an empty one affects the results of the transform.
+*/
+whenever sqlerror continue;
+create table "&&i2b2_data_schema".loyalty_cohort_patient_summary ( 
+  patient_num number,
+  filter_set number
+);
+whenever sqlerror exit;
 
 create or replace PROCEDURE PMN_DROPSQL(sqlstring VARCHAR2) AS 
   BEGIN
@@ -55,7 +69,7 @@ END PMN_ExecuateSQL;
 
 
 
-CREATE OR REPLACE SYNONYM I2B2FACT FOR I2B2DEMODATA.OBSERVATION_FACT
+CREATE OR REPLACE SYNONYM I2B2FACT FOR "&&i2b2_data_schema".OBSERVATION_FACT
 /
 
 
@@ -71,32 +85,32 @@ select DISTINCT PATIENT_NUM from I2B2FACT where START_DATE > to_date('01-Jan-201
 ) where ROWNUM<100000000
 /
 
-create or replace VIEW i2b2patient as select * from I2B2DEMODATA.PATIENT_DIMENSION where PATIENT_NUM in (select PATIENT_NUM from i2b2patient_list)
+create or replace VIEW i2b2patient as select * from "&&i2b2_data_schema".PATIENT_DIMENSION where PATIENT_NUM in (select PATIENT_NUM from i2b2patient_list)
 /
 
-create or replace view i2b2visit as select * from I2B2DEMODATA.VISIT_DIMENSION where START_DATE >= to_date('01-Jan-2010','dd-mon-rrrr') and (END_DATE is NULL or END_DATE < CURRENT_DATE) and (START_DATE <CURRENT_DATE)
+create or replace view i2b2visit as select * from "&&i2b2_data_schema".VISIT_DIMENSION where START_DATE >= to_date('01-Jan-2010','dd-mon-rrrr') and (END_DATE is NULL or END_DATE < CURRENT_DATE) and (START_DATE <CURRENT_DATE)
 /
 
 
-CREATE OR REPLACE SYNONYM pcornet_med FOR  i2b2metadata.pcornet_med
+CREATE OR REPLACE SYNONYM pcornet_med FOR  "&&i2b2_meta_schema".pcornet_med
 /
 
-CREATE OR REPLACE SYNONYM pcornet_lab FOR  i2b2metadata.pcornet_lab
+CREATE OR REPLACE SYNONYM pcornet_lab FOR  "&&i2b2_meta_schema".pcornet_lab
 /
 
-CREATE OR REPLACE SYNONYM pcornet_diag FOR  i2b2metadata.pcornet_diag
+CREATE OR REPLACE SYNONYM pcornet_diag FOR  "&&i2b2_meta_schema".pcornet_diag
 /
 
-CREATE OR REPLACE SYNONYM pcornet_demo FOR  i2b2metadata.pcornet_demo
+CREATE OR REPLACE SYNONYM pcornet_demo FOR  "&&i2b2_meta_schema".pcornet_demo
 /
 
-CREATE OR REPLACE SYNONYM pcornet_proc FOR  i2b2metadata.pcornet_proc
+CREATE OR REPLACE SYNONYM pcornet_proc FOR  "&&i2b2_meta_schema".pcornet_proc
 /
 
-CREATE OR REPLACE SYNONYM pcornet_vital FOR  i2b2metadata.pcornet_vital
+CREATE OR REPLACE SYNONYM pcornet_vital FOR  "&&i2b2_meta_schema".pcornet_vital
 /
 
-CREATE OR REPLACE SYNONYM pcornet_enc FOR  i2b2metadata.pcornet_enc
+CREATE OR REPLACE SYNONYM pcornet_enc FOR  "&&i2b2_meta_schema".pcornet_enc
 /
 
 create or replace FUNCTION GETDATAMARTID RETURN VARCHAR2 IS 
@@ -117,7 +131,7 @@ BEGIN
 END;
 /
 
-create or replace view i2b2loyalty_patients as (select patient_num,to_date('01-Jul-2010','dd-mon-rrrr') period_start,to_date('01-Jul-2014','dd-mon-rrrr') period_end from i2b2demodata.loyalty_cohort_patient_summary where BITAND(filter_set, 61511) = 61511 and patient_num in (select patient_num from i2b2patient))
+create or replace view i2b2loyalty_patients as (select patient_num,to_date('01-Jul-2010','dd-mon-rrrr') period_start,to_date('01-Jul-2014','dd-mon-rrrr') period_end from "&&i2b2_data_schema".loyalty_cohort_patient_summary where BITAND(filter_set, 61511) = 61511 and patient_num in (select patient_num from i2b2patient))
 /
 
 BEGIN
@@ -942,7 +956,7 @@ select distinct v.patient_num, v.encounter_num,
 	end_Date, 
 	to_char(end_Date,'HH:MI'), 
 	providerid,location_zip, 
-(case when pcori_enctype is not null then pcori_enctype else 'UN' end) enc_type, facility_id,  CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE  discharge_disposition END , CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE discharge_status END  , drg.drg, drg_type, CASE WHEN admitting_source IS NULL THEN 'NI' ELSE admitting_source END  
+(case when pcori_enctype is not null then pcori_enctype else 'UN' end) enc_type, facility_id,  CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE  discharge_disposition END , CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE discharge_status END  , drg.drg, drg_type, CASE WHEN _source IS NULL THEN 'NI' ELSE admitting_source END  
 from i2b2visit v inner join pmndemographic d on v.patient_num=d.patid
 left outer join 
    (select * from
