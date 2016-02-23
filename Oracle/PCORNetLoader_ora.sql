@@ -115,13 +115,13 @@ CREATE OR REPLACE SYNONYM pcornet_enc FOR  "&&i2b2_meta_schema".pcornet_enc
 
 create or replace FUNCTION GETDATAMARTID RETURN VARCHAR2 IS 
 BEGIN 
-    RETURN 'WF';
+    RETURN &&datamart_id;
 END;
 /
 
 CREATE OR REPLACE FUNCTION GETDATAMARTNAME RETURN VARCHAR2 AS 
 BEGIN 
-    RETURN 'WakeForest';
+    RETURN &&datamart_name;
 END;
 /
 
@@ -131,8 +131,17 @@ BEGIN
 END;
 /
 
-create or replace view i2b2loyalty_patients as (select patient_num,to_date('01-Jul-2010','dd-mon-rrrr') period_start,to_date('01-Jul-2014','dd-mon-rrrr') period_end from "&&i2b2_data_schema".loyalty_cohort_patient_summary where BITAND(filter_set, 61511) = 61511 and patient_num in (select patient_num from i2b2patient))
-/
+--create or replace view i2b2loyalty_patients as (select patient_num,to_date('01-Jul-2010','dd-mon-rrrr') period_start,to_date('01-Jul-2014','dd-mon-rrrr') period_end from "&&i2b2_data_schema".loyalty_cohort_patient_summary where BITAND(filter_set, 61511) = 61511 and patient_num in (select patient_num from i2b2patient))
+--/
+
+--For testing on the tiny KUMC test set, let's count all patients
+create or replace view i2b2loyalty_patients as (
+  select 
+    patient_num, to_date('01-Jul-2010','dd-mon-rrrr') period_start,
+    to_date('01-Jul-2014','dd-mon-rrrr') period_end 
+  from "&&i2b2_data_schema".patient_dimension 
+  );
+
 
 BEGIN
 PMN_DROPSQL('DROP TABLE pcornet_codelist');
@@ -941,6 +950,36 @@ end PCORNetDemographic;
 
 
 
+/* TODOs: 
+
+1)
+Figure out what "_source" is supposed to be.  I'ts an invalid name in
+oracle as-is.  And, I don't see where it comes from - the tables were selecting 
+from don't have it.
+
+Error(16,266): PL/SQL: ORA-00911: invalid character
+00911. 00000 -  "invalid character"
+*Cause:    identifiers may not start with any ASCII character other than
+           letters and numbers.  $#_ are also allowed after the first
+           character.
+           
+Commented out that and what it's used for (ADMITTING_SOURCE)
+
+2)
+ORA-00904: "DISCHARGE_STATUS": invalid identifier
+
+3)
+ORA-00904: "DISCHARGE_DISPOSITION": invalid identifier
+
+4)
+ORA-00904: "FACILITY_ID": invalid identifier
+
+5)
+ORA-00904: "LOCATION_ZIP": invalid identifier
+
+6)
+ORA-00904: "PROVIDERID": invalid identifier
+*/
 create or replace procedure PCORNetEncounter as
 
 sqltext varchar2(4000);
@@ -955,8 +994,13 @@ select distinct v.patient_num, v.encounter_num,
 	to_char(start_Date,'HH:MI'), 
 	end_Date, 
 	to_char(end_Date,'HH:MI'), 
-	providerid,location_zip, 
-(case when pcori_enctype is not null then pcori_enctype else 'UN' end) enc_type, facility_id,  CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE  discharge_disposition END , CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE discharge_status END  , drg.drg, drg_type, CASE WHEN _source IS NULL THEN 'NI' ELSE admitting_source END  
+	'NI' providerid, --See TODO above
+  'NI' location_zip, /* See TODO above */
+(case when pcori_enctype is not null then pcori_enctype else 'UN' end) enc_type, 
+  'NI' facility_id,  /* See TODO above */
+  'NI' discharge_disposition /*CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE  discharge_disposition END*/ , 
+  'NI' discharge_status /* See TODO above CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE discharge_status END*/ , 
+  drg.drg, drg_type, 'NI' admitting_source /* see TODO above CASE WHEN _source IS NULL THEN 'NI' ELSE admitting_source END*/
 from i2b2visit v inner join pmndemographic d on v.patient_num=d.patid
 left outer join 
    (select * from
@@ -1199,7 +1243,10 @@ INSERT INTO pmnENROLLMENT(PATID, ENR_START_DATE, ENR_END_DATE, CHART, BASIS)
 end PCORNetEnroll;
 /
 
-
+/* TODO: why? Error(106,17): PL/SQL: ORA-00942: table or view does not exist
+Well, that's a compiler error and the function itself is supposed to create that
+table.  So, maybe that's ok?  Perhaps it'll work at runtime?
+*/
 create or replace procedure PCORNetLabResultCM as
 sqltext varchar2(4000);
 begin
@@ -1258,7 +1305,7 @@ INSERT INTO pmnlabresults_cm
       ,RAW_ORDER_DEPT
       ,RAW_FACILITY_CODE)
 
-
+--00942. 00000 -  "table or view does not exist" Error at Line: 1,342 Column: 17 (location)
 SELECT DISTINCT  M.patient_num patid,
 M.encounter_num encounterid,
 CASE WHEN ont_parent.C_BASECODE LIKE 'LAB_NAME%' then SUBSTR (ont_parent.c_basecode,10, 10) ELSE 'NI' END LAB_NAME,
@@ -1336,7 +1383,10 @@ end PCORNetHarvest;
 
 
 
-
+/* TODO: Error(93,15): PL/SQL: ORA-00942: table or view does not exist
+At compile time, it's complaining about the fact tables don't exist that are 
+created in the function itself.
+*/
 create or replace procedure PCORNetPrescribing as
 sqltext varchar2(4000);
 begin
@@ -1439,7 +1489,7 @@ end PCORNetPrescribing;
 /
 
 
-
+-- TODO: Same compile-time errors about tables created in the function
 create or replace procedure PCORNetDispensing as
 sqltext varchar2(4000);
 begin
@@ -1569,21 +1619,34 @@ end pcornetReport;
 
 
 
-
+/* These have compile errors at least partly due to the compile errors noted above
+regarding missing tables that are created inside the function itself.
+Error(12,1): PLS-00905: object NGRAHAM.PCORNETLABRESULTCM is invalid
+Error(12,1): PL/SQL: Statement ignored
+Error(13,1): PLS-00905: object NGRAHAM.PCORNETPRESCRIBING is invalid
+Error(13,1): PL/SQL: Statement ignored
+Error(14,1): PLS-00905: object NGRAHAM.PCORNETDISPENSING is invalid
+Error(14,1): PL/SQL: Statement ignored
+*/
 create or replace procedure pcornetloader as
 begin
 ---pcornetclear;
 PCORNetHarvest;
 PCORNetDemographic;
 PCORNetEncounter;
-PCORNetDiagnosis;
-PCORNetCondition;
-PCORNetProcedure;
-PCORNetVital;
+--PCORNetDiagnosis;
+--PCORNetCondition;
+
+/* Commented out PCORNetProcedure, PCORNetVital as they take a _very_ long time 
+even with our tiny test set.  Cartesian joins with the fact table. */ 
+--PCORNetProcedure; 
+--PCORNetVital;
 PCORNetEnroll;
-PCORNetLabResultCM;
-PCORNetPrescribing;
-PCORNetDispensing;
+
+-- Comment out due to compile errors noted above
+--PCORNetLabResultCM;
+--PCORNetPrescribing;
+--PCORNetDispensing;
 
 end pcornetloader;
 /
@@ -1593,6 +1656,26 @@ end pcornetloader;
 
 
 
+
+/* TODO: PCORNetDiagnosis, PCORNetCondition causes the following for some reason.
+Perhaps because I'm creating the function in my own schema and it's referencing 
+(and possibly creating) things in another.
+
+01031. 00000 -  "insufficient privileges"
+*Cause:    An attempt was made to change the current username or password
+           without the appropriate privilege. This error also occurs if
+           attempting to install a database without the necessary operating
+           system privileges.
+           When Trusted Oracle is configure in DBMS MAC, this error may occur
+           if the user was granted the necessary privilege at a higher label
+           than the current login.
+*Action:   Ask the database administrator to perform the operation or grant
+           the required privileges.
+           For Trusted Oracle users getting this error although granted the
+           the appropriate privilege at a higher label, ask the database
+           administrator to regrant the privilege at the appropriate label.
+
+*/
 BEGIN
 pcornetloader; --- you may want to run sql statements one by one in the pcornetloader procedure :)
 END;
