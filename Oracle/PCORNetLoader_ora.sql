@@ -797,9 +797,24 @@ END;
 /
 
 
+/* TODO: Race vs Ethnicity - I think Eric at MCRF switched things around to use
+the fact table rather than the RACE_CD in the patient dimension.
+Refs:
+https://informatics.gpcnetwork.org/trac/Project/ticket/191#comment:15
+http://listserv.kumc.edu/pipermail/gpc-dev/2016q1/002508.html (thread)
+
+Maybe something like the following, along with a change to the demographic
+procedure?
 
 
-
+update blueheronmetadata.pcornet_demo set
+  c_facttablecolumn = 'CONCEPT_CD', 
+  c_tablename='CONCEPT_DIMENSION', 
+  c_columnname = 'CONCEPT_PATH', 
+  c_operator='LIKE', 
+  c_dimcode='\i2b2\Demographics\Ethnicity\Hispanic'
+where c_fullname = '\PCORI\DEMOGRAPHIC\HISPANIC\Y\';
+*/
 
 
 create or replace procedure PCORNetDemographic as 
