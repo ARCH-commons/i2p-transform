@@ -1257,11 +1257,36 @@ INSERT INTO pmnENROLLMENT(PATID, ENR_START_DATE, ENR_END_DATE, CHART, BASIS)
 
 end PCORNetEnroll;
 /
+/* TODO: Review this:  I got Error(106,17): PL/SQL: ORA-00942: table or view does 
+not exist apparently due to tables that the procedure references but also drops/
+recreates before reference.  Creating them outside the function solves the issue:
 
-/* TODO: why? Error(106,17): PL/SQL: ORA-00942: table or view does not exist
-Well, that's a compiler error and the function itself is supposed to create that
-table.  So, maybe that's ok?  Perhaps it'll work at runtime?
+create table priority as (
+  select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, lsource.pcori_basecode  PRIORITY
+  from i2b2fact
+  inner join pmnENCOUNTER enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num
+  inner join pcornet_lab lsource on i2b2fact.modifier_cd =lsource.c_basecode
+  where c_fullname LIKE '\PCORI_MOD\PRIORITY\%'
+  );
+
+create table location as (
+  select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, lsource.pcori_basecode  RESULT_LOC
+  from i2b2fact
+  inner join pmnENCOUNTER enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num
+  inner join pcornet_lab lsource on i2b2fact.modifier_cd =lsource.c_basecode
+  where c_fullname LIKE '\PCORI_MOD\RESULT_LOC\%'
+);
 */
+
+/* TODO: Review: I got Error(63,123): PL/SQL: ORA-00904: "LAB"."PCORI_SPECIMEN_SOURCE": invalid identifier
+
+So, I just altered the table to have the referenced column.
+
+alter table blueheronmetadata.pcornet_lab add (
+  pcori_specimen_source varchar2(1000) -- arbitrary
+  );
+*/
+
 create or replace procedure PCORNetLabResultCM as
 sqltext varchar2(4000);
 begin
