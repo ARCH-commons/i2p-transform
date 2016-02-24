@@ -1649,8 +1649,8 @@ begin
 PCORNetHarvest;
 PCORNetDemographic;
 PCORNetEncounter;
---PCORNetDiagnosis;
---PCORNetCondition;
+PCORNetDiagnosis;
+PCORNetCondition;
 
 /* Commented out PCORNetProcedure, PCORNetVital as they take a _very_ long time 
 even with our tiny test set.  Cartesian joins with the fact table. */ 
@@ -1667,30 +1667,6 @@ end pcornetloader;
 /
 
 
-
-
-
-
-
-/* TODO: PCORNetDiagnosis, PCORNetCondition causes the following for some reason.
-Perhaps because I'm creating the function in my own schema and it's referencing 
-(and possibly creating) things in another.
-
-01031. 00000 -  "insufficient privileges"
-*Cause:    An attempt was made to change the current username or password
-           without the appropriate privilege. This error also occurs if
-           attempting to install a database without the necessary operating
-           system privileges.
-           When Trusted Oracle is configure in DBMS MAC, this error may occur
-           if the user was granted the necessary privilege at a higher label
-           than the current login.
-*Action:   Ask the database administrator to perform the operation or grant
-           the required privileges.
-           For Trusted Oracle users getting this error although granted the
-           the appropriate privilege at a higher label, ask the database
-           administrator to regrant the privilege at the appropriate label.
-
-*/
 BEGIN
 pcornetloader; --- you may want to run sql statements one by one in the pcornetloader procedure :)
 END;
