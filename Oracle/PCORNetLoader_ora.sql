@@ -1744,11 +1744,8 @@ PCORNetDemographic;
 PCORNetEncounter;
 PCORNetDiagnosis;
 PCORNetCondition;
-
-/* Commented out PCORNetProcedure, PCORNetVital as they take a _very_ long time 
-even with our tiny test set.  Cartesian joins with the fact table. */ 
---PCORNetProcedure; 
---PCORNetVital;
+PCORNetProcedure; 
+PCORNetVital;
 PCORNetEnroll;
 PCORNetLabResultCM;
 PCORNetPrescribing;
