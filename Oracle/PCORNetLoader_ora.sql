@@ -1425,8 +1425,55 @@ end PCORNetHarvest;
 
 /* TODO: Error(93,15): PL/SQL: ORA-00942: table or view does not exist
 At compile time, it's complaining about the fact tables don't exist that are 
-created in the function itself.
+created in the function itself.  I created them ahead of time with the following:
+
+create table basis as (
+  select pcori_basecode,c_fullname,encounter_num,concept_cd from i2b2fact basis
+  inner join pmnENCOUNTER enc on enc.patid = basis.patient_num and enc.encounterid = basis.encounter_Num
+  join pcornet_med basiscode
+  on basis.modifier_cd = basiscode.c_basecode
+  and basiscode.c_fullname like '\PCORI_MOD\RX_BASIS\%'
+  );
+  
+create table freq as (
+  select pcori_basecode,encounter_num,concept_cd from i2b2fact freq
+  inner join pmnENCOUNTER enc on enc.patid = freq.patient_num and enc.encounterid = freq.encounter_Num
+  join pcornet_med freqcode
+  on freq.modifier_cd = freqcode.c_basecode
+  and freqcode.c_fullname like '\PCORI_MOD\RX_FREQUENCY\%'
+  );
+
+create table quantity as (
+  select nval_num,encounter_num,concept_cd from i2b2fact quantity
+  inner join pmnENCOUNTER enc on enc.patid = quantity.patient_num and enc.encounterid = quantity.encounter_Num
+  join pcornet_med quantitycode
+  on quantity.modifier_cd = quantitycode.c_basecode
+  and quantitycode.c_fullname like '\PCORI_MOD\RX_QUANTITY\'
+  );
+
+create table refills as (
+  select nval_num,encounter_num,concept_cd from i2b2fact refills
+  inner join pmnENCOUNTER enc on enc.patid = refills.patient_num and enc.encounterid = refills.encounter_Num
+  join pcornet_med refillscode
+  on refills.modifier_cd = refillscode.c_basecode
+  and refillscode.c_fullname like '\PCORI_MOD\RX_REFILLS\'
+  );
+
+create table supply as (
+  select nval_num,encounter_num,concept_cd from i2b2fact supply
+  inner join pmnENCOUNTER enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num
+  join pcornet_med supplycode
+  on supply.modifier_cd = supplycode.c_basecode
+  and supplycode.c_fullname like '\PCORI_MOD\RX_DAYS_SUPPLY\'
+  );
+  
+TODO: Also: Error(71,159): PL/SQL: ORA-00904: "MO"."PCORI_CUI": invalid identifier
+alter table blueheronmetadata.pcornet_med add (
+  pcori_cui varchar2(1000) -- arbitrary
+  );
+
 */
+
 create or replace procedure PCORNetPrescribing as
 sqltext varchar2(4000);
 begin
@@ -1529,7 +1576,28 @@ end PCORNetPrescribing;
 /
 
 
+
 -- TODO: Same compile-time errors about tables created in the function
+/*
+Error(53,16): PL/SQL: ORA-00942: table or view does not exist (amount)
+ - supply is created above in the prescribing function
+
+create table amount as (
+  select nval_num,encounter_num,concept_cd from i2b2fact amount
+  join pcornet_med amountcode
+  on amount.modifier_cd = amountcode.c_basecode
+  and amountcode.c_fullname like '\PCORI_MOD\RX_QUANTITY\'
+  );
+  
+TODO: Error(57,57): PL/SQL: ORA-00904: "MO"."PCORI_NDC": invalid identifier
+
+alter table blueheronmetadata.pcornet_med add (
+  pcori_ndc varchar2(1000) -- arbitrary
+  );
+  
+\pcornet_med
+*/
+
 create or replace procedure PCORNetDispensing as
 sqltext varchar2(4000);
 begin
@@ -1682,11 +1750,9 @@ even with our tiny test set.  Cartesian joins with the fact table. */
 --PCORNetProcedure; 
 --PCORNetVital;
 PCORNetEnroll;
-
--- Comment out due to compile errors noted above
---PCORNetLabResultCM;
---PCORNetPrescribing;
---PCORNetDispensing;
+PCORNetLabResultCM;
+PCORNetPrescribing;
+PCORNetDispensing;
 
 end pcornetloader;
 /
