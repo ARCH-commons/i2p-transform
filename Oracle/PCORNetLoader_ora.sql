@@ -220,11 +220,11 @@ end pcornet_popcodelist;
 
 
 BEGIN
-PMN_DROPSQL('DROP TABLE pmnENROLLMENT');
+PMN_DROPSQL('DROP TABLE enrollment');
 END;
 /
 
-CREATE TABLE pmnENROLLMENT (
+CREATE TABLE enrollment (
 	PATID varchar(50) NOT NULL,
 	ENR_START_DATE date NOT NULL,
 	ENR_END_DATE date NULL,
@@ -238,11 +238,11 @@ CREATE TABLE pmnENROLLMENT (
 
 
 BEGIN
-PMN_DROPSQL('DROP TABLE pmnVITAL');
+PMN_DROPSQL('DROP TABLE vital');
 END;
 /
 
-CREATE TABLE pmnVITAL (
+CREATE TABLE vital (
 	VITALIID NUMBER(19)  primary key,
 	PATID varchar(50) NULL,
 	ENCOUNTERID varchar(50) NULL,
@@ -271,28 +271,28 @@ CREATE TABLE pmnVITAL (
 /
 
 BEGIN
-PMN_DROPSQL('DROP SEQUENCE pmnVITAL_seq');
+PMN_DROPSQL('DROP SEQUENCE vital_seq');
 END;
 /
 
-create sequence  pmnVITAL_seq
+create sequence  vital_seq
 /
 
-create or replace trigger pmnVITAL_trg
-before insert on pmnVITAL
+create or replace trigger vital_trg
+before insert on vital
 for each row
 begin
-  select pmnVITAL_seq.nextval into :new.VITALIID from dual;
+  select vital_seq.nextval into :new.VITALIID from dual;
 end;
 /
 
 
 BEGIN
-PMN_DROPSQL('DROP TABLE pmnPROCEDURE');
+PMN_DROPSQL('DROP TABLE procedures');
 END;
 /
 
-CREATE TABLE pmnPROCEDURE(
+CREATE TABLE procedures(
 	PROCEDURESID NUMBER(19)  primary key,
 	PATID varchar(50) NOT NULL,
 	ENCOUNTERID varchar(50) NOT NULL,
@@ -309,27 +309,27 @@ CREATE TABLE pmnPROCEDURE(
 /
 
 BEGIN
-PMN_DROPSQL('DROP sequence  pmnPROCEDURE_seq');
+PMN_DROPSQL('DROP sequence  procedures_seq');
 END;
 /
 
-create sequence  pmnPROCEDURE_seq
+create sequence  procedures_seq
 /
 
-create or replace trigger pmnPROCEDURE_trg
-before insert on pmnPROCEDURE
+create or replace trigger procedures_trg
+before insert on procedures
 for each row
 begin
-  select pmnPROCEDURE_seq.nextval into :new.PROCEDURESID from dual;
+  select procedures_seq.nextval into :new.PROCEDURESID from dual;
 end;
 /
 
 BEGIN
-PMN_DROPSQL('DROP TABLE pmndiagnosis');
+PMN_DROPSQL('DROP TABLE diagnosis');
 END;
 /
 
-CREATE TABLE pmndiagnosis(
+CREATE TABLE diagnosis(
 	DIAGNOSISID NUMBER(19)  primary key,
 	PATID varchar(50) NOT NULL,
 	ENCOUNTERID varchar(50) NOT NULL,
@@ -349,17 +349,17 @@ CREATE TABLE pmndiagnosis(
 /
 
 BEGIN
-PMN_DROPSQL('DROP sequence  pmndiagnosis_seq');
+PMN_DROPSQL('DROP sequence  diagnosis_seq');
 END;
 /
-create sequence  pmndiagnosis_seq
+create sequence  diagnosis_seq
 /
 
-create or replace trigger pmndiagnosis_trg
-before insert on pmndiagnosis
+create or replace trigger diagnosis_trg
+before insert on diagnosis
 for each row
 begin
-  select pmndiagnosis_seq.nextval into :new.DIAGNOSISID from dual;
+  select diagnosis_seq.nextval into :new.DIAGNOSISID from dual;
 end;
 /
 
@@ -367,11 +367,11 @@ end;
 
 
 BEGIN
-PMN_DROPSQL('DROP TABLE pmnlabresults_cm');
+PMN_DROPSQL('DROP TABLE lab_result_cm');
 END;
 /
 
-CREATE TABLE pmnlabresults_cm(
+CREATE TABLE lab_result_cm(
 	LAB_RESULT_CM_ID NUMBER(19)  primary key,
 	PATID varchar(50) NOT NULL,
 	ENCOUNTERID varchar(50) NULL,
@@ -408,18 +408,18 @@ CREATE TABLE pmnlabresults_cm(
 
 
 BEGIN
-PMN_DROPSQL('DROP SEQUENCE pmnlabresults_cm_seq');
+PMN_DROPSQL('DROP SEQUENCE lab_result_cm_seq');
 END;
 /
 
-create sequence  pmnlabresults_cm_seq
+create sequence  lab_result_cm_seq
 /
 
-create or replace trigger pmnlabresults_cm_trg
-before insert on pmnlabresults_cm
+create or replace trigger lab_result_cm_trg
+before insert on lab_result_cm
 for each row
 begin
-  select pmnlabresults_cm_seq.nextval into :new.LAB_RESULT_CM_ID from dual;
+  select lab_result_cm_seq.nextval into :new.LAB_RESULT_CM_ID from dual;
 end;
 /
 
@@ -485,10 +485,10 @@ INSERT INTO PMN_LabNormal(LAB_NAME, NORM_RANGE_LOW, NORM_MODIFIER_LOW, NORM_RANG
 /
 
 BEGIN
-PMN_DROPSQL('DROP TABLE pmndeath');
+PMN_DROPSQL('DROP TABLE death');
 END;
 /
-CREATE TABLE pmndeath(
+CREATE TABLE death(
 	PATID varchar(50) NOT NULL,
 	DEATH_DATE date NOT NULL,
 	DEATH_DATE_IMPUTE varchar(2) NULL,
@@ -498,10 +498,10 @@ CREATE TABLE pmndeath(
 /
 
 BEGIN
-PMN_DROPSQL('DROP TABLE pmndeath_cause');
+PMN_DROPSQL('DROP TABLE death_cause');
 END;
 /
-CREATE TABLE pmndeath_cause(
+CREATE TABLE death_cause(
 	PATID varchar(50) NOT NULL,
 	DEATH_CAUSE varchar(8) NOT NULL,
 	DEATH_CAUSE_CODE varchar(2) NOT NULL,
@@ -512,10 +512,10 @@ CREATE TABLE pmndeath_cause(
 /
 
 BEGIN
-PMN_DROPSQL('DROP TABLE pmndispensing');
+PMN_DROPSQL('DROP TABLE dispensing');
 END;
 /
-CREATE TABLE pmndispensing(
+CREATE TABLE dispensing(
 	DISPENSINGID NUMBER(19)  primary key,
 	PATID varchar(50) NOT NULL,
 	PRESCRIBINGID NUMBER(19)  NULL, -- jgk fix 9/24
@@ -529,17 +529,17 @@ CREATE TABLE pmndispensing(
 
 
 BEGIN
-PMN_DROPSQL('DROP sequence  pmndispensing_seq');
+PMN_DROPSQL('DROP sequence  dispensing_seq');
 END;
 /
-create sequence  pmndispensing_seq
+create sequence  dispensing_seq
 /
 
-create or replace trigger pmndispensing_trg
-before insert on pmndispensing
+create or replace trigger dispensing_trg
+before insert on dispensing
 for each row
 begin
-  select pmndispensing_seq.nextval into :new.DISPENSINGID from dual;
+  select dispensing_seq.nextval into :new.DISPENSINGID from dual;
 end;
 /
 
@@ -553,10 +553,10 @@ end;
 
 
 BEGIN
-PMN_DROPSQL('DROP TABLE pmnprescribing');
+PMN_DROPSQL('DROP TABLE prescribing');
 END;
 /
-CREATE TABLE pmnprescribing(
+CREATE TABLE prescribing(
 	PRESCRIBINGID NUMBER(19)  primary key,
 	PATID varchar(50) NOT NULL,
 	ENCOUNTERID  varchar(50) NULL,
@@ -579,25 +579,25 @@ CREATE TABLE pmnprescribing(
 
 
 BEGIN
-PMN_DROPSQL('DROP sequence  pmnprescribing_seq');
+PMN_DROPSQL('DROP sequence  prescribing_seq');
 END;
 /
-create sequence  pmnprescribing_seq
+create sequence  prescribing_seq
 /
 
-create or replace trigger pmnprescribing_trg
-before insert on pmnprescribing
+create or replace trigger prescribing_trg
+before insert on prescribing
 for each row
 begin
-  select pmnprescribing_seq.nextval into :new.PRESCRIBINGID from dual;
+  select prescribing_seq.nextval into :new.PRESCRIBINGID from dual;
 end;
 /
 
 BEGIN
-PMN_DROPSQL('DROP TABLE pmnpcornet_trial');
+PMN_DROPSQL('DROP TABLE pcornet_trial');
 END;
 /
-CREATE TABLE pmnpcornet_trial(
+CREATE TABLE pcornet_trial(
 	PATID varchar(50) NOT NULL,
 	TRIAL_ID varchar(20) NOT NULL,
 	PARTICIPANTID varchar(50) NOT NULL,
@@ -610,10 +610,10 @@ CREATE TABLE pmnpcornet_trial(
 /
 
 BEGIN
-PMN_DROPSQL('DROP TABLE pmncondition');
+PMN_DROPSQL('DROP TABLE condition');
 END;
 /
-CREATE TABLE pmncondition(
+CREATE TABLE condition(
 	CONDITIONID NUMBER(19)  primary key,
 	PATID varchar(50) NOT NULL,
 	ENCOUNTERID  varchar(50) NULL,
@@ -632,27 +632,27 @@ CREATE TABLE pmncondition(
 /
 
 BEGIN
-PMN_DROPSQL('DROP sequence  pmncondition_seq');
+PMN_DROPSQL('DROP sequence  condition_seq');
 END;
 /
-create sequence  pmncondition_seq
+create sequence  condition_seq
 /
 
-create or replace trigger pmncondition_trg
-before insert on pmncondition
+create or replace trigger condition_trg
+before insert on condition
 for each row
 begin
-  select pmncondition_seq.nextval into :new.CONDITIONID from dual;
+  select condition_seq.nextval into :new.CONDITIONID from dual;
 end;
 /
 
 
 
 BEGIN
-PMN_DROPSQL('DROP TABLE pmnpro_cm');
+PMN_DROPSQL('DROP TABLE pro_cm');
 END;
 /
-CREATE TABLE pmnpro_cm(
+CREATE TABLE pro_cm(
 	PRO_CM_ID NUMBER(19)  primary key,
 	PATID varchar(50) NOT NULL,
 	ENCOUNTERID  varchar(50) NULL,
@@ -670,25 +670,25 @@ CREATE TABLE pmnpro_cm(
 /
 
 BEGIN
-PMN_DROPSQL('DROP sequence  pmnpro_cm_seq');
+PMN_DROPSQL('DROP sequence  pro_cm_seq');
 END;
 /
-create sequence  pmnpro_cm_seq
+create sequence  pro_cm_seq
 /
 
-create or replace trigger pmnpro_cm_trg
-before insert on pmnpro_cm
+create or replace trigger pro_cm_trg
+before insert on pro_cm
 for each row
 begin
-  select pmnpro_cm_seq.nextval into :new.PRO_CM_ID from dual;
+  select pro_cm_seq.nextval into :new.PRO_CM_ID from dual;
 end;
 /
 
 BEGIN
-PMN_DROPSQL('DROP TABLE pmnharvest');
+PMN_DROPSQL('DROP TABLE harvest');
 END;
 /
-CREATE TABLE pmnharvest(
+CREATE TABLE harvest(
 	NETWORKID varchar(10) NOT NULL,
 	NETWORK_NAME varchar(20) NULL,
 	DATAMARTID varchar(10) NOT NULL,
@@ -735,10 +735,10 @@ CREATE TABLE pmnharvest(
 
 
 BEGIN
-PMN_DROPSQL('DROP TABLE pmnENCOUNTER');
+PMN_DROPSQL('DROP TABLE encounter');
 END;
 /
-CREATE TABLE pmnENCOUNTER(
+CREATE TABLE encounter(
 	PATID varchar(50) NOT NULL,
 	ENCOUNTERID varchar(50) NOT NULL,
 	ADMIT_DATE date NULL,
@@ -764,10 +764,10 @@ CREATE TABLE pmnENCOUNTER(
 /
 
 BEGIN
-PMN_DROPSQL('DROP TABLE pmndemographic');
+PMN_DROPSQL('DROP TABLE demographic');
 END;
 /
-CREATE TABLE pmndemographic(
+CREATE TABLE demographic(
 	PATID varchar(50) NOT NULL,
 	BIRTH_DATE date NULL,
 	BIRTH_TIME varchar(5) NULL,
@@ -821,7 +821,7 @@ create or replace procedure PCORNetDemographic as
 sqltext varchar2(4000); 
 cursor getsql is 
 --1 --  S,R,NH
-	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
+	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
 	'	select ''1'',patient_num, '||
 	'	birth_date, '||
 	'	to_char(birth_date,''HH:MI''), '||
@@ -838,7 +838,7 @@ cursor getsql is
 	and sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX%'
 	and sex.c_visualattributes like 'L%'
 union -- A - S,R,H
-select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
+select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
 	'	select ''A'',patient_num, '||
 	'	birth_date, '||
 	'	to_char(birth_date,''HH:MI''), '||
@@ -858,7 +858,7 @@ select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HI
 	and sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX%'
 	and sex.c_visualattributes like 'L%'
 union --2 S, nR, nH
-	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
+	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
 	'	select ''2'',patient_num, '||
 	'	birth_date, '||
 	'	to_char(birth_date,''HH:MI''), '||
@@ -873,7 +873,7 @@ union --2 S, nR, nH
 	where sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX%'
 	and sex.c_visualattributes like 'L%'
 union --3 -- nS,R, NH
-	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
+	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
 	'	select ''3'',patient_num, '||
 	'	birth_date, '||
 	'	to_char(birth_date,''HH:MI''), '||
@@ -888,7 +888,7 @@ union --3 -- nS,R, NH
 	where race.c_fullname like '\PCORI\DEMOGRAPHIC\RACE%'
 	and race.c_visualattributes like 'L%'
 union --B -- nS,R, H
-	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
+	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
 	'	select ''B'',patient_num, '||
 	'	birth_date, '||
 	'	to_char(birth_date,''HH:MI''), '||
@@ -906,7 +906,7 @@ union --B -- nS,R, H
 	and hisp.c_fullname like '\PCORI\DEMOGRAPHIC\HISPANIC\Y%'
 	and hisp.c_visualattributes like 'L%'
 union --4 -- S, NR, H
-	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
+	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
 	'	select ''4'',patient_num, '||
 	'	birth_date, '||
 	'	to_char(birth_date,''HH:MI''), '||
@@ -921,7 +921,7 @@ union --4 -- S, NR, H
 	where sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX%'
 	and sex.c_visualattributes like 'L%'
 union --5 -- NS, NR, H
-	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
+	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
 	'	select ''5'',patient_num, '||
 	'	birth_date, '||
 	'	to_char(birth_date,''HH:MI''), '||
@@ -934,7 +934,7 @@ union --5 -- NS, NR, H
 	'	and lower(nvl(p.race_cd,''xx'')) in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'')'
 	from dual
 union --6 -- NS, NR, nH
-	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
+	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
 	'	select ''6'',patient_num, '||
 	'	birth_date, '||
 	'	to_char(birth_date,''HH:MI''), '||
@@ -999,7 +999,7 @@ create or replace procedure PCORNetEncounter as
 sqltext varchar2(4000);
 begin
 
-insert into pmnencounter(PATID,ENCOUNTERID,admit_date ,ADMIT_TIME , 
+insert into encounter(PATID,ENCOUNTERID,admit_date ,ADMIT_TIME , 
 		DISCHARGE_DATE ,DISCHARGE_TIME ,PROVIDERID ,FACILITY_LOCATION  
 		,ENC_TYPE ,FACILITYID ,DISCHARGE_DISPOSITION , 
 		DISCHARGE_STATUS ,DRG ,DRG_TYPE ,ADMITTING_SOURCE) 
@@ -1015,13 +1015,13 @@ select distinct v.patient_num, v.encounter_num,
   'NI' discharge_disposition /*CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE  discharge_disposition END*/ , 
   'NI' discharge_status /* See TODO above CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE discharge_status END*/ , 
   drg.drg, drg_type, 'NI' admitting_source /* see TODO above CASE WHEN _source IS NULL THEN 'NI' ELSE admitting_source END*/
-from i2b2visit v inner join pmndemographic d on v.patient_num=d.patid
+from i2b2visit v inner join demographic d on v.patient_num=d.patid
 left outer join 
    (select * from
    (select patient_num,encounter_num,drg_type, drg,row_number() over (partition by  patient_num, encounter_num order by drg_type desc) AS rn from 
    (select patient_num,encounter_num,drg_type,max(drg) drg  from
     (select distinct f.patient_num,encounter_num,SUBSTR(c_fullname,22,2) drg_type,SUBSTR(pcori_basecode,INSTR(pcori_basecode, ':')+1,3) drg from i2b2fact f 
-     inner join pmndemographic d on f.patient_num=d.patid
+     inner join demographic d on f.patient_num=d.patid
      inner join pcornet_enc enc on enc.c_basecode  = f.concept_cd   
       and enc.c_fullname like '\PCORI\ENCOUNTER\DRG\%') drg1 group by patient_num,encounter_num,drg_type) drg) drg
      where rn=1) drg -- This section is bugfixed to only include 1 drg if multiple DRG types exist in a single encounter...
@@ -1047,7 +1047,7 @@ PMN_DROPSQL('DROP TABLE sourcefact');
 sqltext := 'create table sourcefact as '||
 	'select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode dxsource, dxsource.c_fullname '||
 	'from i2b2fact factline '||
-    'inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num '||
+    'inner join encounter enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num '||
     'inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode '||
 	'where dxsource.c_fullname like ''\PCORI_MOD\CONDITION_OR_DX\%''';
 PMN_EXECUATESQL(sqltext);
@@ -1058,19 +1058,19 @@ PMN_DROPSQL('DROP TABLE pdxfact');
 sqltext := 'create table pdxfact as '||
 	'select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode pdxsource,dxsource.c_fullname  '||
 	'from i2b2fact factline '||
-    'inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num '||
+    'inner join encounter enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num '||
     'inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode '||
 	'and dxsource.c_fullname like ''\PCORI_MOD\PDX\%''';
 PMN_EXECUATESQL(sqltext);
 
 
-sqltext := 'insert into pmndiagnosis (patid,			encounterid,	enc_type, admit_date, providerid, dx, dx_type, dx_source, pdx) '||
+sqltext := 'insert into diagnosis (patid,			encounterid,	enc_type, admit_date, providerid, dx, dx_type, dx_source, pdx) '||
 'select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, factline.start_date, factline.provider_id, diag.pcori_basecode,  '||
 'SUBSTR(diag.c_fullname,18,2) dxtype,   '||
 '	CASE WHEN enc_type=''AV'' THEN ''FI'' ELSE nvl(SUBSTR(dxsource,INSTR(dxsource,'':'')+1,2) ,''NI'')END, '||
 '	nvl(SUBSTR(pdxsource,INSTR(pdxsource, '':'')+1,2),''NI'') '|| -- jgk bugfix 9/28/15 
 'from i2b2fact factline '||
-'inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num '||
+'inner join encounter enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num '||
 ' left outer join sourcefact '||
 'on	factline.patient_num=sourcefact.patient_num '||
 'and factline.encounter_num=sourcefact.encounter_num '||
@@ -1107,18 +1107,18 @@ PMN_DROPSQL('DROP TABLE sourcefact2');
 sqltext := 'create table sourcefact2 as '||
 	'select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode dxsource, dxsource.c_fullname '||
 	'from i2b2fact factline '||
-    'inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num '||
+    'inner join encounter enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num '||
     'inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode '||
 	'where dxsource.c_fullname like ''\PCORI_MOD\CONDITION_OR_DX\%''';
 PMN_EXECUATESQL(sqltext);
 
-sqltext := 'insert into pmncondition (patid, encounterid, report_date, resolve_date, condition, condition_type, condition_status, condition_source) '||
+sqltext := 'insert into condition (patid, encounterid, report_date, resolve_date, condition, condition_type, condition_status, condition_source) '||
 'select distinct factline.patient_num, min(factline.encounter_num) encounterid, min(factline.start_date) report_date, NVL(max(factline.end_date),null) resolve_date, diag.pcori_basecode,  '||
 'SUBSTR(diag.c_fullname,18,2) condition_type,   '||
 '	NVL2(max(factline.end_date) , ''RS'', ''NI'') condition_status,  '|| -- Imputed so might not be entirely accurate
 '	NVL(SUBSTR(max(dxsource),INSTR(max(dxsource), '':'')+1,2),''NI'') condition_source '||
 'from i2b2fact factline '||
-'inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num '||
+'inner join encounter enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num '||
 'inner join pcornet_diag diag on diag.c_basecode  = factline.concept_cd    '||
 ' left outer join sourcefact2 sf '||
 'on	factline.patient_num=sf.patient_num '||
@@ -1143,12 +1143,12 @@ end PCORNetCondition;
 
 create or replace procedure PCORNetProcedure as
 begin
-insert into pmnprocedure( 
+insert into procedures( 
 				patid,			encounterid,	enc_type, admit_date, providerid, px, px_type) 
 select  distinct fact.patient_num, enc.encounterid,	enc.enc_type, fact.start_date, 
 		fact.provider_id, SUBSTR(pr.pcori_basecode,INSTR(pr.pcori_basecode, ':')+1,11) px, SUBSTR(pr.c_fullname,18,2) pxtype 
 from i2b2fact fact
- inner join pmnENCOUNTER enc on enc.patid = fact.patient_num and enc.encounterid = fact.encounter_Num
+ inner join encounter enc on enc.patid = fact.patient_num and enc.encounterid = fact.encounter_Num
  inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
 where pr.c_fullname like '\PCORI\PROCEDURE\%';
 
@@ -1164,7 +1164,7 @@ end PCORNetProcedure;
 create or replace procedure PCORNetVital as
 begin
 -- jgk: I took out admit_date - it doesn't appear in the scheme. Now in SQLServer format - date, substring, name on inner select, no nested with. Added modifiers and now use only pathnames, not codes.
-insert into pmnVITAL(patid, encounterid, measure_date, measure_time,vital_source,ht, wt, diastolic, systolic, original_bmi, bp_position,smoking,tobacco,tobacco_type)
+insert into vital(patid, encounterid, measure_date, measure_time,vital_source,ht, wt, diastolic, systolic, original_bmi, bp_position,smoking,tobacco,tobacco_type)
 select patid, encounterid, to_date(measure_date,'rrrr-mm-dd') measure_date, measure_time,vital_source,ht, wt, diastolic, systolic, original_bmi, bp_position,smoking,tobacco,
 case when tobacco in ('02','03','04') then -- no tobacco
     case when smoking in ('03','04') then '04' -- no smoking
@@ -1194,7 +1194,7 @@ from (
     , case when vit.pcori_code like '\PCORI\VITAL\TOBACCO\SMOKING\%' then vit.pcori_basecode else null end smoking
     , case when vit.pcori_code like '\PCORI\VITAL\TOBACCO\__\%' then vit.pcori_basecode else null end unk_tobacco
     , enc.admit_date
-  from pmndemographic pd
+  from demographic pd
   left join (
     select 
       obs.patient_num patid, obs.encounter_num encounterid, 
@@ -1223,7 +1223,7 @@ from (
       where pm.c_fullname like bp.concept_path || '%'
       ) codes on codes.concept_cd = obs.concept_cd
     ) vit on vit.patid = pd.patid
-  join pmnencounter enc on enc.encounterid = vit.encounterid
+  join encounter enc on enc.encounterid = vit.encounterid
   ) x
 where ht is not null 
   or wt is not null 
@@ -1247,11 +1247,11 @@ end PCORNetVital;
 create or replace procedure PCORNetEnroll as
 begin
 
-INSERT INTO pmnENROLLMENT(PATID, ENR_START_DATE, ENR_END_DATE, CHART, BASIS) 
+INSERT INTO enrollment(PATID, ENR_START_DATE, ENR_END_DATE, CHART, BASIS) 
     select x.patient_num patid, case when l.patient_num is not null then l.period_start else enr_start end enr_start_date
     , case when l.patient_num is not null then l.period_end when enr_end_end>enr_end then enr_end_end else enr_end end enr_end_date 
     , 'Y' chart, case when l.patient_num is not null then 'A' else 'E' end basis from 
-    (select patient_num, min(start_date) enr_start,max(start_date) enr_end,max(end_date) enr_end_end from i2b2visit where patient_num in (select patid from pmndemographic) group by patient_num) x
+    (select patient_num, min(start_date) enr_start,max(start_date) enr_end,max(end_date) enr_end_end from i2b2visit where patient_num in (select patid from demographic) group by patient_num) x
     left outer join i2b2loyalty_patients l on l.patient_num=x.patient_num;
 
 end PCORNetEnroll;
@@ -1275,7 +1275,7 @@ drop table location;
 create table priority as (
   select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, lsource.pcori_basecode  PRIORITY
   from i2b2fact
-  inner join pmnENCOUNTER enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num
+  inner join encounter enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num
   inner join pcornet_lab lsource on i2b2fact.modifier_cd =lsource.c_basecode
   where c_fullname LIKE '\PCORI_MOD\PRIORITY\%'
   );
@@ -1283,7 +1283,7 @@ create table priority as (
 create table location as (
   select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, lsource.pcori_basecode  RESULT_LOC
   from i2b2fact
-  inner join pmnENCOUNTER enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num
+  inner join encounter enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num
   inner join pcornet_lab lsource on i2b2fact.modifier_cd =lsource.c_basecode
   where c_fullname LIKE '\PCORI_MOD\RESULT_LOC\%'
 );
@@ -1301,7 +1301,7 @@ PMN_DROPSQL('DROP TABLE priority');
 sqltext := 'create table priority as '||
 '(select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, lsource.pcori_basecode  PRIORITY  '||
 'from i2b2fact '||
-'inner join pmnENCOUNTER enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num '||
+'inner join encounter enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num '||
 'inner join pcornet_lab lsource on i2b2fact.modifier_cd =lsource.c_basecode '||
 'where c_fullname LIKE ''\PCORI_MOD\PRIORITY\%'') ';
 
@@ -1312,14 +1312,14 @@ PMN_DROPSQL('DROP TABLE location');
 sqltext := 'create table location as '||
 '(select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, lsource.pcori_basecode  RESULT_LOC '||
 'from i2b2fact '||
-'inner join pmnENCOUNTER enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num '||
+'inner join encounter enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num '||
 'inner join pcornet_lab lsource on i2b2fact.modifier_cd =lsource.c_basecode '||
 'where c_fullname LIKE ''\PCORI_MOD\RESULT_LOC\%'') ';
 
 PMN_EXECUATESQL(sqltext);
 
 
-INSERT INTO pmnlabresults_cm
+INSERT INTO lab_result_cm
       (PATID
       ,ENCOUNTERID
       ,LAB_NAME
@@ -1383,7 +1383,7 @@ NULL RAW_ORDER_DEPT,
 NULL RAW_FACILITY_CODE
 
 FROM i2b2fact M
-inner join pmnENCOUNTER enc on enc.patid = m.patient_num and enc.encounterid = m.encounter_Num -- Constraint to selected encounters
+inner join encounter enc on enc.patid = m.patient_num and enc.encounterid = m.encounter_Num -- Constraint to selected encounters
 
 inner join pcornet_lab lab on lab.c_basecode  = M.concept_cd and lab.c_fullname like '\PCORI\LAB_RESULT_CM\%'
 inner JOIN pcornet_lab ont_parent on lab.c_path=ont_parent.c_fullname
@@ -1418,7 +1418,7 @@ END PCORNetLabResultCM;
 create or replace procedure PCORNetHarvest as
 begin
 
-INSERT INTO pmnharvest(NETWORKID, NETWORK_NAME, DATAMARTID, DATAMART_NAME, DATAMART_PLATFORM, CDM_VERSION, DATAMART_CLAIMS, DATAMART_EHR, BIRTH_DATE_MGMT, ENR_START_DATE_MGMT, ENR_END_DATE_MGMT, ADMIT_DATE_MGMT, DISCHARGE_DATE_MGMT, PX_DATE_MGMT, RX_ORDER_DATE_MGMT, RX_START_DATE_MGMT, RX_END_DATE_MGMT, DISPENSE_DATE_MGMT, LAB_ORDER_DATE_MGMT, SPECIMENT_DATE_MGMT, RESULT_DATE_MGMT, MEASURE_DATE_MGMT, ONSET_DATE_MGMT, REPORT_DATE_MGMT, RESOLVE_DATE_MGMT, PRO_DATE_MGMT, REFRESH_DEMOGRAPHIC_DATE, REFRESH_ENROLLMENT_DATE, REFRESH_ENCOUNTER_DATE, REFRESH_DIAGNOSIS_DATE, REFRESH_PROCEDURES_DATE, REFRESH_VITAL_DATE, REFRESH_DISPENSING_DATE, REFRESH_LAB_RESULT_CM_DATE, REFRESH_CONDITION_DATE, REFRESH_PRO_CM_DATE, REFRESH_PRESCRIBING_DATE, REFRESH_PCORNET_TRIAL_DATE, REFRESH_DEATH_DATE, REFRESH_DEATH_CAUSE_DATE) 
+INSERT INTO harvest(NETWORKID, NETWORK_NAME, DATAMARTID, DATAMART_NAME, DATAMART_PLATFORM, CDM_VERSION, DATAMART_CLAIMS, DATAMART_EHR, BIRTH_DATE_MGMT, ENR_START_DATE_MGMT, ENR_END_DATE_MGMT, ADMIT_DATE_MGMT, DISCHARGE_DATE_MGMT, PX_DATE_MGMT, RX_ORDER_DATE_MGMT, RX_START_DATE_MGMT, RX_END_DATE_MGMT, DISPENSE_DATE_MGMT, LAB_ORDER_DATE_MGMT, SPECIMENT_DATE_MGMT, RESULT_DATE_MGMT, MEASURE_DATE_MGMT, ONSET_DATE_MGMT, REPORT_DATE_MGMT, RESOLVE_DATE_MGMT, PRO_DATE_MGMT, REFRESH_DEMOGRAPHIC_DATE, REFRESH_ENROLLMENT_DATE, REFRESH_ENCOUNTER_DATE, REFRESH_DIAGNOSIS_DATE, REFRESH_PROCEDURES_DATE, REFRESH_VITAL_DATE, REFRESH_DISPENSING_DATE, REFRESH_LAB_RESULT_CM_DATE, REFRESH_CONDITION_DATE, REFRESH_PRO_CM_DATE, REFRESH_PRESCRIBING_DATE, REFRESH_PCORNET_TRIAL_DATE, REFRESH_DEATH_DATE, REFRESH_DEATH_CAUSE_DATE) 
 	VALUES('&&network_id', '&&network_name', getDataMartID(), getDataMartName(), getDataMartPlatform(), 3, 01, 02, 1,1,2,1,2,1,2,1,2,1,1,2,2,1,1,1,2,1,current_date,current_date,current_date,current_date,current_date,current_date,current_date,current_date,current_date,null,current_date,null,null,null);
 
 end PCORNetHarvest;
@@ -1443,7 +1443,7 @@ drop table supply;
 
 create table basis as (
   select pcori_basecode,c_fullname,encounter_num,concept_cd from i2b2fact basis
-  inner join pmnENCOUNTER enc on enc.patid = basis.patient_num and enc.encounterid = basis.encounter_Num
+  inner join encounter enc on enc.patid = basis.patient_num and enc.encounterid = basis.encounter_Num
   join pcornet_med basiscode
   on basis.modifier_cd = basiscode.c_basecode
   and basiscode.c_fullname like '\PCORI_MOD\RX_BASIS\%'
@@ -1451,7 +1451,7 @@ create table basis as (
   
 create table freq as (
   select pcori_basecode,encounter_num,concept_cd from i2b2fact freq
-  inner join pmnENCOUNTER enc on enc.patid = freq.patient_num and enc.encounterid = freq.encounter_Num
+  inner join encounter enc on enc.patid = freq.patient_num and enc.encounterid = freq.encounter_Num
   join pcornet_med freqcode
   on freq.modifier_cd = freqcode.c_basecode
   and freqcode.c_fullname like '\PCORI_MOD\RX_FREQUENCY\%'
@@ -1459,7 +1459,7 @@ create table freq as (
 
 create table quantity as (
   select nval_num,encounter_num,concept_cd from i2b2fact quantity
-  inner join pmnENCOUNTER enc on enc.patid = quantity.patient_num and enc.encounterid = quantity.encounter_Num
+  inner join encounter enc on enc.patid = quantity.patient_num and enc.encounterid = quantity.encounter_Num
   join pcornet_med quantitycode
   on quantity.modifier_cd = quantitycode.c_basecode
   and quantitycode.c_fullname like '\PCORI_MOD\RX_QUANTITY\'
@@ -1467,7 +1467,7 @@ create table quantity as (
 
 create table refills as (
   select nval_num,encounter_num,concept_cd from i2b2fact refills
-  inner join pmnENCOUNTER enc on enc.patid = refills.patient_num and enc.encounterid = refills.encounter_Num
+  inner join encounter enc on enc.patid = refills.patient_num and enc.encounterid = refills.encounter_Num
   join pcornet_med refillscode
   on refills.modifier_cd = refillscode.c_basecode
   and refillscode.c_fullname like '\PCORI_MOD\RX_REFILLS\'
@@ -1475,7 +1475,7 @@ create table refills as (
 
 create table supply as (
   select nval_num,encounter_num,concept_cd from i2b2fact supply
-  inner join pmnENCOUNTER enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num
+  inner join encounter enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num
   join pcornet_med supplycode
   on supply.modifier_cd = supplycode.c_basecode
   and supplycode.c_fullname like '\PCORI_MOD\RX_DAYS_SUPPLY\'
@@ -1493,7 +1493,7 @@ begin
 PMN_DROPSQL('DROP TABLE basis');
 sqltext := 'create table basis as '||
 '(select pcori_basecode,c_fullname,encounter_num,concept_cd from i2b2fact basis '||
-'        inner join pmnENCOUNTER enc on enc.patid = basis.patient_num and enc.encounterid = basis.encounter_Num '||
+'        inner join encounter enc on enc.patid = basis.patient_num and enc.encounterid = basis.encounter_Num '||
 '     join pcornet_med basiscode  '||
 '        on basis.modifier_cd = basiscode.c_basecode '||
 '        and basiscode.c_fullname like ''\PCORI_MOD\RX_BASIS\%'') ';
@@ -1502,7 +1502,7 @@ PMN_EXECUATESQL(sqltext);
 PMN_DROPSQL('DROP TABLE freq');
 sqltext := 'create table freq as '||
 '(select pcori_basecode,encounter_num,concept_cd from i2b2fact freq '||
-'        inner join pmnENCOUNTER enc on enc.patid = freq.patient_num and enc.encounterid = freq.encounter_Num '||
+'        inner join encounter enc on enc.patid = freq.patient_num and enc.encounterid = freq.encounter_Num '||
 '     join pcornet_med freqcode  '||
 '        on freq.modifier_cd = freqcode.c_basecode '||
 '        and freqcode.c_fullname like ''\PCORI_MOD\RX_FREQUENCY\%'') ';
@@ -1511,7 +1511,7 @@ PMN_EXECUATESQL(sqltext);
 PMN_DROPSQL('DROP TABLE quantity');
 sqltext := 'create table quantity as '||
 '(select nval_num,encounter_num,concept_cd from i2b2fact quantity '||
-'        inner join pmnENCOUNTER enc on enc.patid = quantity.patient_num and enc.encounterid = quantity.encounter_Num '||
+'        inner join encounter enc on enc.patid = quantity.patient_num and enc.encounterid = quantity.encounter_Num '||
 '     join pcornet_med quantitycode  '||
 '        on quantity.modifier_cd = quantitycode.c_basecode '||
 '        and quantitycode.c_fullname like ''\PCORI_MOD\RX_QUANTITY\'') ';
@@ -1521,7 +1521,7 @@ PMN_EXECUATESQL(sqltext);
 PMN_DROPSQL('DROP TABLE refills');
 sqltext := 'create table refills as   '||
 '(select nval_num,encounter_num,concept_cd from i2b2fact refills '||
-'        inner join pmnENCOUNTER enc on enc.patid = refills.patient_num and enc.encounterid = refills.encounter_Num '||
+'        inner join encounter enc on enc.patid = refills.patient_num and enc.encounterid = refills.encounter_Num '||
 '     join pcornet_med refillscode  '||
 '        on refills.modifier_cd = refillscode.c_basecode '||
 '        and refillscode.c_fullname like ''\PCORI_MOD\RX_REFILLS\'') ';
@@ -1530,7 +1530,7 @@ PMN_EXECUATESQL(sqltext);
 PMN_DROPSQL('DROP TABLE supply');  
 sqltext := 'create table supply as  '||
 '(select nval_num,encounter_num,concept_cd from i2b2fact supply '||
-'        inner join pmnENCOUNTER enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num '||
+'        inner join encounter enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num '||
 '     join pcornet_med supplycode  '||
 '        on supply.modifier_cd = supplycode.c_basecode '||
 '        and supplycode.c_fullname like ''\PCORI_MOD\RX_DAYS_SUPPLY\'')  ';
@@ -1538,7 +1538,7 @@ PMN_EXECUATESQL(sqltext);
 
 
 -- insert data with outer joins to ensure all records are included even if some data elements are missing
-insert into pmnprescribing (
+insert into prescribing (
 	PATID
     ,encounterid
     ,RX_PROVIDERID
@@ -1559,7 +1559,7 @@ insert into pmnprescribing (
 select distinct  m.patient_num, m.Encounter_Num,m.provider_id,  m.start_date order_date,  to_char(m.start_date,'HH:MI'), m.start_date start_date, m.end_date, mo.pcori_cui
     ,quantity.nval_num quantity, refills.nval_num refills, supply.nval_num supply, freq.pcori_basecode frequency, basis.pcori_basecode basis
  from i2b2fact m inner join pcornet_med mo on m.concept_cd = mo.c_basecode 
-inner join pmnENCOUNTER enc on enc.encounterid = m.encounter_Num
+inner join encounter enc on enc.encounterid = m.encounter_Num
 -- TODO: This join adds several minutes to the load - must be debugged
 
     left join basis
@@ -1617,7 +1617,7 @@ begin
 PMN_DROPSQL('DROP TABLE supply');
 sqltext := 'create table supply as '||
 '(select nval_num,encounter_num,concept_cd from i2b2fact supply '||
-'        inner join pmnENCOUNTER enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num '||
+'        inner join encounter enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num '||
 '      join pcornet_med supplycode  '||
 '        on supply.modifier_cd = supplycode.c_basecode '||
 '        and supplycode.c_fullname like ''\PCORI_MOD\RX_DAYS_SUPPLY\'' ) ';
@@ -1634,7 +1634,7 @@ PMN_EXECUATESQL(sqltext);
         
 -- insert data with outer joins to ensure all records are included even if some data elements are missing
 
-insert into pmndispensing (
+insert into dispensing (
 	PATID
     ,PRESCRIBINGID
 	,DISPENSE_DATE -- using start_date from i2b2
@@ -1647,11 +1647,11 @@ select  m.patient_num, null,m.start_date, NVL(mo.pcori_ndc,'NA')
     ,max(supply.nval_num) sup, max(amount.nval_num) amt 
 from i2b2fact m inner join pcornet_med mo
 on m.concept_cd = mo.c_basecode
-inner join pmnENCOUNTER enc on enc.encounterid = m.encounter_Num
+inner join encounter enc on enc.encounterid = m.encounter_Num
 
     -- jgk bugfix 11/2 - we weren't filtering dispensing events
     inner join (select pcori_basecode,c_fullname,encounter_num,concept_cd from i2b2fact basis
-        inner join pmnENCOUNTER enc on enc.patid = basis.patient_num and enc.encounterid = basis.encounter_Num
+        inner join encounter enc on enc.patid = basis.patient_num and enc.encounterid = basis.encounter_Num
      join pcornet_med basiscode 
         on basis.modifier_cd = basiscode.c_basecode
         and basiscode.c_fullname='\PCORI_MOD\RX_BASIS\DI\') basis
@@ -1688,52 +1688,52 @@ i2b2procs number;
 i2b2lcs number;
 
 pmnpats  number;
-pmnencounters number;
+encounters number;
 pmndx number;
 pmnprocs number;
 pmnfacts number;
 pmnenroll number;
-pmnvital number;
+vital number;
 
 
 
 pmnlabs number;
-pmnprescribings number;
-pmndispensings number;
+prescribings number;
+dispensings number;
 pmncond number;
 
 
 v_runid number;
 begin
 select count(*) into i2b2Pats   from i2b2patient;
-select count(*) into i2b2Encounters   from i2b2visit i inner join pmndemographic d on i.patient_num=d.patid;
+select count(*) into i2b2Encounters   from i2b2visit i inner join demographic d on i.patient_num=d.patid;
 
 
-select count(*) into pmnPats   from pmndemographic;
-select count(*) into pmnencounters   from pmnencounter e ;
-select count(*) into pmndx   from pmndiagnosis;
-select count(*) into pmnprocs  from pmnprocedure;
+select count(*) into pmnPats   from demographic;
+select count(*) into encounters   from encounter e ;
+select count(*) into pmndx   from diagnosis;
+select count(*) into pmnprocs  from procedures;
 
-select count(*) into pmncond from pmncondition;
-select count(*) into pmnenroll  from pmnenrollment;
-select count(*) into pmnvital  from pmnvital;
-select count(*) into pmnlabs from pmnlabresults_cm;
-select count(*) into pmnprescribings from pmnprescribing;
-select count(*) into pmndispensings from pmndispensing;
+select count(*) into pmncond from condition;
+select count(*) into pmnenroll  from enrollment;
+select count(*) into vital  from vital;
+select count(*) into pmnlabs from lab_result_cm;
+select count(*) into prescribings from prescribing;
+select count(*) into dispensings from dispensing;
 
 select max(runid) into v_runid from i2pReport;
 v_runid := v_runid + 1;
 insert into i2pReport values( v_runid, SYSDATE, 'Pats', i2b2pats, pmnpats, i2b2pats-pmnpats);
 insert into i2pReport values( v_runid, SYSDATE, 'Enrollment', i2b2pats, pmnenroll, i2b2pats-pmnpats);
 
-insert into i2pReport values(v_runid, SYSDATE, 'Encounters', i2b2Encounters, pmnEncounters, i2b2encounters-pmnencounters);
+insert into i2pReport values(v_runid, SYSDATE, 'Encounters', i2b2Encounters, encounters, i2b2encounters-encounters);
 insert into i2pReport values(v_runid, SYSDATE, 'DX',		null,		pmndx,		null);
 insert into i2pReport values(v_runid, SYSDATE, 'PX',		null,		pmnprocs,	null);
 insert into i2pReport values(v_runid, SYSDATE, 'Condition',	null,		pmncond,	null);
-insert into i2pReport values(v_runid, SYSDATE, 'Vital',		null,		pmnvital,	null);
+insert into i2pReport values(v_runid, SYSDATE, 'Vital',		null,		vital,	null);
 insert into i2pReport values(v_runid, SYSDATE, 'Labs',		null,		pmnlabs,	null);
-insert into i2pReport values(v_runid, SYSDATE, 'Prescribing',	null,		pmnprescribings,null);
-insert into i2pReport values(v_runid, SYSDATE, 'Dispensing',	null,		pmndispensings,	null);
+insert into i2pReport values(v_runid, SYSDATE, 'Prescribing',	null,		prescribings,null);
+insert into i2pReport values(v_runid, SYSDATE, 'Dispensing',	null,		dispensings,	null);
 
 end pcornetReport;
 /
