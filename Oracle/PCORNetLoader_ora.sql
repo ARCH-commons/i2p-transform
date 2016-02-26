@@ -16,16 +16,6 @@
 --undef i2b2_data_schema;
 --undef i2b2_meta_schema;
 
-/* Create the loyalty cohort summary table if it doesn't exist.
-TODO: Determine the side effects of doing so - I don't quite know what this 
-table means or how having an empty one affects the results of the transform.
-*/
-whenever sqlerror continue;
-create table "&&i2b2_data_schema".loyalty_cohort_patient_summary ( 
-  patient_num number,
-  filter_set number
-);
-whenever sqlerror exit;
 
 create or replace PROCEDURE PMN_DROPSQL(sqlstring VARCHAR2) AS 
   BEGIN
@@ -131,10 +121,15 @@ BEGIN
 END;
 /
 
+/* TODO: Consider building the loyalty cohort as designed: 
+https://github.com/njgraham/SCILHS-utils/blob/master/LoyaltyCohort/LoyaltyCohort-ora.sql
+
+For now, let's count all patients for testing with the KUMC test patients.
+*/
+
 --create or replace view i2b2loyalty_patients as (select patient_num,to_date('01-Jul-2010','dd-mon-rrrr') period_start,to_date('01-Jul-2014','dd-mon-rrrr') period_end from "&&i2b2_data_schema".loyalty_cohort_patient_summary where BITAND(filter_set, 61511) = 61511 and patient_num in (select patient_num from i2b2patient))
 --/
 
---For testing on the tiny KUMC test set, let's count all patients
 create or replace view i2b2loyalty_patients as (
   select 
     patient_num, to_date('01-Jul-2010','dd-mon-rrrr') period_start,
@@ -1257,9 +1252,21 @@ INSERT INTO pmnENROLLMENT(PATID, ENR_START_DATE, ENR_END_DATE, CHART, BASIS)
 
 end PCORNetEnroll;
 /
-/* TODO: Review this:  I got Error(106,17): PL/SQL: ORA-00942: table or view does 
-not exist apparently due to tables that the procedure references but also drops/
-recreates before reference.  Creating them outside the function solves the issue:
+
+/* TODO: When compiling PCORNetLabResultCM I got Error(106,17): 
+  PL/SQL: ORA-00942: table or view does not exist 
+apparently due to tables that the procedure references but also drops/recreates
+before reference.  Creating them outside the function solves the issue.  SQL
+copied from the function.
+
+In the same function, I got 
+  Error(63,123): PL/SQL: ORA-00904: "LAB"."PCORI_SPECIMEN_SOURCE": invalid identifier
+So, I just altered the table to have the referenced column.
+
+*/
+whenever sqlerror continue;
+drop table priority;
+drop table location;
 
 create table priority as (
   select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, lsource.pcori_basecode  PRIORITY
@@ -1276,16 +1283,11 @@ create table location as (
   inner join pcornet_lab lsource on i2b2fact.modifier_cd =lsource.c_basecode
   where c_fullname LIKE '\PCORI_MOD\RESULT_LOC\%'
 );
-*/
-
-/* TODO: Review: I got Error(63,123): PL/SQL: ORA-00904: "LAB"."PCORI_SPECIMEN_SOURCE": invalid identifier
-
-So, I just altered the table to have the referenced column.
 
 alter table blueheronmetadata.pcornet_lab add (
   pcori_specimen_source varchar2(1000) -- arbitrary
   );
-*/
+whenever sqlerror exit;
 
 create or replace procedure PCORNetLabResultCM as
 sqltext varchar2(4000);
@@ -1345,7 +1347,6 @@ INSERT INTO pmnlabresults_cm
       ,RAW_ORDER_DEPT
       ,RAW_FACILITY_CODE)
 
---00942. 00000 -  "table or view does not exist" Error at Line: 1,342 Column: 17 (location)
 SELECT DISTINCT  M.patient_num patid,
 M.encounter_num encounterid,
 CASE WHEN ont_parent.C_BASECODE LIKE 'LAB_NAME%' then SUBSTR (ont_parent.c_basecode,10, 10) ELSE 'NI' END LAB_NAME,
@@ -1414,18 +1415,27 @@ create or replace procedure PCORNetHarvest as
 begin
 
 INSERT INTO pmnharvest(NETWORKID, NETWORK_NAME, DATAMARTID, DATAMART_NAME, DATAMART_PLATFORM, CDM_VERSION, DATAMART_CLAIMS, DATAMART_EHR, BIRTH_DATE_MGMT, ENR_START_DATE_MGMT, ENR_END_DATE_MGMT, ADMIT_DATE_MGMT, DISCHARGE_DATE_MGMT, PX_DATE_MGMT, RX_ORDER_DATE_MGMT, RX_START_DATE_MGMT, RX_END_DATE_MGMT, DISPENSE_DATE_MGMT, LAB_ORDER_DATE_MGMT, SPECIMENT_DATE_MGMT, RESULT_DATE_MGMT, MEASURE_DATE_MGMT, ONSET_DATE_MGMT, REPORT_DATE_MGMT, RESOLVE_DATE_MGMT, PRO_DATE_MGMT, REFRESH_DEMOGRAPHIC_DATE, REFRESH_ENROLLMENT_DATE, REFRESH_ENCOUNTER_DATE, REFRESH_DIAGNOSIS_DATE, REFRESH_PROCEDURES_DATE, REFRESH_VITAL_DATE, REFRESH_DISPENSING_DATE, REFRESH_LAB_RESULT_CM_DATE, REFRESH_CONDITION_DATE, REFRESH_PRO_CM_DATE, REFRESH_PRESCRIBING_DATE, REFRESH_PCORNET_TRIAL_DATE, REFRESH_DEATH_DATE, REFRESH_DEATH_CAUSE_DATE) 
-	VALUES('SCILHS', 'SCILHS', getDataMartID(), getDataMartName(), getDataMartPlatform(), 3, 01, 02, 1,1,2,1,2,1,2,1,2,1,1,2,2,1,1,1,2,1,current_date,current_date,current_date,current_date,current_date,current_date,current_date,current_date,current_date,null,current_date,null,null,null);
+	VALUES(&&network_id, &&network_name, getDataMartID(), getDataMartName(), getDataMartPlatform(), 3, 01, 02, 1,1,2,1,2,1,2,1,2,1,1,2,2,1,1,1,2,1,current_date,current_date,current_date,current_date,current_date,current_date,current_date,current_date,current_date,null,current_date,null,null,null);
 
 end PCORNetHarvest;
 /
 
 
 
-
-
-/* TODO: Error(93,15): PL/SQL: ORA-00942: table or view does not exist
+/* TODO: When compiling PCORNetPrescribing, I got Error(93,15): 
+  PL/SQL: ORA-00942: table or view does not exist
 At compile time, it's complaining about the fact tables don't exist that are 
-created in the function itself.  I created them ahead of time with the following:
+created in the function itself.  I created them ahead of time - SQL taken from
+the procedure.
+
+Also: Error(71,159): PL/SQL: ORA-00904: "MO"."PCORI_CUI": invalid identifier
+*/
+whenever sqlerror continue;
+drop table basis;
+drop table freq;
+drop table quantity;
+drop table refills;
+drop table supply;
 
 create table basis as (
   select pcori_basecode,c_fullname,encounter_num,concept_cd from i2b2fact basis
@@ -1466,13 +1476,11 @@ create table supply as (
   on supply.modifier_cd = supplycode.c_basecode
   and supplycode.c_fullname like '\PCORI_MOD\RX_DAYS_SUPPLY\'
   );
-  
-TODO: Also: Error(71,159): PL/SQL: ORA-00904: "MO"."PCORI_CUI": invalid identifier
+
 alter table blueheronmetadata.pcornet_med add (
   pcori_cui varchar2(1000) -- arbitrary
   );
-
-*/
+whenever sqlerror exit;
 
 create or replace procedure PCORNetPrescribing as
 sqltext varchar2(4000);
@@ -1577,10 +1585,15 @@ end PCORNetPrescribing;
 
 
 
--- TODO: Same compile-time errors about tables created in the function
-/*
+/* TODO: When compiling PCORNetDispensing:
+
 Error(53,16): PL/SQL: ORA-00942: table or view does not exist (amount)
- - supply is created above in the prescribing function
+ - supply, also used, is created above in the prescribing function
+
+Also, Error(57,57): PL/SQL: ORA-00904: "MO"."PCORI_NDC": invalid identifier
+*/
+whenever sqlerror continue;
+drop table amount;
 
 create table amount as (
   select nval_num,encounter_num,concept_cd from i2b2fact amount
@@ -1588,15 +1601,11 @@ create table amount as (
   on amount.modifier_cd = amountcode.c_basecode
   and amountcode.c_fullname like '\PCORI_MOD\RX_QUANTITY\'
   );
-  
-TODO: Error(57,57): PL/SQL: ORA-00904: "MO"."PCORI_NDC": invalid identifier
 
 alter table blueheronmetadata.pcornet_med add (
   pcori_ndc varchar2(1000) -- arbitrary
   );
-  
-\pcornet_med
-*/
+whenever sqlerror exit;
 
 create or replace procedure PCORNetDispensing as
 sqltext varchar2(4000);
@@ -1727,15 +1736,7 @@ end pcornetReport;
 
 
 
-/* These have compile errors at least partly due to the compile errors noted above
-regarding missing tables that are created inside the function itself.
-Error(12,1): PLS-00905: object NGRAHAM.PCORNETLABRESULTCM is invalid
-Error(12,1): PL/SQL: Statement ignored
-Error(13,1): PLS-00905: object NGRAHAM.PCORNETPRESCRIBING is invalid
-Error(13,1): PL/SQL: Statement ignored
-Error(14,1): PLS-00905: object NGRAHAM.PCORNETDISPENSING is invalid
-Error(14,1): PL/SQL: Statement ignored
-*/
+
 create or replace procedure pcornetloader as
 begin
 ---pcornetclear;
@@ -1749,7 +1750,28 @@ PCORNetVital;
 PCORNetEnroll;
 PCORNetLabResultCM;
 PCORNetPrescribing;
-PCORNetDispensing;
+
+/* ORA-04068: existing state of packages has been discarded
+ORA-04065: not executed, altered or dropped stored procedure "NGRAHAM.PCORNETDISPENSING"
+ORA-06508: PL/SQL: could not find program unit being called: "NGRAHAM.PCORNETDISPENSING"
+ORA-06512: at "NGRAHAM.PCORNETLOADER", line 14
+ORA-06512: at line 2
+04068. 00000 -  "existing state of packages%s%s%s has been discarded"
+*Cause:    One of errors 4060 - 4067 when attempt to execute a stored
+           procedure.
+*Action:   Try again after proper re-initialization of any application's
+           state.
+
+The above error only happens when we call PCORNetDispensing _and_ PCORNetPrescribing
+from within pcornetloader.  When running either individually, the error does not
+happen.
+
+Skipping dispensing as per gpc-dev notes:
+http://listserv.kumc.edu/pipermail/gpc-dev/attachments/20160223/8d79fa70/attachment-0001.pdf
+> LV: the dispensing side [?] is not mandatory? we just did Rx, since that
+> what we have in our i2b2
+*/
+--PCORNetDispensing;
 
 end pcornetloader;
 /
