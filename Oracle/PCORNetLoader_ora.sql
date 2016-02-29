@@ -229,7 +229,7 @@ CREATE TABLE enrollment (
 	ENR_START_DATE date NOT NULL,
 	ENR_END_DATE date NULL,
 	CHART varchar(1) NULL,
-	BASIS varchar(1) NOT NULL,
+	ENR_BASIS varchar(1) NOT NULL,
 	RAW_CHART varchar(50) NULL,
 	RAW_BASIS varchar(50) NULL
 )
@@ -1247,7 +1247,7 @@ end PCORNetVital;
 create or replace procedure PCORNetEnroll as
 begin
 
-INSERT INTO enrollment(PATID, ENR_START_DATE, ENR_END_DATE, CHART, BASIS) 
+INSERT INTO enrollment(PATID, ENR_START_DATE, ENR_END_DATE, CHART, ENR_BASIS) 
     select x.patient_num patid, case when l.patient_num is not null then l.period_start else enr_start end enr_start_date
     , case when l.patient_num is not null then l.period_end when enr_end_end>enr_end then enr_end_end else enr_end end enr_end_date 
     , 'Y' chart, case when l.patient_num is not null then 'A' else 'E' end basis from 
