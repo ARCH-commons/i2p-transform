@@ -599,7 +599,7 @@ END;
 /
 CREATE TABLE pcornet_trial(
 	PATID varchar(50) NOT NULL,
-	TRIAL_ID varchar(20) NOT NULL,
+	TRIALID varchar(20) NOT NULL,
 	PARTICIPANTID varchar(50) NOT NULL,
 	TRIAL_SITEID varchar(50) NULL,
 	TRIAL_ENROLL_DATE date NULL,
