@@ -282,7 +282,7 @@ create or replace trigger vital_trg
 before insert on vital
 for each row
 begin
-  select vital_seq.nextval into :new.VITALIID from dual;
+  select vital_seq.nextval into :new.VITALID from dual;
 end;
 /
 
