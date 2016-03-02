@@ -82,3 +82,50 @@ order by c_hlevel
 ;
 
 commit;
+
+--select *
+delete 
+from "&&i2b2_meta_schema".PCORNET_PROC
+where c_fullname like '\PCORI\PROCEDURE\09\_%'
+;
+
+/* Replace PCORNet Procedure (ICD9) hierarchy with the local hierarchy.
+*/
+insert into "&&i2b2_meta_schema".PCORNET_PROC
+select 
+  ht.c_hlevel, 
+  replace(ht.c_fullname, '\i2b2\Procedures\PRC\ICD9 (Inpatient)', '\PCORI\PROCEDURE\09') c_fullname, 
+  ht.c_name, ht.c_synonym_cd, ht.c_visualattributes,
+  ht.c_totalnum, ht.c_basecode, ht.c_metadataxml, ht.c_facttablecolumn, ht.c_tablename, 
+  ht.c_columnname, ht.c_columndatatype, ht.c_operator, ht.c_dimcode, ht.c_comment, 
+  ht.c_tooltip, ht.m_applied_path, ht.update_date, ht.download_date, ht.import_date, 
+  ht.sourcesystem_cd, ht.valuetype_cd, ht.m_exclusion_cd, ht.c_path, ht.c_symbol,
+  ht.c_basecode pcori_basecode 
+from 
+  "&&i2b2_meta_schema"."&&terms_table" ht
+where c_fullname like '\i2b2\Procedures\PRC\ICD9 (Inpatient)\_%' order by c_hlevel 
+;
+
+
+--select *
+delete 
+from "&&i2b2_meta_schema".PCORNET_PROC
+where c_fullname like '\PCORI\PROCEDURE\C4\%'
+;
+
+/* Replace PCORNet Procedure (ICD9) hierarchy with the local hierarchy.
+*/
+insert into "&&i2b2_meta_schema".PCORNET_PROC
+select 
+  ht.c_hlevel, 
+  replace(ht.c_fullname, '\i2b2\Procedures\PRC\Metathesaurus CPT Hierarchical Terms', '\PCORI\PROCEDURE\C4') c_fullname, 
+  ht.c_name, ht.c_synonym_cd, ht.c_visualattributes,
+  ht.c_totalnum, ht.c_basecode, ht.c_metadataxml, ht.c_facttablecolumn, ht.c_tablename, 
+  ht.c_columnname, ht.c_columndatatype, ht.c_operator, ht.c_dimcode, ht.c_comment, 
+  ht.c_tooltip, ht.m_applied_path, ht.update_date, ht.download_date, ht.import_date, 
+  ht.sourcesystem_cd, ht.valuetype_cd, ht.m_exclusion_cd, ht.c_path, ht.c_symbol,
+  ht.c_basecode pcori_basecode 
+from 
+  "&&i2b2_meta_schema"."&&terms_table" ht
+where c_fullname like '\i2b2\Procedures\PRC\Metathesaurus CPT Hierarchical Terms\%' order by c_hlevel 
+;
