@@ -72,5 +72,8 @@ start pcornet_mapping.sql
 -- SCILHS transform
 start PCORNetLoader_ora.sql
 
+-- CDM transform tests
+start cdm_transform_tests.sql
+
 quit;
 EOF
