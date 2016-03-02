@@ -69,6 +69,9 @@ define terms_table=${terms_table}
 -- Local terminology mapping
 start pcornet_mapping.sql
 
+-- Prepare for transform
+start gather_table_stats.sql
+
 -- SCILHS transform
 start PCORNetLoader_ora.sql
 

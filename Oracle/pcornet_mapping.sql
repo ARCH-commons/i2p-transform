@@ -53,11 +53,6 @@ from "&&i2b2_meta_schema".PCORNET_DIAG
 where c_fullname like '\PCORI\DIAGNOSIS\09\%'
 ;
 
-select count(*), scheme from (
-  select substr(c_basecode, 1, instr(c_basecode, ':')) scheme from "&&i2b2_meta_schema".PCORNET_DIAG
-  )
-group by scheme;
-
 
 insert into "&&i2b2_meta_schema".PCORNET_DIAG
 with terms_dxi as (
