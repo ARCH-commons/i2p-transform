@@ -243,7 +243,7 @@ END;
 /
 
 CREATE TABLE vital (
-	VITALIID varchar(19)  primary key,
+	VITALID varchar(19)  primary key,
 	PATID varchar(50) NULL,
 	ENCOUNTERID varchar(50) NULL,
 	MEASURE_DATE date NULL,
