@@ -5,8 +5,8 @@ ACK: http://stackoverflow.com/questions/2242024/for-each-string-execute-a-functi
 */
 declare
 table_list sys.dbms_debug_vc2coll := sys.dbms_debug_vc2coll(
-  'PCORNET_DEMO', 'PCORNET_DIAG', 'PCORNET_DIAG_BACKUP', 'PCORNET_ENC', 
-  'PCORNET_ENROLL', 'PCORNET_LAB', 'PCORNET_MED', 'PCORNET_PROC', 'PCORNET_VITAL');
+  'PCORNET_DEMO', 'PCORNET_DIAG', 'PCORNET_ENC', 'PCORNET_ENROLL', 'PCORNET_LAB', 
+  'PCORNET_MED', 'PCORNET_PROC', 'PCORNET_VITAL');
 begin 
   for t in table_list.first .. table_list.last
   loop
