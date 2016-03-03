@@ -47,18 +47,6 @@ data sasdata.DEMOGRAPHIC / view=sasdata.DEMOGRAPHIC;
 	drop _BIRTH_TIME;
 run;
 
-/*
-proc contents data=oracdata.DEMOGRAPHIC;
-run;
-proc print data=oracdata.DEMOGRAPHIC (firstobs=1 obs=10);
-run;
-
-proc contents data=sasdata.DEMOGRAPHIC;
-run;
-proc print data=sasdata.DEMOGRAPHIC (firstobs=1 obs=10);
-run;
-*/
-
 
 ***************************************************************;
 * Create data step view for ENROLLMENT
@@ -67,18 +55,6 @@ run;
 data sasdata.ENROLLMENT / view=sasdata.ENROLLMENT;
 	set oracdata.ENROLLMENT;
 run;
-
-/*
-proc contents data=oracdata.ENROLLMENT;
-run;
-proc print data=oracdata.ENROLLMENT (firstobs=1 obs=10);
-run;
-
-proc contents data=sasdata.ENROLLMENT;
-run;
-proc print data=sasdata.ENROLLMENT (firstobs=1 obs=10);
-run;
-*/
 
 
 ***************************************************************;
@@ -102,18 +78,6 @@ data sasdata.ENCOUNTER / view=sasdata.ENCOUNTER;
 	format DISCHARGE_TIME hhmm.;
 	drop _DISCHARGE_TIME;
 run;
-
-/*
-proc contents data=oracdata.ENCOUNTER;
-run;
-proc print data=oracdata.ENCOUNTER (firstobs=1 obs=10);
-run;
-
-proc contents data=sasdata.ENCOUNTER;
-run;
-proc print data=sasdata.ENCOUNTER (firstobs=1 obs=10);
-run;
-*/
 
 
 ***************************************************************;
@@ -151,18 +115,6 @@ data sasdata.VITAL / view=sasdata.VITAL;
 	drop _MEASURE_TIME;
 run;
 
-/*
-proc contents data=oracdata.VITAL;
-run;
-proc print data=oracdata.VITAL (firstobs=1 obs=10);
-run;
-
-proc contents data=sasdata.VITAL;
-run;
-proc print data=sasdata.VITAL (firstobs=1 obs=10);
-run;
-*/
-
 
 ***************************************************************;
 * Create data step view for DISPENSING
@@ -199,18 +151,6 @@ data sasdata.LAB_RESULT_CM / view=sasdata.LAB_RESULT_CM;
 	drop _RESULT_NUM;*/
 run;
 
-/*
-proc contents data=oracdata.LAB_RESULT_CM;
-run;
-proc print data=oracdata.LAB_RESULT_CM (firstobs=1 obs=10);
-run;
-
-proc contents data=sasdata.LAB_RESULT_CM;
-run;
-proc print data=sasdata.LAB_RESULT_CM (firstobs=1 obs=10);
-run;
-*/
-
 
 ***************************************************************;
 * Create data step view for CONDITION
@@ -238,18 +178,6 @@ data sasdata.PRO_CM / view=sasdata.PRO_CM;
 	drop _PRO_TIME;
 run;
 
-/*
-proc contents data=oracdata.PRO_CM;
-run;
-proc print data=oracdata.PRO_CM (firstobs=1 obs=10);
-run;
-
-proc contents data=sasdata.PRO_CM;
-run;
-proc print data=sasdata.PRO_CM (firstobs=1 obs=10);
-run;
-*/
-
 
 ***************************************************************;
 * Create data step view for PRESCRIBING
@@ -267,18 +195,6 @@ data sasdata.PRESCRIBING / view=sasdata.PRESCRIBING;
 	format RX_ORDER_TIME hhmm.;
 	drop _RX_ORDER_TIME;
 run;
-
-/*
-proc contents data=oracdata.PRESCRIBING;
-run;
-proc print data=oracdata.PRESCRIBING (firstobs=1 obs=10);
-run;
-
-proc contents data=sasdata.PRESCRIBING;
-run;
-proc print data=sasdata.PRESCRIBING (firstobs=1 obs=10);
-run;
-*/
 
 
 ***************************************************************;
