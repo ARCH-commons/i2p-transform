@@ -1272,21 +1272,23 @@ whenever sqlerror continue;
 drop table priority;
 drop table location;
 
-create table priority as (
-  select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, lsource.pcori_basecode  PRIORITY
-  from i2b2fact
-  inner join encounter enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num
-  inner join pcornet_lab lsource on i2b2fact.modifier_cd =lsource.c_basecode
-  where c_fullname LIKE '\PCORI_MOD\PRIORITY\%'
+create table priority (
+  patient_num number(38,0),
+	encounter_num number(38,0),
+	provider_id varchar2(50 byte),
+	concept_cd varchar2(50 byte),
+	start_date date,
+	priority varchar2(50 byte)
   );
-
-create table location as (
-  select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, lsource.pcori_basecode  RESULT_LOC
-  from i2b2fact
-  inner join encounter enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num
-  inner join pcornet_lab lsource on i2b2fact.modifier_cd =lsource.c_basecode
-  where c_fullname LIKE '\PCORI_MOD\RESULT_LOC\%'
-);
+   
+create table location (	
+  patient_num number(38,0), 
+	encounter_num number(38,0), 
+	provider_id varchar2(50 byte), 
+	concept_cd varchar2(50 byte), 
+	start_date date, 
+	result_loc varchar2(50 byte)
+  );
 
 alter table blueheronmetadata.pcornet_lab add (
   pcori_specimen_source varchar2(1000) -- arbitrary
@@ -1441,44 +1443,35 @@ drop table quantity;
 drop table refills;
 drop table supply;
 
-create table basis as (
-  select pcori_basecode,c_fullname,encounter_num,concept_cd from i2b2fact basis
-  inner join encounter enc on enc.patid = basis.patient_num and enc.encounterid = basis.encounter_Num
-  join pcornet_med basiscode
-  on basis.modifier_cd = basiscode.c_basecode
-  and basiscode.c_fullname like '\PCORI_MOD\RX_BASIS\%'
+create table basis (
+  pcori_basecode varchar2(50 byte), 
+	c_fullname varchar2(700 byte), 
+	encounter_num number(38,0), 
+	concept_cd varchar2(50 byte)
+  ) ;
+  
+create table freq (
+  pcori_basecode varchar2(50 byte), 
+	encounter_num number(38,0), 
+	concept_cd varchar2(50 byte)
+  );
+
+create table quantity(
+  nval_num number(18,5), 
+	encounter_num number(38,0), 
+	concept_cd varchar2(50 byte)
   );
   
-create table freq as (
-  select pcori_basecode,encounter_num,concept_cd from i2b2fact freq
-  inner join encounter enc on enc.patid = freq.patient_num and enc.encounterid = freq.encounter_Num
-  join pcornet_med freqcode
-  on freq.modifier_cd = freqcode.c_basecode
-  and freqcode.c_fullname like '\PCORI_MOD\RX_FREQUENCY\%'
+create table refills(
+  nval_num number(18,5), 
+	encounter_num number(38,0), 
+	concept_cd varchar2(50 byte)
   );
 
-create table quantity as (
-  select nval_num,encounter_num,concept_cd from i2b2fact quantity
-  inner join encounter enc on enc.patid = quantity.patient_num and enc.encounterid = quantity.encounter_Num
-  join pcornet_med quantitycode
-  on quantity.modifier_cd = quantitycode.c_basecode
-  and quantitycode.c_fullname like '\PCORI_MOD\RX_QUANTITY\'
-  );
-
-create table refills as (
-  select nval_num,encounter_num,concept_cd from i2b2fact refills
-  inner join encounter enc on enc.patid = refills.patient_num and enc.encounterid = refills.encounter_Num
-  join pcornet_med refillscode
-  on refills.modifier_cd = refillscode.c_basecode
-  and refillscode.c_fullname like '\PCORI_MOD\RX_REFILLS\'
-  );
-
-create table supply as (
-  select nval_num,encounter_num,concept_cd from i2b2fact supply
-  inner join encounter enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num
-  join pcornet_med supplycode
-  on supply.modifier_cd = supplycode.c_basecode
-  and supplycode.c_fullname like '\PCORI_MOD\RX_DAYS_SUPPLY\'
+create table supply(
+  nval_num number(18,5), 
+	encounter_num number(38,0), 
+	concept_cd varchar2(50 byte)
   );
 
 alter table blueheronmetadata.pcornet_med add (
@@ -1599,12 +1592,11 @@ Also, Error(57,57): PL/SQL: ORA-00904: "MO"."PCORI_NDC": invalid identifier
 whenever sqlerror continue;
 drop table amount;
 
-create table amount as (
-  select nval_num,encounter_num,concept_cd from i2b2fact amount
-  join pcornet_med amountcode
-  on amount.modifier_cd = amountcode.c_basecode
-  and amountcode.c_fullname like '\PCORI_MOD\RX_QUANTITY\'
-  );
+create table amount(
+  nval_num number(18,5), 
+	encounter_num number(38,0), 
+	concept_cd varchar2(50 byte)
+  ); 
 
 alter table blueheronmetadata.pcornet_med add (
   pcori_ndc varchar2(1000) -- arbitrary
@@ -1756,9 +1748,9 @@ PCORNetLabResultCM;
 PCORNetPrescribing;
 
 /* ORA-04068: existing state of packages has been discarded
-ORA-04065: not executed, altered or dropped stored procedure "NGRAHAM.PCORNETDISPENSING"
-ORA-06508: PL/SQL: could not find program unit being called: "NGRAHAM.PCORNETDISPENSING"
-ORA-06512: at "NGRAHAM.PCORNETLOADER", line 14
+ORA-04065: not executed, altered or dropped stored procedure "PCORNETDISPENSING"
+ORA-06508: PL/SQL: could not find program unit being called: "PCORNETDISPENSING"
+ORA-06512: at "PCORNETLOADER", line 14
 ORA-06512: at line 2
 04068. 00000 -  "existing state of packages%s%s%s has been discarded"
 *Cause:    One of errors 4060 - 4067 when attempt to execute a stored
