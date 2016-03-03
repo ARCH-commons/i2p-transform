@@ -81,6 +81,21 @@ from terms_dxi td
 order by c_hlevel
 ;
 
+-- Primary diagnosis modifier
+update "&&i2b2_meta_schema".pcornet_diag pd
+set pd.c_basecode = (
+  select ht.c_basecode 
+  from "&&i2b2_meta_schema"."&&terms_table" ht
+  join pcornet_mapping pm on pm.local_path = ht.c_fullname
+  where ht.c_tablename = 'MODIFIER_DIMENSION' and pm.pcori_path = pd.c_fullname
+  )
+where exists (
+  select ht.c_basecode 
+  from "&&i2b2_meta_schema"."&&terms_table" ht
+  join pcornet_mapping pm on pm.local_path = ht.c_fullname
+  where ht.c_tablename = 'MODIFIER_DIMENSION' and pm.pcori_path = pd.c_fullname
+  );  
+
 commit;
 
 --select *
