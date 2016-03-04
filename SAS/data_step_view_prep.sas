@@ -134,7 +134,7 @@ data sasdata.LAB_RESULT_CM / view=sasdata.LAB_RESULT_CM;
 		rename = (
 			RESULT_TIME = _RESULT_TIME
 			SPECIMEN_TIME = _SPECIMEN_TIME
-			/*RESULT_NUM = _RESULT_NUM*/
+			RESULT_NUM = _RESULT_NUM
 		)
 	)
 	;
@@ -147,8 +147,8 @@ data sasdata.LAB_RESULT_CM / view=sasdata.LAB_RESULT_CM;
 	format SPECIMEN_TIME hhmm.;
 	drop _SPECIMEN_TIME;
 	
-	/*RESULT_NUM = put(_RESULT_NUM, best8.);
-	drop _RESULT_NUM;*/
+	RESULT_NUM = put(_RESULT_NUM, best8.);
+	drop _RESULT_NUM;
 run;
 
 
