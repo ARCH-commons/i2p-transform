@@ -38,3 +38,34 @@ diff as (
   from cdm cross join i2b2
   )
 select case when diff.pct > 10 then 1/0 else 1 end proc_pat_count_ok from diff;
+
+
+/* Make sure we have roughly the same number of Hispanic patients in the CDM and
+i2b2.
+*/
+with
+num_hispanic_cdm as (
+  select count(*) qty from demographic where hispanic = 'Y'
+  ),
+num_hispanic_i2b2 as (
+  select count(*) qty from "&&i2b2_data_schema".patient_dimension where ethnicity_cd = 'Y'
+  ),
+diff as (
+  select ((abs(cdm.qty - i2b2.qty) / i2b2.qty) * 100) pct 
+  from num_hispanic_cdm cdm cross join num_hispanic_i2b2 i2b2
+  )
+select case when diff.pct > 10 then 1/0 else 1 end hisp_y_pat_count_ok from diff;
+
+-- TODO: Consider trying to combine the Y and N tests as they are copy/paste
+with
+num_hispanic_cdm as (
+  select count(*) qty from demographic where hispanic = 'N'
+  ),
+num_hispanic_i2b2 as (
+  select count(*) qty from "&&i2b2_data_schema".patient_dimension where ethnicity_cd = 'N'
+  ),
+diff as (
+  select ((abs(cdm.qty - i2b2.qty) / i2b2.qty) * 100) pct 
+  from num_hispanic_cdm cdm cross join num_hispanic_i2b2 i2b2
+  )
+select case when diff.pct > 10 then 1/0 else 1 end hisp_n_pat_count_ok from diff;
