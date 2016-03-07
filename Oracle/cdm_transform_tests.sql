@@ -69,3 +69,23 @@ diff as (
   from num_hispanic_cdm cdm cross join num_hispanic_i2b2 i2b2
   )
 select case when diff.pct > 10 then 1/0 else 1 end hisp_n_pat_count_ok from diff;
+
+-- Make sure we have some diagnosis source information 
+select case when count(*) < 3 then 1/0 else 1 end a_few_dx_sources from (
+  select distinct dx_source from diagnosis
+  );
+
+-- Make sure we have valid DX_SOURCE values
+select case when count(*) > 0 then 1/0 else 1 end valid_dx_sources from (
+  select distinct dx_source from diagnosis where dx_source not in ('AD', 'DI', 'FI', 'IN', 'NI', 'UN', 'OT')
+  );
+  
+-- Make sure we have a couple principal diagnoses (PDX)
+select case when count(*) < 2 then 1/0 else 1 end a_few_pdx_flags from (
+  select distinct pdx from diagnosis
+  );
+
+-- Make sure we have valid PDX values
+select case when count(*) > 0 then 1/0 else 1 end valid_pdx_flags from (
+  select distinct pdx from diagnosis where pdx not in ('P', 'S', 'X', 'NI', 'UN', 'OT')
+  );
