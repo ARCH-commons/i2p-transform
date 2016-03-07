@@ -1,5 +1,7 @@
 pcori_path,local_path
 \PCORI_MOD\PDX\P\,\Diagnosis\Clinical\PRIMARY_DX_YN\
+\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\DI\,\Diagnosis\\modifier_dx\billing_diagnosis\discharge\
+\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\AD\,\Diagnosis\\modifier_dx\billing_diagnosis\admit\
 \PCORI\DEMOGRAPHIC\BIOBANK_FLAG\Y\,\i2b2\Specimens\
 \PCORI\DEMOGRAPHIC\HISPANIC\N\,"\i2b2\Demographics\Ethnicity\Non Hispanic, Latino or Spanish Origin\"
 \PCORI\DEMOGRAPHIC\HISPANIC\NI\,\i2b2\Demographics\Ethnicity\Not Recorded\

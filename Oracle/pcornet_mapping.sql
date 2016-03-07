@@ -57,6 +57,13 @@ insert into "&&i2b2_meta_schema".pcornet_demo (
   select * from pcornet_ontology_updates where c_fullname like '\PCORI\DEMOGRAPHIC\%'
   );
 
+/* Bugs in the SCILHS ontology
+*/
+--https://github.com/SCILHS/scilhs-ontology/issues/11
+update "&&i2b2_meta_schema".pcornet_diag pd set pd.pcori_basecode = 'PDX:S' where c_fullname = '\PCORI_MOD\PDX\S\';
+update "&&i2b2_meta_schema".pcornet_diag pd set pd.pcori_basecode = 'PDX:P' where c_fullname = '\PCORI_MOD\PDX\P\';
+update "&&i2b2_meta_schema".pcornet_diag pd set pd.pcori_basecode = 'PDX:X' where c_fullname = '\PCORI_MOD\PDX\X\';
+
 
 /* Replace PCORNet ICD9 diagnoses hierarchy with the local hierarchy filling in
 the pcornet_basecode with the expected values.
@@ -96,20 +103,37 @@ from terms_dxi td
 order by c_hlevel
 ;
 
--- Primary diagnosis modifier
-update "&&i2b2_meta_schema".pcornet_diag pd
-set pd.c_basecode = (
-  select ht.c_basecode 
-  from "&&i2b2_meta_schema"."&&terms_table" ht
-  join pcornet_mapping pm on pm.local_path = ht.c_fullname
-  where ht.c_tablename = 'MODIFIER_DIMENSION' and pm.pcori_path = pd.c_fullname
-  )
-where exists (
-  select ht.c_basecode 
-  from "&&i2b2_meta_schema"."&&terms_table" ht
-  join pcornet_mapping pm on pm.local_path = ht.c_fullname
-  where ht.c_tablename = 'MODIFIER_DIMENSION' and pm.pcori_path = pd.c_fullname
-  );  
+
+-- Other diagnosis mappings such as modifiers for PDX, DX_SOURCE.
+insert into "&&i2b2_meta_schema".PCORNET_DIAG
+SELECT pcornet_diag.C_HLEVEL+1,
+  pcornet_diag.C_FULLNAME || i2b2.c_basecode || '\' as  C_FULLNAME,
+  i2b2.c_basecode || ' ' || i2b2.c_name as C_NAME,
+  pcornet_diag.C_SYNONYM_CD,
+  pcornet_diag.C_VISUALATTRIBUTES,
+  pcornet_diag.C_TOTALNUM,
+  i2b2.c_basecode as C_BASECODE,
+  pcornet_diag.C_METADATAXML,
+  pcornet_diag.C_FACTTABLECOLUMN,
+  pcornet_diag.C_TABLENAME,
+  pcornet_diag.C_COLUMNNAME,
+  pcornet_diag.C_COLUMNDATATYPE,
+  pcornet_diag.C_OPERATOR,
+  pcornet_diag.C_FULLNAME || i2b2.c_basecode || '\' as  C_DIMCODE,
+  pcornet_diag.C_COMMENT,
+  pcornet_diag.C_TOOLTIP,
+  pcornet_diag.M_APPLIED_PATH,
+  pcornet_diag.UPDATE_DATE,
+  pcornet_diag.DOWNLOAD_DATE,
+  pcornet_diag.IMPORT_DATE,
+  'MAPPING' as SOURCESYSTEM_CD,
+  pcornet_diag.VALUETYPE_CD,
+  pcornet_diag.M_EXCLUSION_CD,
+  pcornet_diag.C_PATH,
+  pcornet_diag.C_SYMBOL,
+  pcornet_diag.PCORI_BASECODE
+FROM "&&i2b2_meta_schema".pcornet_diag join pcornet_mapping on pcornet_mapping.PCORI_PATH = pcornet_diag.c_fullname and pcornet_mapping.local_path is not null
+join "&&i2b2_meta_schema"."&&terms_table" i2b2 on i2b2.c_fullname like pcornet_mapping.local_path || '%';
 
 commit;
 
