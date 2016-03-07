@@ -38,3 +38,9 @@ diff as (
   from cdm cross join i2b2
   )
 select case when diff.pct > 10 then 1/0 else 1 end proc_pat_count_ok from diff;
+
+/* Test to make sure we have something about patient smoking tobacco use */
+with smokers as (
+  select count(*) qty from vital where smoking!='NI'
+)
+select case when smokers.qty > 0 then 1 else 1/0 end smoker_count_ok from smokers;
