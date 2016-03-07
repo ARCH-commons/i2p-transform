@@ -201,7 +201,7 @@ select 'RACE',c_dimcode from pcornet_demo where c_fullname like '\PCORI\DEMOGRAP
 union
 select 'SEX',c_dimcode from pcornet_demo where c_fullname like '\PCORI\DEMOGRAPHIC\SEX%'
 union
-select 'HISPANIC',c_dimcode from pcornet_demo where c_fullname like '\PCORI\DEMOGRAPHIC\HISPANIC\Y%';
+select 'HISPANIC',c_dimcode from pcornet_demo where c_fullname like '\PCORI\DEMOGRAPHIC\HISPANIC%';
 
 
 begin
@@ -796,26 +796,6 @@ END;
 /
 
 
-/* TODO: Race vs Ethnicity - I think Eric at MCRF switched things around to use
-the fact table rather than the RACE_CD in the patient dimension.
-Refs:
-https://informatics.gpcnetwork.org/trac/Project/ticket/191#comment:15
-http://listserv.kumc.edu/pipermail/gpc-dev/2016q1/002508.html (thread)
-
-Maybe something like the following, along with a change to the demographic
-procedure?
-
-
-update blueheronmetadata.pcornet_demo set
-  c_facttablecolumn = 'CONCEPT_CD', 
-  c_tablename='CONCEPT_DIMENSION', 
-  c_columnname = 'CONCEPT_PATH', 
-  c_operator='LIKE', 
-  c_dimcode='\i2b2\Demographics\Ethnicity\Hispanic'
-where c_fullname = '\PCORI\DEMOGRAPHIC\HISPANIC\Y\';
-*/
-
-
 create or replace procedure PCORNetDemographic as 
 
 sqltext varchar2(4000); 
@@ -830,8 +810,8 @@ cursor getsql is
 	''''||race.pcori_basecode||''''||
 	' from i2b2patient p '||
 	'	where lower(p.sex_cd) in ('||lower(sex.c_dimcode)||') '||
-	'	and	lower(p.race_cd) in ('||lower(race.c_dimcode)||') '||
-	'   and lower(nvl(p.race_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'') '
+	'    and    lower(p.race_cd) in ('||lower(race.c_dimcode)||') '||
+	'   and lower(nvl(p.ethnicity_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'') '
 	from pcornet_demo race, pcornet_demo sex
 	where race.c_fullname like '\PCORI\DEMOGRAPHIC\RACE%'
 	and race.c_visualattributes like 'L%'
@@ -848,12 +828,11 @@ select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPA
 	' from i2b2patient p '||
 	'	where lower(p.sex_cd) in ('||lower(sex.c_dimcode)||') '||
 	'	and	lower(p.race_cd) in ('||lower(race.c_dimcode)||') '||
-	'	and	lower(nvl(p.race_cd,''xx'')) in (select lower(code) from pcornet_codelist where codetype=''RACE'') '||
-	'   and lower(nvl(p.race_cd,''xx'')) in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'') '
+	'	and	lower(p.ethnicity_cd) in ('||lower(hisp.c_dimcode)||') '
 	from pcornet_demo race, pcornet_demo hisp, pcornet_demo sex
 	where race.c_fullname like '\PCORI\DEMOGRAPHIC\RACE%'
 	and race.c_visualattributes like 'L%'
-	and hisp.c_fullname like '\PCORI\DEMOGRAPHIC\HISPANIC\Y%'
+	and hisp.c_fullname like '\PCORI\DEMOGRAPHIC\HISPANIC%'
 	and hisp.c_visualattributes like 'L%'
 	and sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX%'
 	and sex.c_visualattributes like 'L%'
@@ -868,7 +847,7 @@ union --2 S, nR, nH
 	' from i2b2patient p '||
 	'	where lower(nvl(p.sex_cd,''xx'')) in ('||lower(sex.c_dimcode)||') '||
 	'	and	lower(nvl(p.race_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''RACE'') '||
-	'   and lower(nvl(p.race_cd,''ni'')) not in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'') '
+	'   and lower(nvl(p.ethnicity_cd,''ni'')) not in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'') '
 	from pcornet_demo sex
 	where sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX%'
 	and sex.c_visualattributes like 'L%'
@@ -883,7 +862,7 @@ union --3 -- nS,R, NH
 	' from i2b2patient p '||
 	'	where lower(nvl(p.sex_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''SEX'') '||
 	'	and	lower(p.race_cd) in ('||lower(race.c_dimcode)||') '||
-	'   and lower(nvl(p.race_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'')'
+	'   and lower(nvl(p.ethnicity_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'')'
 	from pcornet_demo race
 	where race.c_fullname like '\PCORI\DEMOGRAPHIC\RACE%'
 	and race.c_visualattributes like 'L%'
@@ -898,12 +877,11 @@ union --B -- nS,R, H
 	' from i2b2patient p '||
 	'	where lower(nvl(p.sex_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''SEX'') '||
 	'	and	lower(p.race_cd) in ('||lower(race.c_dimcode)||') '||
-	'	and	lower(nvl(p.race_cd,''xx'')) in (select lower(code) from pcornet_codelist where codetype=''RACE'') '||
-	'   and lower(nvl(p.race_cd,''xx'')) in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'')'
+	'	and	lower(p.ethnicity_cd) in ('||lower(hisp.c_dimcode)||') '
 	from pcornet_demo race,pcornet_demo hisp
 	where race.c_fullname like '\PCORI\DEMOGRAPHIC\RACE%'
 	and race.c_visualattributes like 'L%'
-	and hisp.c_fullname like '\PCORI\DEMOGRAPHIC\HISPANIC\Y%'
+	and hisp.c_fullname like '\PCORI\DEMOGRAPHIC\HISPANIC%'
 	and hisp.c_visualattributes like 'L%'
 union --4 -- S, NR, H
 	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
@@ -911,28 +889,32 @@ union --4 -- S, NR, H
 	'	birth_date, '||
 	'	to_char(birth_date,''HH:MI''), '||
 	''''||sex.pcori_basecode||''','||
-	'''Y'','||
+	''''||hisp.pcori_basecode||''','||
 	'''NI'''||
 	' from i2b2patient p '||
 	'	where lower(nvl(p.sex_cd,''NI'')) in ('||lower(sex.c_dimcode)||') '||
-	'	and lower(nvl(p.race_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''RACE'') '||
-	'	and lower(nvl(p.race_cd,''xx'')) in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'') '
-	from pcornet_demo sex
+	'	and lower(nvl(p.ethnicity_cd,''NI'')) in ('||lower(hisp.c_dimcode)||') '||
+	'	and lower(nvl(p.race_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''RACE'') '
+	from pcornet_demo sex, pcornet_demo hisp
 	where sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX%'
 	and sex.c_visualattributes like 'L%'
+	and hisp.c_fullname like '\PCORI\DEMOGRAPHIC\HISPANIC%'
+	and hisp.c_visualattributes like 'L%'
 union --5 -- NS, NR, H
 	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
 	'	select ''5'',patient_num, '||
 	'	birth_date, '||
 	'	to_char(birth_date,''HH:MI''), '||
 	'''NI'','||
-	'''Y'','||
+	''''||hisp.pcori_basecode||''','||
 	'''NI'''||
 	' from i2b2patient p '||
 	'	where lower(nvl(p.sex_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''SEX'') '||
 	'	and lower(nvl(p.race_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''RACE'') '||
-	'	and lower(nvl(p.race_cd,''xx'')) in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'')'
-	from dual
+	'	and lower(nvl(p.ethnicity_cd,''NI'')) in ('||lower(hisp.c_dimcode)||') '
+  from pcornet_demo hisp
+	where hisp.c_fullname like '\PCORI\DEMOGRAPHIC\HISPANIC%'
+	and hisp.c_visualattributes like 'L%'
 union --6 -- NS, NR, nH
 	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
 	'	select ''6'',patient_num, '||
@@ -943,7 +925,7 @@ union --6 -- NS, NR, nH
 	'''NI'''||
 	' from i2b2patient p '||
 	'	where lower(nvl(p.sex_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''SEX'') '||
-	'	and lower(nvl(p.race_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'') '||
+	'	and lower(nvl(p.ethnicity_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'') '||
 	'   and lower(nvl(p.race_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''RACE'') ' 
 	from dual;
 

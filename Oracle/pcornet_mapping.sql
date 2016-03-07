@@ -42,6 +42,21 @@ join "&&i2b2_meta_schema"."&&terms_table" i2b2 on i2b2.c_fullname=pcornet_mappin
 
 commit;
 
+/* Updates to PCORNet demographic ontology
+ - Hispanic was added as a column, so updating code lists.
+ 
+TODO: Consider making a pull request to the SCILHS ontology with the changes.
+See also: https://github.com/SCILHS/i2p-transform/issues/1
+*/
+delete
+from "&&i2b2_meta_schema".pcornet_demo where c_fullname in (
+  select c_fullname from pcornet_ontology_updates
+  where c_fullname like '\PCORI\DEMOGRAPHIC\%'
+  );
+insert into "&&i2b2_meta_schema".pcornet_demo (
+  select * from pcornet_ontology_updates where c_fullname like '\PCORI\DEMOGRAPHIC\%'
+  );
+
 
 /* Replace PCORNet ICD9 diagnoses hierarchy with the local hierarchy filling in
 the pcornet_basecode with the expected values.
