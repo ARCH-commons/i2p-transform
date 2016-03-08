@@ -40,7 +40,16 @@ diff as (
 select case when diff.pct > 10 then 1/0 else 1 end proc_pat_count_ok from diff;
 
 /* Test to make sure we have something about patient smoking tobacco use */
-with smokers as (
-  select count(*) qty from vital where smoking!='NI'
+with snums as (
+  select smoking cat, count(smoking) qty from vital group by smoking
+),
+tot as (
+  select sum(qty) as cnt from snums
+),
+calc as (
+  select snums.cat, (snums.qty/tot.cnt*100) pct,
+    case when (snums.qty/tot.cnt*100) > 1 then 1 else 0 end tst
+  from snums, tot 
+  where snums.cat!='NI'
 )
-select case when smokers.qty > 0 then 1 else 1/0 end smoker_count_ok from smokers;
+select case when sum(calc.tst) < 3 then 1/0 else 1 end pass from calc;
