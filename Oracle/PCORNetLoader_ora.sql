@@ -1738,7 +1738,7 @@ PCORNetHarvest;
 PCORNetDemographic;
 PCORNetEncounter;
 PCORNetDiagnosis;
-PCORNetCondition;
+-- TODO: Put this back - avoid performance issues for now: PCORNetCondition;
 PCORNetProcedure; 
 PCORNetVital;
 PCORNetEnroll;
