@@ -68,6 +68,16 @@ calc as (
 select case when sum(calc.tst) < 3 then 1/0 else 1 end pass from calc;
 
 
-
+/* Test to make sure we have something about tobacco use types */
+with ttnums as (
+  select tobacco_type cat, count(tobacco) qty from vital group by tobacco_type order by cat
+),
+tot as (
+  select sum(qty) as cnt from ttnums
+),
+calc as (
+  select ttnums.cat, (ttnums.qty/tot.cnt*100) pct, case when (ttnums.qty/tot.cnt*100) > 1 then 1 else 0 end tst from ttnums, tot where ttnums.cat!='NI'
+)
+select case when sum(calc.tst) < 2 then 1/0 else 1 end pass from calc;
 
 
