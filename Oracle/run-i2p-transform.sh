@@ -19,8 +19,6 @@ set -e
 # All i2b2 terms - used for local path mapping
 #export terms_table=
 
-# Make sure the ethnicity code has been added to the patient dimension
-# See update_ethnicity_pdim.sql
 sqlplus /nolog <<EOF
 connect ${pcornet_cdm_user}/${pcornet_cdm}
 
@@ -30,7 +28,16 @@ define i2b2_data_schema=${i2b2_data_schema}
 
 WHENEVER SQLERROR EXIT SQL.SQLCODE;
 
+-- Make sure the ethnicity code has been added to the patient dimension
+-- See update_ethnicity_pdim.sql
 select ethnicity_cd from "&&i2b2_data_schema".patient_dimension where 1=0;
+
+-- Make sure the inout_cd has been populated
+-- See update_inout_cd_vdim.sql
+select case when qty = 0 then 1/0 else 1 end inout_cd_populated from (
+  select count(*) qty from "&&i2b2_data_schema".visit_dimension where inout_cd is not null
+  );
+
 EOF
 
 # Create/Load the local path mapping and ontology update tables
