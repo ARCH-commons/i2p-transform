@@ -36,6 +36,8 @@ join hispanic_codes hc on hc.concept_cd = obs.concept_cd
 group by obs.patient_num
 ;
 
+create index hispanic_codes_patnum_idx on hispanic_patients(patient_num);
+
 update "&&i2b2_data_schema".patient_dimension pd
 set ethnicity_cd = coalesce((
   select hp.pcori_code from hispanic_patients hp
