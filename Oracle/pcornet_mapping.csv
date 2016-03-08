@@ -48,6 +48,14 @@ pcori_path,local_path
 \PCORI\VITAL\BP\SYSTOLIC\,\i2b2\Flowsheet\KU\GEN TMP CARD ECHO VITALS T:900426\KU GEN CARD GRP CV COMMON VITALS G:910000 I#2\BLOOD PRESSURE M:5 I#2\SYSTOLIC\
 \PCORI\VITAL\ORIGINAL_BMI\,\i2b2\Flowsheet\MODEL\VITAL SIGNS COMPLEX T:31010\KU IP GRP ADULT HEIGHT/WEIGHT G:300220 I#4\KU IP ROW BMI M:301070 I#6\
 \PCORI\VITAL\WT\,\i2b2\Flowsheet\KU\GEN CARD\IP/OP HEIGHT/WEIGHT T:900445\KU GEN CARD G IP/OP PROCEDURE HEIGHT/WEI G:900612 I#1\WEIGHT/SCALE M:14 I#2\
+\PCORI\VITAL\TOBACCO\SMOKING\YES\01\,\i2b2\History\Social History\Tobacco Usage\Smoking Tobacco Use\Current Every Day Smoker\
+\PCORI\VITAL\TOBACCO\SMOKING\YES\02\,\i2b2\History\Social History\Tobacco Usage\Smoking Tobacco Use\Current Some Day Smoker\
+\PCORI\VITAL\TOBACCO\SMOKING\03\,\i2b2\History\Social History\Tobacco Usage\Smoking Tobacco Use\Former Smoker\
+\PCORI\VITAL\TOBACCO\SMOKING\04\,\i2b2\History\Social History\Tobacco Usage\Smoking Tobacco Use\Never Smoker \
+\PCORI\VITAL\TOBACCO\SMOKING\YES\05\,\i2b2\History\Social History\Tobacco Usage\Smoking Tobacco Use\Smoker, Current Status Unknown\
+\PCORI\VITAL\TOBACCO\SMOKING\06\,\i2b2\History\Social History\Tobacco Usage\Smoking Tobacco Use\Unknown If Ever Smoked\
+\PCORI\VITAL\TOBACCO\SMOKING\YES\07\,\i2b2\History\Social History\Tobacco Usage\Smoking Tobacco Use\Heavy Tobacco Smoker\
+\PCORI\VITAL\TOBACCO\SMOKING\YES\08\,\i2b2\History\Social History\Tobacco Usage\Smoking Tobacco Use\Light Tobacco Smoker\
 \PCORI\ENCOUNTER\DISCHARGE_DISPOSITION\A\,\i2b2\Visit Details\Discharge Disposition Codes\253\
 \PCORI\ENCOUNTER\DISCHARGE_DISPOSITION\A\,\i2b2\Visit Details\Discharge Disposition Codes\09\
 \PCORI\ENCOUNTER\DISCHARGE_DISPOSITION\A\,\i2b2\Visit Details\Discharge Disposition Codes\10\

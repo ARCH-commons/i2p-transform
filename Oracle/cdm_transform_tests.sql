@@ -120,3 +120,8 @@ select case when pct_not_null < 99 then 1/0 else 1 end some_px_dates_not_null fr
 select case when count(*) = 0 then 1/0 else 1 end have_px_sources from (
   select distinct px_source from procedures where px_source is not null
   );
+/* Test to make sure we have something about patient smoking tobacco use */
+with smokers as (
+  select count(*) qty from vital where smoking!='NI'
+)
+select case when smokers.qty > 0 then 1 else 1/0 end smoker_count_ok from smokers;
