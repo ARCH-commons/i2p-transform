@@ -1,3 +1,6 @@
+#!/bin/bash
+set -e
+
 # Expected environment variables (put there by Jenkins, etc.)
 
 # Database SID
@@ -16,7 +19,21 @@
 # All i2b2 terms - used for local path mapping
 #export terms_table=
 
-# Create/Load the local path mapping table
+# Make sure the ethnicity code has been added to the patient dimension
+# See update_ethnicity_pdim.sql
+sqlplus /nolog <<EOF
+connect ${pcornet_cdm_user}/${pcornet_cdm}
+
+set echo on;
+
+define i2b2_data_schema=${i2b2_data_schema}
+
+WHENEVER SQLERROR EXIT SQL.SQLCODE;
+
+select ethnicity_cd from "&&i2b2_data_schema".patient_dimension where 1=0;
+EOF
+
+# Create/Load the local path mapping and ontology update tables
 sqlplus /nolog <<EOF
 connect ${pcornet_cdm_user}/${pcornet_cdm}
 
