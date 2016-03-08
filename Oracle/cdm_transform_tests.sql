@@ -89,3 +89,17 @@ select case when count(*) < 2 then 1/0 else 1 end a_few_pdx_flags from (
 select case when count(*) > 0 then 1/0 else 1 end valid_pdx_flags from (
   select distinct pdx from diagnosis where pdx not in ('P', 'S', 'X', 'NI', 'UN', 'OT')
   );
+
+-- Make sure that at least half of our enrollment records are distinct dates
+select case when pct_distinct < 5 then 1/0 else 1 end many_enr_dates from (
+  with half_enrs as (
+    select round((select count(*)/2 from enrollment)) qty from dual
+    ),
+  distinct_date as (
+    select count(qty) qty from (
+      select distinct enr_start_date qty from enrollment
+      )
+    )
+  select round((distinct_date.qty/half_enrs.qty) * 100, 4) pct_distinct
+  from distinct_date cross join half_enrs
+  );
