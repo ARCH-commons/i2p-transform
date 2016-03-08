@@ -53,3 +53,15 @@ calc as (
   where snums.cat!='NI'
 )
 select case when sum(calc.tst) < 3 then 1/0 else 1 end pass from calc;
+
+
+/* Test to make sure we have something about patient general tobacco use */
+with tobacco as (
+  select count(*) qty from vital where tobacco!='NI'
+)
+select case when tobacco.qty > 0 then 1 else 1/0 end tobacco_count_ok from tobacco;
+
+
+
+
+
