@@ -125,3 +125,15 @@ with smokers as (
   select count(*) qty from vital where smoking!='NI'
 )
 select case when smokers.qty > 0 then 1 else 1/0 end smoker_count_ok from smokers;
+
+-- Make sure we have some encounter types
+select case when pct_known < 20 then 1/0 else 1 end some_known_enc_types from (
+  with all_enc as (
+    select count(*) qty from encounter
+    ),
+  known_enc as (
+    select count(*) qty from encounter where enc_type is not null and enc_type != 'UN'
+    )
+  select round((known_enc.qty / all_enc.qty) * 100, 4) pct_known 
+  from known_enc cross join all_enc
+  );
