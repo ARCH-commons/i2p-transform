@@ -103,3 +103,15 @@ select case when pct_distinct < 5 then 1/0 else 1 end many_enr_dates from (
   select round((distinct_date.qty/all_enrs.qty) * 100, 4) pct_distinct
   from distinct_date cross join all_enrs
   );
+
+-- Make sure most procedure dates are not null
+select case when pct_not_null < 99 then 1/0 else 1 end some_px_dates_not_null from (
+  with all_px as (
+    select count(*) qty from procedures
+    ),
+  not_null as (
+    select count(*) qty from procedures where px_date is not null
+    )
+  select round((not_null.qty / all_px.qty) * 100, 4) pct_not_null 
+  from not_null cross join all_px
+);
