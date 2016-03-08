@@ -1126,8 +1126,8 @@ end PCORNetCondition;
 create or replace procedure PCORNetProcedure as
 begin
 insert into procedures( 
-				patid,			encounterid,	enc_type, admit_date, providerid, px, px_type) 
-select  distinct fact.patient_num, enc.encounterid,	enc.enc_type, fact.start_date, 
+				patid,			encounterid,	enc_type, admit_date, px_date, providerid, px, px_type) 
+select  distinct fact.patient_num, enc.encounterid,	enc.enc_type, enc.admit_date, fact.start_date, 
 		fact.provider_id, SUBSTR(pr.pcori_basecode,INSTR(pr.pcori_basecode, ':')+1,11) px, SUBSTR(pr.c_fullname,18,2) pxtype 
 from i2b2fact fact
  inner join encounter enc on enc.patid = fact.patient_num and enc.encounterid = fact.encounter_Num
