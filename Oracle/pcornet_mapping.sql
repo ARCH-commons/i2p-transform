@@ -40,6 +40,36 @@ SELECT PCORNET_VITAL.C_HLEVEL+1,
 FROM "&&i2b2_meta_schema".PCORNET_VITAL join pcornet_mapping on pcornet_mapping.PCORI_PATH=PCORNET_VITAL.c_fullname and pcornet_mapping.local_path is not null
 join "&&i2b2_meta_schema"."&&terms_table" i2b2 on i2b2.c_fullname=pcornet_mapping.local_path;
 
+insert into "&&i2b2_meta_schema".PCORNET_ENC
+SELECT PCORNET_ENC.C_HLEVEL+1,
+  PCORNET_ENC.C_FULLNAME || i2b2.c_name || '\' as  C_FULLNAME,
+  i2b2.c_basecode || ' ' || i2b2.c_name as C_NAME,
+  PCORNET_ENC.C_SYNONYM_CD,
+  PCORNET_ENC.C_VISUALATTRIBUTES,
+  PCORNET_ENC.C_TOTALNUM,
+  i2b2.c_basecode as C_BASECODE,
+  PCORNET_ENC.C_METADATAXML,
+  PCORNET_ENC.C_FACTTABLECOLUMN,
+  PCORNET_ENC.C_TABLENAME,
+  PCORNET_ENC.C_COLUMNNAME,
+  PCORNET_ENC.C_COLUMNDATATYPE,
+  PCORNET_ENC.C_OPERATOR,
+  PCORNET_ENC.C_FULLNAME || i2b2.c_name || '\' as  C_DIMCODE,
+  PCORNET_ENC.C_COMMENT,
+  PCORNET_ENC.C_TOOLTIP,
+  PCORNET_ENC.M_APPLIED_PATH,
+  PCORNET_ENC.UPDATE_DATE,
+  PCORNET_ENC.DOWNLOAD_DATE,
+  PCORNET_ENC.IMPORT_DATE,
+  'MAPPING' as SOURCESYSTEM_CD,
+  PCORNET_ENC.VALUETYPE_CD,
+  PCORNET_ENC.M_EXCLUSION_CD,
+  PCORNET_ENC.C_PATH,
+  PCORNET_ENC.C_SYMBOL,
+  PCORNET_ENC.PCORI_BASECODE
+FROM "&&i2b2_meta_schema".PCORNET_ENC join pcornet_mapping on pcornet_mapping.PCORI_PATH=PCORNET_ENC.c_fullname and pcornet_mapping.local_path is not null
+join "&&i2b2_meta_schema"."&&terms_table" i2b2 on i2b2.c_fullname=pcornet_mapping.local_path;
+
 commit;
 
 /* Updates to PCORNet demographic ontology
