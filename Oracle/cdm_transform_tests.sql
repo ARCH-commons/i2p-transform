@@ -115,3 +115,8 @@ select case when pct_not_null < 99 then 1/0 else 1 end some_px_dates_not_null fr
   select round((not_null.qty / all_px.qty) * 100, 4) pct_not_null 
   from not_null cross join all_px
 );
+
+-- Make sure we have some procedure sources (px_source)
+select case when count(*) = 0 then 1/0 else 1 end have_px_sources from (
+  select distinct px_source from procedures where px_source is not null
+  );
