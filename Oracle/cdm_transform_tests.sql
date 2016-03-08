@@ -52,14 +52,20 @@ calc as (
   from snums, tot 
   where snums.cat!='NI'
 )
-select case when sum(calc.tst) < 3 then 1/0 else 1 end pass from calc;
+select case when sum(calc.tst) < 3 then 1/0 else 1 end smoking_count_ok from calc;
 
 
 /* Test to make sure we have something about patient general tobacco use */
-with tobacco as (
-  select count(*) qty from vital where tobacco!='NI'
+with tnums as (
+  select tobacco cat, count(tobacco) qty from vital group by tobacco
+),
+tot as (
+  select sum(qty) as cnt from tnums
+),
+calc as (
+  select tnums.cat, (tnums.qty/tot.cnt*100) pct, case when (tnums.qty/tot.cnt*100) > 1 then 1 else 0 end tst from tnums, tot where tnums.cat!='NI'
 )
-select case when tobacco.qty > 0 then 1 else 1/0 end tobacco_count_ok from tobacco;
+select case when sum(calc.tst) < 3 then 1/0 else 1 end pass from calc;
 
 
 
