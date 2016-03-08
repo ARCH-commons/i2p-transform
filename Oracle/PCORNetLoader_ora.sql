@@ -1230,11 +1230,25 @@ create or replace procedure PCORNetEnroll as
 begin
 
 INSERT INTO enrollment(PATID, ENR_START_DATE, ENR_END_DATE, CHART, ENR_BASIS) 
-    select x.patient_num patid, case when l.patient_num is not null then l.period_start else enr_start end enr_start_date
-    , case when l.patient_num is not null then l.period_end when enr_end_end>enr_end then enr_end_end else enr_end end enr_end_date 
-    , 'Y' chart, case when l.patient_num is not null then 'A' else 'E' end basis from 
-    (select patient_num, min(start_date) enr_start,max(start_date) enr_end,max(end_date) enr_end_end from i2b2visit where patient_num in (select patid from demographic) group by patient_num) x
-    left outer join i2b2loyalty_patients l on l.patient_num=x.patient_num;
+with pats_delta as (
+  -- If only one visit, visit_delta_days will be 0
+  select patient_num, max(start_date) - min(start_date) visit_delta_days
+  from i2b2visit
+  where start_date > add_months(sysdate, -36)
+  group by patient_num
+  ),
+enrolled as (
+  select distinct patient_num 
+  from pats_delta
+  where visit_delta_days > 30
+  )
+select 
+  visit.patient_num patid, min(visit.start_date) enr_start_date, 
+  max(visit.start_date) enr_end_date, 'Y' chart, 'A' enr_basis
+from enrolled enr
+join i2b2visit visit on enr.patient_num = visit.patient_num
+group by visit.patient_num;
+
 
 end PCORNetEnroll;
 /
