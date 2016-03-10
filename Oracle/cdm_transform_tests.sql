@@ -121,19 +121,43 @@ select case when count(*) = 0 then 1/0 else 1 end have_px_sources from (
   select distinct px_source from procedures where px_source is not null
   );
 /* Test to make sure we have something about patient smoking tobacco use */
-with smokers as (
-  select count(*) qty from vital where smoking!='NI'
+with snums as (
+  select smoking cat, count(smoking) qty from vital group by smoking
+),
+tot as (
+  select sum(qty) as cnt from snums
+),
+calc as (
+  select snums.cat, (snums.qty/tot.cnt*100) pct,
+    case when (snums.qty/tot.cnt*100) > 1 then 1 else 0 end tst
+  from snums, tot 
+  where snums.cat!='NI'
 )
-select case when smokers.qty > 0 then 1 else 1/0 end smoker_count_ok from smokers;
+select case when sum(calc.tst) < 3 then 1/0 else 1 end smoking_count_ok from calc;
 
--- Make sure we have some encounter types
-select case when pct_known < 20 then 1/0 else 1 end some_known_enc_types from (
-  with all_enc as (
-    select count(*) qty from encounter
-    ),
-  known_enc as (
-    select count(*) qty from encounter where enc_type is not null and enc_type != 'UN'
-    )
-  select round((known_enc.qty / all_enc.qty) * 100, 4) pct_known 
-  from known_enc cross join all_enc
-  );
+
+/* Test to make sure we have something about patient general tobacco use */
+with tnums as (
+  select tobacco cat, count(tobacco) qty from vital group by tobacco
+),
+tot as (
+  select sum(qty) as cnt from tnums
+),
+calc as (
+  select tnums.cat, (tnums.qty/tot.cnt*100) pct, case when (tnums.qty/tot.cnt*100) > 1 then 1 else 0 end tst from tnums, tot where tnums.cat!='NI'
+)
+select case when sum(calc.tst) < 3 then 1/0 else 1 end pass from calc;
+
+
+/* Test to make sure we have something about tobacco use types */
+with ttnums as (
+  select tobacco_type cat, count(tobacco) qty from vital group by tobacco_type order by cat
+),
+tot as (
+  select sum(qty) as cnt from ttnums
+),
+calc as (
+  select ttnums.cat, (ttnums.qty/tot.cnt*100) pct, case when (ttnums.qty/tot.cnt*100) > 1 then 1 else 0 end tst from ttnums, tot where ttnums.cat!='NI'
+)
+select case when sum(calc.tst) < 2 then 1/0 else 1 end pass from calc;
+

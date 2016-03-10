@@ -43,6 +43,11 @@ pcori_path,local_path
 \PCORI\VITAL\TOBACCO\SMOKING\06\,\i2b2\History\Social History\Tobacco Usage\Smoking Tobacco Use\Unknown If Ever Smoked\
 \PCORI\VITAL\TOBACCO\SMOKING\YES\07\,\i2b2\History\Social History\Tobacco Usage\Smoking Tobacco Use\Heavy Tobacco Smoker\
 \PCORI\VITAL\TOBACCO\SMOKING\YES\08\,\i2b2\History\Social History\Tobacco Usage\Smoking Tobacco Use\Light Tobacco Smoker\
+\PCORI\VITAL\TOBACCO\02\01\,\i2b2\History\Social History\Tobacco Usage\Yes\
+\PCORI\VITAL\TOBACCO\02\02\,\i2b2\History\Social History\Tobacco Usage\Never\
+\PCORI\VITAL\TOBACCO\02\03\,\i2b2\History\Social History\Tobacco Usage\Quit\
+\PCORI\VITAL\TOBACCO\02\04\,\i2b2\History\Social History\Tobacco Usage\Passive\
+\PCORI\VITAL\TOBACCO\UN\06\,\i2b2\History\Social History\Tobacco Usage\Not Asked\
 \PCORI\ENCOUNTER\DISCHARGE_DISPOSITION\A\,\i2b2\Visit Details\Discharge Disposition Codes\253\
 \PCORI\ENCOUNTER\DISCHARGE_DISPOSITION\A\,\i2b2\Visit Details\Discharge Disposition Codes\09\
 \PCORI\ENCOUNTER\DISCHARGE_DISPOSITION\A\,\i2b2\Visit Details\Discharge Disposition Codes\10\
