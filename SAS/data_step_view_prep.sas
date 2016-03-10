@@ -1,39 +1,25 @@
 /*******************************************************************************
-* Generate the data step views required by the PRCOnet Diagnostic Query 
-* (diagnostic.sas).
-*
-* Provided the following values below before execution:
-*  - ORC_SCHEMA
-*  - ORC_USERNAME
-*  - ORC_PASSWORD
-*  - OCR_HOSTNAME
-*  - ORC_SID
-*  - VIEW_LIB_PATH
-*
+* Generate the PCORnet CDMv3 data step views required by PCORnet SAS queries, 
+* providing the required data type transformations where needed. 
 *******************************************************************************/
 
+
+***************************************************************;
+* Clear SAS result buffer
+***************************************************************;
 ODS HTML CLOSE;
 ODS HTML;
 
-libname oracdata oracle schema=ORC_SCEMA user=ORC_USERNAME pw=ORC_PASSWORD 
-  path="(DESCRIPTION = 
-    (ADDRESS = 
-      (PROTOCOL = TCP)
-      (HOST = ORC_HOSTNAME)
-      (PORT = 1521)
-    )
-    (CONNECT_DATA = 
-      (SID = ORC_SID)
-    )
-  )";
-  
-libname sasdata 'VIEW_LIB_PATH';
+
+***************************************************************;
+* Include configurable SAS libraies
+***************************************************************;
+%include './configuration.sas';
 
 
 ***************************************************************;
 * Create data step view for DEMOGRAPHIC
 ***************************************************************;
-
 data sasdata.DEMOGRAPHIC / view=sasdata.DEMOGRAPHIC;
 	set oracdata.DEMOGRAPHIC(
 		rename = (
@@ -41,6 +27,9 @@ data sasdata.DEMOGRAPHIC / view=sasdata.DEMOGRAPHIC;
 		)
 	)
 	;
+
+	BIRTH_DATE = datepart(BIRTH_DATE);
+    format BIRTH_DATE mmddyy10.;
 
 	BIRTH_TIME = input(_BIRTH_TIME, hhmmss.);
 	format BIRTH_TIME hhmm.;
@@ -51,7 +40,6 @@ run;
 ***************************************************************;
 * Create data step view for ENROLLMENT
 ***************************************************************;
-
 data sasdata.ENROLLMENT / view=sasdata.ENROLLMENT;
 	set oracdata.ENROLLMENT;
 run;
@@ -60,7 +48,6 @@ run;
 ***************************************************************;
 * Create data step view for ENCOUNTER
 ***************************************************************;
-
 data sasdata.ENCOUNTER / view=sasdata.ENCOUNTER;
 	set oracdata.ENCOUNTER(
 		rename = (
@@ -83,7 +70,6 @@ run;
 ***************************************************************;
 * Create data step view for DIAGNOSIS
 ***************************************************************;
-
 data sasdata.DIAGNOSIS / view=sasdata.DIAGNOSIS;
 	set oracdata.DIAGNOSIS;
 run;
@@ -119,7 +105,6 @@ run;
 ***************************************************************;
 * Create data step view for DISPENSING
 ***************************************************************;
-
 data sasdata.DISPENSING / view=sasdata.DISPENSING;
 	set oracdata.DISPENSING;
 run;
@@ -128,7 +113,6 @@ run;
 ***************************************************************;
 * Create data step view for LAB_RESULT_CM
 ***************************************************************;
-
 data sasdata.LAB_RESULT_CM / view=sasdata.LAB_RESULT_CM;
 	set oracdata.LAB_RESULT_CM(
 		rename = (
@@ -155,7 +139,6 @@ run;
 ***************************************************************;
 * Create data step view for CONDITION
 ***************************************************************;
-
 data sasdata.CONDITION / view=sasdata.CONDITION;
 	set oracdata.CONDITION;
 run;
@@ -164,7 +147,6 @@ run;
 ***************************************************************;
 * Create data step view for PRO_CM
 ***************************************************************;
-
 data sasdata.PRO_CM / view=sasdata.PRO_CM;
 	set oracdata.PRO_CM(
 		rename = (
@@ -182,7 +164,6 @@ run;
 ***************************************************************;
 * Create data step view for PRESCRIBING
 ***************************************************************;
-
 data sasdata.PRESCRIBING / view=sasdata.PRESCRIBING;
 	set oracdata.PRESCRIBING(
 		rename = (
@@ -200,7 +181,6 @@ run;
 ***************************************************************;
 * Create data step view for PCORNET_TRIAL
 ***************************************************************;
-
 data sasdata.PCORNET_TRIAL / view=sasdata.PCORNET_TRIAL;
 	set oracdata.PCORNET_TRIAL;
 run;
@@ -209,7 +189,6 @@ run;
 ***************************************************************;
 * Create data step view for DEATH
 ***************************************************************;
-
 data sasdata.DEATH / view=sasdata.DEATH;
 	set oracdata.DEATH;
 run;
@@ -218,7 +197,6 @@ run;
 ***************************************************************;
 * Create data step view for DEATH_CAUSE
 ***************************************************************;
-
 data sasdata.DEATH_CAUSE / view=sasdata.DEATH_CAUSE;
 	set oracdata.DEATH_CAUSE;
 run;
@@ -227,7 +205,6 @@ run;
 ***************************************************************;
 * Create data step view for HARVEST
 ***************************************************************;
-
 data sasdata.HARVEST / view=sasdata.HARVEST;
 	set oracdata.HARVEST;
 run;
