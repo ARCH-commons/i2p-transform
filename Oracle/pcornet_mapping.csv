@@ -1,5 +1,7 @@
 pcori_path,local_path
-\PCORI_MOD\PDX\P\,\Diagnosis\Clinical\PRIMARY_DX_YN\
+\PCORI_MOD\PDX\P\,\Diagnosis\\modifier_dx\billing_diagnosis\discharge\discharge_primary\
+\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\DI\,\Diagnosis\\modifier_dx\billing_diagnosis\discharge\
+\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\AD\,\Diagnosis\\modifier_dx\billing_diagnosis\admit\
 \PCORI\DEMOGRAPHIC\BIOBANK_FLAG\Y\,\i2b2\Specimens\
 \PCORI\DEMOGRAPHIC\HISPANIC\N\,"\i2b2\Demographics\Ethnicity\Non Hispanic, Latino or Spanish Origin\"
 \PCORI\DEMOGRAPHIC\HISPANIC\NI\,\i2b2\Demographics\Ethnicity\Not Recorded\
@@ -7,24 +9,11 @@ pcori_path,local_path
 \PCORI\DEMOGRAPHIC\HISPANIC\Y\,\i2b2\Demographics\Ethnicity\Hispanic\
 \PCORI\DEMOGRAPHIC\HISPANIC\Y\,\i2b2\Demographics\Ethnicity\Hispanic or Latino\
 \PCORI\DEMOGRAPHIC\HISPANIC\Y\,"\i2b2\Demographics\Ethnicity\Hispanic, Latino or Spanish Origin\"
-\PCORI\ENCOUNTER\ENC_TYPE\AV\,\i2b2\Visit Details\Encounter Type\102\
-\PCORI\ENCOUNTER\ENC_TYPE\AV\,\i2b2\Visit Details\Encounter Type\126\
-\PCORI\ENCOUNTER\ENC_TYPE\ED\,\i2b2\Visit Details\Encounter Type\103\
-\PCORI\ENCOUNTER\ENC_TYPE\IP\,\i2b2\Visit Details\Encounter Type\101\
-\PCORI\ENCOUNTER\ENC_TYPE\OT\,\i2b2\Visit Details\Encounter Type\110\
-\PCORI\ENCOUNTER\ENC_TYPE\OT\,\i2b2\Visit Details\Encounter Type\128\
-\PCORI\ENCOUNTER\ENC_TYPE\OT\,\i2b2\Visit Details\Encounter Type\122\
-\PCORI\ENCOUNTER\ENC_TYPE\OT\,\i2b2\Visit Details\Encounter Type\127\
-\PCORI\ENCOUNTER\ENC_TYPE\OT\,\i2b2\Visit Details\Encounter Type\107\
-\PCORI\ENCOUNTER\ENC_TYPE\OT\,\i2b2\Visit Details\Encounter Type\104\
-\PCORI\ENCOUNTER\ENC_TYPE\OT\,\i2b2\Visit Details\Encounter Type\130\
-\PCORI\ENCOUNTER\ENC_TYPE\OT\,\i2b2\Visit Details\Encounter Type\125\
-\PCORI\ENCOUNTER\ENC_TYPE\OT\,\i2b2\Visit Details\Encounter Type\124\
-\PCORI\ENCOUNTER\ENC_TYPE\OT\,\i2b2\Visit Details\Encounter Type\114\
-\PCORI\ENCOUNTER\ENC_TYPE\OT\,\i2b2\Visit Details\Encounter Type\123\
-\PCORI\ENCOUNTER\ENC_TYPE\OT\,\i2b2\Visit Details\Encounter Type\109\
-\PCORI\ENCOUNTER\ENC_TYPE\OT\,\i2b2\Visit Details\Encounter Type\115\
-\PCORI\ENCOUNTER\ENC_TYPE\OT\,\i2b2\Visit Details\Encounter Type\129\
+\PCORI\ENCOUNTER\ENC_TYPE\AV\,\i2b2\Visit Details\ENC_TYPE\AV\
+\PCORI\ENCOUNTER\ENC_TYPE\AV\,\i2b2\Visit Details\ENC_TYPE\AV\
+\PCORI\ENCOUNTER\ENC_TYPE\ED\,\i2b2\Visit Details\ENC_TYPE\ED\
+\PCORI\ENCOUNTER\ENC_TYPE\IP\,\i2b2\Visit Details\ENC_TYPE\IP\
+\PCORI\ENCOUNTER\ENC_TYPE\OT\,\i2b2\Visit Details\ENC_TYPE\OT\
 \PCORI\DEMOGRAPHIC\SEX\F\,\i2b2\Demographics\Gender\Female\
 \PCORI\DEMOGRAPHIC\SEX\M\,\i2b2\Demographics\Gender\Male\
 \PCORI\DEMOGRAPHIC\SEX\NI\,\i2b2\Demographics\Gender\Unknown\Unknown-@\
