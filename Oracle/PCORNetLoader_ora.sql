@@ -1288,7 +1288,7 @@ create table location (
 	result_loc varchar2(50 byte)
   );
 
-alter table blueheronmetadata.pcornet_lab add (
+alter table "&&i2b2_meta_schema".pcornet_lab add (
   pcori_specimen_source varchar2(1000) -- arbitrary
   );
 whenever sqlerror exit;
@@ -1472,7 +1472,7 @@ create table supply(
 	concept_cd varchar2(50 byte)
   );
 
-alter table blueheronmetadata.pcornet_med add (
+alter table "&&i2b2_meta_schema".pcornet_med add (
   pcori_cui varchar2(1000) -- arbitrary
   );
 whenever sqlerror exit;
@@ -1596,7 +1596,7 @@ create table amount(
 	concept_cd varchar2(50 byte)
   ); 
 
-alter table blueheronmetadata.pcornet_med add (
+alter table "&&i2b2_meta_schema".pcornet_med add (
   pcori_ndc varchar2(1000) -- arbitrary
   );
 whenever sqlerror exit;
