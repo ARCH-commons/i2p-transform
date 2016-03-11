@@ -18,6 +18,16 @@ create index diagnosis_encid on diagnosis (encounterid);
 create index procedures_patid on procedures (patid);
 create index procedures_encid on procedures (encounterid);
 create index vital_patid on vital (patid);
+
+actually, foreign key constraints make more sense...
+
+alter table encounter
+add constraint fk_patid foreign key (patid)
+references demographic (patid);
+
+
+alter session set NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI';
+
  */
 
 
@@ -27,9 +37,10 @@ TODO: push this back into HERON ETL
 */
 merge into "&&i2b2_data_schema".visit_dimension vd
 using (
+  -- can we get it from UHC length_of_stay?
   select obs.encounter_num, obs.patient_num
        , obs.nval_num length_of_stay
-       , obs.end_date
+       , obs.end_date discharge_date
   from "&&i2b2_data_schema".observation_fact obs
   where obs.concept_cd = 'UHC|LOS:1'  -- TODO: parameterize
 ) obs
@@ -37,9 +48,33 @@ on (  obs.encounter_num = vd.encounter_num
     and obs.patient_num = vd.patient_num)
 when matched then update
  set vd.length_of_stay = obs.length_of_stay
-         , vd.end_date = obs.end_date
+         , vd.end_date = obs.discharge_date
 ;
 -- 194,328 rows merged.
+
+merge into "&&i2b2_data_schema".visit_dimension vd
+using (
+  -- how about discharge disposition?
+  select obs.encounter_num, obs.patient_num
+       , max(obs.start_date) discharge_date
+  from "&&i2b2_data_schema".observation_fact obs
+  join (
+    select distinct concept_cd
+    from "&&i2b2_data_schema".concept_dimension
+      -- TODO: map to PCORnet path
+    where concept_path like '\i2b2\Visit Details\Discharge Disposition Codes\%'
+    group by concept_cd
+  ) cd on cd.concept_cd = obs.concept_cd
+  group by encounter_num, patient_num
+) obs
+on (  obs.encounter_num = vd.encounter_num
+    and obs.patient_num = vd.patient_num)
+when matched then update
+ set vd.length_of_stay = obs.discharge_date - vd.start_date
+         , vd.end_date = obs.discharge_date
+;
+-- 3,879,931 rows merged.
+
 
 
 merge into encounter pe
@@ -61,12 +96,28 @@ with enc_agg as (
   select count(*) enc_qty from encounter
   where enc_type in ('IP', 'IS')
   )
-select count(*), round(count(*) / enc_qty * 100, 1) pct
-from encounter cross join enc_agg
+select count(*), round(count(*) / enc_qty * 100, 1) pct, enc_type
+from (
+select *
+from encounter
 where enc_type in ('IP', 'IS')
 and discharge_date is null
-group by enc_qty
+)
+cross join enc_agg
+group by enc_qty, enc_type
 ;
+
+/* Due to using hostpital accounts as encounters,
+we have a long tail of very long encounters; hundreds of days.
+
+select count(*), los from (
+select round(discharge_date - admit_date) LOS
+from encounter
+where enc_type in ('IP', 'IS')
+) group by los
+order by 2
+;
+*/
 
 
 
