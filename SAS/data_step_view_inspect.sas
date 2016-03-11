@@ -15,7 +15,11 @@ ODS HTML;
 ***************************************************************;
 * Include configurable SAS libraies
 ***************************************************************;
-%include './configuration.sas';
+%let fpath=%sysget(SAS_EXECFILEPATH);
+%let fname=%sysget(SAS_EXECFILENAME);
+%let path= %sysfunc(tranwrd(&fpath,&fname,''));
+%put &path;
+%include '&path/configuration.sas';
 
 
 proc contents data=sasdata.DEMOGRAPHIC;
