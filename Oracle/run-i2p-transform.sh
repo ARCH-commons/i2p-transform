@@ -52,6 +52,9 @@ WHENEVER SQLERROR EXIT SQL.SQLCODE;
 -- See update_ethnicity_pdim.sql
 select ethnicity_cd from "&&i2b2_data_schema".patient_dimension where 1=0;
 
+-- Make sure that the providerid column has been added to the visit dimension
+select providerid from "&&i2b2_data_schema".visit_dimension where 1=0;
+
 -- Make sure the inout_cd has been populated
 -- See update_inout_cd_vdim.sql
 select case when qty = 0 then 1/0 else 1 end inout_cd_populated from (
