@@ -86,62 +86,6 @@ when matched then update set pe.discharge_date = vd.end_date;
 */
 
 
-/* Check that we have encounter.discharge_date for selected visit types.
-
-"Discharge date. Should be populated for all
-Inpatient Hospital Stay (IP) and Non-Acute
-Institutional Stay (IS) encounter types."
- -- PCORnet CDM v3
-*/
-
-/* TODO: Consider moving to cdm_transform_tests.sql
-with enc_agg as (
-  select count(*) enc_qty from encounter
-  where enc_type in ('IP', 'IS')
-  )
-select count(*), round(count(*) / enc_qty * 100, 1) pct, enc_type
-from (
-select *
-from encounter
-where enc_type in ('IP', 'IS')
-and discharge_date is null
-)
-cross join enc_agg
-group by enc_qty, enc_type
-;
-*/
-
-/* Due to using hostpital accounts as encounters,
-we have a long tail of very long encounters; hundreds of days.
-
-select count(*), los from (
-select round(discharge_date - admit_date) LOS
-from encounter
-where enc_type in ('IP', 'IS')
-) group by los
-order by 2
-;
-*/
-
-
-
-/** TODO: chase down ~80% unknown enc_type */
-/* TODO: Consider moving to cdm_transform_tests.sql
-with enc_agg as (
-select count(*) qty from encounter)
-select count(*) encounter_qty
-     , round(count(*) / enc_agg.qty * 100, 1) pct
-     , enc_type
-from encounter enc
-cross join enc_agg
-where exists (
-  select admit_date from diagnosis dx where enc.patid = dx.patid)
-or exists (
-  select admit_date from procedures px where enc.patid = px.patid)
-group by enc_type, enc_agg.qty
-;
-*/
-
 /* TODO: get encounter type from source system? */
 /* TODO: Consider moving to cdm_transform_tests.sql
 select count(*), sourcesystem_cd
