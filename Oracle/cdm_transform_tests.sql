@@ -161,3 +161,15 @@ calc as (
 )
 select case when sum(calc.tst) < 2 then 1/0 else 1 end pass from calc;
 
+-- Make sure most provider ids in the visit dimension are not null/unknown/no information
+select case when pct_not_null < 70 then 1/0 else 1 end some_providers_not_null from (
+  with all_enc as (
+    select count(*) qty from encounter
+    ),
+  not_null as (
+    select count(*) qty from encounter 
+    where providerid is not null and providerid not in ('NI', 'UN')
+    )
+  select round((not_null.qty / all_enc.qty) * 100, 4) pct_not_null 
+  from not_null cross join all_enc
+);
