@@ -972,9 +972,6 @@ ORA-00904: "FACILITY_ID": invalid identifier
 
 5)
 ORA-00904: "LOCATION_ZIP": invalid identifier
-
-6)
-ORA-00904: "PROVIDERID": invalid identifier
 */
 create or replace procedure PCORNetEncounter as
 
@@ -990,7 +987,7 @@ select distinct v.patient_num, v.encounter_num,
 	to_char(start_Date,'HH:MI'), 
 	end_Date, 
 	to_char(end_Date,'HH:MI'), 
-	'NI' providerid, --See TODO above
+	providerid,
   'NI' location_zip, /* See TODO above */
 (case when pcori_enctype is not null then pcori_enctype else 'UN' end) enc_type, 
   'NI' facility_id,  /* See TODO above */
