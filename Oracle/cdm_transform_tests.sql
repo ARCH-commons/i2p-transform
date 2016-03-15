@@ -239,3 +239,22 @@ where enc_type in ('IP', 'IS')
 order by 2
 ;
 */
+
+/* Make sure we have some discharge disposition data.
+
+DISCHARGE_DISPOSITION: Vital status at discharge. Should be populated for 
+Inpatient Hospital Stay (IP) and Non-Acute Institutional Stay (IS) encounter 
+types. May be populated for Emergency Department (ED) and ED-to-Inpatient (EI) 
+encounter types. Should be missing for ambulatory visit (AV or OA) 
+
+from: 2015-07-29-PCORnet-Common-Data-Model-v3dot0-RELEASE.pdf
+
+TODO: Make this test more robust - at the moment, it just makes sure not all are
+NI.
+*/
+select case when qty = 0 then 1/0 else 1 end some_discharge_dispositions from (
+  select count(*) qty 
+  from encounter e 
+  where e.discharge_disposition is not null 
+  and e.discharge_disposition != 'NI'
+  );
