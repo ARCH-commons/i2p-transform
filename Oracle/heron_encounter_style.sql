@@ -198,8 +198,7 @@ enc_type_codes as (
   select 
     pm.pcori_path, replace(substr(pm.pcori_path, instr(pm.pcori_path, '\', -2)), '\', '') pcori_code, pm.local_path, cd.concept_cd
   from pcornet_mapping pm 
-  --join "&&i2b2_data_schema".concept_dimension cd on cd.concept_path like pm.local_path || '%'
-  join nightherondata.concept_dimension cd on cd.concept_path like pm.local_path || '%'
+  join "&&i2b2_data_schema".concept_dimension cd on cd.concept_path like pm.local_path || '%'
   where pm.pcori_path like '\PCORI\ENCOUNTER\DISCHARGE_DISPOSITION\%'
   )
 select obs.encounter_num, et.pcori_code
