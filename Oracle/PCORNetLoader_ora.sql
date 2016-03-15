@@ -961,9 +961,6 @@ Error(16,266): PL/SQL: ORA-00911: invalid character
            
 Commented out that and what it's used for (ADMITTING_SOURCE)
 
-2)
-ORA-00904: "DISCHARGE_STATUS": invalid identifier
-
 3)
 ORA-00904: "DISCHARGE_DISPOSITION": invalid identifier
 
@@ -992,7 +989,7 @@ select distinct v.patient_num, v.encounter_num,
 (case when pcori_enctype is not null then pcori_enctype else 'UN' end) enc_type, 
   'NI' facility_id,  /* See TODO above */
   'NI' discharge_disposition /*CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE  discharge_disposition END*/ , 
-  'NI' discharge_status /* See TODO above CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE discharge_status END*/ , 
+  CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE discharge_status END, 
   drg.drg, drg_type, 'NI' admitting_source /* see TODO above CASE WHEN _source IS NULL THEN 'NI' ELSE admitting_source END*/
 from i2b2visit v inner join demographic d on v.patient_num=d.patid
 left outer join 
