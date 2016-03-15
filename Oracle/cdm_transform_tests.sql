@@ -210,18 +210,29 @@ calc as (
 )
 select case when sum(calc.tst) < 2 then 1/0 else 1 end pass from calc;
 
--- Make sure most provider ids in the visit dimension are not null/unknown/no information
-select case when pct_not_null < 70 then 1/0 else 1 end some_providers_not_null from (
+
+insert into test_cases (query_name, description, pass, freq, pct, value)
+select 'some_providers_not_null' query_name
+     , 'Make sure most provider ids in the visit dimension are
+        not null/unknown/no information' description
+     , case when value = 'OK' and pct > 70 then 1
+            when value = 'UN' and pct < 30 then 1
+            else 0 end pass
+     , t.*
+from (
   with all_enc as (
-    select count(*) qty from encounter
-    ),
-  not_null as (
-    select count(*) qty from encounter 
-    where providerid is not null and providerid not in ('NI', 'UN')
-    )
-  select round((not_null.qty / all_enc.qty) * 100, 4) pct_not_null 
-  from not_null cross join all_enc
-);
+    select count(*) qty from encounter),
+  provider_ok as (
+    select case when providerid is not null
+                and providerid not in ('NI', 'UN') then 'OK'
+           else 'UN'
+           end value
+    from encounter)
+  select count(*) freq, round(count(*) / all_enc.qty * 100, 4) pct, value
+  from provider_ok cross join all_enc
+  group by value, all_enc.qty
+) t
+;
 
 
 insert into test_cases (query_name, description, pass, freq, pct, value)
