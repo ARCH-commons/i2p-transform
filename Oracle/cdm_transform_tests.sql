@@ -1,3 +1,22 @@
+whenever sqlerror continue
+drop table test_cases;
+whenever sqlerror exit;
+create table test_cases (
+  pass integer,
+  query_name varchar2(160),
+  value varchar2(160),
+  freq number,
+  pct number,
+  description varchar2(2000)
+)
+;
+comment on column test_cases.pass is '1 for pass, 0 for fail';
+comment on column test_cases.query_name is 'a la DRN OS SAS script query name';
+comment on column test_cases.value is 'relevant nominal or scalar value';
+comment on column test_cases.freq is 'frequency; i.e. count our quanitity';
+comment on column test_cases.pct is 'percent of all observations';
+
+
 /* Test to make sure we got about the same number of patients in the CDM 
 diagnoses that we do in i2b2.
 */
@@ -204,29 +223,35 @@ select case when pct_not_null < 70 then 1/0 else 1 end some_providers_not_null f
   from not_null cross join all_enc
 );
 
-/* Check that we have encounter.discharge_date for selected visit types.
 
+insert into test_cases (query_name, description, pass, freq, pct, value)
+select 'enc_have_discharge_date' query_name
+     , '
 "Discharge date. Should be populated for all
 Inpatient Hospital Stay (IP) and Non-Acute
 Institutional Stay (IS) encounter types."
  -- PCORnet CDM v3
-*/
-
-select case when count(*) > 0 then 1/0 else 1 end pp_is_enc_have_discharge_date from (
+' description
+     , case when t.freq = 0 then 1 else 0 end pass
+     , t.*
+from (
   with enc_agg as (
     select count(*) enc_qty from encounter
     where enc_type in ('IP', 'IS')
     )
-  select count(*), round(count(*) / enc_qty * 100, 1) pct, enc_type
+  select count(*) freq
+       , round(count(*) / enc_qty * 100, 1) pct
+       , enc_type value
   from (
   select *
   from encounter
   where enc_type in ('IP', 'IS')
   and discharge_date is null
-  )
+  ) problems
   cross join enc_agg
   group by enc_qty, enc_type
-  );
+  ) t
+  ;
 
 /* Due to using hostpital accounts as encounters,
 we have a long tail of very long encounters; hundreds of days.
@@ -239,3 +264,8 @@ where enc_type in ('IP', 'IS')
 order by 2
 ;
 */
+
+select case when count(*) > 0 then 1/0 else 1 end all_test_cases_pass from (
+select * from test_cases where pass = 0
+);
+
