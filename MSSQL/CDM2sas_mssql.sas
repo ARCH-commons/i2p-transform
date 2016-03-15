@@ -225,7 +225,7 @@ SELECT
 	   DATEPART( RESULT_DATE ) AS RESULT_DATE format date9.,
 	   INPUT( RESULT_TIME , time10.) AS RESULT_TIME format hhmm., 
        RESULT_QUAL ,
-       PUT(RESULT_NUM, z5.2) AS RESULT_NUM , /* This RDBMS-SAS data type discrepancy is an issue being addressed by the coordinating center (sould be a SAS number)  */
+       RESULT_NUM , /* Update 3/15/16: We now leave this as a decimal; the December CDM errata state this is ok  */
        RESULT_MODIFIER ,
        RESULT_UNIT ,
        NORM_RANGE_LOW ,
