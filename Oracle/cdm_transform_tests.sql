@@ -120,6 +120,36 @@ select case when pct_not_null < 99 then 1/0 else 1 end some_px_dates_not_null fr
 select case when count(*) = 0 then 1/0 else 1 end have_px_sources from (
   select distinct px_source from procedures where px_source is not null
   );
+
+-- Make sure we have some encounter types
+select case when pct_known < 20 then 1/0 else 1 end some_known_enc_types from (
+  with all_enc as (
+    select count(*) qty from encounter
+    ),
+  known_enc as (
+    select count(*) qty from encounter where enc_type is not null and enc_type != 'UN'
+    )
+  select round((known_enc.qty / all_enc.qty) * 100, 4) pct_known 
+  from known_enc cross join all_enc
+  );
+  
+/** TODO: chase down ~80% unknown enc_type */
+/*
+with enc_agg as (
+select count(*) qty from encounter)
+select count(*) encounter_qty
+     , round(count(*) / enc_agg.qty * 100, 1) pct
+     , enc_type
+from encounter enc
+cross join enc_agg
+where exists (
+  select admit_date from diagnosis dx where enc.patid = dx.patid)
+or exists (
+  select admit_date from procedures px where enc.patid = px.patid)
+group by enc_type, enc_agg.qty
+;
+*/
+
 /* Test to make sure we have something about patient smoking tobacco use */
 with snums as (
   select smoking cat, count(smoking) qty from vital group by smoking
@@ -161,3 +191,51 @@ calc as (
 )
 select case when sum(calc.tst) < 2 then 1/0 else 1 end pass from calc;
 
+-- Make sure most provider ids in the visit dimension are not null/unknown/no information
+select case when pct_not_null < 70 then 1/0 else 1 end some_providers_not_null from (
+  with all_enc as (
+    select count(*) qty from encounter
+    ),
+  not_null as (
+    select count(*) qty from encounter 
+    where providerid is not null and providerid not in ('NI', 'UN')
+    )
+  select round((not_null.qty / all_enc.qty) * 100, 4) pct_not_null 
+  from not_null cross join all_enc
+);
+
+/* Check that we have encounter.discharge_date for selected visit types.
+
+"Discharge date. Should be populated for all
+Inpatient Hospital Stay (IP) and Non-Acute
+Institutional Stay (IS) encounter types."
+ -- PCORnet CDM v3
+*/
+
+select case when count(*) > 0 then 1/0 else 1 end pp_is_enc_have_discharge_date from (
+  with enc_agg as (
+    select count(*) enc_qty from encounter
+    where enc_type in ('IP', 'IS')
+    )
+  select count(*), round(count(*) / enc_qty * 100, 1) pct, enc_type
+  from (
+  select *
+  from encounter
+  where enc_type in ('IP', 'IS')
+  and discharge_date is null
+  )
+  cross join enc_agg
+  group by enc_qty, enc_type
+  );
+
+/* Due to using hostpital accounts as encounters,
+we have a long tail of very long encounters; hundreds of days.
+
+select count(*), los from (
+select round(discharge_date - admit_date) LOS
+from encounter
+where enc_type in ('IP', 'IS')
+) group by los
+order by 2
+;
+*/

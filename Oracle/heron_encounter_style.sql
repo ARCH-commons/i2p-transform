@@ -76,73 +76,25 @@ when matched then update
 -- 3,879,931 rows merged.
 
 
-
+/* -- Manually update encounter (i2p-transform should fill in the column)
 merge into encounter pe
 using "&&i2b2_data_schema".visit_dimension vd
    on ( pe.encounterid = vd.encounter_num
         and vd.end_date is not null)
 when matched then update set pe.discharge_date = vd.end_date;
 -- 165,292 rows merged.
-
-
-/* Check that we have encounter.discharge_date for selected visit types.
-
-"Discharge date. Should be populated for all
-Inpatient Hospital Stay (IP) and Non-Acute
-Institutional Stay (IS) encounter types."
- -- PCORnet CDM v3
-*/
-with enc_agg as (
-  select count(*) enc_qty from encounter
-  where enc_type in ('IP', 'IS')
-  )
-select count(*), round(count(*) / enc_qty * 100, 1) pct, enc_type
-from (
-select *
-from encounter
-where enc_type in ('IP', 'IS')
-and discharge_date is null
-)
-cross join enc_agg
-group by enc_qty, enc_type
-;
-
-/* Due to using hostpital accounts as encounters,
-we have a long tail of very long encounters; hundreds of days.
-
-select count(*), los from (
-select round(discharge_date - admit_date) LOS
-from encounter
-where enc_type in ('IP', 'IS')
-) group by los
-order by 2
-;
 */
 
-
-
-/** TODO: chase down ~80% unknown enc_type */
-with enc_agg as (
-select count(*) qty from encounter)
-select count(*) encounter_qty
-     , round(count(*) / enc_agg.qty * 100, 1) pct
-     , enc_type
-from encounter enc
-cross join enc_agg
-where exists (
-  select admit_date from diagnosis dx where enc.patid = dx.patid)
-or exists (
-  select admit_date from procedures px where enc.patid = px.patid)
-group by enc_type, enc_agg.qty
-;
 
 /* TODO: get encounter type from source system? */
+/* TODO: Consider moving to cdm_transform_tests.sql
 select count(*), sourcesystem_cd
 from nightherondata.visit_dimension
 group by sourcesystem_cd;
 */
 
 /* TODO: get encounter type from place of service? */
+/* TODO: Consider moving to cdm_transform_tests.sql
 select obs.encounter_num, obs.patient_num, obs.start_date, obs.end_date
      , con.concept_cd, con.name_char place_of_service
      , obs.sourcesystem_cd
@@ -152,7 +104,7 @@ join "&&i2b2_data_schema".visit_dimension v on v.encounter_num = obs.encounter_n
 where con.concept_path like '\i2b2\Visit Details\Place of Service (IDX)\%'
 and v.inout_cd = 'OT'
 ;
-
+*/
 
 /* Update the visit dimension to populate the inout_cd with the appropriate 
 PCORNet encounter type codes based on data in the observation_fact.
