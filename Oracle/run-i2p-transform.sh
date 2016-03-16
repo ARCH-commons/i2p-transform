@@ -108,6 +108,9 @@ start gather_table_stats.sql
 -- SCILHS transform
 start PCORNetLoader_ora.sql
 
+-- Post-process steps
+start cdm_postproc.sql
+
 -- CDM transform tests
 start cdm_transform_tests.sql
 
