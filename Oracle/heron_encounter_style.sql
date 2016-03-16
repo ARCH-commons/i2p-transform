@@ -149,26 +149,6 @@ when matched then update
 set inout_cd = et.pcori_code;
 -- 11,085,911 rows merged.
 
-
-create index enc_type_codes_encnum_idx on enc_type(encounter_num);
-
-update "&&i2b2_data_schema".visit_dimension vd
-set inout_cd = coalesce((
-  select et.pcori_code from enc_type et
-  where vd.encounter_num = et.encounter_num
-  ), 'UN');
-
--- Make sure the update went as expected
-select case when count(*) > 0 then 1/0 else 1 end inout_cd_update_match from (
-  select * from (
-    select vd.inout_cd vd_code, et.pcori_code et_code
-    from "&&i2b2_data_schema".visit_dimension vd
-    left join enc_type et on et.encounter_num = vd.encounter_num
-    )
-  where vd_code != vd_code and not (vd_code = 'UN' and vd_code is null)
-  );
-
-
 /* Discharge disposition
 Valid values are:
 
