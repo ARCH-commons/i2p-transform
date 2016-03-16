@@ -167,7 +167,7 @@ pcori_path,local_path
 \PCORI\ENCOUNTER\DISCHARGE_STATUS\IP\,\i2b2\Visit Details\Discharge Disposition Codes\263\
 \PCORI\ENCOUNTER\DISCHARGE_STATUS\HH\,\i2b2\Visit Details\Discharge Disposition Codes\252\
 \PCORI\ENCOUNTER\DISCHARGE_STATUS\HS\,\i2b2\Visit Details\Discharge Disposition Codes\365\
-\PCORI\ENCOUNTER\DRG_TYPE\02\,\i2b2\UHC\Diagnosis\Base MS DRG\
+\PCORI\ENCOUNTER\DRG\02\,\i2b2\UHC\Diagnosis\UHC MS-DRG\
 "\PCORI\ENCOUNTER\ENC_TYPE\AV\","\i2b2\Visit Details\Place of Service (IDX)\22\"
 "\PCORI\ENCOUNTER\ENC_TYPE\OA\","\i2b2\Visit Details\Place of Service (IDX)\03\"
 "\PCORI\ENCOUNTER\ENC_TYPE\AV\","\i2b2\Visit Details\Place of Service (IDX)\26\"
