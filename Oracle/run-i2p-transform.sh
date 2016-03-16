@@ -69,6 +69,7 @@ sqlplus /nolog <<EOF
 connect ${pcornet_cdm_user}/${pcornet_cdm}
 
 set echo on;
+set timing on;
 
 WHENEVER SQLERROR CONTINUE;
 
