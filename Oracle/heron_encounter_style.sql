@@ -150,6 +150,89 @@ set inout_cd = et.pcori_code;
 -- 11,085,911 rows merged.
 
 
+create index enc_type_codes_encnum_idx on enc_type(encounter_num);
+
+update "&&i2b2_data_schema".visit_dimension vd
+set inout_cd = coalesce((
+  select et.pcori_code from enc_type et
+  where vd.encounter_num = et.encounter_num
+  ), 'UN');
+
+-- Make sure the update went as expected
+select case when count(*) > 0 then 1/0 else 1 end inout_cd_update_match from (
+  select * from (
+    select vd.inout_cd vd_code, et.pcori_code et_code
+    from "&&i2b2_data_schema".visit_dimension vd
+    left join enc_type et on et.encounter_num = vd.encounter_num
+    )
+  where vd_code != vd_code and not (vd_code = 'UN' and vd_code is null)
+  );
+
+
+/* Discharge disposition
+Valid values are:
+
+A=Discharged alive
+E=Expired
+NI=No information
+UN=Unknown
+OT=Other
+
+So, if there are multiple discharge dispositions per encounter (as we've observed
+in test data at least) prioritize and pick one.
+*/
+whenever sqlerror continue;
+alter table "&&i2b2_data_schema".visit_dimension add (
+  discharge_disposition  VARCHAR2(4 BYTE)
+  );
+drop table enc_disp_facts;
+drop table discharge_disp;
+whenever sqlerror exit;
+
+-- Two steps (tables) due to Oracle performance/picking bad plans when it's all one query
+create table enc_disp_facts as
+with
+enc_type_codes as (
+  select 
+    pm.pcori_path, replace(substr(pm.pcori_path, instr(pm.pcori_path, '\', -2)), '\', '') pcori_code, pm.local_path, cd.concept_cd
+  from pcornet_mapping pm 
+  join "&&i2b2_data_schema".concept_dimension cd on cd.concept_path like pm.local_path || '%'
+  where pm.pcori_path like '\PCORI\ENCOUNTER\DISCHARGE_DISPOSITION\%'
+  )
+select obs.encounter_num, et.pcori_code
+from "&&i2b2_data_schema".observation_fact obs
+join enc_type_codes et on et.concept_cd = obs.concept_cd;
+
+create table discharge_disp as
+with
+ranks as (
+  select 
+    encounter_num, pcori_code,
+    -- Prioritize disposition
+    decode(pcori_code, 'E', 0, 'A', 1, 'OT', 2, 'UN', 3, 'NI', 4, 99) pc_rank 
+    from enc_disp_facts
+  ),
+priority_rank as (
+  -- TODO: Consider figuring out why we have multiple discharge dispositions per encounter.
+  select min(pc_rank) pc_rank, encounter_num 
+  from ranks
+  group by encounter_num
+  ) 
+select distinct
+  ranks.encounter_num, coalesce(ranks.pcori_code, 'NI') pcori_code 
+from priority_rank pr
+join ranks on pr.encounter_num = ranks.encounter_num and pr.pc_rank = ranks.pc_rank
+;
+
+create index discharge_disp_encnum_idx on discharge_disp(encounter_num);
+
+update "&&i2b2_data_schema".visit_dimension vd
+set discharge_disposition = coalesce((
+  select dd.pcori_code from discharge_disp dd
+  where vd.encounter_num = dd.encounter_num
+  ), 'UN');
+
+
 /* -- Manually update encounter (i2p-transform should fill in the column)
 
 select count(*) from encounter;
