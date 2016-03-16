@@ -233,6 +233,63 @@ set discharge_disposition = coalesce((
   ), 'UN');
 
 
+  /* Discharge status
+There may be multiple per encounter - rank and pick one.
+*/
+whenever sqlerror continue;
+alter table "&&i2b2_data_schema".visit_dimension add (
+  discharge_status  VARCHAR2(4 BYTE)
+  );
+drop table enc_status_facts;
+drop table discharge_status;
+whenever sqlerror exit;
+
+-- Two steps (tables) due to Oracle performance/picking bad plans when it's all one query
+create table enc_status_facts as
+with
+enc_status_codes as (
+  select 
+    pm.pcori_path, replace(substr(pm.pcori_path, instr(pm.pcori_path, '\', -2)), '\', '') pcori_code, pm.local_path, cd.concept_cd
+  from pcornet_mapping pm 
+  join "&&i2b2_data_schema".concept_dimension cd on cd.concept_path like pm.local_path || '%'
+  where pm.pcori_path like '\PCORI\ENCOUNTER\DISCHARGE_STATUS\%'
+  )
+select obs.encounter_num, et.pcori_code
+from "&&i2b2_data_schema".observation_fact obs
+join enc_status_codes et on et.concept_cd = obs.concept_cd;
+
+create table discharge_status as
+with
+ranks as (
+  select 
+    encounter_num, pcori_code,
+    -- Prioritize status: First EX, Middle: <arbitrary>, Last OT, UN, NI
+    decode(pcori_code, 'EX',0,'AF',1,'AL',2,'AM',3,'AW',4,'HH',5,'HO',6,'HS',7,
+                       'IP',8,'NH',9,'RH',10,'RS',11,'SH',12,'SN',12,'OT',96,
+                       'UN',97,'NI',98,99) pc_rank 
+    from enc_status_facts
+  ),
+priority_rank as (
+  -- TODO: Consider figuring out why we have multiple discharge status values per encounter.
+  select min(pc_rank) pc_rank, encounter_num 
+  from ranks
+  group by encounter_num
+  ) 
+select distinct
+  ranks.encounter_num, coalesce(ranks.pcori_code, 'NI') pcori_code 
+from priority_rank pr
+join ranks on pr.encounter_num = ranks.encounter_num and pr.pc_rank = ranks.pc_rank
+;
+
+create index discharge_status_encnum_idx on discharge_status(encounter_num);
+
+update "&&i2b2_data_schema".visit_dimension vd
+set discharge_status = coalesce((
+  select ds.pcori_code from discharge_status ds
+  where vd.encounter_num = ds.encounter_num
+  ), 'UN');
+
+
 /* -- Manually update encounter (i2p-transform should fill in the column)
 
 select count(*) from encounter;

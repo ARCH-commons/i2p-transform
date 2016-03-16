@@ -387,6 +387,30 @@ order by 1
 ) q
 ;
 
+
+insert into test_cases (query_name, description, pass, obs, by_value1, record_n, record_pct)
+select 'ENC_L3_DISSTAT' query_name
+     , 'too many NI' description
+     , case when discharge_status = 'NI' and record_pct < 40 then 1
+            when discharge_status is null and record_pct < 5 then 1
+            when discharge_status != 'NI' then 1
+            else 0
+       end pass
+     , rownum obs
+     , q.*
+from (
+with enc_agg as (
+  select count(*) tot from encounter)
+select discharge_status
+     , count(*) record_n
+     , round(count(*) / enc_agg.tot * 100, 4) record_pct
+from encounter cross join enc_agg
+group by discharge_status, enc_agg.tot
+order by 1
+) q
+;
+
+
 /* Due to using hostpital accounts as encounters,
 we have a long tail of very long encounters; hundreds of days.
 
