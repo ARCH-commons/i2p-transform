@@ -198,7 +198,8 @@ from by_time join by_val on by_time.admit_ym = by_val.admit_ym
 ;
 
 
-
+insert into test_cases (query_name, description, pass
+                      , obs, by_value1, by_value2, record_n, record_pct, distinct_patid_n)
 select 'VIT_L3_SMOKING' query_name
      , 'make sure we have something about patient smoking tobacco use' description
      , case
