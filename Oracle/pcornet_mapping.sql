@@ -234,8 +234,9 @@ select
   ht.c_columnname, ht.c_columndatatype, ht.c_operator, ht.c_dimcode, ht.c_comment, 
   ht.c_tooltip, ht.m_applied_path, ht.update_date, ht.download_date, ht.import_date, 
   ht.sourcesystem_cd, ht.valuetype_cd, ht.m_exclusion_cd, ht.c_path, ht.c_symbol,
-  --TODO: Consider derviving the appropriate replacement strings.
-  replace(ht.c_basecode, 'UHC|UHCMSDRG:', 'MSDRG:') pcori_basecode 
+  case when ht.c_basecode is not null 
+    then 'MSDRG:' || lpad(substr(ht.c_basecode, instr(ht.c_basecode, ':') + 1), 3, '0')
+  end pcori_basecode
 from 
   "&&i2b2_meta_schema"."&&terms_table" ht
 cross join drg_path_map pm
