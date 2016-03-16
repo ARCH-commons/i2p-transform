@@ -240,6 +240,17 @@ calc as (
 select case when sum(calc.tst) < 2 then 1/0 else 1 end pass from calc;
 
 
+/* Simple test to make sure we have some MS-DRGs.
+TODO: Rewrite this as the new-style test (insert into test_cases): ENC_L3_DRG
+*/
+select case when unique_drgs < 10 then 1/0 else 1 end many_different_drgs from (
+  select count(distinct drg) unique_drgs
+  from (
+    select drg from encounter where drg is not null
+    )
+  );
+
+
 insert into test_cases (query_name, description, pass, obs, by_value1, record_n, record_pct)
 select 'ENC_L3_N' query_name
      , 'providerid: many distinct' description

@@ -213,3 +213,57 @@ from
   "&&i2b2_meta_schema"."&&terms_table" ht
 where c_fullname like '\i2b2\Procedures\PRC\Metathesaurus CPT Hierarchical Terms\%' order by c_hlevel 
 ;
+
+/* MS-DRGs
+*/
+delete 
+from "&&i2b2_meta_schema".PCORNET_ENC
+where c_fullname like '\PCORI\ENCOUNTER\DRG\02\%'
+;
+
+insert into "&&i2b2_meta_schema".PCORNET_ENC
+with drg_path_map as (
+  select local_path, local_path || '%' like_local_path, pcori_path, pcori_path || '%' like_pcori_path
+  from pcornet_mapping where pcori_path like '\PCORI\ENCOUNTER\DRG\02\%'
+  )
+select 
+  ht.c_hlevel, 
+  replace(ht.c_fullname, pm.local_path, pm.pcori_path) c_fullname, 
+  ht.c_name, ht.c_synonym_cd, ht.c_visualattributes,
+  ht.c_totalnum, ht.c_basecode, ht.c_metadataxml, ht.c_facttablecolumn, ht.c_tablename, 
+  ht.c_columnname, ht.c_columndatatype, ht.c_operator, ht.c_dimcode, ht.c_comment, 
+  ht.c_tooltip, ht.m_applied_path, ht.update_date, ht.download_date, ht.import_date, 
+  ht.sourcesystem_cd, ht.valuetype_cd, ht.m_exclusion_cd, ht.c_path, ht.c_symbol,
+  --TODO: Consider derviving the appropriate replacement strings.
+  replace(ht.c_basecode, 'UHC|UHCMSDRG:', 'MSDRG:') pcori_basecode 
+from 
+  "&&i2b2_meta_schema"."&&terms_table" ht
+cross join drg_path_map pm
+where c_fullname like pm.like_local_path
+--order by c_hlevel 
+;
+
+/* The following is good for eyeballing the DRG alignment - the names seem to
+match exactly between UHC and the PCORNet ontology.
+*/
+/*
+with drg_path_map as (
+  select local_path, local_path || '%' like_local_path, pcori_path, pcori_path || '%' like_pcori_path
+  from pcornet_mapping where pcori_path like '\PCORI\ENCOUNTER\DRG\02\%'
+  ),
+pcornet_drgs as (
+  select replace(pe.pcori_basecode, 'MSDRG:', '') drg_code, pe.* 
+  from "&&i2b2_meta_schema".pcornet_enc pe
+  cross join drg_path_map dm
+  where pe.c_fullname like dm.like_pcori_path
+  ),
+local_drgs as (
+  select
+    replace(ht.c_basecode, 'UHC|UHCMSDRG:', '') drg_code, ht.*
+  from "&&i2b2_meta_schema"."&&terms_table" ht 
+  cross join drg_path_map dm
+  where ht.c_fullname like dm.like_local_path
+  )
+select pd.drg_code, pd.c_name, ld.c_name from pcornet_drgs pd
+join local_drgs ld on ld.drg_code = pd.drg_code;
+*/
