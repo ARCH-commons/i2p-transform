@@ -240,15 +240,28 @@ calc as (
 select case when sum(calc.tst) < 2 then 1/0 else 1 end pass from calc;
 
 
-/* Simple test to make sure we have some MS-DRGs.
-TODO: Rewrite this as the new-style test (insert into test_cases): ENC_L3_DRG
-*/
-select case when unique_drgs < 10 then 1/0 else 1 end many_different_drgs from (
-  select count(distinct drg) unique_drgs
-  from (
-    select drg from encounter where drg is not null
-    )
-  );
+insert into test_cases (query_name, description, pass, obs, by_value1, record_n, record_pct)
+select 'ENC_L3_DRG' query_name
+     , 'make sure we have some MS-DRGs' description
+     , case when drg  = 'NULL or missing' and record_pct < 95 then 1
+            when drg != 'NULL or missing' and record_n >= 1 then 1
+            else 0
+       end pass
+     , rownum obs
+     , q.*
+from (
+with enc as (
+select coalesce(drg, 'NULL or missing') drg
+from encounter
+),
+agg as (
+  select count(*) tot from encounter)
+select drg, count(*) record_n, round(count(*) / agg.tot * 100, 4) record_pct
+from enc cross join agg
+group by drg, agg.tot
+order by 2 desc
+) q
+;
 
 
 insert into test_cases (query_name, description, pass, obs, by_value1, record_n, record_pct)
