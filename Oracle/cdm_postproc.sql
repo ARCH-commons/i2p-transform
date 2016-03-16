@@ -23,5 +23,5 @@ update vital v set v.systolic = v.diastolic, v.diastolic = v.systolic;
 
 /* Currently in HERON, we have hight in cm and weight in kg - the CDM wants
 height in inches and weight in pounds. */
-update vital v set v.ht = v.ht * 0.393701;
+update vital v set v.ht = v.ht / 2.54;
 update vital v set v.wt = v.wt * 2.20462;
