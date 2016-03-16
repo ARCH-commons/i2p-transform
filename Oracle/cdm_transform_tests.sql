@@ -243,7 +243,8 @@ select case when sum(calc.tst) < 2 then 1/0 else 1 end pass from calc;
 insert into test_cases (query_name, description, pass, obs, by_value1, record_n, record_pct)
 select 'ENC_L3_N' query_name
      , 'providerid: many distinct' description
-     , case when distinct_n / all_n * 100 >= 2 then 1
+     , case when distinct_n / all_n * 100 >= 0.01
+             and null_n / all_n * 100 < 40 then 1
             else 0 end pass
      , rownum obs
      , t.tag, t.distinct_n, round(t.distinct_n / t.all_n * 100, 4)
