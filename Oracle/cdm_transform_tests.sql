@@ -198,20 +198,47 @@ from by_time join by_val on by_time.admit_ym = by_val.admit_ym
 ;
 
 
-/* Test to make sure we have something about patient smoking tobacco use */
-with snums as (
-  select smoking cat, count(smoking) qty from vital group by smoking
+insert into test_cases (query_name, description, pass
+                      , obs, by_value1, by_value2, record_n, record_pct, distinct_patid_n)
+select 'VIT_L3_SMOKING' query_name
+     , 'make sure we have something about patient smoking tobacco use' description
+     , case
+         when smoking = 'NI' and record_pct < 95 then 1
+         when smoking != 'NI' and distinct_patid_n > 2 then 1
+         else 0
+       end pass
+     , rownum obs
+     , q.*
+from (
+with smoking_terms as (
+select distinct pcori_basecode
+from pcornet_vital
+where c_fullname like '\PCORI\VITAL\TOBACCO\SMOKING\%'
 ),
-tot as (
-  select sum(qty) as cnt from snums
+vit as (
+select patid
+     , smoking
+     , case when smoking = 'NI' then null
+         when exists (
+         select pcori_basecode
+         from smoking_terms
+         where smoking_terms.pcori_basecode = vital.smoking)
+         then null
+         else 1
+         end value_outside
+from vital
 ),
-calc as (
-  select snums.cat, (snums.qty/tot.cnt*100) pct,
-    case when (snums.qty/tot.cnt*100) > 1 then 1 else 0 end tst
-  from snums, tot 
-  where snums.cat!='NI'
-)
-select case when sum(calc.tst) < 3 then 1/0 else 1 end smoking_count_ok from calc;
+agg as (
+  select count(*) tot from vital)
+select smoking, value_outside
+     , count(*)
+     , round(count(*) / tot * 100, 4) record_pct
+     , count(distinct patid) distinct_patid_n
+from vit cross join agg
+group by smoking, value_outside, tot
+order by smoking
+) q
+;
 
 
 /* Test to make sure we have something about patient general tobacco use */
@@ -243,7 +270,8 @@ select case when sum(calc.tst) < 2 then 1/0 else 1 end pass from calc;
 insert into test_cases (query_name, description, pass, obs, by_value1, record_n, record_pct)
 select 'ENC_L3_N' query_name
      , 'providerid: many distinct' description
-     , case when distinct_n / all_n * 100 >= 2 then 1
+     , case when distinct_n / all_n * 100 >= 0.01
+             and null_n / all_n * 100 < 40 then 1
             else 0 end pass
      , rownum obs
      , t.tag, t.distinct_n, round(t.distinct_n / t.all_n * 100, 4)
