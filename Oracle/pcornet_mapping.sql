@@ -10,6 +10,9 @@ set echo on;
 delete 
 from "&&i2b2_meta_schema".PCORNET_VITAL where sourcesystem_cd='MAPPING';
 
+delete 
+from "&&i2b2_meta_schema".PCORNET_ENC where sourcesystem_cd='MAPPING';
+
 insert into "&&i2b2_meta_schema".PCORNET_VITAL
 SELECT PCORNET_VITAL.C_HLEVEL+1,
   PCORNET_VITAL.C_FULLNAME || i2b2.c_basecode || '\' as  C_FULLNAME,
