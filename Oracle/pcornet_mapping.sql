@@ -268,3 +268,37 @@ local_drgs as (
 select pd.drg_code, pd.c_name, ld.c_name from pcornet_drgs pd
 join local_drgs ld on ld.drg_code = pd.drg_code;
 */
+
+/* Admitting source: For i2p-transform, these values go in the visit dimension.
+To make them queryable from the web interface, insert the local terms under the
+PCORI parent.
+*/
+
+
+create or replace view admit_src_path_map as
+select local_path, local_path || '%' like_local_path, pcori_path, pcori_path || '%' like_pcori_path
+from pcornet_mapping where pcori_path like '\PCORI\ENCOUNTER\ADMITTING_SOURCE\%'
+;
+
+update "&&i2b2_meta_schema".PCORNET_ENC
+set c_visualattributes = 'FA' where c_fullname in (
+  select pcori_path from admit_src_path_map
+  );
+  
+insert into "&&i2b2_meta_schema".PCORNET_ENC
+select 
+  pe.c_hlevel + 1 c_hlevel,
+  pm.pcori_path || ht.c_basecode || '\' c_fullname,
+  ht.c_name, ht.c_synonym_cd, ht.c_visualattributes,
+  ht.c_totalnum, ht.c_basecode, ht.c_metadataxml, ht.c_facttablecolumn, ht.c_tablename, 
+  ht.c_columnname, ht.c_columndatatype, ht.c_operator, ht.c_dimcode, ht.c_comment, 
+  ht.c_tooltip, ht.m_applied_path, ht.update_date, ht.download_date, ht.import_date, 
+  'MAPPING' sourcesystem_cd, ht.valuetype_cd, ht.m_exclusion_cd, ht.c_path, ht.c_symbol,
+  pe.pcori_basecode
+from 
+  "&&i2b2_meta_schema"."&&terms_table" ht
+cross join admit_src_path_map pm
+join "&&i2b2_meta_schema".pcornet_enc pe on pe.c_fullname = pm.pcori_path
+where ht.c_fullname like pm.like_local_path
+order by c_hlevel
+;
