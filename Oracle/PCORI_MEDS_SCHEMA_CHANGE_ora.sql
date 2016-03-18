@@ -53,7 +53,7 @@ select * from
 with
 cui(c_fullname,pcori_cui,c_hlevel) as
 (
-    select c_fullname,pcori_cui,c_hlevel from I2B2METADATA.pcornet_med where pcori_cui is not null
+    select c_fullname,pcori_cui,c_hlevel from pcornet_med where pcori_cui is not null
    union all
     select m.c_fullname, cui.pcori_cui, m.c_hlevel
     from I2B2METADATA.pcornet_med m inner join cui on cui.c_fullname=m.c_path where m.pcori_cui is null
@@ -77,9 +77,9 @@ select * from
 (
 with ndc(c_fullname,pcori_ndc,c_hlevel) as
 (
-    select c_fullname,pcori_ndc,c_hlevel from I2B2METADATA.pcornet_med where pcori_ndc is not null
+    select c_fullname,pcori_ndc,c_hlevel from pcornet_med where pcori_ndc is not null
    union all
-    select m.c_fullname,ndc.pcori_ndc,m.c_hlevel from I2B2METADATA.pcornet_med m
+    select m.c_fullname,ndc.pcori_ndc,m.c_hlevel from pcornet_med m
     inner join ndc on ndc.c_fullname=m.c_path where m.pcori_ndc is null
 ),
 ndcd as ( select c_fullname,pcori_ndc, row_number() over (partition by C_FULLNAME order by c_hlevel desc) as rowno from ndc)
