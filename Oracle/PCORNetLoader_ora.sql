@@ -1374,7 +1374,7 @@ DECLARE sqltext09 VARCHAR2(4000) :=
 '        and refillscode.c_fullname like ''\PCORI_MOD\RX_REFILLS\'') ';
 BEGIN
   PMN_DROPSQL('DROP TABLE refills');
-  PMN_EXECUATESQL(sqltext);
+  PMN_EXECUATESQL(sqltext09);
 END;
 
 -- TODO: update security after updating columns in I2B2METADATA.pcornet_med
@@ -1388,7 +1388,7 @@ DECLARE sqltext10 VARCHAR2(4000) :=
 BEGIN
   PMN_DROPSQL('DROP TABLE supply');  
   PMN_EXECUATESQL(sqltext10);
-END
+END;
 
 create or replace procedure PCORNetPrescribing as
 sqltext varchar2(4000);
@@ -1456,7 +1456,7 @@ PMN_EXECUATESQL(sqltext);
 BEGIN
   PMN_DROPSQL('DROP TABLE supply');  
   PMN_EXECUATESQL(sqltext11);
-END
+END;
 
 -- TODO: update security after updating columns in I2B2METADATA.pcornet_med
 DECLARE sqltext12 VARCHAR2(4000) :=
