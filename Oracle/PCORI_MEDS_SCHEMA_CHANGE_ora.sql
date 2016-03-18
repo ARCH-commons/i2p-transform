@@ -65,7 +65,7 @@ select DISTINCT cuid.c_fullname as c_fullname, cuid.pcori_cui as pcori_cui from 
 );
 
 -- TODO: work on performance
-update I2B2METADATA.pcornet_med x set x.pcori_cui =
+update pcornet_med x set x.pcori_cui =
     (select pcori_cui  from CUI_T t where x.c_fullname = t.c_fullname)
 where x.pcori_cui is null;
  
@@ -87,7 +87,7 @@ select DISTINCT ndcd.c_fullname as c_fullname, ndcd.pcori_ndc as pcori_ndc from 
 );
  
 -- TODO: work on performance
-update I2B2METADATA.pcornet_med x set x.pcori_ndc =
+update pcornet_med x set x.pcori_ndc =
     (select pcori_ndc  from NDC_T t where x.c_fullname = t.c_fullname)
 where x.pcori_ndc is null;
 
