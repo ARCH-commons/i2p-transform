@@ -39,11 +39,11 @@ BEGIN
   END IF;
 END;
 
--- necessary for CDM scripts if modifying ONT cell schema
-grant all on I2B2METADATA.pcornet_med to cdm;
-
 UPDATE I2B2METADATA.pcornet_med set PCORI_CUI = PCORI_BASECODE where length(pcori_basecode)<11 and c_hlevel>2 and LOWER(sourcesystem_cd) not in ('integration_tool')
 and pcori_basecode not like 'N%' and m_applied_path='@';
+
+-- necessary for CDM scripts if modifying ONT cell schema
+grant all on I2B2METADATA.pcornet_med to cdm;
 
 alter session set current_schema=CDM;
  
