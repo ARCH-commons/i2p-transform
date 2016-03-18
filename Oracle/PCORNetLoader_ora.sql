@@ -1325,7 +1325,6 @@ INSERT INTO pmnharvest(NETWORKID, NETWORK_NAME, DATAMARTID, DATAMART_NAME, DATAM
 
 end PCORNetHarvest;
 
--- TODO: update security after updating columns in I2B2METADATA.pcornet_med
 DECLARE sqltext06 VARCHAR2(4000) :=
 'create table basis as '||
 '(select pcori_basecode,c_fullname,encounter_num,concept_cd from i2b2fact basis '||
@@ -1338,7 +1337,6 @@ BEGIN
   PMN_EXECUATESQL(sqltext06);
 END;
 
--- TODO: update security after updating columns in I2B2METADATA.pcornet_med
 DECLARE sqltext07 VARCHAR2(4000) :=
 'create table freq as '||
 '(select pcori_basecode,encounter_num,concept_cd from i2b2fact freq '||
@@ -1351,7 +1349,6 @@ BEGIN
   PMN_EXECUATESQL(sqltext07);
 END;
 
--- TODO: update security after updating columns in I2B2METADATA.pcornet_med
 DECLARE sqltext08 VARCHAR2(4000) :=
 'create table quantity as '||
 '(select nval_num,encounter_num,concept_cd from i2b2fact quantity '||
@@ -1364,7 +1361,6 @@ BEGIN
   PMN_EXECUATESQL(sqltext08);
 END;
 
--- TODO: update security after updating columns in I2B2METADATA.pcornet_med
 DECLARE sqltext09 VARCHAR2(4000) :=
 'create table refills as   '||
 '(select nval_num,encounter_num,concept_cd from i2b2fact refills '||
@@ -1377,7 +1373,6 @@ BEGIN
   PMN_EXECUATESQL(sqltext09);
 END;
 
--- TODO: update security after updating columns in I2B2METADATA.pcornet_med
 DECLARE sqltext10 VARCHAR2(4000) :=
 'create table supply as  '||
 '(select nval_num,encounter_num,concept_cd from i2b2fact supply '||
@@ -1444,7 +1439,6 @@ where (basis.c_fullname is null or basis.c_fullname= '\PCORI_MOD\RX_BASIS\PR\%')
 end PCORNetPrescribing;
 
 
--- TODO: update security after updating columns in I2B2METADATA.pcornet_med
 DECLARE sqltext11 VARCHAR2(4000) :=
 'create table supply as '||
 '(select nval_num,encounter_num,concept_cd from i2b2fact supply '||
@@ -1452,13 +1446,11 @@ DECLARE sqltext11 VARCHAR2(4000) :=
 '      join pcornet_med supplycode  '||
 '        on supply.modifier_cd = supplycode.c_basecode '||
 '        and supplycode.c_fullname like ''\PCORI_MOD\RX_DAYS_SUPPLY\'' ) ';
-PMN_EXECUATESQL(sqltext);
 BEGIN
   PMN_DROPSQL('DROP TABLE supply');  
   PMN_EXECUATESQL(sqltext11);
 END;
 
--- TODO: update security after updating columns in I2B2METADATA.pcornet_med
 DECLARE sqltext12 VARCHAR2(4000) :=
 'create table amount as '||
 '(select nval_num,encounter_num,concept_cd from i2b2fact amount '||
@@ -1468,7 +1460,7 @@ DECLARE sqltext12 VARCHAR2(4000) :=
 BEGIN
   PMN_DROPSQL('DROP TABLE amount');
   PMN_EXECUATESQL(sqltext12);
-END
+END;
 
 create or replace procedure PCORNetDispensing as
 sqltext varchar2(4000);
