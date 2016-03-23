@@ -1,9 +1,9 @@
 ''' load_csv.py - Load a specified data file with sqlplus/sqlldr
 '''
-from contextlib import contextmanager
 from collections import defaultdict
+from contextlib import contextmanager
 from csv import DictReader
-from functools import partial
+from subprocess import PIPE
 import logging
 
 # OCAP exception for logging
@@ -12,62 +12,43 @@ logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
 log = logging.getLogger(__name__)
 
 
-def main(argv, environ, open_argv, mk_sqlplus):
-    def logif(logf, s):
-        if s:
-            logf(s)
-
-    sp = mk_sqlplus()
-
+def main(argv, environ, open_argv, mk_tool):
     # TODO: Consider docopt
     table_name, csv, ctl_out_fn, user_env, password_env = argv[1:6]
 
-    # Use Oracle utilities to drop/create table based on csv input
+    table_tool = mk_tool(table_name=table_name,
+                         user=environ[user_env],
+                         password=environ[password_env])
+
     with open_argv(csv, 'rb') as fin:
         dr = DictReader(fin)
-        ret, so, se = sp.create_table(user=environ[user_env],
-                                      password=environ[password_env],
-                                      table_name=table_name,
-                                      dr=dr)
-    logif(log.info, so)
-    logif(log.error, se)
-    if ret:
-        raise RuntimeError()
+        table_tool.create(dr=dr)
 
-    # Write out a control file based on csv input
     with open_argv(ctl_out_fn, 'wb') as ctl_fout:
-        ctl_fout.write(sp.ctl_from_csv(schema_table=table_name,
-                                       fields=dr.fieldnames))
+        ctl_code = table_tool.ctl_from_csv(fields=dr.fieldnames)
+        ctl_fout.write(ctl_code)
 
-    # Load .csv using Oracle utilities
-    ret, so, se = sp.load_table(user=environ[user_env],
-                                password=environ[password_env],
-                                table_name=table_name,
-                                ctl_fn=ctl_out_fn,
-                                csv=csv)
-    logif(log.info, so)
-    logif(log.error, se)
-    if ret:
-        raise RuntimeError()
+    table_tool.load(ctl_fn=ctl_out_fn, csv=csv)
 
 
 class MockPopen(object):
     def __init__(self, cmd_args, stdout=None, stderr=None, shell=False):
-        self ._cmd_args = cmd_args
+        self._cmd_args = cmd_args
+        self.returncode = 0
 
     def communicate(self):
         log.info('MockPopen::communicate: %s' % (self._cmd_args))
         return ('', '')
 
 
-class OracleUtils(object):
+class TableTool(object):
     '''
     Test DDL generation - note test for 0-length column
     >>> from StringIO import StringIO
     >>> sio = StringIO('\\n'.join([l.strip() for l in """col1,col2,col3
     ...           some data,Some other data and stuff,""".split('\\n')]))
-    >>> s = OracleUtils(MockPopen, None)
-    >>> print s.ddl_from_csv('some_table', DictReader(sio))
+    >>> s = TableTool('me', 'sekret', 'some_table', MockPopen)
+    >>> print s.ddl_from_csv(DictReader(sio))
     ... # doctest: +NORMALIZE_WHITESPACE
     create table some_table (
         col1 varchar2(16),
@@ -76,7 +57,7 @@ class OracleUtils(object):
         );
 
     Test control file generation
-    >>> print s.ctl_from_csv('some_table', ['col1', 'col2'])
+    >>> print s.ctl_from_csv(['col1', 'col2'])
     ... # doctest: +NORMALIZE_WHITESPACE
         options (errors=0, skip=1)
         load data
@@ -87,80 +68,90 @@ class OracleUtils(object):
         col2
         )
     '''
-    def __init__(self, Popen, PIPE, sqlplus_cmd='sqlplus /nolog',
+    def __init__(self, Popen, user, password, table_name,
+                 sqlplus_cmd='sqlplus /nolog',
                  sqlldr_cmd='sqlldr'):
-        self._sqlplus_cmd = sqlplus_cmd
-        self._sqlldr_cmd = sqlldr_cmd
-        self._Popen = Popen
-        self.PIPE = PIPE
+        def run(template):
+            cmd = dedent(template.format(
+                sqlplus=sqlplus_cmd, sqlldr=sqlldr_cmd,
+                user=user, password=password,
+                table_name=table_name))
+            p = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
+            stdout, stderr = p.communicate()
+            if stdout:
+                log.info('stdout: %s', stdout)
+            if stderr:
+                log.warn('stderr: %s', stderr)
+            if p.returncode:
+                raise IOError(p.returncode)
+
+        self.run = run
+        self.table_name = table_name
 
     @classmethod
-    def make(cls, Popen, PIPE):
-        return OracleUtils(Popen, PIPE)
+    def make(cls, Popen, user, password, name):
+        return TableTool(Popen, user, password, name)
 
-    def create_table(self, user, password, table_name, dr):
+    def create(self, dr):
         # Note: shell = true might not be the most secure, but it makes
         # piplining easier.
         # See also https://docs.python.org/2.7/library/subprocess.html#replacing-shell-pipeline  # noqa
-        # Also, be warned taht SQL injection is possible with arguments!
-        cmd = self._sqlplus_cmd + ' ' + (
-            '\n'.join([c.strip() for c in """<<EOF
-                       connect %(user)s/%(password)s;
-                       set echo on;
-                       WHENEVER SQLERROR CONTINUE;
-                       drop table %(table_name)s;
-                       WHENEVER SQLERROR EXIT SQL.SQLCODE;
-                       %(create)s
-                       EOF""".split('\n')])
-            % dict(user=user, password=password, table_name=table_name,
-                   create=self.ddl_from_csv(table_name, dr)))
-        p = self._Popen(cmd, stdout=self.PIPE, stderr=self.PIPE, shell=True)
-        so, se = p.communicate()
-        return p.returncode, so, se
+        # Also, be warned that SQL injection is possible with arguments!
+        cmd = ("""{sqlplus} <<EOF
+        connect {user}/{password};
+        set echo on;
+        WHENEVER SQLERROR CONTINUE;
+        drop table {table_name};
+        WHENEVER SQLERROR EXIT SQL.SQLCODE;
+        %(create)s
+        EOF""") % dict(create=self.ddl_from_csv(dr))
+        self.run(cmd)
 
-    def load_table(self, user, password, table_name, ctl_fn, csv):
-        cmd = self._sqlldr_cmd + (' %(user)s/%(password)s control=%(ctl_fn)s '
-                                  'data=%(csv)s log=%(log)s bad=%(bad)s '
-                                  'errors=0'
-                                  % dict(user=user, password=password,
-                                         ctl_fn=ctl_fn, csv=csv,
-                                         log=csv + '.log', bad=csv + '.bad'))
-        p = self._Popen(cmd, stdout=self.PIPE, stderr=self.PIPE, shell=True)
-        so, se = p.communicate()
-        return p.returncode, so, se
+    def load(self, ctl_fn, csv):
+        cmd = ('{sqlldr} {user}/{password} control=%(ctl_fn)s '
+               'data=%(csv)s log=%(log)s bad=%(bad)s '
+               'errors=0'
+               % dict(ctl_fn=ctl_fn, csv=csv,
+                      log=csv + '.log', bad=csv + '.bad'))
+        self.run(cmd)
 
-    @staticmethod
-    def ddl_from_csv(table_name, dr):
+    def ddl_from_csv(self, dr):
         def sz(l, chunk=16):
-            return max(chunk, chunk * ((l+chunk-1)/chunk))
+            return max(chunk, chunk * ((l + chunk - 1) / chunk))
 
         mcl = defaultdict(int)
         for row in dr:
             # Use fieldnames to maintain column ordering
             for col in dr.fieldnames:
                 mcl[col] = sz(max(mcl[col], len(row[col])))
-        return ('create table %s (\n  ' % table_name +
+        return ('create table %s (\n  ' % self.table_name +
                 ',\n  '.join(['%s varchar2(%s)' % (c, mcl[c])
                               for c in dr.fieldnames]) + '\n);')
 
-    @staticmethod
-    def ctl_from_csv(schema_table, fields, delim=','):
+    def ctl_from_csv(self, fields, delim=','):
         ctl = ('''options (errors=0, skip=1)
                load data
                truncate into table %(schema_table)s
                fields terminated by '%(delim)s' optionally enclosed by '"'
                trailing nullcols(
                %(columns)s
-           )''') % dict(schema_table=schema_table,
+           )''') % dict(schema_table=self.table_name,
                         columns=', \n'.join(fields),
                         delim=delim)
-        return '\n'.join([l.strip() for l in ctl.split('\n')])
+        return dedent(ctl)
+
+
+def dedent(txt):
+    '''spaces from indented triple-quoted strings are kinda annoying.
+    '''
+    return '\n'.join(line.strip()
+                     for line in txt.split('\n'))
 
 
 if __name__ == '__main__':
     def _tcb():
         from os import environ
-        from subprocess import Popen, PIPE
+        from subprocess import Popen
         from sys import argv
 
         @contextmanager
@@ -170,10 +161,12 @@ if __name__ == '__main__':
             with open(fn, mode) as f:
                 yield f
 
-        return(dict(argv=argv, environ=environ, open_argv=open_argv,
-                    mk_sqlplus=partial(
-                        OracleUtils.make,
-                        Popen=MockPopen if '--dry-run' in argv else Popen,
-                        PIPE=PIPE)))
+        def mk_tool(table_name, user, password):
+            return TableTool.make(
+                MockPopen if '--dry-run' in argv else Popen,
+                user, password, table_name)
 
-    main(**_tcb())
+        main(argv=argv, environ=environ, open_argv=open_argv,
+             mk_tool=mk_tool)
+
+    _tcb()
