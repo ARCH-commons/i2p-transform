@@ -19,6 +19,7 @@ set -e
 # All i2b2 terms - used for local path mapping
 #export terms_table=
 
+. ./load_harvest_local.sh
 . ./load_pcornet_mapping.sh
 
 # Run some tests
