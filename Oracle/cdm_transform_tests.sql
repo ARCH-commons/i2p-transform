@@ -241,30 +241,106 @@ order by smoking
 ;
 
 
-/* Test to make sure we have something about patient general tobacco use */
-with tnums as (
-  select tobacco cat, count(tobacco) qty from vital group by tobacco
-),
-tot as (
-  select sum(qty) as cnt from tnums
-),
-calc as (
-  select tnums.cat, (tnums.qty/tot.cnt*100) pct, case when (tnums.qty/tot.cnt*100) > 1 then 1 else 0 end tst from tnums, tot where tnums.cat!='NI'
-)
-select case when sum(calc.tst) < 3 then 1/0 else 1 end pass from calc;
+/* Test to make sure we have something about patient non-smoking tobacco use */
+insert into test_cases (query_name, description, pass
+                      , obs, by_value1, by_value2, record_n, record_pct, distinct_patid_n)
+	select 'VIT_L3_TOBACCO' query_name
+	     , 'make sure we have something about patient non-smoking tobacco use' description
+	     , case
+	         when tobacco = 'NI' and record_pct < 95 then 1
+	         when tobacco != 'NI' and distinct_patid_n > 2 then 1
+	         else 0
+	       end pass
+	     , rownum obs
+	     , q.*
+	from (
+	with tobacco_terms as (
+	select distinct pcori_basecode
+	from pcornet_vital
+	where c_fullname like '\PCORI\VITAL\TOBACCO\02\%'
+	),
+	vit as (
+	select patid
+	     , tobacco
+	     , case when tobacco = 'NI' then null
+	         when exists (
+	         select pcori_basecode
+	         from tobacco_terms
+	         where tobacco_terms.pcori_basecode = vital.tobacco)
+	         then null
+	         else 1
+	         end value_outside
+	from vital
+	),
+	agg as (
+	  select count(*) tot from vital)
+	select tobacco, value_outside
+	     , count(*)
+	     , round(count(*) / tot * 100, 4) record_pct
+	     , count(distinct patid) distinct_patid_n
+	from vit cross join agg
+	group by tobacco, value_outside, tot
+	order by tobacco
+	) q
+	;
 
 
 /* Test to make sure we have something about tobacco use types */
-with ttnums as (
-  select tobacco_type cat, count(tobacco) qty from vital group by tobacco_type order by cat
-),
-tot as (
-  select sum(qty) as cnt from ttnums
-),
-calc as (
-  select ttnums.cat, (ttnums.qty/tot.cnt*100) pct, case when (ttnums.qty/tot.cnt*100) > 1 then 1 else 0 end tst from ttnums, tot where ttnums.cat!='NI'
-)
-select case when sum(calc.tst) < 2 then 1/0 else 1 end pass from calc;
+insert into test_cases (query_name, description, pass
+                      , obs, by_value1, by_value2, record_n, record_pct, distinct_patid_n)
+	select 'VIT_L3_TOBACCO_TYPE' query_name
+	     , 'make sure we have something about patient tobacco use types' description
+	     , case
+	         when tobacco_type = 'NI' and record_pct < 95 then 1
+	         when tobacco_type != 'NI' and distinct_patid_n > 2 then 1
+	         else 0
+	       end pass
+	     , rownum obs
+	     , q.*
+	from (
+	with tobacco_type_terms as (
+    select '01' pcori_basecode from dual
+    union all
+    select '02' pcori_basecode from dual
+    union all
+    select '03' pcori_basecode from dual
+    union all
+    select '04' pcori_basecode from dual
+    union all
+    select '05' pcori_basecode from dual
+    union all
+    select '06' pcori_basecode from dual
+    union all
+    select 'NI' pcori_basecode from dual
+    union all
+    select 'UN' pcori_basecode from dual
+    union all
+    select 'OT' pcori_basecode from dual
+	),
+	vit as (
+	select patid
+	     , tobacco_type
+	     , case when tobacco_type = 'NI' then null
+	         when exists (
+	         select pcori_basecode
+	         from tobacco_type_terms
+	         where tobacco_type_terms.pcori_basecode = vital.tobacco_type)
+	         then null
+	         else 1
+	         end value_outside
+	from vital
+	),
+	agg as (
+	  select count(*) tot from vital)
+	select tobacco_type, value_outside
+	     , count(*)
+	     , round(count(*) / tot * 100, 4) record_pct
+	     , count(distinct patid) distinct_patid_n
+	from vit cross join agg
+	group by tobacco_type, value_outside, tot
+	order by tobacco_type
+	) q
+	;
 
 
 insert into test_cases (query_name, description, pass, obs, by_value1, record_n, record_pct)

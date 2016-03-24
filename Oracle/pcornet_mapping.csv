@@ -39,7 +39,7 @@ pcori_path,local_path
 \PCORI\VITAL\TOBACCO\SMOKING\YES\02\,\i2b2\History\Social History\Tobacco Usage\Smoking Tobacco Use\Current Some Day Smoker\
 \PCORI\VITAL\TOBACCO\SMOKING\03\,\i2b2\History\Social History\Tobacco Usage\Smoking Tobacco Use\Former Smoker\
 \PCORI\VITAL\TOBACCO\SMOKING\04\,\i2b2\History\Social History\Tobacco Usage\Smoking Tobacco Use\Never Smoker \
-\PCORI\VITAL\TOBACCO\SMOKING\YES\05\,\i2b2\History\Social History\Tobacco Usage\Smoking Tobacco Use\Smoker, Current Status Unknown\
+\PCORI\VITAL\TOBACCO\SMOKING\YES\05\,"\i2b2\History\Social History\Tobacco Usage\Smoking Tobacco Use\Smoker, Current Status Unknown\"
 \PCORI\VITAL\TOBACCO\SMOKING\06\,\i2b2\History\Social History\Tobacco Usage\Smoking Tobacco Use\Unknown If Ever Smoked\
 \PCORI\VITAL\TOBACCO\SMOKING\YES\07\,\i2b2\History\Social History\Tobacco Usage\Smoking Tobacco Use\Heavy Tobacco Smoker\
 \PCORI\VITAL\TOBACCO\SMOKING\YES\08\,\i2b2\History\Social History\Tobacco Usage\Smoking Tobacco Use\Light Tobacco Smoker\
