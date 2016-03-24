@@ -270,6 +270,54 @@ set discharge_status = coalesce((
   ), 'UN');
 
 
+/* Admitting source
+There may be multiple per encounter - rank and pick one.
+*/
+whenever sqlerror continue;
+alter table "&&i2b2_data_schema".visit_dimension add (
+  admitting_source  VARCHAR2(4 BYTE)
+  );
+whenever sqlerror exit;
+
+merge into "&&i2b2_data_schema".visit_dimension vd using (
+  with codes as (
+    select 
+      pm.pcori_path, cd.concept_cd, cd.name_char, 
+      replace(pe.pcori_basecode, 'ADMITTING_SOURCE:', '') pcori_code 
+    from 
+      pcornet_mapping pm 
+    join "&&i2b2_data_schema".concept_dimension cd on cd.concept_path like pm.local_path || '%'
+    join "&&i2b2_meta_schema".pcornet_enc pe on pe.c_fullname = pm.pcori_path
+    where pm.pcori_path like '\PCORI\ENCOUNTER\ADMITTING_SOURCE\%'
+    ),
+  enc_as as (
+    select obs.encounter_num, codes.pcori_code
+    from "&&i2b2_data_schema".observation_fact obs
+    join codes on codes.concept_cd = obs.concept_cd
+    ),
+  ranks as (
+    select 
+      encounter_num, pcori_code,
+      -- Prioritize status: Last OT, UN, NI
+      decode(pcori_code, 'AF',0,'AL',1,'AV',2,'ED',3,'HH',4,'HO',5,'HS',6,'IP',7,
+                         'NH',8,'RH',9,'RS',10,'SN',11,'OT',12,'UN',13,'NI',14, 99) as_rank 
+      from enc_as
+    ),
+  priority_rank as (
+    select min(as_rank) as_rank, encounter_num 
+    from ranks
+    group by encounter_num
+    ) 
+  select distinct
+    ranks.encounter_num, coalesce(ranks.pcori_code, 'NI') pcori_code 
+  from priority_rank pr
+  join ranks on pr.encounter_num = ranks.encounter_num and pr.as_rank = ranks.as_rank
+  ) admt_enc on (admt_enc.encounter_num = vd.encounter_num)
+when matched then update
+set vd.admitting_source = admt_enc.pcori_code
+;
+
+
 /* -- Manually update encounter (i2p-transform should fill in the column)
 
 select count(*) from encounter;

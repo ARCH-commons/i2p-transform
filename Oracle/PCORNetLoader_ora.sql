@@ -947,20 +947,6 @@ end PCORNetDemographic;
 
 
 /* TODOs: 
-
-1)
-Figure out what "_source" is supposed to be.  I'ts an invalid name in
-oracle as-is.  And, I don't see where it comes from - the tables were selecting 
-from don't have it.
-
-Error(16,266): PL/SQL: ORA-00911: invalid character
-00911. 00000 -  "invalid character"
-*Cause:    identifiers may not start with any ASCII character other than
-           letters and numbers.  $#_ are also allowed after the first
-           character.
-           
-Commented out that and what it's used for (ADMITTING_SOURCE)
-
 4)
 ORA-00904: "FACILITY_ID": invalid identifier
 
@@ -987,7 +973,8 @@ select distinct v.patient_num, v.encounter_num,
   'NI' facility_id,  /* See TODO above */
   CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE  discharge_disposition END, 
   CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE discharge_status END, 
-  drg.drg, drg_type, 'NI' admitting_source /* see TODO above CASE WHEN _source IS NULL THEN 'NI' ELSE admitting_source END*/
+  drg.drg, drg_type, 
+  CASE WHEN admitting_source IS NULL THEN 'NI' ELSE admitting_source END admitting_source
 from i2b2visit v inner join demographic d on v.patient_num=d.patid
 left outer join 
    (select * from
@@ -1410,7 +1397,22 @@ create or replace procedure PCORNetHarvest as
 begin
 
 INSERT INTO harvest(NETWORKID, NETWORK_NAME, DATAMARTID, DATAMART_NAME, DATAMART_PLATFORM, CDM_VERSION, DATAMART_CLAIMS, DATAMART_EHR, BIRTH_DATE_MGMT, ENR_START_DATE_MGMT, ENR_END_DATE_MGMT, ADMIT_DATE_MGMT, DISCHARGE_DATE_MGMT, PX_DATE_MGMT, RX_ORDER_DATE_MGMT, RX_START_DATE_MGMT, RX_END_DATE_MGMT, DISPENSE_DATE_MGMT, LAB_ORDER_DATE_MGMT, SPECIMEN_DATE_MGMT, RESULT_DATE_MGMT, MEASURE_DATE_MGMT, ONSET_DATE_MGMT, REPORT_DATE_MGMT, RESOLVE_DATE_MGMT, PRO_DATE_MGMT, REFRESH_DEMOGRAPHIC_DATE, REFRESH_ENROLLMENT_DATE, REFRESH_ENCOUNTER_DATE, REFRESH_DIAGNOSIS_DATE, REFRESH_PROCEDURES_DATE, REFRESH_VITAL_DATE, REFRESH_DISPENSING_DATE, REFRESH_LAB_RESULT_CM_DATE, REFRESH_CONDITION_DATE, REFRESH_PRO_CM_DATE, REFRESH_PRESCRIBING_DATE, REFRESH_PCORNET_TRIAL_DATE, REFRESH_DEATH_DATE, REFRESH_DEATH_CAUSE_DATE) 
-	VALUES('&&network_id', '&&network_name', getDataMartID(), getDataMartName(), getDataMartPlatform(), 3, 01, 02, 1,1,2,1,2,1,2,1,2,1,1,2,2,1,1,1,2,1,current_date,current_date,current_date,current_date,current_date,current_date,current_date,current_date,current_date,null,current_date,null,null,null);
+	select '&&network_id', '&&network_name', getDataMartID(), getDataMartName(), getDataMartPlatform(), 3, hl.DATAMART_CLAIMS, hl.DATAMART_EHR, hl.BIRTH_DATE_MGMT, hl.ENR_START_DATE_MGMT, hl.ENR_END_DATE_MGMT, hl.ADMIT_DATE_MGMT, hl.DISCHARGE_DATE_MGMT, hl.PX_DATE_MGMT, hl.RX_ORDER_DATE_MGMT, hl.RX_START_DATE_MGMT, hl.RX_END_DATE_MGMT, hl.DISPENSE_DATE_MGMT, hl.LAB_ORDER_DATE_MGMT, hl.SPECIMEN_DATE_MGMT, hl.RESULT_DATE_MGMT, hl.MEASURE_DATE_MGMT, hl.ONSET_DATE_MGMT, hl.REPORT_DATE_MGMT, hl.RESOLVE_DATE_MGMT, hl.PRO_DATE_MGMT,
+  case when (select count(*) from demographic) > 0 then current_date else null end REFRESH_DEMOGRAPHIC_DATE,
+  case when (select count(*) from enrollment) > 0 then current_date else null end REFRESH_ENROLLMENT_DATE,
+  case when (select count(*) from encounter) > 0 then current_date else null end REFRESH_ENCOUNTER_DATE,
+  case when (select count(*) from diagnosis) > 0 then current_date else null end REFRESH_DIAGNOSIS_DATE,
+  case when (select count(*) from procedures) > 0 then current_date else null end REFRESH_PROCEDURES_DATE,
+  case when (select count(*) from vital) > 0 then current_date else null end REFRESH_VITAL_DATE,
+  case when (select count(*) from dispensing) > 0 then current_date else null end REFRESH_DISPENSING_DATE,
+  case when (select count(*) from lab_result_cm) > 0 then current_date else null end REFRESH_LAB_RESULT_CM_DATE,
+  case when (select count(*) from condition) > 0 then current_date else null end REFRESH_CONDITION_DATE,
+  case when (select count(*) from pro_cm) > 0 then current_date else null end REFRESH_PRO_CM_DATE,
+  case when (select count(*) from prescribing) > 0 then current_date else null end REFRESH_PRESCRIBING_DATE,
+  case when (select count(*) from pcornet_trial) > 0 then current_date else null end REFRESH_PCORNET_TRIAL_DATE,
+  case when (select count(*) from death) > 0 then current_date else null end REFRESH_DEATH_DATE,
+  case when (select count(*) from death_cause) > 0 then current_date else null end REFRESH_DEATH_CAUSE_DATE
+  from harvest_local hl;
 
 end PCORNetHarvest;
 /

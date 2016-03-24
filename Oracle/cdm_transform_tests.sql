@@ -411,6 +411,35 @@ order by 1
 ;
 
 
+/*  Should be populated for Inpatient Hospital Stay (IP) and Non-Acute 
+Institutional Stay (IS) encounter types.
+*/
+insert into test_cases (query_name, description, pass, obs, by_value1, record_n, record_pct)
+select 'ENC_L3_ADMSRC' query_name
+     , 'too many NI' description
+     , case when admitting_source = 'NI' and record_pct < 40 then 1
+            when admitting_source is null and record_pct < 5 then 1
+            when admitting_source != 'NI' then 1
+            else 0
+       end pass
+     , rownum obs
+     , q.*
+from (
+  with ipis as (
+    select * from encounter where enc_type in ('IP', 'IS')
+    ),
+  enc_agg as (
+    select count(*) tot from ipis
+    )
+  select admitting_source
+       , count(*) record_n
+       , round(count(*) / enc_agg.tot * 100, 4) record_pct
+  from ipis cross join enc_agg
+  group by admitting_source, enc_agg.tot
+  order by 1
+  ) q
+;
+
 /* Due to using hostpital accounts as encounters,
 we have a long tail of very long encounters; hundreds of days.
 
