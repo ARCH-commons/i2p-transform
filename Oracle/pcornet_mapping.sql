@@ -305,3 +305,67 @@ join "&&i2b2_meta_schema".pcornet_enc pe on pe.c_fullname = pm.pcori_path
 where ht.c_fullname like pm.like_local_path
 order by c_hlevel
 ;
+
+
+/* Medications
+This section takes the place of PCORI_MEDS_SCHEMA_CHANGE_ora.sql included in the
+SCILHS code.
+*/
+alter table "&&i2b2_meta_schema".pcornet_med add (
+  pcori_cui varchar2(8)
+  );
+whenever sqlerror exit;
+
+delete 
+from "&&i2b2_meta_schema".PCORNET_MED
+where c_fullname like '\PCORI\MEDICATION\RXNORM_CUI\%'
+and c_fullname not like '\PCORI_MOD\%';
+
+
+insert into "&&i2b2_meta_schema".PCORNET_MED
+with 
+rxnorm_mapping as (
+  /* TODO: Consider whether we want just one rxcui for a clarity medication?
+  Without picking just one this query results in duplicate c_fullnames and causes
+  errors in the webclient.
+  
+  TODO: Consider changing HERON paths to be RXCUIs or including the RXCUI column
+  so that we don't have to reach back to the clarity_med_id_to_rxcui map. See
+  also https://informatics.gpcnetwork.org/trac/Project/ticket/390.
+  */
+  select min(rxcui) rxcui, clarity_med_id 
+  from "&&i2b2_etl_schema". clarity_med_id_to_rxcui@id
+  group by clarity_med_id
+  ),
+terms_rx as (
+  select 
+    cm2rx.rxcui mapped_rxcui, ht.* 
+  from 
+    "&&i2b2_meta_schema"."&&terms_table" ht
+  left join rxnorm_mapping cm2rx on to_char(cm2rx.clarity_med_id) = replace(ht.c_basecode, 'KUH|MEDICATION_ID:', '')
+  where c_fullname like '\i2b2\Medications%'
+  and ht.c_visualattributes not like '%H%'
+  )
+select
+  rx.c_hlevel + 1 c_hlevel, 
+  replace(rx.c_fullname, '\i2b2\Medications\', '\PCORI\MEDICATION\RXNORM_CUI\') c_fullname, 
+  rx.c_name, rx.c_synonym_cd, rx.c_visualattributes,
+  rx.c_totalnum, rx.c_basecode, rx.c_metadataxml, rx.c_facttablecolumn, rx.c_tablename, 
+  rx.c_columnname, rx.c_columndatatype, rx.c_operator, rx.c_dimcode, rx.c_comment, 
+  rx.c_tooltip, rx.m_applied_path, rx.update_date, rx.download_date, rx.import_date, 
+  rx.sourcesystem_cd, rx.valuetype_cd, rx.m_exclusion_cd, rx.c_path, rx.c_symbol,
+  rx.rxcui pcori_basecode, rx.rxcui pcori_cui, 
+  -- Don't worry about NDCs for now - used for dispensing
+  null pcori_ndc from (
+    select
+      trx.*,
+      case 
+        when trx.mapped_rxcui is not null then trx.mapped_rxcui
+        when trx.c_basecode like 'RXCUI:%' then replace(trx.c_basecode, 'RXCUI:', '')
+        else null 
+      end rxcui
+    from terms_rx trx
+    --order by trx.c_hlevel
+    ) rx;
+
+commit;

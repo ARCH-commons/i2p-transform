@@ -15,6 +15,11 @@ using encounter e
    on (p.encounterid = e.encounterid)
 when matched then update set p.providerid = e.providerid;
 
+merge into prescribing p
+using encounter e
+   on (p.encounterid = e.encounterid)
+when matched then update set p.rx_providerid = e.providerid;
+
 /* Currently in HERON, systolic and diastolic blood pressures from flowsheets 
 are reversed.  This is fixed in the HERON ETL code (#4026) but we haven't run a 
 production ETL yet. 

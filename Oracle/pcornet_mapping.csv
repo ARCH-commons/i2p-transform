@@ -1,4 +1,8 @@
 pcori_path,local_path
+\PCORI_MOD\RX_BASIS\PR\,\Medication\Inpatient\
+\PCORI_MOD\RX_BASIS\PR\,\Medication\Other Orders\
+\PCORI_MOD\RX_BASIS\PR\,\Medication\Outpatient\
+\PCORI_MOD\RX_BASIS\PR\,\Medication\PRN Inpatient Order\
 \PCORI_MOD\PDX\P\,\Diagnosis\\modifier_dx\billing_diagnosis\discharge\discharge_primary\
 \PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\DI\,\Diagnosis\\modifier_dx\billing_diagnosis\discharge\
 \PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\AD\,\Diagnosis\\modifier_dx\billing_diagnosis\admit\

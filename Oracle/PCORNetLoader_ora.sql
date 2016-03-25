@@ -1424,8 +1424,6 @@ end PCORNetHarvest;
 At compile time, it's complaining about the fact tables don't exist that are 
 created in the function itself.  I created them ahead of time - SQL taken from
 the procedure.
-
-Also: Error(71,159): PL/SQL: ORA-00904: "MO"."PCORI_CUI": invalid identifier
 */
 whenever sqlerror continue;
 drop table basis;
@@ -1465,9 +1463,6 @@ create table supply(
 	concept_cd varchar2(50 byte)
   );
 
-alter table "&&i2b2_meta_schema".pcornet_med add (
-  pcori_cui varchar2(1000) -- arbitrary
-  );
 whenever sqlerror exit;
 
 create or replace procedure PCORNetPrescribing as
