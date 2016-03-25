@@ -311,8 +311,13 @@ order by c_hlevel
 This section takes the place of PCORI_MEDS_SCHEMA_CHANGE_ora.sql included in the
 SCILHS code.
 */
+whenever sqlerror continue;
 alter table "&&i2b2_meta_schema".pcornet_med add (
   pcori_cui varchar2(8)
+  );
+
+alter table "&&i2b2_meta_schema".pcornet_med add (
+  pcori_ndc varchar2(12)
   );
 whenever sqlerror exit;
 
@@ -328,7 +333,6 @@ rxnorm_mapping as (
   /* TODO: Consider whether we want just one rxcui for a clarity medication?
   Without picking just one this query results in duplicate c_fullnames and causes
   errors in the webclient.
-  
   TODO: Consider changing HERON paths to be RXCUIs or including the RXCUI column
   so that we don't have to reach back to the clarity_med_id_to_rxcui map. See
   also https://informatics.gpcnetwork.org/trac/Project/ticket/390.
