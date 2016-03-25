@@ -326,6 +326,13 @@ from "&&i2b2_meta_schema".PCORNET_MED
 where c_fullname like '\PCORI\MEDICATION\RXNORM_CUI\%'
 and c_fullname not like '\PCORI_MOD\%';
 
+update "&&i2b2_meta_schema".PCORNET_MED med
+set med.c_visualattributes = 'DAE' where c_fullname in (
+  select distinct pm.pcori_path
+  from pcornet_mapping pm
+  join "&&i2b2_meta_schema".PCORNET_MED med on med.c_fullname = pm.pcori_path
+  where  med.c_fullname like '\PCORI_MOD\%'
+  );
 
 insert into "&&i2b2_meta_schema".PCORNET_MED
 with 
@@ -371,5 +378,49 @@ select
     from terms_rx trx
     --order by trx.c_hlevel
     ) rx;
+
+delete 
+from "&&i2b2_meta_schema".PCORNET_MED where sourcesystem_cd='MAPPING';
+
+-- Other diagnosis mappings such as modifiers for PDX, DX_SOURCE.
+insert into "&&i2b2_meta_schema".PCORNET_MED
+with med_mod_mapping as (
+  select distinct pcori_path, i2b2.c_fullname, i2b2.c_basecode, i2b2.c_name
+  FROM "&&i2b2_meta_schema".pcornet_med 
+  join pcornet_mapping on pcornet_mapping.PCORI_PATH = pcornet_med.c_fullname and pcornet_mapping.local_path is not null
+  join "&&i2b2_meta_schema"."&&terms_table" i2b2 on i2b2.c_fullname like pcornet_mapping.local_path || '%'
+  where i2b2.c_basecode is not null
+  )
+SELECT pcornet_med.C_HLEVEL+1,
+  pcornet_med.C_FULLNAME || med_mod_mapping.c_basecode || '\' as  C_FULLNAME,
+  med_mod_mapping.c_basecode || ' ' || med_mod_mapping.c_name as C_NAME,
+  pcornet_med.C_SYNONYM_CD,
+  pcornet_med.C_VISUALATTRIBUTES,
+  pcornet_med.C_TOTALNUM,
+  med_mod_mapping.c_basecode as C_BASECODE,
+  pcornet_med.C_METADATAXML,
+  pcornet_med.C_FACTTABLECOLUMN,
+  pcornet_med.C_TABLENAME,
+  pcornet_med.C_COLUMNNAME,
+  pcornet_med.C_COLUMNDATATYPE,
+  pcornet_med.C_OPERATOR,
+  pcornet_med.C_FULLNAME || med_mod_mapping.c_basecode || '\' as  C_DIMCODE,
+  pcornet_med.C_COMMENT,
+  pcornet_med.C_TOOLTIP,
+  pcornet_med.M_APPLIED_PATH,
+  pcornet_med.UPDATE_DATE,
+  pcornet_med.DOWNLOAD_DATE,
+  pcornet_med.IMPORT_DATE,
+  'MAPPING' as SOURCESYSTEM_CD,
+  pcornet_med.VALUETYPE_CD,
+  pcornet_med.M_EXCLUSION_CD,
+  pcornet_med.C_PATH,
+  pcornet_med.C_SYMBOL,
+  pcornet_med.PCORI_BASECODE,
+  null pcori_cui,
+  null pcori_ndc
+from med_mod_mapping
+join "&&i2b2_meta_schema".pcornet_med on med_mod_mapping.PCORI_PATH = pcornet_med.c_fullname
+;
 
 commit;
