@@ -1424,8 +1424,6 @@ end PCORNetHarvest;
 At compile time, it's complaining about the fact tables don't exist that are 
 created in the function itself.  I created them ahead of time - SQL taken from
 the procedure.
-
-Also: Error(71,159): PL/SQL: ORA-00904: "MO"."PCORI_CUI": invalid identifier
 */
 whenever sqlerror continue;
 drop table basis;
@@ -1465,9 +1463,6 @@ create table supply(
 	concept_cd varchar2(50 byte)
   );
 
-alter table "&&i2b2_meta_schema".pcornet_med add (
-  pcori_cui varchar2(1000) -- arbitrary
-  );
 whenever sqlerror exit;
 
 create or replace procedure PCORNetPrescribing as
@@ -1541,7 +1536,8 @@ insert into prescribing (
 --    ,RAW_RXNORM_CUI
 )
 select distinct  m.patient_num, m.Encounter_Num,m.provider_id,  m.start_date order_date,  to_char(m.start_date,'HH:MI'), m.start_date start_date, m.end_date, mo.pcori_cui
-    ,quantity.nval_num quantity, refills.nval_num refills, supply.nval_num supply, freq.pcori_basecode frequency, basis.pcori_basecode basis
+    ,quantity.nval_num quantity, refills.nval_num refills, supply.nval_num supply, freq.pcori_basecode frequency, 
+    substr(basis.pcori_basecode, instr(basis.pcori_basecode, ':') + 1, 2) basis
  from i2b2fact m inner join pcornet_med mo on m.concept_cd = mo.c_basecode 
 inner join encounter enc on enc.encounterid = m.encounter_Num
 -- TODO: This join adds several minutes to the load - must be debugged
@@ -1566,7 +1562,8 @@ inner join encounter enc on enc.encounterid = m.encounter_Num
     on m.encounter_num = supply.encounter_num
     and m.concept_cd = supply.concept_Cd
 
-where (basis.c_fullname is null or basis.c_fullname= '\PCORI_MOD\RX_BASIS\PR\%'); -- jgk 11/2 bugfix: filter for PR, not DI
+where (basis.c_fullname is null or basis.c_fullname like '\PCORI_MOD\RX_BASIS\PR\%');
+
 
 end PCORNetPrescribing;
 /
