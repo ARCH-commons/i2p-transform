@@ -1206,7 +1206,7 @@ with pats_delta as (
   -- If only one visit, visit_delta_days will be 0
   select patient_num, max(start_date) - min(start_date) visit_delta_days
   from i2b2visit
-  where start_date > add_months(sysdate, -36)
+  where start_date > add_months(sysdate, -&&enrollment_months_back)
   group by patient_num
   ),
 enrolled as (

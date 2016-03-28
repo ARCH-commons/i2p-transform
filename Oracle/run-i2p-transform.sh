@@ -18,6 +18,7 @@ set -e
 # export i2b2_etl_schema=
 # export min_pat_list_date_dd_mon_rrrr=
 # export min_visit_date_dd_mon_rrrr=
+# export enrollment_months_back=36
 
 # All i2b2 terms - used for local path mapping
 #export terms_table=
@@ -93,6 +94,7 @@ define network_name=${network_name}
 define terms_table=${terms_table}
 define min_pat_list_date_dd_mon_rrrr=${min_pat_list_date_dd_mon_rrrr}
 define min_visit_date_dd_mon_rrrr=${min_visit_date_dd_mon_rrrr}
+define enrollment_months_back=${enrollment_months_back}
 
 -- Local terminology mapping
 start pcornet_mapping.sql
