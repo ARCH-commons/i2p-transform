@@ -491,7 +491,7 @@ with terms_loinc as (
   )
 select
   tl.c_hlevel, 
-  replace(tl.c_fullname, '\i2b2\Laboratory Tests\', '\PCORI\LAB_RESULT\') c_fullname, 
+  replace(tl.c_fullname, '\i2b2\Laboratory Tests\', '\PCORI\LAB_RESULT_CM\') c_fullname, 
   tl.c_name, tl.c_synonym_cd, tl.c_visualattributes,
   tl.c_totalnum, tl.c_basecode, tl.c_metadataxml, tl.c_facttablecolumn, tl.c_tablename, 
   tl.c_columnname, tl.c_columndatatype, tl.c_operator, tl.c_dimcode, tl.c_comment, 
