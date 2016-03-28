@@ -477,7 +477,7 @@ SELECT * FROM DUAL;
 -- Delete SCHILS Lab hierarchy
 delete 
 from "&&i2b2_meta_schema".PCORNET_LAB
-where c_fullname like '\PCORI\LAB_RESULT\%'
+where c_fullname like '\PCORI\LAB_RESULT_CM\%'
 ;
 
 -- Replace with local Lab hierarchy + PCORI_BASECODE + PCORI_SPECIMEN_SOURCE
