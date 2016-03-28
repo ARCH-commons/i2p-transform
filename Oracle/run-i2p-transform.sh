@@ -16,6 +16,8 @@ set -e
 #export network_id=
 #export network_name=
 # export i2b2_etl_schema=
+# export min_pat_list_date_dd_mon_rrrr=
+# export min_visit_date_dd_mon_rrrr=
 
 # All i2b2 terms - used for local path mapping
 #export terms_table=
@@ -89,6 +91,8 @@ define datamart_name=${datamart_name}
 define network_id=${network_id}
 define network_name=${network_name}
 define terms_table=${terms_table}
+define min_pat_list_date_dd_mon_rrrr=${min_pat_list_date_dd_mon_rrrr}
+define min_visit_date_dd_mon_rrrr=${min_visit_date_dd_mon_rrrr}
 
 -- Local terminology mapping
 start pcornet_mapping.sql
