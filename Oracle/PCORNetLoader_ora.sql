@@ -1716,7 +1716,6 @@ end pcornetReport;
 create or replace procedure pcornetloader as
 begin
 ---pcornetclear;
-PCORNetHarvest;
 PCORNetDemographic;
 PCORNetEncounter;
 PCORNetDiagnosis;
@@ -1748,6 +1747,7 @@ http://listserv.kumc.edu/pipermail/gpc-dev/attachments/20160223/8d79fa70/attachm
 > what we have in our i2b2
 */
 --PCORNetDispensing;
+PCORNetHarvest;
 
 end pcornetloader;
 /
