@@ -20,12 +20,6 @@ using encounter e
    on (p.encounterid = e.encounterid)
 when matched then update set p.rx_providerid = e.providerid;
 
-/* Currently in HERON, systolic and diastolic blood pressures from flowsheets 
-are reversed.  This is fixed in the HERON ETL code (#4026) but we haven't run a 
-production ETL yet. 
-*/
-update vital v set v.systolic = v.diastolic, v.diastolic = v.systolic;
-
 /* Currently in HERON, we have hight in cm and weight in kg - the CDM wants
 height in inches and weight in pounds. */
 update vital v set v.ht = v.ht / 2.54;
