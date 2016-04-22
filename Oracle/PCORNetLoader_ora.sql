@@ -2,8 +2,11 @@
 -- PCORNetLoader Script
 -- Orignal MSSQL Verion Contributors: Jeff Klann, PhD; Aaron Abend; Arturo Torres
 -- Translate to Oracle version: by Kun Wei(Wake Forest)
+-- Versin 0.6.3
+-- Version 0.6.3, typos found in field names in trial, enrollment, vital, and harvest tables - 1/11/16
 -- Version 0.6.2, bugfix release, 1/6/16 (create table and pcornetreport bugs)
 -- Version 6.01, release to SCILHS, 10/15/15
+-- Translate to Oracle version: by Kun Wei(Wake Forest)
 -- Prescribing/dispensing bugfixes (untested) inserted by Jeff Klann 12/10/15
 --
 --
@@ -207,7 +210,7 @@ CREATE TABLE pmnENROLLMENT (
 	ENR_START_DATE date NOT NULL,
 	ENR_END_DATE date NULL,
 	CHART varchar(1) NULL,
-	BASIS varchar(1) NOT NULL,
+	ENR_BASIS varchar(1) NOT NULL, -- jgk fixed 1/11/16 should be ENR_BASIS, not BASIS
 	RAW_CHART varchar(50) NULL,
 	RAW_BASIS varchar(50) NULL
 )
@@ -221,7 +224,7 @@ END;
 /
 
 CREATE TABLE pmnVITAL (
-	VITALIID NUMBER(19)  primary key,
+	VITALID NUMBER(19)  primary key, --Fixed typo 1/11/16 jgk
 	PATID varchar(50) NULL,
 	ENCOUNTERID varchar(50) NULL,
 	MEASURE_DATE date NULL,
@@ -260,7 +263,7 @@ create or replace trigger pmnVITAL_trg
 before insert on pmnVITAL
 for each row
 begin
-  select pmnVITAL_seq.nextval into :new.VITALIID from dual;
+  select pmnVITAL_seq.nextval into :new.VITALID from dual;
 end;
 /
 
@@ -546,7 +549,7 @@ CREATE TABLE pmnprescribing(
 	RX_QUANTITY int NULL,
 	RX_REFILLS int NULL,
 	RX_DAYS_SUPPLY int NULL,
-	RX_FREQUENCY int NULL,
+	RX_FREQUENCY varchar (2) NULL, -- Data type error, fixed 1/11/16 jgk
 	RX_BASIS varchar (2) NULL,
 	RXNORM_CUI int NULL,
 	RAW_RX_MED_NAME varchar (50) NULL,
@@ -577,7 +580,7 @@ END;
 /
 CREATE TABLE pmnpcornet_trial(
 	PATID varchar(50) NOT NULL,
-	TRIAL_ID varchar(20) NOT NULL,
+	TRIALID varchar(20) NOT NULL, --Name mistake - fix 1/11/16 jgk 
 	PARTICIPANTID varchar(50) NOT NULL,
 	TRIAL_SITEID varchar(50) NULL,
 	TRIAL_ENROLL_DATE date NULL,
@@ -686,7 +689,7 @@ CREATE TABLE pmnharvest(
 	RX_END_DATE_MGMT varchar(2) NULL,
 	DISPENSE_DATE_MGMT varchar(2) NULL,
 	LAB_ORDER_DATE_MGMT varchar(2) NULL,
-	SPECIMENT_DATE_MGMT varchar(2) NULL,
+	SPECIMEN_DATE_MGMT varchar(2) NULL, -- Typo fixed 1/16/15 jgk
 	RESULT_DATE_MGMT varchar(2) NULL,
 	MEASURE_DATE_MGMT varchar(2) NULL,
 	ONSET_DATE_MGMT varchar(2) NULL,
@@ -1101,7 +1104,8 @@ case when tobacco in ('02','03','04') then -- no tobacco
  when tobacco='01' then
     case when smoking in ('03','04') then '02' -- no smoking
         when smoking in ('01','02','07','08') then '03' -- smoking
-        else '05' end
+        else 'OT' end
+  when tobacco in ('NI','OT','UN') and smoking in ('01','02','07','08') then '05'  -- (unknown tobacco w/ smoking) jgk bugfix 12/17/15
  else 'NI' end tobacco_type 
 from
 (select patid, encounterid, measure_date, measure_time, NVL(max(vital_source),'HC') vital_source, -- jgk: not in the spec, so I took it out  admit_date,
@@ -1175,10 +1179,10 @@ end PCORNetVital;
 create or replace procedure PCORNetEnroll as
 begin
 
-INSERT INTO pmnENROLLMENT(PATID, ENR_START_DATE, ENR_END_DATE, CHART, BASIS) 
+INSERT INTO pmnENROLLMENT(PATID, ENR_START_DATE, ENR_END_DATE, CHART, ENR_BASIS) 
     select x.patient_num patid, case when l.patient_num is not null then l.period_start else enr_start end enr_start_date
     , case when l.patient_num is not null then l.period_end when enr_end_end>enr_end then enr_end_end else enr_end end enr_end_date 
-    , 'Y' chart, case when l.patient_num is not null then 'A' else 'E' end basis from 
+    , 'Y' chart, case when l.patient_num is not null then 'A' else 'E' end enr_basis from 
     (select patient_num, min(start_date) enr_start,max(start_date) enr_end,max(end_date) enr_end_end from i2b2visit where patient_num in (select patid from pmndemographic) group by patient_num) x
     left outer join i2b2loyalty_patients l on l.patient_num=x.patient_num;
 
@@ -1312,7 +1316,7 @@ END PCORNetLabResultCM;
 create or replace procedure PCORNetHarvest as
 begin
 
-INSERT INTO pmnharvest(NETWORKID, NETWORK_NAME, DATAMARTID, DATAMART_NAME, DATAMART_PLATFORM, CDM_VERSION, DATAMART_CLAIMS, DATAMART_EHR, BIRTH_DATE_MGMT, ENR_START_DATE_MGMT, ENR_END_DATE_MGMT, ADMIT_DATE_MGMT, DISCHARGE_DATE_MGMT, PX_DATE_MGMT, RX_ORDER_DATE_MGMT, RX_START_DATE_MGMT, RX_END_DATE_MGMT, DISPENSE_DATE_MGMT, LAB_ORDER_DATE_MGMT, SPECIMENT_DATE_MGMT, RESULT_DATE_MGMT, MEASURE_DATE_MGMT, ONSET_DATE_MGMT, REPORT_DATE_MGMT, RESOLVE_DATE_MGMT, PRO_DATE_MGMT, REFRESH_DEMOGRAPHIC_DATE, REFRESH_ENROLLMENT_DATE, REFRESH_ENCOUNTER_DATE, REFRESH_DIAGNOSIS_DATE, REFRESH_PROCEDURES_DATE, REFRESH_VITAL_DATE, REFRESH_DISPENSING_DATE, REFRESH_LAB_RESULT_CM_DATE, REFRESH_CONDITION_DATE, REFRESH_PRO_CM_DATE, REFRESH_PRESCRIBING_DATE, REFRESH_PCORNET_TRIAL_DATE, REFRESH_DEATH_DATE, REFRESH_DEATH_CAUSE_DATE) 
+INSERT INTO pmnharvest(NETWORKID, NETWORK_NAME, DATAMARTID, DATAMART_NAME, DATAMART_PLATFORM, CDM_VERSION, DATAMART_CLAIMS, DATAMART_EHR, BIRTH_DATE_MGMT, ENR_START_DATE_MGMT, ENR_END_DATE_MGMT, ADMIT_DATE_MGMT, DISCHARGE_DATE_MGMT, PX_DATE_MGMT, RX_ORDER_DATE_MGMT, RX_START_DATE_MGMT, RX_END_DATE_MGMT, DISPENSE_DATE_MGMT, LAB_ORDER_DATE_MGMT, SPECIMEN_DATE_MGMT, RESULT_DATE_MGMT, MEASURE_DATE_MGMT, ONSET_DATE_MGMT, REPORT_DATE_MGMT, RESOLVE_DATE_MGMT, PRO_DATE_MGMT, REFRESH_DEMOGRAPHIC_DATE, REFRESH_ENROLLMENT_DATE, REFRESH_ENCOUNTER_DATE, REFRESH_DIAGNOSIS_DATE, REFRESH_PROCEDURES_DATE, REFRESH_VITAL_DATE, REFRESH_DISPENSING_DATE, REFRESH_LAB_RESULT_CM_DATE, REFRESH_CONDITION_DATE, REFRESH_PRO_CM_DATE, REFRESH_PRESCRIBING_DATE, REFRESH_PCORNET_TRIAL_DATE, REFRESH_DEATH_DATE, REFRESH_DEATH_CAUSE_DATE) 
 	VALUES('SCILHS', 'SCILHS', getDataMartID(), getDataMartName(), getDataMartPlatform(), 3, 01, 02, 1,1,2,1,2,1,2,1,2,1,1,2,2,1,1,1,2,1,current_date,current_date,current_date,current_date,current_date,current_date,current_date,current_date,current_date,null,current_date,null,null,null);
 
 end PCORNetHarvest;
