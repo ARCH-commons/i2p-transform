@@ -22,6 +22,7 @@ Instructions:
 \--------------------------------------------------------------------------------------*/
 
 libname sql_cdm odbc datasrc='PopMedNet'; 
+/* optionally add a password above: e.g., libname sql_cdm odbc datasrc='ORACLE_PMN' password=myPassWord; */
 libname cdm "C:\Users\jgk\Documents\My SAS Files\CDM";
 
 
