@@ -3,6 +3,7 @@
 -- PCORNetLoader Script
 -- Current version will not transform: Death, Death_Condition, PCORnet_Trial, PRO_CM 
 -- Contributors: Jeff Klann, PhD; Aaron Abend; Arturo Torres
+-- Version 0.6.4, Harvest leading zero bug, px_type default
 -- Version 0.6.3, typos found in field names in trial, enrollment, vital, and harvest tables - 1/11/16
 -- Version 0.6.2, bugfix in tobbaco_type logic in vitals, 12/17/15
 -- Version 6.1 became 0.6.1, 12/17/15
@@ -1120,6 +1121,7 @@ go
 ----------------------------------------------------------------------------------------------------------------------------------------
 -- 4. Procedures - v6 by Aaron Abend and Jeff Klann
 -- v6 - minor optimizations
+-- 0.6.4 - NI in px_source, fixed encounter start vs. fact start
 ----------------------------------------------------------------------------------------------------------------------------------------
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'PCORNetProcedure') AND type in (N'P', N'PC')) DROP PROCEDURE PCORNetProcedure
 go
@@ -1128,9 +1130,9 @@ create procedure PCORNetProcedure as
 
 begin
 insert into pmnprocedure( 
-				patid,			encounterid,	enc_type, admit_date, providerid, px, px_type) 
-select  distinct fact.patient_num, enc.encounterid,	enc.enc_type, fact.start_date, 
-		fact.provider_id, substring(pr.pcori_basecode,charindex(':',pr.pcori_basecode)+1,11) px, substring(pr.c_fullname,18,2) pxtype 
+				patid,			encounterid,	enc_type, admit_date, providerid, px, px_type, px_source,px_date) 
+select  distinct fact.patient_num, enc.encounterid,	enc.enc_type, enc.start_date, 
+		fact.provider_id, substring(pr.pcori_basecode,charindex(':',pr.pcori_basecode)+1,11) px, substring(pr.c_fullname,18,2) pxtype, 'NI' px_source,fact.start_date
 from i2b2fact fact
  inner join pmnENCOUNTER enc on enc.patid = fact.patient_num and enc.encounterid = fact.encounter_Num
  inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
