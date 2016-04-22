@@ -1147,11 +1147,11 @@ go
 -- TODO: This version does not do unit conversions.
 ----------------------------------------------------------------------------------------------------------------------------------------
 ------------------------- Vitals Code ------------------------------------------------ 
--- 10/2/15
 -- Written by Jeff Klann, PhD
 -- Borrows heavily from GPC's CDM_transform.sql by Dan Connolly and Nathan Graham, available at https://bitbucket.org/njgraham/pcori-annotated-data-dictionary/overview 
 -- This transform must be run after demographics and encounters. It does not rely on the PCORI_basecode column except for tobacco and smoking status, so that does not need to be changed.
 -- v6 now supports CDM v3 (smoking and tobacco transforms)
+-- v0.6.4 now correctly merges modifiers
 -- TODO: This does not do unit conversions.
 
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'PCORNetVital') AND type in (N'P', N'PC'))
@@ -1194,11 +1194,12 @@ from (
     , enc.admit_date
   from pmndemographic pd
   left join (
-    select 
-      obs.patient_num patid, obs.encounter_num encounterid, 
-      	substring(convert(varchar,obs.start_Date,20),1,10) measure_date, 
-	substring(convert(varchar,obs.start_Date,20),12,5) measure_time, 
-      nval_num, pcori_basecode, codes.pcori_code
+ -- Begin gather facts and modifier facts
+      select patient_num patid, encounter_num encounterid, 
+      	substring(convert(varchar,start_Date,20),1,10) measure_date, 
+	substring(convert(varchar,start_Date,20),12,5) measure_time, 
+      nval_num, pcori_basecode, pcori_code from
+    (select obs.patient_num, obs.encounter_num, obs.start_Date, nval_num, pcori_basecode, codes.pcori_code
     from i2b2fact obs
     inner join (select c_basecode concept_cd, c_fullname pcori_code, pcori_basecode
       from (
@@ -1212,15 +1213,24 @@ from (
         union all
         select '\PCORI\VITAL\ORIGINAL_BMI\' concept_path
         union all
-        select '\PCORI_MOD\BP_POSITION\' concept_path
-        union all
-        select '\PCORI_MOD\VITAL_SOURCE\' concept_path
-        union all
         select '\PCORI\VITAL\TOBACCO\' concept_path
         ) bp, pcornet_vital pm
       where pm.c_fullname like bp.concept_path + '%'
-      ) codes on codes.concept_cd = obs.concept_cd
-    ) vit on vit.patid = pd.patid
+      ) codes on (codes.concept_cd = obs.concept_cd) 
+      UNION ALL
+    select obs.patient_num, obs.encounter_num, obs.start_Date, nval_num, pcori_basecode, codes.pcori_code
+    from i2b2fact obs
+    inner join (select c_basecode concept_cd, c_fullname pcori_code, pcori_basecode
+      from (
+        select '\PCORI_MOD\BP_POSITION\' concept_path
+        union all
+        select '\PCORI_MOD\VITAL_SOURCE\' concept_path
+        ) bp, pcornet_vital pm
+      where pm.c_fullname like bp.concept_path + '%'
+     ) codes on (codes.concept_cd = obs.modifier_cd)
+     )fx
+-- End gather facts and modifier facts
+    ) vit on vit.patid = pd.patid    
   join pmnencounter enc on enc.encounterid = vit.encounterid
   ) x
 where ht is not null 
@@ -1387,6 +1397,7 @@ GO
 ----------------------------------------------------------------------------------------------------------------------------------------
 -- 8. HARVEST - v6
 -- Populates with SCILHS defaults and parameters at top of script. Update for other networks.
+-- 1/16/16 fixed typo
 ----------------------------------------------------------------------------------------------------------------------------------------
 -- Written by Jeff Klann, PhD 
 -- BUGFIX 04/22/16: Needed leading zeros on numbers
@@ -1685,7 +1696,8 @@ insert into i2pReport select @runid, getdate(), 'Condition',		null,		@pmncond,	n
 insert into i2pReport select @runid, getdate(), 'Vital',		null,		@pmnvital,	null
 insert into i2pReport select @runid, getdate(), 'Labs',		null,		@pmnlabs,	null
 insert into i2pReport select @runid, getdate(), 'Prescribing',		null,	@pmnprescribings,	null
-insert into i2pReport select @runid, getdate(), 'Dispensing',		null,	@pmndispensings,	nullinsert into i2pReport select @runid, getdate(), 'Pats',			@i2b2pats,		@pmnpats,			@i2b2pats-@pmnpats
+insert into i2pReport select @runid, getdate(), 'Dispensing',		null,	@pmndispensings,	null
+insert into i2pReport select @runid, getdate(), 'Pats',			@i2b2pats,		@pmnpats,			@i2b2pats-@pmnpats
 insert into i2pReport select @runid, getdate(), 'Enrollment',	@i2b2pats,		@pmnenroll,			@i2b2pats-@pmnpats
 
 insert into i2pReport select @runid, getdate(), 'Encounters',	@i2b2Encounters,@pmnEncounters,		@i2b2encounters-@pmnencounters
@@ -1701,6 +1713,4 @@ select concept 'Data Type',sourceval 'From i2b2',destval 'In PopMedNet', diff 'D
 
 end
 GO
-
-
 
