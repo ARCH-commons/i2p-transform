@@ -462,7 +462,6 @@ lt.VALUETYPE_CD,
 lt.M_EXCLUSION_CD,
 lm.C_PATH,
 lt.C_SYMBOL,
-lt.TERM_ID,
 lm.PCORI_BASECODE,
 lm.pcori_specimen_source
 from "&&i2b2_meta_schema"."&&terms_table" lt, lab_map lm
