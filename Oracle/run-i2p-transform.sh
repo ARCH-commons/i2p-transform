@@ -66,7 +66,6 @@ set timing on;
 
 WHENEVER SQLERROR CONTINUE;
 
-drop table PMN_LABNORMAL;
 drop table DEMOGRAPHIC;
 drop table ENROLLMENT;
 drop table ENCOUNTER;
