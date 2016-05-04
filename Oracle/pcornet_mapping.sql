@@ -430,78 +430,49 @@ commit;
 
 insert into "&&i2b2_meta_schema".PCORNET_LAB
 with lab_map as (
-	select distinct lab.c_hlevel, lab.c_path, lab.pcori_basecode, trim(CHR(13) from lab.pcori_specimen_source) as pcori_specimen_source
-	from pcornet_lab lab 
-	inner JOIN pcornet_lab ont_parent on lab.c_path=ont_parent.c_fullname
-	inner join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
-	where lab.c_fullname like '\PCORI\LAB_RESULT_CM\%'
+  select distinct lab.c_hlevel, lab.c_path, lab.pcori_basecode, trim(CHR(13) from lab.pcori_specimen_source) as pcori_specimen_source
+  from pcornet_lab lab 
+  inner JOIN pcornet_lab ont_parent on lab.c_path=ont_parent.c_fullname
+  inner join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
+  where lab.c_fullname like '\PCORI\LAB_RESULT_CM\%'
 ),
 local_loinc_terms as (
-	select
-		lm.C_HLEVEL,
-		lt.C_FULLNAME,
-		lt.C_NAME,
-		lt.C_SYNONYM_CD,
-		lt.C_VISUALATTRIBUTES,
-		lt.C_TOTALNUM,
-		lt.C_BASECODE,
-		lt.C_METADATAXML,
-		lt.C_FACTTABLECOLUMN,
-		lt.C_TABLENAME,
-		lt.C_COLUMNNAME,
-		lt.C_COLUMNDATATYPE,
-		lt.C_OPERATOR,
-		lt.C_DIMCODE,
-		lt.C_COMMENT,
-		lt.C_TOOLTIP,
-		lt.M_APPLIED_PATH,
-		lt.UPDATE_DATE,
-		lt.DOWNLOAD_DATE,
-		lt.IMPORT_DATE,
-		lt.SOURCESYSTEM_CD,
-		lt.VALUETYPE_CD,
-		lt.M_EXCLUSION_CD,
-		lm.C_PATH,
-		lt.C_SYMBOL,
-		lt.TERM_ID,
-		lm.PCORI_BASECODE,
-		lm.pcori_specimen_source
-	from "&&i2b2_meta_schema"."&&terms_table" lt, lab_map lm
-	where lm.pcori_specimen_source=replace(lt.c_basecode, 'LOINC:', '')
-		and lt.c_fullname like '\i2b2\Laboratory Tests\%' and lt.c_basecode like 'LOINC:%'
+  select lm.C_HLEVEL, lt.C_FULLNAME, lm.C_PATH, lm.PCORI_BASECODE, lm.pcori_specimen_source
+  from "&&i2b2_meta_schema"."&&terms_table" lt, lab_map lm
+  where lm.pcori_specimen_source=replace(lt.c_basecode, 'LOINC:', '')
+    and lt.c_fullname like '\i2b2\Laboratory Tests\%' and lt.c_basecode like 'LOINC:%'
 )
 select 
-	llt.C_HLEVEL,
-	concat(llt.c_path, substr(regexp_substr(lt.c_fullname, '\\[^\\]+\\$'), 2, length(regexp_substr(lt.c_fullname, '\\[^\\]+\\$')))) as c_fullname,
-	lt.C_NAME,
-	lt.C_SYNONYM_CD,
-	lt.C_VISUALATTRIBUTES,
-	lt.C_TOTALNUM,
-	lt.C_BASECODE,
-	lt.C_METADATAXML,
-	lt.C_FACTTABLECOLUMN,
-	lt.C_TABLENAME,
-	lt.C_COLUMNNAME,
-	lt.C_COLUMNDATATYPE,
-	lt.C_OPERATOR,
-	lt.C_DIMCODE,
-	lt.C_COMMENT,
-	lt.C_TOOLTIP,
-	lt.M_APPLIED_PATH,
-	lt.UPDATE_DATE,
-	lt.DOWNLOAD_DATE,
-	lt.IMPORT_DATE,
-	'MAPPING',
-	lt.VALUETYPE_CD,
-	lt.M_EXCLUSION_CD,
-	llt.C_PATH,
-	lt.C_SYMBOL,
-	lt.TERM_ID,
-	llt.PCORI_BASECODE,
-	llt.pcori_specimen_source
+  llt.C_HLEVEL,
+  concat(llt.c_path, substr(regexp_substr(lt.c_fullname, '\\[^\\]+\\$'), 2, length(regexp_substr(lt.c_fullname, '\\[^\\]+\\$')))) as c_fullname,
+  lt.C_NAME,
+  lt.C_SYNONYM_CD,
+  lt.C_VISUALATTRIBUTES,
+  lt.C_TOTALNUM,
+  lt.C_BASECODE,
+  lt.C_METADATAXML,
+  lt.C_FACTTABLECOLUMN,
+  lt.C_TABLENAME,
+  lt.C_COLUMNNAME,
+  lt.C_COLUMNDATATYPE,
+  lt.C_OPERATOR,
+  lt.C_DIMCODE,
+  lt.C_COMMENT,
+  lt.C_TOOLTIP,
+  lt.M_APPLIED_PATH,
+  lt.UPDATE_DATE,
+  lt.DOWNLOAD_DATE,
+  lt.IMPORT_DATE,
+  'MAPPING',
+  lt.VALUETYPE_CD,
+  lt.M_EXCLUSION_CD,
+  llt.C_PATH,
+  lt.C_SYMBOL,
+  llt.PCORI_BASECODE,
+  llt.pcori_specimen_source
 from "&&i2b2_meta_schema"."&&terms_table" lt, local_loinc_terms llt
 where lt.c_fullname like llt.c_fullname||'%\'
-;	
+;
 
 commit;
 
