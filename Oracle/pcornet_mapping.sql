@@ -430,7 +430,7 @@ commit;
 
 insert into "&&i2b2_meta_schema".PCORNET_LAB
 with lab_map as (
-  select distinct lab.c_hlevel, lab.c_path, lab.pcori_basecode, trim(CHR(13) from lab.pcori_specimen_source) as pcori_specimen_source
+	select distinct lab.c_hlevel, lab.c_path, lab.pcori_specimen_source, trim(CHR(13) from lab.pcori_basecode) as pcori_basecode
   from pcornet_lab lab 
   inner JOIN pcornet_lab ont_parent on lab.c_path=ont_parent.c_fullname
   inner join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
@@ -439,7 +439,7 @@ with lab_map as (
 local_loinc_terms as (
   select lm.C_HLEVEL, lt.C_FULLNAME, lm.C_PATH, lm.PCORI_BASECODE, lm.pcori_specimen_source
   from "&&i2b2_meta_schema"."&&terms_table" lt, lab_map lm
-  where lm.pcori_specimen_source=replace(lt.c_basecode, 'LOINC:', '')
+  where lm.pcori_basecode=replace(lt.c_basecode, 'LOINC:', '')
     and lt.c_fullname like '\i2b2\Laboratory Tests\%' and lt.c_basecode like 'LOINC:%'
 )
 select 
