@@ -428,7 +428,7 @@ commit;
 /* Add relevent nodes from local i2b2 lab hierarchy to PCORNet Labs hierarchy.
 */
 
-insert into "&&i2b2_meta_schema".PCORNET_LAB
+insert into PCORNET_LAB
 with lab_map as (
 	select distinct lab.c_hlevel, lab.c_path, lab.pcori_specimen_source, trim(CHR(13) from lab.pcori_basecode) as pcori_basecode
   from pcornet_lab lab 
@@ -468,8 +468,8 @@ select
   lt.M_EXCLUSION_CD,
   llt.C_PATH,
   lt.C_SYMBOL,
-  llt.PCORI_BASECODE,
-  llt.pcori_specimen_source
+  llt.pcori_specimen_source,
+  llt.PCORI_BASECODE
 from "&&i2b2_meta_schema"."&&terms_table" lt, local_loinc_terms llt
 where lt.c_fullname like llt.c_fullname||'%\'
 ;
