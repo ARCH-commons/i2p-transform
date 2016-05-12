@@ -1275,7 +1275,8 @@ m.start_date SPECIMEN_DATE,
 to_char(m.start_date,'HH:MI')  SPECIMEN_TIME,
 m.end_date RESULT_DATE,
 to_char(m.end_date,'HH:MI') RESULT_TIME,
-CASE WHEN m.ValType_Cd='T' THEN NVL(nullif(m.TVal_Char,''),'NI') ELSE 'NI' END RESULT_QUAL, -- TODO: Should be a standardized value
+--CASE WHEN m.ValType_Cd='T' THEN NVL(nullif(m.TVal_Char,''),'NI') ELSE 'NI' END RESULT_QUAL, -- TODO: Should be a standardized value
+'NI' RESULT_QUAL, -- Temporary fix for KUMC
 CASE WHEN m.ValType_Cd='N' THEN m.NVAL_NUM ELSE null END RESULT_NUM,
 CASE WHEN m.ValType_Cd='N' THEN (CASE NVL(nullif(m.TVal_Char,''),'NI') WHEN 'E' THEN 'EQ' WHEN 'NE' THEN 'OT' WHEN 'L' THEN 'LT' WHEN 'LE' THEN 'LE' WHEN 'G' THEN 'GT' WHEN 'GE' THEN 'GE' ELSE 'NI' END)  ELSE 'TX' END RESULT_MODIFIER,
 NVL(m.Units_CD,'NI') RESULT_UNIT, -- TODO: Should be standardized units
