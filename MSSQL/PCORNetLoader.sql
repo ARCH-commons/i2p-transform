@@ -3,6 +3,7 @@
 -- PCORNetLoader Script
 -- Current version will not transform: Death, Death_Condition, PCORnet_Trial, PRO_CM 
 -- Contributors: Jeff Klann, PhD; Aaron Abend; Arturo Torres
+-- Version 0.6.5, Harvest leading zero was still a bug!
 -- Version 0.6.4, Harvest leading zero bug, px_type default
 -- Version 0.6.3, typos found in field names in trial, enrollment, vital, and harvest tables - 1/11/16
 -- Version 0.6.2, bugfix in tobbaco_type logic in vitals, 12/17/15
@@ -1398,6 +1399,7 @@ GO
 -- 8. HARVEST - v6
 -- Populates with SCILHS defaults and parameters at top of script. Update for other networks.
 -- 1/16/16 fixed typo
+-- 5/17/16 fixed quotes around insert statement
 ----------------------------------------------------------------------------------------------------------------------------------------
 -- Written by Jeff Klann, PhD 
 -- BUGFIX 04/22/16: Needed leading zeros on numbers
@@ -1408,7 +1410,7 @@ create procedure PCORNetHarvest as
 begin
 
 INSERT INTO [dbo].[pmnharvest]([NETWORKID], [NETWORK_NAME], [DATAMARTID], [DATAMART_NAME], [DATAMART_PLATFORM], [CDM_VERSION], [DATAMART_CLAIMS], [DATAMART_EHR], [BIRTH_DATE_MGMT], [ENR_START_DATE_MGMT], [ENR_END_DATE_MGMT], [ADMIT_DATE_MGMT], [DISCHARGE_DATE_MGMT], [PX_DATE_MGMT], [RX_ORDER_DATE_MGMT], [RX_START_DATE_MGMT], [RX_END_DATE_MGMT], [DISPENSE_DATE_MGMT], [LAB_ORDER_DATE_MGMT], [SPECIMEN_DATE_MGMT], [RESULT_DATE_MGMT], [MEASURE_DATE_MGMT], [ONSET_DATE_MGMT], [REPORT_DATE_MGMT], [RESOLVE_DATE_MGMT], [PRO_DATE_MGMT], [REFRESH_DEMOGRAPHIC_DATE], [REFRESH_ENROLLMENT_DATE], [REFRESH_ENCOUNTER_DATE], [REFRESH_DIAGNOSIS_DATE], [REFRESH_PROCEDURES_DATE], [REFRESH_VITAL_DATE], [REFRESH_DISPENSING_DATE], [REFRESH_LAB_RESULT_CM_DATE], [REFRESH_CONDITION_DATE], [REFRESH_PRO_CM_DATE], [REFRESH_PRESCRIBING_DATE], [REFRESH_PCORNET_TRIAL_DATE], [REFRESH_DEATH_DATE], [REFRESH_DEATH_CAUSE_DATE]) 
-	VALUES('SCILHS', 'SCILHS', dbo.getDataMartID(), dbo.getDataMartName(), dbo.getDataMartPlatform(), 3, 01, 02, 01,01,02,01,02,01,02,01,02,01,01,02,02,01,01,01,02,01,getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),null,getdate(),null,null,null)
+	VALUES('SCILHS', 'SCILHS', dbo.getDataMartID(), dbo.getDataMartName(), dbo.getDataMartPlatform(), 3, '01', '02', '01','01','02','01','02','01','02','01','02','01','01','02','02','01','01','01','02','01',getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),null,getdate(),null,null,null)
 
 end
 GO
