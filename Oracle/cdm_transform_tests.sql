@@ -528,6 +528,38 @@ order by 2
 ;
 */
 
+
+/*  Verify that LAB_RESULT_CM contains data associated with a least half of the 
+labs defined in PMN_LABLOCAL.
+*/
+insert into test_cases (query_name, description, obs, by_value1, by_value2, record_pct, pass)
+with partial_lab_counts as (
+  select lab_name, count(lab_name) lab_count
+  from lab_result_cm
+  group by lab_name
+), complete_lab_counts as(
+  select replace(pmn.lab_name, 'LAB_NAME:', '') lab_name,
+    case when lc.lab_count is null then 0 else lc.lab_count end lab_count
+  from pmn_labnormal pmn
+  left outer join partial_lab_counts lc on concat('LAB_NAME:', lc.lab_name) = pmn.lab_name
+), total_lab_types as (
+  select count(*) num_labs from complete_lab_counts
+), present_lab_types as (
+  select count(*) num_labs from complete_lab_counts
+  where lab_count > 0
+)
+select
+'LAB_RESULT_CM Test' query_name,
+'LAB_RESULT_CM contains data associated with at least half of the defined labs' description,
+rownum obs,
+plt.num_labs by_value1,
+tlt.num_labs by_values2,
+round(plt.num_labs/tlt.num_labs, 4) record_pct,
+case when (plt.num_labs/tlt.num_labs) > 0.5 then 1 else 0 end pass
+from present_lab_types plt
+cross join total_lab_types tlt
+;
+
 select case when count(*) > 0 then 1/0 else 1 end all_test_cases_pass from (
 select * from test_cases where pass = 0
 );

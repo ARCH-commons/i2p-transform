@@ -24,6 +24,7 @@ set -e
 #export terms_table=
 
 python load_csv.py harvest_local harvest_local.csv harvest_local.ctl pcornet_cdm_user pcornet_cdm
+python load_csv.py PMN_LabNormal pmn_labnormal.csv pmn_labnormal.ctl pcornet_cdm_user pcornet_cdm
 . ./load_pcornet_mapping.sh
 
 # Run some tests
@@ -65,7 +66,6 @@ set timing on;
 
 WHENEVER SQLERROR CONTINUE;
 
-drop table PMN_LABNORMAL;
 drop table DEMOGRAPHIC;
 drop table ENROLLMENT;
 drop table ENCOUNTER;
