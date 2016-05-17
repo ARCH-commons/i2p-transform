@@ -428,11 +428,11 @@ commit;
 /* Add relevent nodes from local i2b2 lab hierarchy to PCORNet Labs hierarchy.
 */
 
-insert into PCORNET_LAB
+insert into "&&i2b2_meta_schema".pcornet_lab
 with lab_map as (
 	select distinct lab.c_hlevel, lab.c_path, lab.pcori_specimen_source, trim(CHR(13) from lab.pcori_basecode) as pcori_basecode
-  from pcornet_lab lab 
-  inner JOIN pcornet_lab ont_parent on lab.c_path=ont_parent.c_fullname
+  from "&&i2b2_meta_schema".pcornet_lab lab 
+  inner JOIN "&&i2b2_meta_schema".pcornet_lab ont_parent on lab.c_path=ont_parent.c_fullname
   inner join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
   where lab.c_fullname like '\PCORI\LAB_RESULT_CM\%'
 ),
