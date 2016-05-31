@@ -1,9 +1,9 @@
 ----------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------------
 -- PCORNetLoader Script
--- Current version will not transform: Death, Death_Condition, PCORnet_Trial, PRO_CM 
+-- Current version will not transform: Death_Condition, PCORnet_Trial, PRO_CM 
 -- Contributors: Jeff Klann, PhD; Aaron Abend; Arturo Torres
--- Version 0.6.5, Harvest leading zero was still a bug!
+-- Version 0.6.5, Harvest leading zero was still a bug!; wrong column referenced in pcornetprocedure; added simple (non-ontology) death transform
 -- Version 0.6.4, Harvest leading zero bug, px_type default
 -- Version 0.6.3, typos found in field names in trial, enrollment, vital, and harvest tables - 1/11/16
 -- Version 0.6.2, bugfix in tobbaco_type logic in vitals, 12/17/15
@@ -91,6 +91,7 @@ GO
 
 -- Update the loyalty cohort filter set - you will need to point this to your local database name
 -- Also set the loyalty cohort time period - this should be dynamic in a future update - right now it can be left alone
+-- Filters selected (61511) include: Has age and sex, Has race, Lives in same state as hospital,Has data in the first and last 18 months,Has diagnoses,Is alive,Is not in the bottom 10% of fact count 
 IF  EXISTS (SELECT * FROM sys.views WHERE object_id = OBJECT_ID('i2b2loyalty_patients')) DROP VIEW i2b2loyalty_patients
 GO
 create view i2b2loyalty_patients as
@@ -1123,6 +1124,7 @@ go
 -- 4. Procedures - v6 by Aaron Abend and Jeff Klann
 -- v6 - minor optimizations
 -- 0.6.4 - NI in px_source, fixed encounter start vs. fact start
+-- 0.6.5 - Somehow was referencing the wrong column name from encounter table for admit date
 ----------------------------------------------------------------------------------------------------------------------------------------
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'PCORNetProcedure') AND type in (N'P', N'PC')) DROP PROCEDURE PCORNetProcedure
 go
@@ -1132,7 +1134,7 @@ create procedure PCORNetProcedure as
 begin
 insert into pmnprocedure( 
 				patid,			encounterid,	enc_type, admit_date, providerid, px, px_type, px_source,px_date) 
-select  distinct fact.patient_num, enc.encounterid,	enc.enc_type, enc.start_date, 
+select  distinct fact.patient_num, enc.encounterid,	enc.enc_type, enc.admit_date, 
 		fact.provider_id, substring(pr.pcori_basecode,charindex(':',pr.pcori_basecode)+1,11) px, substring(pr.c_fullname,18,2) pxtype, 'NI' px_source,fact.start_date
 from i2b2fact fact
  inner join pmnENCOUNTER enc on enc.patid = fact.patient_num and enc.encounterid = fact.encounter_Num
@@ -1141,7 +1143,6 @@ where pr.c_fullname like '\PCORI\PROCEDURE\%'
 
 end
 go
-
 ----------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------------
 -- 5. Vitals - v6 by Jeff Klann
@@ -1584,6 +1585,31 @@ group by m.encounter_num ,m.patient_num, m.start_date,  mo.pcori_ndc
 
 end
 GO
+----------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------
+-- 10. Death - v1 by Jeff Klann, PhD
+-- Simple transform only pulls death date from patient dimension, does not rely on an ontology
+----------------------------------------------------------------------------------------------------------------------------------------
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'PCORNetDeath') AND type in (N'P', N'PC')) DROP PROCEDURE PCORNetDeath
+go
+
+
+create procedure PCORNetDeath as
+
+begin
+insert into pmndeath( 
+				patid,			death_date, death_date_impute, death_source,death_match_confidence) 
+select  distinct pat.patient_num, pat.death_date, case 
+when vital_status_cd like 'X%' then 'B'
+when vital_status_cd like 'M%' then 'D'
+when vital_status_cd like 'Y%' then 'N'
+else 'OT'	
+end, 'NI','NI'
+from i2b2patient pat
+where (pat.death_date is not null or vital_status_cd like 'Z%') and pat.patient_num in (select patid from pmndemographic)
+
+end
+go
 
 ----------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------------
@@ -1608,6 +1634,7 @@ DELETE FROM pmnlabresults_cm
 DELETE FROM pmnencounter
 DELETE FROM pmndemographic
 DELETE FROM pmnharvest
+delete from pmndeath
 
 end
 go
@@ -1634,6 +1661,7 @@ exec PCORNetEnroll
 exec PCORNetLabResultCM
 exec PCORNetPrescribing
 exec PCORNetDispensing
+exec PCORNetDeath
 exec pcornetreport
 
 end
