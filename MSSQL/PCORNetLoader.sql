@@ -1631,10 +1631,10 @@ DELETE FROM pmncondition
 DELETE FROM pmnvital
 DELETE FROM pmnenrollment
 DELETE FROM pmnlabresults_cm
+delete from pmndeath
 DELETE FROM pmnencounter
 DELETE FROM pmndemographic
 DELETE FROM pmnharvest
-delete from pmndeath
 
 end
 go

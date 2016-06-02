@@ -62,6 +62,8 @@ exec PCORNetPrescribing
 GO
 exec PCORNetDispensing
 GO
+exec PCORNetDeath
+GO
 exec pcornetreport
 GO
 
