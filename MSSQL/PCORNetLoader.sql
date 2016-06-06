@@ -3,7 +3,7 @@
 -- PCORNetLoader Script
 -- Current version will not transform: Death_Condition, PCORnet_Trial, PRO_CM 
 -- Contributors: Jeff Klann, PhD; Aaron Abend; Arturo Torres
--- Version 0.6.5, Harvest leading zero was still a bug!; wrong column referenced in pcornetprocedure; added simple (non-ontology) death transform
+-- Version 0.6.5, Harvest leading zero was still a bug!; wrong column referenced in pcornetprocedure; added simple (non-ontology) death transform; duplicate code in i2preport
 -- Version 0.6.4, Harvest leading zero bug, px_type default
 -- Version 0.6.3, typos found in field names in trial, enrollment, vital, and harvest tables - 1/11/16
 -- Version 0.6.2, bugfix in tobbaco_type logic in vitals, 12/17/15
@@ -1729,15 +1729,6 @@ insert into i2pReport select @runid, getdate(), 'Prescribing',		null,	@pmnprescr
 insert into i2pReport select @runid, getdate(), 'Dispensing',		null,	@pmndispensings,	null
 insert into i2pReport select @runid, getdate(), 'Pats',			@i2b2pats,		@pmnpats,			@i2b2pats-@pmnpats
 insert into i2pReport select @runid, getdate(), 'Enrollment',	@i2b2pats,		@pmnenroll,			@i2b2pats-@pmnpats
-
-insert into i2pReport select @runid, getdate(), 'Encounters',	@i2b2Encounters,@pmnEncounters,		@i2b2encounters-@pmnencounters
-insert into i2pReport select @runid, getdate(), 'DX',		null,		@pmndx,	null
-insert into i2pReport select @runid, getdate(), 'PX',		null,		@pmnprocs,	null
-insert into i2pReport select @runid, getdate(), 'Condition',		null,		@pmncond,	null
-insert into i2pReport select @runid, getdate(), 'Vital',		null,		@pmnvital,	null
-insert into i2pReport select @runid, getdate(), 'Labs',		null,		@pmnlabs,	null
-insert into i2pReport select @runid, getdate(), 'Prescribing',		null,	@pmnprescribings,	null
-insert into i2pReport select @runid, getdate(), 'Dispensing',		null,	@pmndispensings,	null
 
 select concept 'Data Type',sourceval 'From i2b2',destval 'In PopMedNet', diff 'Difference' from i2preport where runid=@runid
 
