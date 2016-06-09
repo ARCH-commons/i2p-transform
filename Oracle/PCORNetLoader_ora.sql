@@ -1276,11 +1276,11 @@ to_char(m.start_date,'HH:MI')  SPECIMEN_TIME,
 m.end_date RESULT_DATE,
 to_char(m.end_date,'HH:MI') RESULT_TIME,
 --CASE WHEN m.ValType_Cd='T' THEN NVL(nullif(m.TVal_Char,''),'NI') ELSE 'NI' END RESULT_QUAL, -- TODO: Should be a standardized value
-'NI' RESULT_QUAL, -- Temporary fix for KUMC
+'NI' RESULT_QUAL, -- Local fix for KUMC (temp)
 CASE WHEN m.ValType_Cd='N' THEN m.NVAL_NUM ELSE null END RESULT_NUM,
 CASE WHEN m.ValType_Cd='N' THEN (CASE NVL(nullif(m.TVal_Char,''),'NI') WHEN 'E' THEN 'EQ' WHEN 'NE' THEN 'OT' WHEN 'L' THEN 'LT' WHEN 'LE' THEN 'LE' WHEN 'G' THEN 'GT' WHEN 'GE' THEN 'GE' ELSE 'NI' END)  ELSE 'TX' END RESULT_MODIFIER,
 --NVL(m.Units_CD,'NI') RESULT_UNIT, -- TODO: Should be standardized units
-'NI' RESULT_UNIT, -- Temporary fix for KUMC
+CASE WHEN INSTR(m.Units_CD, '%') > 0 THEN 'PERCENT' WHEN m.Units_CD IS NULL THEN NVL(m.Units_CD,'NI') ELSE TRIM(REPLACE(UPPER(m.Units_CD), '(CALC)', '')) end RESULT_UNIT, -- Local fix for KUMC
 nullif(norm.NORM_RANGE_LOW,'') NORM_RANGE_LOW
 ,norm.NORM_MODIFIER_LOW,
 nullif(norm.NORM_RANGE_HIGH,'') NORM_RANGE_HIGH
@@ -1289,7 +1289,8 @@ CASE NVL(nullif(m.VALUEFLAG_CD,''),'NI') WHEN 'H' THEN 'AH' WHEN 'L' THEN 'AL' W
 NULL RAW_LAB_NAME,
 NULL RAW_LAB_CODE,
 NULL RAW_PANEL,
-CASE WHEN m.ValType_Cd='T' THEN m.TVal_Char ELSE to_char(m.NVal_Num) END RAW_RESULT,
+--CASE WHEN m.ValType_Cd='T' THEN m.TVal_Char ELSE to_char(m.NVal_Num) END RAW_RESULT,
+CASE WHEN m.ValType_Cd='T' THEN substr(m.TVal_Char, 1, 50) ELSE to_char(m.NVal_Num) END RAW_RESULT, -- Local fix for KUMC
 NULL RAW_UNIT,
 NULL RAW_ORDER_DEPT,
 NULL RAW_FACILITY_CODE
