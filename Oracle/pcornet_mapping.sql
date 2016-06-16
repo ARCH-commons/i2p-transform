@@ -352,7 +352,7 @@ select
   m_exclusion_cd, c_path, c_symbol, 
   strs.freq_mod_pfx || substr(ht.c_fullname, length(strs.freq_mod_path) + 1, 2) pcori_basecode, 
   null pcori_cui, null pcori_ndc
-from blueheronmetadata.heron_terms ht
+from "&&i2b2_meta_schema"."&&terms_table" ht
 cross join rx_frequency_strs strs
 where ht.c_fullname like (select strs.freq_mod_path || '%' from rx_frequency_strs)
 and ht.m_exclusion_cd is null
