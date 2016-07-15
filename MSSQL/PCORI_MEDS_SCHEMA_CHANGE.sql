@@ -27,7 +27,7 @@ GO
 -- Update RxNorm NDC codes for non-integration and non-RxNorm rows
 update pcornet_med set pcori_cui=pcori_basecode
 from pcornet_med where len(pcori_basecode)<11 
- and c_hlevel>2 and sourcesystem_cd not in ('integration_tool') and pcori_basecode not like 'N%' and m_applied_path='@'
+ and c_hlevel>2 and sourcesystem_cd not in ('integration_tool') and pcori_basecode not like 'N%' and m_applied_path='@' and c_basecode not like 'NDFRT%'
 GO
 
 -- Update integration and NDC rows for RxNorm 
