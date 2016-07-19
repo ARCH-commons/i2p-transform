@@ -60,21 +60,31 @@ IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'pcornet_enc') DROP SYNONYM
 IF OBJECTPROPERTY (object_id('dbo.getDataMartID'), 'IsScalarFunction') = 1 DROP function getDataMartID
 IF OBJECTPROPERTY (object_id('dbo.getDataMartName'), 'IsScalarFunction') = 1 DROP function getDataMartName
 IF OBJECTPROPERTY (object_id('dbo.getDataMartPlatform'), 'IsScalarFunction') = 1 DROP function getDataMartPlatform
+GO
 
 -- You will almost certainly need to edit your database name
 -- Synonyms for dimension tables
-create synonym i2b2visit for PCORI_Mart..visit_dimension 
+create synonym i2b2visit for PCORI_Mart..visit_dimension
+GO 
 create synonym i2b2patient for  PCORI_Mart..patient_dimension
+GO
 create synonym i2b2fact for  PCORI_Mart..observation_fact    
+GO
 
 -- You will almost certainly need to edit your database name
 -- Synonyms for ontology dimensions and loyalty cohort summary
 create synonym pcornet_med for PCORI_Mart..pcornet_med
+GO
 create synonym pcornet_lab for PCORI_Mart..pcornet_lab
-create synonym pcornet_diag for PCORI_Mart..pcornet_diag 
+GO
+create synonym pcornet_diag for PCORI_Mart..pcornet_diag
+GO 
 create synonym pcornet_demo for PCORI_Mart..pcornet_demographics 
+GO
 create synonym pcornet_proc for PCORI_Mart..pcornet_proc
+GO
 create synonym pcornet_vital for PCORI_Mart..pcornet_vital
+GO
 create synonym pcornet_enc for PCORI_Mart..pcornet_enc
 GO
 
@@ -1490,7 +1500,7 @@ insert into pmnprescribing (
 --    ,RAW_RXNORM_CUI
 )
 select distinct  m.patient_num, m.Encounter_Num,m.provider_id,  m.start_date order_date,  substring(convert(varchar,m.start_date,8),1,5), m.start_date start_date, m.end_date, mo.pcori_cui
-    ,quantity.nval_num quantity, refills.nval_num refills, supply.nval_num supply, freq.pcori_basecode frequency, basis.pcori_basecode basis
+    ,quantity.nval_num quantity, refills.nval_num refills, supply.nval_num supply, substring(freq.pcori_basecode,charindex(':',freq.pcori_basecode)+1,2) frequency, substring(basis.pcori_basecode,charindex(':',basis.pcori_basecode)+1,2) basis
  from i2b2fact m inner join pcornet_med mo on m.concept_cd = mo.c_basecode 
 inner join pmnENCOUNTER enc on enc.encounterid = m.encounter_Num
 -- TODO: This join adds several minutes to the load - must be debugged
