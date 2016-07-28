@@ -70,6 +70,8 @@ create synonym i2b2patient for  PCORI_Mart..patient_dimension
 GO
 create synonym i2b2fact for  PCORI_Mart..observation_fact    
 GO
+create synonym i2b2concept for  PCORI_Mart..concept_dimension  
+GO
 
 -- You will almost certainly need to edit your database name
 -- Synonyms for ontology dimensions and loyalty cohort summary
