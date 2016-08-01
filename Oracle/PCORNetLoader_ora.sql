@@ -66,6 +66,8 @@ END PMN_ExecuateSQL;
 CREATE OR REPLACE SYNONYM I2B2FACT FOR "&&i2b2_data_schema".OBSERVATION_FACT
 /
 
+CREATE OR REPLACE SYNONYM I2B2MEDFACT FOR OBSERVATION_FACT_MEDS
+/
 
 BEGIN
 PMN_DROPSQL('DROP TABLE i2b2patient_list');
@@ -1441,7 +1443,7 @@ begin
 
 PMN_DROPSQL('DROP TABLE basis');
 sqltext := 'create table basis as '||
-'(select pcori_basecode,c_fullname,encounter_num,concept_cd from i2b2fact basis '||
+'(select pcori_basecode,c_fullname,encounter_num,concept_cd from i2b2medfact basis '||
 '        inner join encounter enc on enc.patid = basis.patient_num and enc.encounterid = basis.encounter_Num '||
 '     join pcornet_med basiscode  '||
 '        on basis.modifier_cd = basiscode.c_basecode '||
@@ -1450,7 +1452,7 @@ PMN_EXECUATESQL(sqltext);
 
 PMN_DROPSQL('DROP TABLE freq');
 sqltext := 'create table freq as '||
-'(select pcori_basecode,encounter_num,concept_cd from i2b2fact freq '||
+'(select pcori_basecode,encounter_num,concept_cd from i2b2medfact freq '||
 '        inner join encounter enc on enc.patid = freq.patient_num and enc.encounterid = freq.encounter_Num '||
 '     join pcornet_med freqcode  '||
 '        on freq.modifier_cd = freqcode.c_basecode '||
@@ -1459,7 +1461,7 @@ PMN_EXECUATESQL(sqltext);
 
 PMN_DROPSQL('DROP TABLE quantity');
 sqltext := 'create table quantity as '||
-'(select nval_num,encounter_num,concept_cd from i2b2fact quantity '||
+'(select nval_num,encounter_num,concept_cd from i2b2medfact quantity '||
 '        inner join encounter enc on enc.patid = quantity.patient_num and enc.encounterid = quantity.encounter_Num '||
 '     join pcornet_med quantitycode  '||
 '        on quantity.modifier_cd = quantitycode.c_basecode '||
@@ -1469,7 +1471,7 @@ PMN_EXECUATESQL(sqltext);
         
 PMN_DROPSQL('DROP TABLE refills');
 sqltext := 'create table refills as   '||
-'(select nval_num,encounter_num,concept_cd from i2b2fact refills '||
+'(select nval_num,encounter_num,concept_cd from i2b2medfact refills '||
 '        inner join encounter enc on enc.patid = refills.patient_num and enc.encounterid = refills.encounter_Num '||
 '     join pcornet_med refillscode  '||
 '        on refills.modifier_cd = refillscode.c_basecode '||
@@ -1478,7 +1480,7 @@ PMN_EXECUATESQL(sqltext);
 
 PMN_DROPSQL('DROP TABLE supply');  
 sqltext := 'create table supply as  '||
-'(select nval_num,encounter_num,concept_cd from i2b2fact supply '||
+'(select nval_num,encounter_num,concept_cd from i2b2medfact supply '||
 '        inner join encounter enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num '||
 '     join pcornet_med supplycode  '||
 '        on supply.modifier_cd = supplycode.c_basecode '||
@@ -1508,7 +1510,7 @@ insert into prescribing (
 select distinct  m.patient_num, m.Encounter_Num,m.provider_id,  m.start_date order_date,  to_char(m.start_date,'HH:MI'), m.start_date start_date, m.end_date, mo.pcori_cui
     ,quantity.nval_num quantity, refills.nval_num refills, supply.nval_num supply, substr(freq.pcori_basecode, instr(freq.pcori_basecode, ':') + 1, 2) frequency, 
     substr(basis.pcori_basecode, instr(basis.pcori_basecode, ':') + 1, 2) basis
- from i2b2fact m inner join pcornet_med mo on m.concept_cd = mo.c_basecode 
+ from i2b2medfact m inner join pcornet_med mo on m.concept_cd = mo.c_basecode 
 inner join encounter enc on enc.encounterid = m.encounter_Num
 -- TODO: This join adds several minutes to the load - must be debugged
 
