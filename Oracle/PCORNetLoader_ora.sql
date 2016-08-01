@@ -874,7 +874,7 @@ FETCH getsql INTO sqltext;
 END LOOP;
 CLOSE getsql;
 
-execute immediate 'drop index demographic_patid';
+PMN_DROPSQL('drop index demographic_patid');
 execute immediate 'create index demographic_patid on demographic (PATID)';
 
 end PCORNetDemographic; 
@@ -928,9 +928,9 @@ left outer join
  inner join pcornet_enc e on c_dimcode like '%'''||inout_cd||'''%' and e.c_fullname like '\PCORI\ENCOUNTER\ENC_TYPE\%') enctype
   on enctype.patient_num=v.patient_num and enctype.encounter_num=v.encounter_num;
 
-execute immediate 'drop index encounter_patid';
+PMN_DROPSQL('drop index encounter_patid');
 execute immediate 'create index encounter_patid on encounter (PATID)';
-execute immediate 'drop index encounter_encounterid';
+PMN_DROPSQL('drop index encounter_encounterid');
 execute immediate 'create index encounter_encounterid on encounter (ENCOUNTERID)';
 
 end PCORNetEncounter;
@@ -990,9 +990,9 @@ sqltext := 'insert into diagnosis (patid,			encounterid,	enc_type, admit_date, p
 
 PMN_EXECUATESQL(sqltext);
 
-execute immediate 'drop index diagnosis_patid';
+PMN_DROPSQL('drop index diagnosis_patid');
 execute immediate 'create index diagnosis_patid on diagnosis (PATID)';
-execute immediate 'drop index diagnosis_encounterid';
+PMN_DROPSQL('drop index diagnosis_encounterid');
 execute immediate 'create index diagnosis_encounterid on diagnosis (ENCOUNTERID)';
 
 end PCORNetDiagnosis;
@@ -1037,9 +1037,9 @@ sqltext := 'insert into condition (patid, encounterid, report_date, resolve_date
 
 PMN_EXECUATESQL(sqltext);
 
-execute immediate 'drop index condition_patid';
+PMN_DROPSQL('drop index condition_patid');
 execute immediate 'create index condition_patid on condition (PATID)';
-execute immediate 'drop index condition_encounterid';
+PMN_DROPSQL('drop index condition_encounterid');
 execute immediate 'create index condition_encounterid on condition (ENCOUNTERID)';
 
 end PCORNetCondition;
@@ -1064,9 +1064,9 @@ from i2b2fact fact
  inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
 where pr.c_fullname like '\PCORI\PROCEDURE\%';
 
-execute immediate 'drop index procedures_patid';
+PMN_DROPSQL('drop index procedures_patid');
 execute immediate 'create index procedures_patid on procedures (PATID)';
-execute immediate 'drop index procedures_encounterid';
+PMN_DROPSQL('drop index procedures_encounterid');
 execute immediate 'create index procedures_encounterid on procedures (ENCOUNTERID)';
 
 end PCORNetProcedure;
@@ -1153,9 +1153,9 @@ where ht is not null
   or tobacco is not null
 group by patid, encounterid, measure_date, measure_time, admit_date) y;
 
-execute immediate 'drop index vital_patid';
+PMN_DROPSQL('drop index vital_patid');
 execute immediate 'create index vital_patid on vital (PATID)';
-execute immediate 'drop index vital_encounterid';
+PMN_DROPSQL('drop index vital_encounterid');
 execute immediate 'create index vital_encounterid on vital (ENCOUNTERID)';
 
 end PCORNetVital;
@@ -1189,7 +1189,7 @@ from enrolled enr
 join i2b2visit visit on enr.patient_num = visit.patient_num
 group by visit.patient_num;
 
-execute immediate 'drop index enrollment_patid';
+PMN_DROPSQL('drop index enrollment_patid');
 execute immediate 'create index enrollment_patid on enrollment (PATID)';
 
 end PCORNetEnroll;
@@ -1352,9 +1352,9 @@ WHERE m.ValType_Cd in ('N','T')
 and ont_parent.C_BASECODE LIKE 'LAB_NAME%' -- Exclude non-pcori labs
 and m.MODIFIER_CD='@';
 
-execute immediate 'drop index lab_result_cm_patid';
+PMN_DROPSQL('drop index lab_result_cm_patid');
 execute immediate 'create index lab_result_cm_patid on lab_result_cm (PATID)';
-execute immediate 'drop index lab_result_cm_encounterid';
+PMN_DROPSQL('drop index lab_result_cm_encounterid');
 execute immediate 'create index lab_result_cm_encounterid on lab_result_cm (ENCOUNTERID)';
 
 END PCORNetLabResultCM;
@@ -1534,9 +1534,9 @@ inner join encounter enc on enc.encounterid = m.encounter_Num
 
 where (basis.c_fullname is null or basis.c_fullname like '\PCORI_MOD\RX_BASIS\PR\%');
 
-execute immediate 'drop index prescribing_patid';
+PMN_DROPSQL('drop index prescribing_patid');
 execute immediate 'create index prescribing_patid on prescribing (PATID)';
-execute immediate 'drop index prescribing_encounterid';
+PMN_DROPSQL('drop index prescribing_encounterid');
 execute immediate 'create index prescribing_encounterid on prescribing (ENCOUNTERID)';
 
 end PCORNetPrescribing;
@@ -1623,7 +1623,7 @@ inner join encounter enc on enc.encounterid = m.encounter_Num
 
 group by m.encounter_num ,m.patient_num, m.start_date,  mo.pcori_ndc;
 
-execute immediate 'drop index dispensing_patid';
+PMN_DROPSQL('drop index dispensing_patid');
 execute immediate 'create index dispensing_patid on dispensing (PATID)';
 
 end PCORNetDispensing;
