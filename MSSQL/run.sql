@@ -45,7 +45,7 @@ select
     o.patient_num, count(*) num_facts
     into #miniloyalty_patient_facts
 	from i2b2fact o 
-    inner join i2b2patient_list p on p.patient_num=o.patient_num
+    left join i2b2patient_list p on p.patient_num=o.patient_num
 	where concept_cd in (select concept_cd from i2b2concept where concept_path like '\P%') -- Change to '\PCORI%' if your paths are standard
     and o.start_date>='1/1/2010'
 	group by o.patient_num
