@@ -343,7 +343,7 @@ delete
 from "&&i2b2_meta_schema".PCORNET_MED pm
 where pm.c_fullname like (select strs.freq_mod_path || '%' from rx_frequency_strs strs);
 
-insert into pcornet_med
+insert into "&&i2b2_meta_schema".pcornet_med
 select
   c_hlevel, c_fullname, c_name, c_synonym_cd, c_visualattributes, c_totalnum, 
   c_basecode, c_metadataxml, c_facttablecolumn, c_tablename, c_columnname, 
