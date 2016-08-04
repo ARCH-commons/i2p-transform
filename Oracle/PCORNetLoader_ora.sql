@@ -20,6 +20,17 @@
 --undef network_id;
 --undef network_name;
 
+create or replace PROCEDURE GATHER_TABLE_STATS(table_name VARCHAR2) AS 
+  BEGIN
+  DBMS_STATS.GATHER_TABLE_STATS (
+          ownname => 'PCORNET_CDM', -- This doesn't work as a parameter for some reason.
+          tabname => table_name,
+          estimate_percent => 50, -- Percentage picked somewhat arbitrarily
+          cascade => TRUE,
+          degree => 16 
+          );
+END GATHER_TABLE_STATS;
+/
 
 create or replace PROCEDURE PMN_DROPSQL(sqlstring VARCHAR2) AS 
   BEGIN
@@ -879,14 +890,7 @@ END LOOP;
 CLOSE getsql;
 
 execute immediate 'create index demographic_patid on demographic (PATID)';
-
-DBMS_STATS.GATHER_TABLE_STATS (
-        ownname => 'PCORNET_CDM', -- This doesn't work as a parameter for some reason.
-        tabname => 'DEMOGRAPHIC',
-        estimate_percent => 50,
-        cascade => TRUE,
-        degree => 16
-        );
+GATHER_TABLE_STATS('DEMOGRAPHIC');
 
 end PCORNetDemographic; 
 /
@@ -944,14 +948,7 @@ left outer join
 
 execute immediate 'create index encounter_patid on encounter (PATID)';
 execute immediate 'create index encounter_encounterid on encounter (ENCOUNTERID)';
-
-DBMS_STATS.GATHER_TABLE_STATS (
-        ownname => 'PCORNET_CDM', -- This doesn't work as a parameter for some reason.
-        tabname => 'ENCOUNTER',
-        estimate_percent => 50,
-        cascade => TRUE,
-        degree => 16
-        );
+GATHER_TABLE_STATS('ENCOUNTER');
 
 end PCORNetEncounter;
 /
@@ -977,14 +974,7 @@ sqltext := 'create table sourcefact as '||
 PMN_EXECUATESQL(sqltext);
 
 execute immediate 'create index sourcefact_idx on sourcefact (patient_num, encounter_num, provider_id, concept_cd, start_date)';
-
-DBMS_STATS.GATHER_TABLE_STATS (
-        ownname => 'PCORNET_CDM',
-        tabname => 'SOURCEFACT',
-        estimate_percent => 50,
-        cascade => TRUE,
-        degree => 16
-        );
+GATHER_TABLE_STATS('SOURCEFACT');
 
 PMN_DROPSQL('DROP TABLE pdxfact');
 
@@ -997,14 +987,7 @@ sqltext := 'create table pdxfact as '||
 PMN_EXECUATESQL(sqltext);
 
 execute immediate 'create index pdxfact_idx on pdxfact (patient_num, encounter_num, provider_id, concept_cd, start_date)';
-
-DBMS_STATS.GATHER_TABLE_STATS (
-        ownname => 'PCORNET_CDM',
-        tabname => 'PDXFACT',
-        estimate_percent => 50,
-        cascade => TRUE,
-        degree => 16
-        );
+GATHER_TABLE_STATS('PDXFACT');
 
 sqltext := 'insert into diagnosis (patid,			encounterid,	enc_type, admit_date, providerid, dx, dx_type, dx_source, pdx) '||
 'select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, factline.start_date, factline.provider_id, diag.pcori_basecode,  '||
@@ -1033,14 +1016,7 @@ PMN_EXECUATESQL(sqltext);
 
 execute immediate 'create index diagnosis_patid on diagnosis (PATID)';
 execute immediate 'create index diagnosis_encounterid on diagnosis (ENCOUNTERID)';
-
-DBMS_STATS.GATHER_TABLE_STATS (
-        ownname => 'PCORNET_CDM',
-        tabname => 'DIAGNOSIS',
-        estimate_percent => 50,
-        cascade => TRUE,
-        degree => 16
-        );
+GATHER_TABLE_STATS('DIAGNOSIS');
 
 end PCORNetDiagnosis;
 /
@@ -1117,14 +1093,7 @@ where pr.c_fullname like '\PCORI\PROCEDURE\%';
 
 execute immediate 'create index procedures_patid on procedures (PATID)';
 execute immediate 'create index procedures_encounterid on procedures (ENCOUNTERID)';
-
-DBMS_STATS.GATHER_TABLE_STATS (
-        ownname => 'PCORNET_CDM',
-        tabname => 'PROCEDURES',
-        estimate_percent => 50,
-        cascade => TRUE,
-        degree => 16
-        );
+GATHER_TABLE_STATS('PROCEDURES');
 
 end PCORNetProcedure;
 /
@@ -1216,14 +1185,7 @@ group by patid, encounterid, measure_date, measure_time, admit_date) y;
 
 execute immediate 'create index vital_patid on vital (PATID)';
 execute immediate 'create index vital_encounterid on vital (ENCOUNTERID)';
-
-DBMS_STATS.GATHER_TABLE_STATS (
-        ownname => 'PCORNET_CDM',
-        tabname => 'VITAL',
-        estimate_percent => 50,
-        cascade => TRUE,
-        degree => 16
-        );
+GATHER_TABLE_STATS('VITAL');
 
 end PCORNetVital;
 /
@@ -1259,14 +1221,7 @@ join i2b2visit visit on enr.patient_num = visit.patient_num
 group by visit.patient_num;
 
 execute immediate 'create index enrollment_patid on enrollment (PATID)';
-
-DBMS_STATS.GATHER_TABLE_STATS (
-        ownname => 'PCORNET_CDM',
-        tabname => 'ENROLLMENT',
-        estimate_percent => 50,
-        cascade => TRUE,
-        degree => 16
-        );
+GATHER_TABLE_STATS('ENROLLMENT');
 
 end PCORNetEnroll;
 /
@@ -1328,14 +1283,7 @@ sqltext := 'create table priority as '||
 PMN_EXECUATESQL(sqltext);
 
 execute immediate 'create index priority_idx on priority (patient_num, encounter_num, provider_id, concept_cd, start_date)';
-
-DBMS_STATS.GATHER_TABLE_STATS (
-        ownname => 'PCORNET_CDM',
-        tabname => 'PRIORITY',
-        estimate_percent => 50,
-        cascade => TRUE,
-        degree => 16
-        );
+GATHER_TABLE_STATS('PRIORITY');
 
 PMN_DROPSQL('DROP TABLE location');
 sqltext := 'create table location as '||
@@ -1348,15 +1296,7 @@ sqltext := 'create table location as '||
 PMN_EXECUATESQL(sqltext);
 
 execute immediate 'create index location_idx on location (patient_num, encounter_num, provider_id, concept_cd, start_date)';
-
-DBMS_STATS.GATHER_TABLE_STATS (
-        ownname => 'PCORNET_CDM',
-        tabname => 'LOCATION',
-        estimate_percent => 50,
-        cascade => TRUE,
-        degree => 16
-        );
-
+GATHER_TABLE_STATS('LOCATION');
 
 INSERT INTO lab_result_cm
       (PATID
@@ -1549,13 +1489,7 @@ sqltext := 'create table basis as '||
 PMN_EXECUATESQL(sqltext);
 
 execute immediate 'create index basis_idx on basis (encounter_num, concept_cd)';
-DBMS_STATS.GATHER_TABLE_STATS (
-        ownname => 'PCORNET_CDM',
-        tabname => 'BASIS',
-        estimate_percent => 50,
-        cascade => TRUE,
-        degree => 16
-        );
+GATHER_TABLE_STATS('BASIS');
 
 PMN_DROPSQL('DROP TABLE freq');
 sqltext := 'create table freq as '||
@@ -1567,13 +1501,7 @@ sqltext := 'create table freq as '||
 PMN_EXECUATESQL(sqltext);
 
 execute immediate 'create index freq_idx on freq (encounter_num, concept_cd)';
-DBMS_STATS.GATHER_TABLE_STATS (
-        ownname => 'PCORNET_CDM',
-        tabname => 'FREQ',
-        estimate_percent => 50,
-        cascade => TRUE,
-        degree => 16
-        );
+GATHER_TABLE_STATS('FREQ');
 
 PMN_DROPSQL('DROP TABLE quantity');
 sqltext := 'create table quantity as '||
@@ -1586,13 +1514,7 @@ sqltext := 'create table quantity as '||
 PMN_EXECUATESQL(sqltext);
 
 execute immediate 'create index quantity_idx on quantity (encounter_num, concept_cd)';
-DBMS_STATS.GATHER_TABLE_STATS (
-        ownname => 'PCORNET_CDM',
-        tabname => 'QUANTITY',
-        estimate_percent => 50,
-        cascade => TRUE,
-        degree => 16
-        );
+GATHER_TABLE_STATS('QUANTITY');
         
 PMN_DROPSQL('DROP TABLE refills');
 sqltext := 'create table refills as   '||
@@ -1604,13 +1526,7 @@ sqltext := 'create table refills as   '||
 PMN_EXECUATESQL(sqltext);
 
 execute immediate 'create index refills_idx on refills (encounter_num, concept_cd)';
-DBMS_STATS.GATHER_TABLE_STATS (
-        ownname => 'PCORNET_CDM',
-        tabname => 'REFILLS',
-        estimate_percent => 50,
-        cascade => TRUE,
-        degree => 16
-        );
+GATHER_TABLE_STATS('REFILLS');
         
 PMN_DROPSQL('DROP TABLE supply');  
 sqltext := 'create table supply as  '||
@@ -1622,13 +1538,7 @@ sqltext := 'create table supply as  '||
 PMN_EXECUATESQL(sqltext);
 
 execute immediate 'create index supply_idx on supply (encounter_num, concept_cd)';
-DBMS_STATS.GATHER_TABLE_STATS (
-        ownname => 'PCORNET_CDM',
-        tabname => 'SUPPLY',
-        estimate_percent => 50,
-        cascade => TRUE,
-        degree => 16
-        );
+GATHER_TABLE_STATS('SUPPLY');
 
 -- insert data with outer joins to ensure all records are included even if some data elements are missing
 insert into prescribing (
@@ -1680,14 +1590,7 @@ where (basis.c_fullname is null or basis.c_fullname like '\PCORI_MOD\RX_BASIS\PR
 
 execute immediate 'create index prescribing_patid on prescribing (PATID)';
 execute immediate 'create index prescribing_encounterid on prescribing (ENCOUNTERID)';
-
-DBMS_STATS.GATHER_TABLE_STATS (
-        ownname => 'PCORNET_CDM',
-        tabname => 'PRESCRIBING',
-        estimate_percent => 50,
-        cascade => TRUE,
-        degree => 16
-        );
+GATHER_TABLE_STATS('PRESCRIBING');
 
 end PCORNetPrescribing;
 /
