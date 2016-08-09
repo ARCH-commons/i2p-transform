@@ -71,7 +71,9 @@ END;
 CREATE table i2b2patient_list as 
 select * from
 (
-select DISTINCT PATIENT_NUM from I2B2FACT where START_DATE > to_date('01-Jan-2010','dd-mon-rrrr')
+select DISTINCT f.PATIENT_NUM from I2B2FACT f 
+inner join i2b2visit v on f.patient_num=v.patient_num
+where f.START_DATE >= to_date('01-Jan-2010','dd-mon-rrrr') and v.START_DATE >= to_date('01-Jan-2010','dd-mon-rrrr')
 ) where ROWNUM<100000000
 /
 
