@@ -18,7 +18,9 @@ drop table i2b2patient_list
 GO
 
 -- Make 100000000 number smaller for testing
-select distinct top 100000000 patient_num into i2b2patient_list from i2b2fact where start_date>='20100101'
+select distinct top 100000000 f.patient_num into i2b2patient_list from i2b2fact f
+inner join i2b2visit v on f.patient_num=v.patient_num
+ where f.start_date>='20100101' and v.start_date>='20100101'
 GO
 -- Change to match your database names
 drop synonym i2b2patient;
