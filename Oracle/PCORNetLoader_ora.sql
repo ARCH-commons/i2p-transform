@@ -1441,33 +1441,53 @@ drop table supply;
 
 create table basis (
   pcori_basecode varchar2(50 byte), 
-	c_fullname varchar2(700 byte), 
-	encounter_num number(38,0), 
-	concept_cd varchar2(50 byte)
+  c_fullname varchar2(700 byte), 
+  encounter_num number(38,0), 
+  concept_cd varchar2(50 byte),
+  instance_num number(18,0),
+  start_date date,
+  provider_id varchar2(50 byte),
+  modifier_cd varchar2(100 byte)
   ) ;
   
 create table freq (
   pcori_basecode varchar2(50 byte), 
-	encounter_num number(38,0), 
-	concept_cd varchar2(50 byte)
+  encounter_num number(38,0), 
+  concept_cd varchar2(50 byte),
+  instance_num number(18,0),
+  start_date date,
+  provider_id varchar2(50 byte),
+  modifier_cd varchar2(100 byte)
   );
 
 create table quantity(
   nval_num number(18,5), 
-	encounter_num number(38,0), 
-	concept_cd varchar2(50 byte)
+  encounter_num number(38,0), 
+  concept_cd varchar2(50 byte),
+  instance_num number(18,0),
+  start_date date,
+  provider_id varchar2(50 byte),
+  modifier_cd varchar2(100 byte)
   );
   
 create table refills(
   nval_num number(18,5), 
-	encounter_num number(38,0), 
-	concept_cd varchar2(50 byte)
+  encounter_num number(38,0), 
+  concept_cd varchar2(50 byte),
+  instance_num number(18,0),
+  start_date date,
+  provider_id varchar2(50 byte),
+  modifier_cd varchar2(100 byte)
   );
 
 create table supply(
   nval_num number(18,5), 
-	encounter_num number(38,0), 
-	concept_cd varchar2(50 byte)
+  encounter_num number(38,0), 
+  concept_cd varchar2(50 byte),
+  instance_num number(18,0),
+  start_date date,
+  provider_id varchar2(50 byte),
+  modifier_cd varchar2(100 byte)
   );
 
 whenever sqlerror exit;
@@ -1479,33 +1499,34 @@ begin
 PMN_DROPSQL('drop index prescribing_patid');
 PMN_DROPSQL('drop index prescribing_encounterid');
 
+
 PMN_DROPSQL('DROP TABLE basis');
 sqltext := 'create table basis as '||
-'(select pcori_basecode,c_fullname,encounter_num,concept_cd from i2b2medfact basis '||
+'(select pcori_basecode,c_fullname,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd from i2b2medfact basis '||
 '        inner join encounter enc on enc.patid = basis.patient_num and enc.encounterid = basis.encounter_Num '||
 '     join pcornet_med basiscode  '||
 '        on basis.modifier_cd = basiscode.c_basecode '||
 '        and basiscode.c_fullname like ''\PCORI_MOD\RX_BASIS\%'') ';
 PMN_EXECUATESQL(sqltext);
 
-execute immediate 'create index basis_idx on basis (encounter_num, concept_cd)';
+execute immediate 'create unique index basis_idx on basis (instance_num, start_date, provider_id, concept_cd, encounter_num, modifier_cd)';
 GATHER_TABLE_STATS('BASIS');
 
 PMN_DROPSQL('DROP TABLE freq');
 sqltext := 'create table freq as '||
-'(select pcori_basecode,encounter_num,concept_cd from i2b2medfact freq '||
+'(select pcori_basecode,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd from i2b2medfact freq '||
 '        inner join encounter enc on enc.patid = freq.patient_num and enc.encounterid = freq.encounter_Num '||
 '     join pcornet_med freqcode  '||
 '        on freq.modifier_cd = freqcode.c_basecode '||
 '        and freqcode.c_fullname like ''\PCORI_MOD\RX_FREQUENCY\%'') ';
 PMN_EXECUATESQL(sqltext);
 
-execute immediate 'create index freq_idx on freq (encounter_num, concept_cd)';
+execute immediate 'create unique index freq_idx on freq (instance_num, start_date, provider_id, concept_cd, encounter_num, modifier_cd)';
 GATHER_TABLE_STATS('FREQ');
 
 PMN_DROPSQL('DROP TABLE quantity');
 sqltext := 'create table quantity as '||
-'(select nval_num,encounter_num,concept_cd from i2b2medfact quantity '||
+'(select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd from i2b2medfact quantity '||
 '        inner join encounter enc on enc.patid = quantity.patient_num and enc.encounterid = quantity.encounter_Num '||
 '     join pcornet_med quantitycode  '||
 '        on quantity.modifier_cd = quantitycode.c_basecode '||
@@ -1513,31 +1534,31 @@ sqltext := 'create table quantity as '||
 
 PMN_EXECUATESQL(sqltext);
 
-execute immediate 'create index quantity_idx on quantity (encounter_num, concept_cd)';
+execute immediate 'create unique index quantity_idx on quantity (instance_num, start_date, provider_id, concept_cd, encounter_num, modifier_cd)';
 GATHER_TABLE_STATS('QUANTITY');
         
 PMN_DROPSQL('DROP TABLE refills');
 sqltext := 'create table refills as   '||
-'(select nval_num,encounter_num,concept_cd from i2b2medfact refills '||
+'(select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd from i2b2medfact refills '||
 '        inner join encounter enc on enc.patid = refills.patient_num and enc.encounterid = refills.encounter_Num '||
 '     join pcornet_med refillscode  '||
 '        on refills.modifier_cd = refillscode.c_basecode '||
 '        and refillscode.c_fullname like ''\PCORI_MOD\RX_REFILLS\'') ';
 PMN_EXECUATESQL(sqltext);
 
-execute immediate 'create index refills_idx on refills (encounter_num, concept_cd)';
+execute immediate 'create unique index refills_idx on refills (instance_num, start_date, provider_id, concept_cd, encounter_num, modifier_cd)';
 GATHER_TABLE_STATS('REFILLS');
         
 PMN_DROPSQL('DROP TABLE supply');  
 sqltext := 'create table supply as  '||
-'(select nval_num,encounter_num,concept_cd from i2b2medfact supply '||
+'(select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd from i2b2medfact supply '||
 '        inner join encounter enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num '||
 '     join pcornet_med supplycode  '||
 '        on supply.modifier_cd = supplycode.c_basecode '||
 '        and supplycode.c_fullname like ''\PCORI_MOD\RX_DAYS_SUPPLY\'')  ';
 PMN_EXECUATESQL(sqltext);
 
-execute immediate 'create index supply_idx on supply (encounter_num, concept_cd)';
+execute immediate 'create unique index supply_idx on supply (instance_num, start_date, provider_id, concept_cd, encounter_num, modifier_cd)';
 GATHER_TABLE_STATS('SUPPLY');
 
 -- insert data with outer joins to ensure all records are included even if some data elements are missing
@@ -1569,22 +1590,37 @@ inner join encounter enc on enc.encounterid = m.encounter_Num
     left join basis
     on m.encounter_num = basis.encounter_num
     and m.concept_cd = basis.concept_Cd
+    and m.start_date = basis.start_date
+    and m.provider_id = basis.provider_id
+    and m.modifier_cd = basis.modifier_cd
 
     left join  freq
     on m.encounter_num = freq.encounter_num
     and m.concept_cd = freq.concept_Cd
+    and m.start_date = freq.start_date
+    and m.provider_id = freq.provider_id
+    and m.modifier_cd = freq.modifier_cd
 
     left join quantity 
     on m.encounter_num = quantity.encounter_num
     and m.concept_cd = quantity.concept_Cd
+    and m.start_date = quantity.start_date
+    and m.provider_id = quantity.provider_id
+    and m.modifier_cd = quantity.modifier_cd
 
     left join refills
     on m.encounter_num = refills.encounter_num
     and m.concept_cd = refills.concept_Cd
+    and m.start_date = refills.start_date
+    and m.provider_id = refills.provider_id
+    and m.modifier_cd = refills.modifier_cd
 
     left join supply
     on m.encounter_num = supply.encounter_num
     and m.concept_cd = supply.concept_Cd
+    and m.start_date = supply.start_date
+    and m.provider_id = supply.provider_id
+    and m.modifier_cd = supply.modifier_cd
 
 where (basis.c_fullname is null or basis.c_fullname like '\PCORI_MOD\RX_BASIS\PR\%');
 
