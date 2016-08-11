@@ -948,7 +948,7 @@ select distinct v.patient_num, v.encounter_num,
 	end_Date, 
 	to_char(end_Date,'HH:MI'), 
 	providerid,location_zip, 
-(case when pcori_enctype is not null then pcori_enctype else 'UN' end) enc_type, facility_id,  CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE  discharge_disposition END , CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE discharge_status END  , drg.drg, drg_type, CASE WHEN admitting_source IS NULL THEN 'NI' ELSE admitting_source END  
+(case when pcori_enctype is not null then pcori_enctype else 'UN' end) enc_type, facilityid,  CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE  discharge_disposition END , CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE discharge_status END  , drg.drg, drg_type, CASE WHEN admitting_source IS NULL THEN 'NI' ELSE admitting_source END  
 from i2b2visit v inner join pmndemographic d on v.patient_num=d.patid
 left outer join 
    (select * from
