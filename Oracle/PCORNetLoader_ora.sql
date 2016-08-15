@@ -1336,7 +1336,7 @@ begin
 
 PMN_DROPSQL('DROP TABLE basis');
 sqltext := 'create table basis as '||
-'(select pcori_basecode,c_fullname,encounter_num,concept_cd from i2b2fact basis '||
+'(select pcori_basecode,c_fullname,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd from i2b2fact basis '||
 '        inner join pmnENCOUNTER enc on enc.patid = basis.patient_num and enc.encounterid = basis.encounter_Num '||
 '     join pcornet_med basiscode  '||
 '        on basis.modifier_cd = basiscode.c_basecode '||
@@ -1345,7 +1345,7 @@ PMN_EXECUATESQL(sqltext);
 
 PMN_DROPSQL('DROP TABLE freq');
 sqltext := 'create table freq as '||
-'(select pcori_basecode,encounter_num,concept_cd from i2b2fact freq '||
+'(select pcori_basecode,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd from i2b2fact freq '||
 '        inner join pmnENCOUNTER enc on enc.patid = freq.patient_num and enc.encounterid = freq.encounter_Num '||
 '     join pcornet_med freqcode  '||
 '        on freq.modifier_cd = freqcode.c_basecode '||
@@ -1354,7 +1354,7 @@ PMN_EXECUATESQL(sqltext);
 
 PMN_DROPSQL('DROP TABLE quantity');
 sqltext := 'create table quantity as '||
-'(select nval_num,encounter_num,concept_cd from i2b2fact quantity '||
+'(select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd from i2b2fact quantity '||
 '        inner join pmnENCOUNTER enc on enc.patid = quantity.patient_num and enc.encounterid = quantity.encounter_Num '||
 '     join pcornet_med quantitycode  '||
 '        on quantity.modifier_cd = quantitycode.c_basecode '||
@@ -1364,7 +1364,7 @@ PMN_EXECUATESQL(sqltext);
         
 PMN_DROPSQL('DROP TABLE refills');
 sqltext := 'create table refills as   '||
-'(select nval_num,encounter_num,concept_cd from i2b2fact refills '||
+'(select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd from i2b2fact refills '||
 '        inner join pmnENCOUNTER enc on enc.patid = refills.patient_num and enc.encounterid = refills.encounter_Num '||
 '     join pcornet_med refillscode  '||
 '        on refills.modifier_cd = refillscode.c_basecode '||
@@ -1373,7 +1373,7 @@ PMN_EXECUATESQL(sqltext);
 
 PMN_DROPSQL('DROP TABLE supply');  
 sqltext := 'create table supply as  '||
-'(select nval_num,encounter_num,concept_cd from i2b2fact supply '||
+'(select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd from i2b2fact supply '||
 '        inner join pmnENCOUNTER enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num '||
 '     join pcornet_med supplycode  '||
 '        on supply.modifier_cd = supplycode.c_basecode '||
@@ -1409,22 +1409,37 @@ inner join pmnENCOUNTER enc on enc.encounterid = m.encounter_Num
     left join basis
     on m.encounter_num = basis.encounter_num
     and m.concept_cd = basis.concept_Cd
+    and m.start_date = basis.start_date
+    and m.provider_id = basis.provider_id
+    and m.modifier_cd = basis.modifier_cd
 
     left join  freq
     on m.encounter_num = freq.encounter_num
     and m.concept_cd = freq.concept_Cd
+    and m.start_date = freq.start_date
+    and m.provider_id = freq.provider_id
+    and m.modifier_cd = freq.modifier_cd
 
     left join quantity 
     on m.encounter_num = quantity.encounter_num
     and m.concept_cd = quantity.concept_Cd
+    and m.start_date = quantity.start_date
+    and m.provider_id = quantity.provider_id
+    and m.modifier_cd = quantity.modifier_cd
 
     left join refills
     on m.encounter_num = refills.encounter_num
     and m.concept_cd = refills.concept_Cd
+    and m.start_date = refills.start_date
+    and m.provider_id = refills.provider_id
+    and m.modifier_cd = refills.modifier_cd
 
     left join supply
     on m.encounter_num = supply.encounter_num
     and m.concept_cd = supply.concept_Cd
+    and m.start_date = supply.start_date
+    and m.provider_id = supply.provider_id
+    and m.modifier_cd = supply.modifier_cd
 
 where (basis.c_fullname is null or basis.c_fullname= '\PCORI_MOD\RX_BASIS\PR\%'); -- jgk 11/2 bugfix: filter for PR, not DI
 
