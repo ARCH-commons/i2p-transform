@@ -333,6 +333,31 @@ set med.c_visualattributes = 'DAE' where c_fullname in (
   join "&&i2b2_meta_schema".PCORNET_MED med on med.c_fullname = pm.pcori_path
   where  med.c_fullname like '\PCORI_MOD\%'
   );
+  
+/* RX Frequency modifiers
+*/
+create or replace view rx_frequency_strs as
+select '\PCORI_MOD\RX_FREQUENCY\' freq_mod_path, 'RX_FREQUENCY:' freq_mod_pfx from dual;
+
+delete
+from "&&i2b2_meta_schema".PCORNET_MED pm
+where pm.c_fullname like (select strs.freq_mod_path || '%' from rx_frequency_strs strs);
+
+insert into "&&i2b2_meta_schema".pcornet_med
+select
+  c_hlevel, c_fullname, c_name, c_synonym_cd, c_visualattributes, c_totalnum, 
+  c_basecode, c_metadataxml, c_facttablecolumn, c_tablename, c_columnname, 
+  c_columndatatype, c_operator, c_dimcode, c_comment, c_tooltip, m_applied_path, 
+  update_date, download_date, import_date, sourcesystem_cd, valuetype_cd, 
+  m_exclusion_cd, c_path, c_symbol, 
+  strs.freq_mod_pfx || substr(ht.c_fullname, length(strs.freq_mod_path) + 1, 2) pcori_basecode, 
+  null pcori_cui, null pcori_ndc
+from "&&i2b2_meta_schema"."&&terms_table" ht
+cross join rx_frequency_strs strs
+where ht.c_fullname like (select strs.freq_mod_path || '%' from rx_frequency_strs)
+and ht.m_exclusion_cd is null
+and ht.c_basecode is not null;
+  
 
 insert into "&&i2b2_meta_schema".PCORNET_MED
 with 
@@ -382,7 +407,7 @@ select
 delete 
 from "&&i2b2_meta_schema".PCORNET_MED where sourcesystem_cd='MAPPING';
 
--- Other diagnosis mappings such as modifiers for PDX, DX_SOURCE.
+
 insert into "&&i2b2_meta_schema".PCORNET_MED
 with med_mod_mapping as (
   select distinct pcori_path, i2b2.c_fullname, i2b2.c_basecode, i2b2.c_name
