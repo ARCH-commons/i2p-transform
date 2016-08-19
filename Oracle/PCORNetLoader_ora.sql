@@ -948,7 +948,7 @@ select distinct v.patient_num, v.encounter_num,
 	end_Date, 
 	to_char(end_Date,'HH:MI'), 
 	providerid,location_zip, 
-(case when pcori_enctype is not null then pcori_enctype else 'UN' end) enc_type, facilityid,  CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE  discharge_disposition END , CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE discharge_status END  , drg.drg, drg_type, CASE WHEN admitting_source IS NULL THEN 'NI' ELSE admitting_source END  
+(case when pcori_enctype is not null then pcori_enctype else 'UN' end) enc_type, facility_id,  CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE  discharge_disposition END , CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE discharge_status END  , drg.drg, drg_type, CASE WHEN admitting_source IS NULL THEN 'NI' ELSE admitting_source END  
 from i2b2visit v inner join pmndemographic d on v.patient_num=d.patid
 left outer join 
    (select * from
@@ -972,13 +972,46 @@ end PCORNetEncounter;
 
 
 
+-- Edited by Matthew Joss 8/15/2016. Create table statements extracted from inside of the procedure to avoid errors with aqua data studio. 
+BEGIN
+PMN_DROPSQL('DROP TABLE sourcefact');
+END;
+/
+
+CREATE TABLE SOURCEFACT  ( 
+	PATIENT_NUM  	NUMBER(38) NOT NULL,
+	ENCOUNTER_NUM	NUMBER(38) NOT NULL,
+	PROVIDER_ID  	VARCHAR2(50) NOT NULL,
+	CONCEPT_CD   	VARCHAR2(50) NOT NULL,
+	START_DATE   	DATE NOT NULL,
+	DXSOURCE     	VARCHAR2(50) NULL,
+	C_FULLNAME   	VARCHAR2(700) NOT NULL 
+	)
+/
+
+BEGIN
+PMN_DROPSQL('DROP TABLE pdxfact');
+END;
+/
+
+CREATE TABLE PDXFACT  ( 
+	PATIENT_NUM  	NUMBER(38) NOT NULL,
+	ENCOUNTER_NUM	NUMBER(38) NOT NULL,
+	PROVIDER_ID  	VARCHAR2(50) NOT NULL,
+	CONCEPT_CD   	VARCHAR2(50) NOT NULL,
+	START_DATE   	DATE NOT NULL,
+	PDXSOURCE    	VARCHAR2(50) NULL,
+	C_FULLNAME   	VARCHAR2(700) NOT NULL 
+	)
+/
+
+
+
 create or replace procedure PCORNetDiagnosis as
 sqltext varchar2(4000);
 begin
 
-PMN_DROPSQL('DROP TABLE sourcefact');
-
-sqltext := 'create table sourcefact as '||
+sqltext := 'insert into sourcefact '||
 	'select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode dxsource, dxsource.c_fullname '||
 	'from i2b2fact factline '||
     'inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num '||
@@ -987,9 +1020,7 @@ sqltext := 'create table sourcefact as '||
 PMN_EXECUATESQL(sqltext);
 
 
-PMN_DROPSQL('DROP TABLE pdxfact');
-
-sqltext := 'create table pdxfact as '||
+sqltext := 'insert into pdxfact '||
 	'select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode pdxsource,dxsource.c_fullname  '||
 	'from i2b2fact factline '||
     'inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num '||
@@ -1030,16 +1061,31 @@ end PCORNetDiagnosis;
 
 
 
+-- Edited by Matthew Joss 8/16/2016. Create table statements extracted from inside of the procedure to avoid errors with aqua data studio. 
+BEGIN
+PMN_DROPSQL('DROP TABLE sourcefact2');
+END;
+/
+
+CREATE TABLE SOURCEFACT2  ( 
+	PATIENT_NUM  	NUMBER(38) NOT NULL,
+	ENCOUNTER_NUM	NUMBER(38) NOT NULL,
+	PROVIDER_ID  	VARCHAR2(50) NOT NULL,
+	CONCEPT_CD   	VARCHAR2(50) NOT NULL,
+	START_DATE   	DATE NOT NULL,
+	DXSOURCE     	VARCHAR2(50) NULL,
+	C_FULLNAME   	VARCHAR2(700) NOT NULL 
+	)
+/
+
+
 
 create or replace procedure PCORNetCondition as
 sqltext varchar2(4000);
 begin
 
-
-PMN_DROPSQL('DROP TABLE sourcefact2');
-
-sqltext := 'create table sourcefact2 as '||
-	'select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode dxsource, dxsource.c_fullname '||
+sqltext := 'insert into sourcefact2 '||
+    'select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode dxsource, dxsource.c_fullname '||
 	'from i2b2fact factline '||
     'inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num '||
     'inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode '||
@@ -1068,10 +1114,6 @@ PMN_EXECUATESQL(sqltext);
 
 end PCORNetCondition;
 /
-
-
-
-
 
 
 
@@ -1193,28 +1235,65 @@ end PCORNetEnroll;
 /
 
 
+
+
+
+
+-- Edited by Matthew Joss 8/16/2016. Create table statements extracted from inside of the procedure to avoid errors with aqua data studio. 
+BEGIN
+PMN_DROPSQL('DROP TABLE priority');
+END;
+/
+
+CREATE TABLE PRIORITY  ( 
+	PATIENT_NUM  	NUMBER(38) NOT NULL,
+	ENCOUNTER_NUM	NUMBER(38) NOT NULL,
+	PROVIDER_ID  	VARCHAR2(50) NOT NULL,
+	CONCEPT_CD   	VARCHAR2(50) NOT NULL,
+	START_DATE   	DATE NOT NULL,
+	PRIORITY     	VARCHAR2(50) NULL 
+	)
+/
+
+BEGIN
+PMN_DROPSQL('DROP TABLE location');
+END;
+/
+
+CREATE TABLE LOCATION  ( 
+	PATIENT_NUM  	NUMBER(38) NOT NULL,
+	ENCOUNTER_NUM	NUMBER(38) NOT NULL,
+	PROVIDER_ID  	VARCHAR2(50) NOT NULL,
+	CONCEPT_CD   	VARCHAR2(50) NOT NULL,
+	START_DATE   	DATE NOT NULL,
+	RESULT_LOC   	VARCHAR2(50) NULL 
+	)
+/
+
+
+
+
 create or replace procedure PCORNetLabResultCM as
 sqltext varchar2(4000);
 begin
-PMN_DROPSQL('DROP TABLE priority');
 
-sqltext := 'create table priority as '||
-'(select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, lsource.pcori_basecode  PRIORITY  '||
+
+sqltext := 'insert into priority '||
+'select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, lsource.pcori_basecode  PRIORITY  '||
 'from i2b2fact '||
 'inner join pmnENCOUNTER enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num '||
 'inner join pcornet_lab lsource on i2b2fact.modifier_cd =lsource.c_basecode '||
-'where c_fullname LIKE ''\PCORI_MOD\PRIORITY\%'') ';
+'where c_fullname LIKE ''\PCORI_MOD\PRIORITY\%''';
 
 PMN_EXECUATESQL(sqltext);
 
 
-PMN_DROPSQL('DROP TABLE location');
-sqltext := 'create table location as '||
-'(select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, lsource.pcori_basecode  RESULT_LOC '||
+sqltext := 'insert into location '||
+'select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, lsource.pcori_basecode  RESULT_LOC '||
 'from i2b2fact '||
 'inner join pmnENCOUNTER enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num '||
 'inner join pcornet_lab lsource on i2b2fact.modifier_cd =lsource.c_basecode '||
-'where c_fullname LIKE ''\PCORI_MOD\RESULT_LOC\%'') ';
+'where c_fullname LIKE ''\PCORI_MOD\RESULT_LOC\%''';
 
 PMN_EXECUATESQL(sqltext);
 
@@ -1330,54 +1409,117 @@ end PCORNetHarvest;
 
 
 
+-- Edited by Matthew Joss 8/16/2016. Create table statements extracted from inside of the procedure to avoid errors with aqua data studio. 
+
+
+BEGIN
+PMN_DROPSQL('DROP TABLE basis');
+END;
+/
+
+
+CREATE TABLE BASIS  ( 
+	PCORI_BASECODE	VARCHAR2(50) NULL,
+	C_FULLNAME    	VARCHAR2(700) NOT NULL,
+	ENCOUNTER_NUM 	NUMBER(38) NOT NULL,
+	CONCEPT_CD    	VARCHAR2(50) NOT NULL 
+	)
+/
+
+BEGIN
+PMN_DROPSQL('DROP TABLE freq');
+END;
+/
+
+CREATE TABLE FREQ  ( 
+	PCORI_BASECODE	VARCHAR2(50) NULL,
+	ENCOUNTER_NUM 	NUMBER(38) NOT NULL,
+	CONCEPT_CD    	VARCHAR2(50) NOT NULL 
+	)
+/
+
+BEGIN
+PMN_DROPSQL('DROP TABLE quantity');
+END;
+/
+
+CREATE TABLE QUANTITY  ( 
+	NVAL_NUM     	NUMBER(18,5) NULL,
+	ENCOUNTER_NUM	NUMBER(38) NOT NULL,
+	CONCEPT_CD   	VARCHAR2(50) NOT NULL 
+	)
+/
+
+BEGIN
+PMN_DROPSQL('DROP TABLE refills');
+END;
+/
+
+CREATE TABLE REFILLS  ( 
+	NVAL_NUM     	NUMBER(18,5) NULL,
+	ENCOUNTER_NUM	NUMBER(38) NOT NULL,
+	CONCEPT_CD   	VARCHAR2(50) NOT NULL 
+	)
+/
+
+BEGIN
+PMN_DROPSQL('DROP TABLE supply');
+END;
+/
+
+CREATE TABLE SUPPLY  ( 
+	NVAL_NUM     	NUMBER(18,5) NULL,
+	ENCOUNTER_NUM	NUMBER(38) NOT NULL,
+	CONCEPT_CD   	VARCHAR2(50) NOT NULL 
+	)
+/
+
+
+
+
 create or replace procedure PCORNetPrescribing as
 sqltext varchar2(4000);
 begin
 
-PMN_DROPSQL('DROP TABLE basis');
-sqltext := 'create table basis as '||
-'(select pcori_basecode,c_fullname,encounter_num,concept_cd from i2b2fact basis '||
+sqltext := 'insert into basis '||
+'select pcori_basecode,c_fullname,encounter_num,concept_cd from i2b2fact basis '||
 '        inner join pmnENCOUNTER enc on enc.patid = basis.patient_num and enc.encounterid = basis.encounter_Num '||
 '     join pcornet_med basiscode  '||
 '        on basis.modifier_cd = basiscode.c_basecode '||
-'        and basiscode.c_fullname like ''\PCORI_MOD\RX_BASIS\%'') ';
+'        and basiscode.c_fullname like ''\PCORI_MOD\RX_BASIS\%''';
 PMN_EXECUATESQL(sqltext);
 
-PMN_DROPSQL('DROP TABLE freq');
-sqltext := 'create table freq as '||
-'(select pcori_basecode,encounter_num,concept_cd from i2b2fact freq '||
+sqltext := 'insert into freq '||
+'select pcori_basecode,encounter_num,concept_cd from i2b2fact freq '||
 '        inner join pmnENCOUNTER enc on enc.patid = freq.patient_num and enc.encounterid = freq.encounter_Num '||
 '     join pcornet_med freqcode  '||
 '        on freq.modifier_cd = freqcode.c_basecode '||
-'        and freqcode.c_fullname like ''\PCORI_MOD\RX_FREQUENCY\%'') ';
+'        and freqcode.c_fullname like ''\PCORI_MOD\RX_FREQUENCY\%''';
 PMN_EXECUATESQL(sqltext);
 
-PMN_DROPSQL('DROP TABLE quantity');
-sqltext := 'create table quantity as '||
-'(select nval_num,encounter_num,concept_cd from i2b2fact quantity '||
+sqltext := 'insert into quantity '||
+'select nval_num,encounter_num,concept_cd from i2b2fact quantity '||
 '        inner join pmnENCOUNTER enc on enc.patid = quantity.patient_num and enc.encounterid = quantity.encounter_Num '||
 '     join pcornet_med quantitycode  '||
 '        on quantity.modifier_cd = quantitycode.c_basecode '||
-'        and quantitycode.c_fullname like ''\PCORI_MOD\RX_QUANTITY\'') ';
+'        and quantitycode.c_fullname like ''\PCORI_MOD\RX_QUANTITY\''';
 
 PMN_EXECUATESQL(sqltext);
         
-PMN_DROPSQL('DROP TABLE refills');
-sqltext := 'create table refills as   '||
-'(select nval_num,encounter_num,concept_cd from i2b2fact refills '||
+sqltext := 'insert into refills '||
+'select nval_num,encounter_num,concept_cd from i2b2fact refills '||
 '        inner join pmnENCOUNTER enc on enc.patid = refills.patient_num and enc.encounterid = refills.encounter_Num '||
 '     join pcornet_med refillscode  '||
 '        on refills.modifier_cd = refillscode.c_basecode '||
-'        and refillscode.c_fullname like ''\PCORI_MOD\RX_REFILLS\'') ';
+'        and refillscode.c_fullname like ''\PCORI_MOD\RX_REFILLS\''';
 PMN_EXECUATESQL(sqltext);
-
-PMN_DROPSQL('DROP TABLE supply');  
-sqltext := 'create table supply as  '||
-'(select nval_num,encounter_num,concept_cd from i2b2fact supply '||
+ 
+sqltext := 'insert into supply '||
+'select nval_num,encounter_num,concept_cd from i2b2fact supply '||
 '        inner join pmnENCOUNTER enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num '||
 '     join pcornet_med supplycode  '||
 '        on supply.modifier_cd = supplycode.c_basecode '||
-'        and supplycode.c_fullname like ''\PCORI_MOD\RX_DAYS_SUPPLY\'')  ';
+'        and supplycode.c_fullname like ''\PCORI_MOD\RX_DAYS_SUPPLY\''';
 PMN_EXECUATESQL(sqltext);
 
 
@@ -1433,25 +1575,56 @@ end PCORNetPrescribing;
 
 
 
+
+
+
+-- Edited by Matthew Joss 8/16/2016. Create table statements extracted from inside of the procedure to avoid errors with aqua data studio. 
+
+BEGIN
+PMN_DROPSQL('DROP TABLE supply');
+END;
+/
+
+CREATE TABLE SUPPLY  ( 
+	NVAL_NUM     	NUMBER(18,5) NULL,
+	ENCOUNTER_NUM	NUMBER(38) NOT NULL,
+	CONCEPT_CD   	VARCHAR2(50) NOT NULL 
+	)
+/
+
+BEGIN
+PMN_DROPSQL('DROP TABLE amount');
+END;
+/
+
+CREATE TABLE AMOUNT  ( 
+	NVAL_NUM     	NUMBER(18,5) NULL,
+	ENCOUNTER_NUM	NUMBER(38) NOT NULL,
+	CONCEPT_CD   	VARCHAR2(50) NOT NULL 
+	)
+/
+
+
+
+
 create or replace procedure PCORNetDispensing as
 sqltext varchar2(4000);
 begin
-PMN_DROPSQL('DROP TABLE supply');
-sqltext := 'create table supply as '||
-'(select nval_num,encounter_num,concept_cd from i2b2fact supply '||
+
+sqltext := 'insert into supply '||
+'select nval_num,encounter_num,concept_cd from i2b2fact supply '||
 '        inner join pmnENCOUNTER enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num '||
 '      join pcornet_med supplycode  '||
 '        on supply.modifier_cd = supplycode.c_basecode '||
-'        and supplycode.c_fullname like ''\PCORI_MOD\RX_DAYS_SUPPLY\'' ) ';
+'        and supplycode.c_fullname like ''\PCORI_MOD\RX_DAYS_SUPPLY\''';
 PMN_EXECUATESQL(sqltext);
 
 
-PMN_DROPSQL('DROP TABLE amount');
-sqltext := 'create table amount as '||
-'(select nval_num,encounter_num,concept_cd from i2b2fact amount '||
+sqltext := 'insert into amount '||
+'select nval_num,encounter_num,concept_cd from i2b2fact amount '||
 '     join pcornet_med amountcode '||
 '        on amount.modifier_cd = amountcode.c_basecode '||
-'        and amountcode.c_fullname like ''\PCORI_MOD\RX_QUANTITY\'') ';
+'        and amountcode.c_fullname like ''\PCORI_MOD\RX_QUANTITY\''';
 PMN_EXECUATESQL(sqltext);
         
 -- insert data with outer joins to ensure all records are included even if some data elements are missing
@@ -1591,7 +1764,8 @@ pcornetloader; --- you may want to run sql statements one by one in the pcornetl
 END;
 /
 
-select concept "Data Type",sourceval "From i2b2",destval "In PopMedNet", diff "Difference" from i2preport where RUNID = (select max(RUNID) from I2PREPORT);
+select concept "Data Type",sourceval "From i2b2",destval "In PopMedNet", diff "Difference" from i2preport where RUNID = (select max(RUNID) from I2PREPORT)
+/
 
 
 
