@@ -1421,8 +1421,12 @@ END;
 CREATE TABLE BASIS  ( 
 	PCORI_BASECODE	VARCHAR2(50) NULL,
 	C_FULLNAME    	VARCHAR2(700) NOT NULL,
+	INSTANCE_NUM  	NUMBER(18) NOT NULL,
+	START_DATE    	DATE NOT NULL,
+	PROVIDER_ID   	VARCHAR2(50) NOT NULL,
+	CONCEPT_CD    	VARCHAR2(50) NOT NULL,
 	ENCOUNTER_NUM 	NUMBER(38) NOT NULL,
-	CONCEPT_CD    	VARCHAR2(50) NOT NULL 
+	MODIFIER_CD   	VARCHAR2(100) NOT NULL 
 	)
 /
 
@@ -1433,10 +1437,15 @@ END;
 
 CREATE TABLE FREQ  ( 
 	PCORI_BASECODE	VARCHAR2(50) NULL,
+	INSTANCE_NUM  	NUMBER(18) NOT NULL,
+	START_DATE    	DATE NOT NULL,
+	PROVIDER_ID   	VARCHAR2(50) NOT NULL,
+	CONCEPT_CD    	VARCHAR2(50) NOT NULL,
 	ENCOUNTER_NUM 	NUMBER(38) NOT NULL,
-	CONCEPT_CD    	VARCHAR2(50) NOT NULL 
+	MODIFIER_CD   	VARCHAR2(100) NOT NULL 
 	)
 /
+
 
 BEGIN
 PMN_DROPSQL('DROP TABLE quantity');
@@ -1445,8 +1454,12 @@ END;
 
 CREATE TABLE QUANTITY  ( 
 	NVAL_NUM     	NUMBER(18,5) NULL,
+	INSTANCE_NUM 	NUMBER(18) NOT NULL,
+	START_DATE   	DATE NOT NULL,
+	PROVIDER_ID  	VARCHAR2(50) NOT NULL,
+	CONCEPT_CD   	VARCHAR2(50) NOT NULL,
 	ENCOUNTER_NUM	NUMBER(38) NOT NULL,
-	CONCEPT_CD   	VARCHAR2(50) NOT NULL 
+	MODIFIER_CD  	VARCHAR2(100) NOT NULL 
 	)
 /
 
@@ -1457,8 +1470,12 @@ END;
 
 CREATE TABLE REFILLS  ( 
 	NVAL_NUM     	NUMBER(18,5) NULL,
+	INSTANCE_NUM 	NUMBER(18) NOT NULL,
+	START_DATE   	DATE NOT NULL,
+	PROVIDER_ID  	VARCHAR2(50) NOT NULL,
+	CONCEPT_CD   	VARCHAR2(50) NOT NULL,
 	ENCOUNTER_NUM	NUMBER(38) NOT NULL,
-	CONCEPT_CD   	VARCHAR2(50) NOT NULL 
+	MODIFIER_CD  	VARCHAR2(100) NOT NULL 
 	)
 /
 
@@ -1469,10 +1486,15 @@ END;
 
 CREATE TABLE SUPPLY  ( 
 	NVAL_NUM     	NUMBER(18,5) NULL,
+	INSTANCE_NUM 	NUMBER(18) NOT NULL,
+	START_DATE   	DATE NOT NULL,
+	PROVIDER_ID  	VARCHAR2(50) NOT NULL,
+	CONCEPT_CD   	VARCHAR2(50) NOT NULL,
 	ENCOUNTER_NUM	NUMBER(38) NOT NULL,
-	CONCEPT_CD   	VARCHAR2(50) NOT NULL 
+	MODIFIER_CD  	VARCHAR2(100) NOT NULL 
 	)
 /
+
 
 
 
@@ -1482,7 +1504,7 @@ sqltext varchar2(4000);
 begin
 
 sqltext := 'insert into basis '||
-'select pcori_basecode,c_fullname,encounter_num,concept_cd from i2b2fact basis '||
+'select pcori_basecode,c_fullname,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd from i2b2fact basis '||
 '        inner join pmnENCOUNTER enc on enc.patid = basis.patient_num and enc.encounterid = basis.encounter_Num '||
 '     join pcornet_med basiscode  '||
 '        on basis.modifier_cd = basiscode.c_basecode '||
@@ -1490,7 +1512,7 @@ sqltext := 'insert into basis '||
 PMN_EXECUATESQL(sqltext);
 
 sqltext := 'insert into freq '||
-'select pcori_basecode,encounter_num,concept_cd from i2b2fact freq '||
+'select pcori_basecode,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd from i2b2fact freq '||
 '        inner join pmnENCOUNTER enc on enc.patid = freq.patient_num and enc.encounterid = freq.encounter_Num '||
 '     join pcornet_med freqcode  '||
 '        on freq.modifier_cd = freqcode.c_basecode '||
@@ -1498,7 +1520,7 @@ sqltext := 'insert into freq '||
 PMN_EXECUATESQL(sqltext);
 
 sqltext := 'insert into quantity '||
-'select nval_num,encounter_num,concept_cd from i2b2fact quantity '||
+'select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd from i2b2fact quantity '||
 '        inner join pmnENCOUNTER enc on enc.patid = quantity.patient_num and enc.encounterid = quantity.encounter_Num '||
 '     join pcornet_med quantitycode  '||
 '        on quantity.modifier_cd = quantitycode.c_basecode '||
@@ -1507,7 +1529,7 @@ sqltext := 'insert into quantity '||
 PMN_EXECUATESQL(sqltext);
         
 sqltext := 'insert into refills '||
-'select nval_num,encounter_num,concept_cd from i2b2fact refills '||
+'select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd from i2b2fact refills '||
 '        inner join pmnENCOUNTER enc on enc.patid = refills.patient_num and enc.encounterid = refills.encounter_Num '||
 '     join pcornet_med refillscode  '||
 '        on refills.modifier_cd = refillscode.c_basecode '||
@@ -1515,7 +1537,7 @@ sqltext := 'insert into refills '||
 PMN_EXECUATESQL(sqltext);
  
 sqltext := 'insert into supply '||
-'select nval_num,encounter_num,concept_cd from i2b2fact supply '||
+'select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd from i2b2fact supply '||
 '        inner join pmnENCOUNTER enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num '||
 '     join pcornet_med supplycode  '||
 '        on supply.modifier_cd = supplycode.c_basecode '||
@@ -1551,22 +1573,37 @@ inner join pmnENCOUNTER enc on enc.encounterid = m.encounter_Num
     left join basis
     on m.encounter_num = basis.encounter_num
     and m.concept_cd = basis.concept_Cd
+    and m.start_date = basis.start_date
+    and m.provider_id = basis.provider_id
+    and m.modifier_cd = basis.modifier_cd
 
     left join  freq
     on m.encounter_num = freq.encounter_num
     and m.concept_cd = freq.concept_Cd
+    and m.start_date = freq.start_date
+    and m.provider_id = freq.provider_id
+    and m.modifier_cd = freq.modifier_cd
 
     left join quantity 
     on m.encounter_num = quantity.encounter_num
     and m.concept_cd = quantity.concept_Cd
+    and m.start_date = quantity.start_date
+    and m.provider_id = quantity.provider_id
+    and m.modifier_cd = quantity.modifier_cd
 
     left join refills
     on m.encounter_num = refills.encounter_num
     and m.concept_cd = refills.concept_Cd
+    and m.start_date = refills.start_date
+    and m.provider_id = refills.provider_id
+    and m.modifier_cd = refills.modifier_cd
 
     left join supply
     on m.encounter_num = supply.encounter_num
     and m.concept_cd = supply.concept_Cd
+    and m.start_date = supply.start_date
+    and m.provider_id = supply.provider_id
+    and m.modifier_cd = supply.modifier_cd
 
 where (basis.c_fullname is null or basis.c_fullname= '\PCORI_MOD\RX_BASIS\PR\%'); -- jgk 11/2 bugfix: filter for PR, not DI
 
@@ -1581,11 +1618,11 @@ end PCORNetPrescribing;
 -- Edited by Matthew Joss 8/16/2016. Create table statements extracted from inside of the procedure to avoid errors with aqua data studio. 
 
 BEGIN
-PMN_DROPSQL('DROP TABLE supply');
+PMN_DROPSQL('DROP TABLE DISP_SUPPLY');
 END;
 /
 
-CREATE TABLE SUPPLY  ( 
+CREATE TABLE DISP_SUPPLY  ( 
 	NVAL_NUM     	NUMBER(18,5) NULL,
 	ENCOUNTER_NUM	NUMBER(38) NOT NULL,
 	CONCEPT_CD   	VARCHAR2(50) NOT NULL 
@@ -1611,11 +1648,11 @@ create or replace procedure PCORNetDispensing as
 sqltext varchar2(4000);
 begin
 
-sqltext := 'insert into supply '||
-'select nval_num,encounter_num,concept_cd from i2b2fact supply '||
-'        inner join pmnENCOUNTER enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num '||
+sqltext := 'insert into DISP_SUPPLY '||
+'select nval_num,encounter_num,concept_cd from i2b2fact DISP_SUPPLY '||
+'        inner join pmnENCOUNTER enc on enc.patid = DISP_SUPPLY.patient_num and enc.encounterid = DISP_SUPPLY.encounter_Num '||
 '      join pcornet_med supplycode  '||
-'        on supply.modifier_cd = supplycode.c_basecode '||
+'        on DISP_SUPPLY.modifier_cd = supplycode.c_basecode '||
 '        and supplycode.c_fullname like ''\PCORI_MOD\RX_DAYS_SUPPLY\''';
 PMN_EXECUATESQL(sqltext);
 
@@ -1639,7 +1676,7 @@ insert into pmndispensing (
 --    ,RAW_NDC
 )
 select  m.patient_num, null,m.start_date, NVL(mo.pcori_ndc,'NA')
-    ,max(supply.nval_num) sup, max(amount.nval_num) amt 
+    ,max(DISP_SUPPLY.nval_num) sup, max(amount.nval_num) amt 
 from i2b2fact m inner join pcornet_med mo
 on m.concept_cd = mo.c_basecode
 inner join pmnENCOUNTER enc on enc.encounterid = m.encounter_Num
@@ -1653,9 +1690,9 @@ inner join pmnENCOUNTER enc on enc.encounterid = m.encounter_Num
     on m.encounter_num = basis.encounter_num
     and m.concept_cd = basis.concept_Cd 
 
-    left join  supply
-    on m.encounter_num = supply.encounter_num
-    and m.concept_cd = supply.concept_Cd
+    left join  DISP_SUPPLY
+    on m.encounter_num = DISP_SUPPLY.encounter_num
+    and m.concept_cd = DISP_SUPPLY.concept_Cd
 
 
     left join  amount
@@ -1666,7 +1703,6 @@ group by m.encounter_num ,m.patient_num, m.start_date,  mo.pcori_ndc;
 
 end PCORNetDispensing;
 /
-
 
 
 
