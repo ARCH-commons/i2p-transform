@@ -928,6 +928,9 @@ FETCH getsql INTO sqltext;
 	COMMIT;
 END LOOP;
 CLOSE getsql;
+
+Commit;
+
 end PCORNetDemographic; 
 /
 
@@ -965,6 +968,8 @@ left outer join
 (select patient_num, encounter_num, inout_cd,SUBSTR(pcori_basecode,INSTR(pcori_basecode, ':')+1,2) pcori_enctype from i2b2visit v
  inner join pcornet_enc e on c_dimcode like '%'''||inout_cd||'''%' and e.c_fullname like '\PCORI\ENCOUNTER\ENC_TYPE\%') enctype
   on enctype.patient_num=v.patient_num and enctype.encounter_num=v.encounter_num;
+
+Commit;
 
 end PCORNetEncounter;
 /
@@ -1054,6 +1059,7 @@ sqltext := 'insert into pmndiagnosis (patid,			encounterid,	enc_type, admit_date
 
 PMN_EXECUATESQL(sqltext);
 
+Commit;
 
 end PCORNetDiagnosis;
 /
@@ -1112,6 +1118,8 @@ sqltext := 'insert into pmncondition (patid, encounterid, report_date, resolve_d
 
 PMN_EXECUATESQL(sqltext);
 
+Commit;
+
 end PCORNetCondition;
 /
 
@@ -1127,6 +1135,8 @@ from i2b2fact fact
  inner join pmnENCOUNTER enc on enc.patid = fact.patient_num and enc.encounterid = fact.encounter_Num
  inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
 where pr.c_fullname like '\PCORI\PROCEDURE\%';
+
+Commit;
 
 end PCORNetProcedure;
 /
@@ -1213,6 +1223,8 @@ where ht is not null
   or tobacco is not null
 group by patid, encounterid, measure_date, measure_time, admit_date) y;
 
+Commit;
+
 end PCORNetVital;
 /
 
@@ -1230,6 +1242,8 @@ INSERT INTO pmnENROLLMENT(PATID, ENR_START_DATE, ENR_END_DATE, CHART, ENR_BASIS)
     , 'Y' chart, case when l.patient_num is not null then 'A' else 'E' end enr_basis from 
     (select patient_num, min(start_date) enr_start,max(start_date) enr_end,max(end_date) enr_end_end from i2b2visit where patient_num in (select patid from pmndemographic) group by patient_num) x
     left outer join i2b2loyalty_patients l on l.patient_num=x.patient_num;
+
+Commit;
 
 end PCORNetEnroll;
 /
@@ -1389,6 +1403,8 @@ WHERE m.ValType_Cd in ('N','T')
 and ont_parent.C_BASECODE LIKE 'LAB_NAME%' -- Exclude non-pcori labs
 and m.MODIFIER_CD='@';
 
+Commit;
+
 END PCORNetLabResultCM;
 /
 
@@ -1400,6 +1416,8 @@ begin
 
 INSERT INTO pmnharvest(NETWORKID, NETWORK_NAME, DATAMARTID, DATAMART_NAME, DATAMART_PLATFORM, CDM_VERSION, DATAMART_CLAIMS, DATAMART_EHR, BIRTH_DATE_MGMT, ENR_START_DATE_MGMT, ENR_END_DATE_MGMT, ADMIT_DATE_MGMT, DISCHARGE_DATE_MGMT, PX_DATE_MGMT, RX_ORDER_DATE_MGMT, RX_START_DATE_MGMT, RX_END_DATE_MGMT, DISPENSE_DATE_MGMT, LAB_ORDER_DATE_MGMT, SPECIMEN_DATE_MGMT, RESULT_DATE_MGMT, MEASURE_DATE_MGMT, ONSET_DATE_MGMT, REPORT_DATE_MGMT, RESOLVE_DATE_MGMT, PRO_DATE_MGMT, REFRESH_DEMOGRAPHIC_DATE, REFRESH_ENROLLMENT_DATE, REFRESH_ENCOUNTER_DATE, REFRESH_DIAGNOSIS_DATE, REFRESH_PROCEDURES_DATE, REFRESH_VITAL_DATE, REFRESH_DISPENSING_DATE, REFRESH_LAB_RESULT_CM_DATE, REFRESH_CONDITION_DATE, REFRESH_PRO_CM_DATE, REFRESH_PRESCRIBING_DATE, REFRESH_PCORNET_TRIAL_DATE, REFRESH_DEATH_DATE, REFRESH_DEATH_CAUSE_DATE) 
 	VALUES('SCILHS', 'SCILHS', getDataMartID(), getDataMartName(), getDataMartPlatform(), 3, '01', '02', '01','01','02','01','02','01','02','01','02','01','01','02','02','01','01','01','02','01',current_date,current_date,current_date,current_date,current_date,current_date,current_date,current_date,current_date,null,current_date,null,null,null);
+
+Commit;
 
 end PCORNetHarvest;
 /
@@ -1607,6 +1625,8 @@ inner join pmnENCOUNTER enc on enc.encounterid = m.encounter_Num
 
 where (basis.c_fullname is null or basis.c_fullname= '\PCORI_MOD\RX_BASIS\PR\%'); -- jgk 11/2 bugfix: filter for PR, not DI
 
+Commit;
+
 end PCORNetPrescribing;
 /
 
@@ -1700,6 +1720,8 @@ inner join pmnENCOUNTER enc on enc.encounterid = m.encounter_Num
     and m.concept_cd = amount.concept_Cd
 
 group by m.encounter_num ,m.patient_num, m.start_date,  mo.pcori_ndc;
+
+Commit;
 
 end PCORNetDispensing;
 /
