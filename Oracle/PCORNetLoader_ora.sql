@@ -2,6 +2,7 @@
 -- PCORNetLoader Script
 -- Orignal MSSQL Verion Contributors: Jeff Klann, PhD; Aaron Abend; Arturo Torres
 -- Translate to Oracle version: by Kun Wei(Wake Forest)
+-- Modified, additional features added, and re-organized by Matthew Joss (PHS)
 -- Propagated 0.6.5 leading 0 bug, but not other fixes
 -- Versin 0.6.3
 -- Version 0.6.3, typos found in field names in trial, enrollment, vital, and harvest tables - 1/11/16
@@ -11,10 +12,15 @@
 -- Prescribing/dispensing bugfixes (untested) inserted by Jeff Klann 12/10/15
 --
 --
--- This is Orace Verion ELT v6 script to build PopMedNet database
+-- This is Oracle Verion ELT v6 script to build PopMedNet database
 -- Instructions:
 --     (please see the original MSSQL version script.)
 -------------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------------------------------------------------------
+-- This first section creates a few procedures that are unique to this Oracle script. These are necessary in order to execute certain commands
+-- Skip to the next section to change the synonym names to point to your database objects 
+----------------------------------------------------------------------------------------------------------------------------------------
 
 
 create or replace PROCEDURE PMN_DROPSQL(sqlstring VARCHAR2) AS 
@@ -56,7 +62,9 @@ END PMN_ExecuateSQL;
 
 
 
-
+----------------------------------------------------------------------------------------------------------------------------------------
+-- create synonyms to make the code portable - please edit these so that the synonyms point to your database objects
+----------------------------------------------------------------------------------------------------------------------------------------
 
 
 CREATE OR REPLACE SYNONYM I2B2FACT FOR I2B2DEMODATA.OBSERVATION_FACT
@@ -125,6 +133,14 @@ END;
 
 create or replace view i2b2loyalty_patients as (select patient_num,to_date('01-Jul-2010','dd-mon-rrrr') period_start,to_date('01-Jul-2014','dd-mon-rrrr') period_end from i2b2demodata.loyalty_cohort_patient_summary where BITAND(filter_set, 61511) = 61511 and patient_num in (select patient_num from i2b2patient))
 /
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+-- Prep-to-transform code
+----------------------------------------------------------------------------------------------------------------------------------------
+
 
 BEGIN
 PMN_DROPSQL('DROP TABLE pcornet_codelist');
@@ -201,6 +217,11 @@ end pcornet_popcodelist;
 /
 
 
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+-- CREATE THE TABLES: Initialization
+----------------------------------------------------------------------------------------------------------------------------------------
 
 
 BEGIN
@@ -779,9 +800,14 @@ pcornet_popcodelist;
 END;
 /
 
+--- Load the procedures
 
 
-
+----------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------
+-- 1. Demographics - by Aaron Abend
+-- Modified by Matthew Joss to support biobank flags
+----------------------------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -929,10 +955,31 @@ FETCH getsql INTO sqltext;
 END LOOP;
 CLOSE getsql;
 
+
+
+
+--UPDATE pmndemographic TO DISPLAY CORRECT BIOBANK_FLAG BASED ON CONCEPT CODE LISTED IN OBSERVATION_FACT: modified by Matthew Joss, copied from MSSQL version 8/24/16
+
+sqltext := 'UPDATE pmndemographic '||
+	'SET BIOBANK_FLAG = ''Y'''||
+	'WHERE PATID IN (SELECT PATID FROM pmndemographic demo INNER JOIN i2b2fact OBS '||
+    'ON demo.PATID = OBS.PATIENT_NUM '||
+    'INNER JOIN pcornet_demo P '||
+    'ON OBS.CONCEPT_CD = P.C_BASECODE '||
+	'WHERE P.C_FULLNAME LIKE ''\PCORI\DEMOGRAPHIC\BIOBANK_FLAG\Y\%'')';
+PMN_EXECUATESQL(sqltext);
+
+
 Commit;
 
 end PCORNetDemographic; 
 /
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------
+-- 2. Encounter - by Jeff Klann and Aaron Abend
+----------------------------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -977,7 +1024,15 @@ end PCORNetEncounter;
 
 
 
--- Edited by Matthew Joss 8/15/2016. Create table statements extracted from inside of the procedure to avoid errors with aqua data studio. 
+----------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------
+-- 3. Diagnosis - by Aaron Abend and Jeff Klann
+-- Notes: Create table statements are now outside of the procedure as an additional initialization step
+-- Edited by Matthew Joss 8/15/2016. Create table statements extracted from inside of the procedure to avoid errors with aqua data studio.
+----------------------------------------------------------------------------------------------------------------------------------------
+
+
+ 
 BEGIN
 PMN_DROPSQL('DROP TABLE sourcefact');
 END;
@@ -1065,9 +1120,15 @@ end PCORNetDiagnosis;
 /
 
 
-
-
+----------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------
+-- 3a. Condition - by Jeff Klann, derived from Diagnosis above
+-- Notes: Create table statements are now outside of the procedure as an additional initialization step
 -- Edited by Matthew Joss 8/16/2016. Create table statements extracted from inside of the procedure to avoid errors with aqua data studio. 
+----------------------------------------------------------------------------------------------------------------------------------------
+
+
+
 BEGIN
 PMN_DROPSQL('DROP TABLE sourcefact2');
 END;
@@ -1125,6 +1186,13 @@ end PCORNetCondition;
 
 
 
+
+----------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------
+-- 4. Procedures - by Aaron Abend and Jeff Klann
+----------------------------------------------------------------------------------------------------------------------------------------
+
+
 create or replace procedure PCORNetProcedure as
 begin
 insert into pmnprocedure( 
@@ -1144,7 +1212,16 @@ end PCORNetProcedure;
 
 
 
-
+----------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------
+-- 5. Vitals - by Jeff Klann
+-- TODO: This version does not do unit conversions.
+----------------------------------------------------------------------------------------------------------------------------------------
+------------------------- Vitals Code ------------------------------------------------ 
+-- Written by Jeff Klann, PhD
+-- Borrows heavily from GPC's CDM_transform.sql by Dan Connolly and Nathan Graham, available at https://bitbucket.org/njgraham/pcori-annotated-data-dictionary/overview 
+-- This transform must be run after demographics and encounters. It does not rely on the PCORI_basecode column except for tobacco and smoking status, so that does not need to be changed.
+-- TODO: This does not do unit conversions.
 
 
 create or replace procedure PCORNetVital as
@@ -1231,6 +1308,14 @@ end PCORNetVital;
 
 
 
+----------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------
+-- 6. Enrollment - by Jeff Klann
+----------------------------------------------------------------------------------------------------------------------------------------
+------------------------- Enrollment Code ------------------------------------------------ 
+-- Written by Jeff Klann, PhD
+-- v6 Updated 9/30/15 - now supports loyalty cohort (be sure view at the top of the script is updated)
+-- Bugfix 1/11/16 - BASIS should be called ENR_BASIS
 
 
 create or replace procedure PCORNetEnroll as
@@ -1248,6 +1333,16 @@ Commit;
 end PCORNetEnroll;
 /
 
+
+----------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------
+-- 7. LAB_RESULT_CM - by Jeff Klann and Arturo Torres
+--  Notes: Create table statements are now outside of the procedure as an additional initialization step
+----------------------------------------------------------------------------------------------------------------------------------------
+------------------------- LAB_RESULT_CM------------------------------------------------ 
+-- 8/14/2015 - first version, Written by Jeff Klann, PhD and Arturo Torres
+-- 9/24/15 - Removed factline cache and optimized
+-- 12/9/15 - Optimized to use temp tables
 
 
 
@@ -1409,6 +1504,14 @@ END PCORNetLabResultCM;
 /
 
 
+----------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------
+-- 8. HARVEST - by Jeff Klann, PhD 
+-- Populates with SCILHS defaults and parameters at top of script. Update for other networks.
+-- 1/16/16 fixed typo
+-- 5/17/16 fixed quotes around insert statement
+----------------------------------------------------------------------------------------------------------------------------------------
+-- BUGFIX 04/22/16: Needed leading zeros on numbers
 
 
 create or replace procedure PCORNetHarvest as
@@ -1423,11 +1526,16 @@ end PCORNetHarvest;
 /
 
 
-
-
-
-
--- Edited by Matthew Joss 8/16/2016. Create table statements extracted from inside of the procedure to avoid errors with aqua data studio. 
+----------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------
+-- 9. Prescribing - by Aaron Abend and Jeff Klann, PhD with optimizations by Griffin Weber, MD, PhD
+-- Notes: Create table statements are now outside of the procedure as an additional initialization step
+-- Modified to use the fact table primary key to join prescribing table with basis, freq, etc. 
+----------------------------------------------------------------------------------------------------------------------------------------
+-- You must have run the meds_schemachange proc to create the PCORI_NDC and PCORI_CUI columns
+-- TODO: The first encounter inner join seems to slow things 
+-- Edited by Matthew Joss 8/16/2016. Create table statements extracted from inside of the procedure to avoid errors with aqua data studio.
+ 
 
 
 BEGIN
@@ -1585,7 +1693,7 @@ insert into pmnprescribing (
 select distinct  m.patient_num, m.Encounter_Num,m.provider_id,  m.start_date order_date,  to_char(m.start_date,'HH:MI'), m.start_date start_date, m.end_date, mo.pcori_cui
     ,quantity.nval_num quantity, refills.nval_num refills, supply.nval_num supply, freq.pcori_basecode frequency, basis.pcori_basecode basis
  from i2b2fact m inner join pcornet_med mo on m.concept_cd = mo.c_basecode 
-inner join pmnENCOUNTER enc on enc.encounterid = m.encounter_Num
+inner join pmnENCOUNTER enc on enc.encounterid = m.encounter_Num        -- Above Select distinct Needs editing: substring(convert(varchar,m.start_date,8),1,5),   ||   substring(freq.pcori_basecode,charindex(':',freq.pcori_basecode)+1,2) frequency, substring(basis.pcori_basecode,charindex(':',basis.pcori_basecode)+1,2) basis
 -- TODO: This join adds several minutes to the load - must be debugged
 
     left join basis
@@ -1632,13 +1740,16 @@ end PCORNetPrescribing;
 
 
 
-
-
-
+----------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------
+-- 9a. Dispensing - by Aaron Abend and Jeff Klann, PhD 
+-- Notes: Create table statements are now outside of the procedure as an additional initialization step
+----------------------------------------------------------------------------------------------------------------------------------------
+-- You must have run the meds_schemachange proc to create the PCORI_NDC and PCORI_CUI columns
 -- Edited by Matthew Joss 8/16/2016. Create table statements extracted from inside of the procedure to avoid errors with aqua data studio. 
 
 BEGIN
-PMN_DROPSQL('DROP TABLE DISP_SUPPLY');
+PMN_DROPSQL('DROP TABLE DISP_SUPPLY');  --Changed the table 'supply' to the name 'disp_supply' to avoid conflicts with the prescribing procedure, Matthew Joss 8/16/16
 END;
 /
 
@@ -1728,6 +1839,10 @@ end PCORNetDispensing;
 
 
 
+----------------------------------------------------------------------------------------------------------------------------------------
+-- 11. Report Results - Original authors: by Aaron Abend and Jeff Klann
+-- This version is useful to check against i2b2, but consider running the more detailed annotated data dictionary tool also.
+----------------------------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -1792,6 +1907,9 @@ end pcornetReport;
 /
 
 
+----------------------------------------------------------------------------------------------------------------------------------------
+-- 12. Load and Run Program
+----------------------------------------------------------------------------------------------------------------------------------------
 
 
 create or replace procedure pcornetloader as
@@ -1811,10 +1929,6 @@ PCORNetDispensing;
 
 end pcornetloader;
 /
-
-
-
-
 
 
 BEGIN
