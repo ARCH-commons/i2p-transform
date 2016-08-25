@@ -834,7 +834,7 @@ GO
 ----------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------------
 -- 1. Demographics - v4.1 by Aaron Abend
---
+-- Modified by Matthew Joss to support biobank flags
 ----------------------------------------------------------------------------------------------------------------------------------------
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'PCORNetDemographics') AND type in (N'P', N'PC')) DROP PROCEDURE PCORNetDemographics
 go
@@ -1425,7 +1425,6 @@ GO
 -- 1/16/16 fixed typo
 -- 5/17/16 fixed quotes around insert statement
 ----------------------------------------------------------------------------------------------------------------------------------------
--- Written by Jeff Klann, PhD 
 -- BUGFIX 04/22/16: Needed leading zeros on numbers
 
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'PCORNetHarvest') AND type in (N'P', N'PC')) DROP PROCEDURE PCORNetHarvest;
@@ -1441,9 +1440,8 @@ GO
 
 ----------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------------
--- 9. Prescribing - v6.1
+-- 9. Prescribing - by Aaron Abend and Jeff Klann, PhD with optimizations by Griffin Weber, MD, PhD
 ----------------------------------------------------------------------------------------------------------------------------------------
--- Written by Aaron Abend and Jeff Klann, PhD with optimizations by Griffin Weber, MD, PhD
 -- You must have run the meds_schemachange proc to create the PCORI_NDC and PCORI_CUI columns
 -- TODO: The first encounter inner join seems to slow things down
 
@@ -1544,9 +1542,8 @@ end
 GO
 ----------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------------
--- 9a. Dispensing - v6
+-- 9a. Dispensing - by Aaron Abend and Jeff Klann, PhD 
 ----------------------------------------------------------------------------------------------------------------------------------------
--- Written by Aaron Abend and Jeff Klann, PhD 
 -- You must have run the meds_schemachange proc to create the PCORI_NDC and PCORI_CUI columns
 
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'PCORNetDispensing') AND type in (N'P', N'PC')) DROP PROCEDURE PCORNetDispensing;
@@ -1643,7 +1640,7 @@ IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'pcornetclear
 go
 
 create procedure pcornetclear
-as
+as 
 begin
 
 DELETE FROM pmndispensing
