@@ -551,12 +551,6 @@ end;
 
 
 
-
-
-
-
-
-
 BEGIN
 PMN_DROPSQL('DROP TABLE pmnprescribing');
 END;
@@ -1071,6 +1065,8 @@ create or replace procedure PCORNetDiagnosis as
 sqltext varchar2(4000);
 begin
 
+PMN_DROPSQL('DELETE FROM sourcefact'); -- clear data ffrom temp table
+
 sqltext := 'insert into sourcefact '||
 	'select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode dxsource, dxsource.c_fullname '||
 	'from i2b2fact factline '||
@@ -1079,6 +1075,7 @@ sqltext := 'insert into sourcefact '||
 	'where dxsource.c_fullname like ''\PCORI_MOD\CONDITION_OR_DX\%''';
 PMN_EXECUATESQL(sqltext);
 
+PMN_DROPSQL('DELETE FROM pdxfact');
 
 sqltext := 'insert into pdxfact '||
 	'select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode pdxsource,dxsource.c_fullname  '||
@@ -1151,6 +1148,8 @@ create or replace procedure PCORNetCondition as
 sqltext varchar2(4000);
 begin
 
+PMN_DROPSQL('DELETE FROM sourcefact2'); -- clear data ffrom temp table
+
 sqltext := 'insert into sourcefact2 '||
     'select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode dxsource, dxsource.c_fullname '||
 	'from i2b2fact factline '||
@@ -1195,6 +1194,7 @@ end PCORNetCondition;
 
 create or replace procedure PCORNetProcedure as
 begin
+
 insert into pmnprocedure( 
 				patid,			encounterid,	enc_type, admit_date, providerid, px, px_type) 
 select  distinct fact.patient_num, enc.encounterid,	enc.enc_type, fact.start_date, 
@@ -1386,6 +1386,7 @@ create or replace procedure PCORNetLabResultCM as
 sqltext varchar2(4000);
 begin
 
+PMN_DROPSQL('DELETE FROM priority'); -- clear data ffrom temp table
 
 sqltext := 'insert into priority '||
 'select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, lsource.pcori_basecode  PRIORITY  '||
@@ -1396,6 +1397,8 @@ sqltext := 'insert into priority '||
 
 PMN_EXECUATESQL(sqltext);
 
+
+PMN_DROPSQL('DELETE FROM location');
 
 sqltext := 'insert into location '||
 'select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, lsource.pcori_basecode  RESULT_LOC '||
@@ -1629,13 +1632,18 @@ create or replace procedure PCORNetPrescribing as
 sqltext varchar2(4000);
 begin
 
+PMN_DROPSQL('DELETE FROM basis'); -- clear data ffrom temp table
+
 sqltext := 'insert into basis '||
 'select pcori_basecode,c_fullname,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd from i2b2fact basis '||
 '        inner join pmnENCOUNTER enc on enc.patid = basis.patient_num and enc.encounterid = basis.encounter_Num '||
 '     join pcornet_med basiscode  '||
 '        on basis.modifier_cd = basiscode.c_basecode '||
 '        and basiscode.c_fullname like ''\PCORI_MOD\RX_BASIS\%''';
+
 PMN_EXECUATESQL(sqltext);
+
+PMN_DROPSQL('DELETE FROM freq');
 
 sqltext := 'insert into freq '||
 'select pcori_basecode,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd from i2b2fact freq '||
@@ -1643,7 +1651,10 @@ sqltext := 'insert into freq '||
 '     join pcornet_med freqcode  '||
 '        on freq.modifier_cd = freqcode.c_basecode '||
 '        and freqcode.c_fullname like ''\PCORI_MOD\RX_FREQUENCY\%''';
+
 PMN_EXECUATESQL(sqltext);
+
+PMN_DROPSQL('DELETE FROM quantity');
 
 sqltext := 'insert into quantity '||
 'select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd from i2b2fact quantity '||
@@ -1653,6 +1664,8 @@ sqltext := 'insert into quantity '||
 '        and quantitycode.c_fullname like ''\PCORI_MOD\RX_QUANTITY\''';
 
 PMN_EXECUATESQL(sqltext);
+
+PMN_DROPSQL('DELETE FROM refills');
         
 sqltext := 'insert into refills '||
 'select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd from i2b2fact refills '||
@@ -1660,7 +1673,10 @@ sqltext := 'insert into refills '||
 '     join pcornet_med refillscode  '||
 '        on refills.modifier_cd = refillscode.c_basecode '||
 '        and refillscode.c_fullname like ''\PCORI_MOD\RX_REFILLS\''';
+
 PMN_EXECUATESQL(sqltext);
+
+PMN_DROPSQL('DELETE FROM supply');
  
 sqltext := 'insert into supply '||
 'select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd from i2b2fact supply '||
@@ -1668,6 +1684,7 @@ sqltext := 'insert into supply '||
 '     join pcornet_med supplycode  '||
 '        on supply.modifier_cd = supplycode.c_basecode '||
 '        and supplycode.c_fullname like ''\PCORI_MOD\RX_DAYS_SUPPLY\''';
+
 PMN_EXECUATESQL(sqltext);
 
 
@@ -1690,10 +1707,10 @@ insert into pmnprescribing (
 --    ,RAW_RX_FREQUENCY,
 --    ,RAW_RXNORM_CUI
 )
-select distinct  m.patient_num, m.Encounter_Num,m.provider_id,  m.start_date order_date,  to_char(m.start_date,'HH:MI'), m.start_date start_date, m.end_date, mo.pcori_cui
-    ,quantity.nval_num quantity, refills.nval_num refills, supply.nval_num supply, freq.pcori_basecode frequency, basis.pcori_basecode basis
+select distinct  m.patient_num, m.Encounter_Num,m.provider_id,  m.start_date order_date,  to_char(m.start_date,'HH24:MI'), m.start_date start_date, m.end_date, mo.pcori_cui -- Changed HH to HH24, Matthew Joss 8/25/16
+    ,quantity.nval_num quantity, refills.nval_num refills, supply.nval_num supply, substr(freq.pcori_basecode, instr(freq.pcori_basecode, ':') + 1, 2) frequency, substr(basis.pcori_basecode, instr(freq.pcori_basecode, ':') + 1, 2) basis
  from i2b2fact m inner join pcornet_med mo on m.concept_cd = mo.c_basecode 
-inner join pmnENCOUNTER enc on enc.encounterid = m.encounter_Num        -- Above Select distinct Needs editing: substring(convert(varchar,m.start_date,8),1,5),   ||   substring(freq.pcori_basecode,charindex(':',freq.pcori_basecode)+1,2) frequency, substring(basis.pcori_basecode,charindex(':',basis.pcori_basecode)+1,2) basis
+inner join pmnENCOUNTER enc on enc.encounterid = m.encounter_Num       
 -- TODO: This join adds several minutes to the load - must be debugged
 
     left join basis
@@ -1779,6 +1796,8 @@ create or replace procedure PCORNetDispensing as
 sqltext varchar2(4000);
 begin
 
+PMN_DROPSQL('DELETE FROM DISP_SUPPLY'); -- clear data ffrom temp table
+
 sqltext := 'insert into DISP_SUPPLY '||
 'select nval_num,encounter_num,concept_cd from i2b2fact DISP_SUPPLY '||
 '        inner join pmnENCOUNTER enc on enc.patid = DISP_SUPPLY.patient_num and enc.encounterid = DISP_SUPPLY.encounter_Num '||
@@ -1787,6 +1806,7 @@ sqltext := 'insert into DISP_SUPPLY '||
 '        and supplycode.c_fullname like ''\PCORI_MOD\RX_DAYS_SUPPLY\''';
 PMN_EXECUATESQL(sqltext);
 
+PMN_DROPSQL('DELETE FROM amount');
 
 sqltext := 'insert into amount '||
 'select nval_num,encounter_num,concept_cd from i2b2fact amount '||
@@ -1796,6 +1816,7 @@ sqltext := 'insert into amount '||
 PMN_EXECUATESQL(sqltext);
         
 -- insert data with outer joins to ensure all records are included even if some data elements are missing
+
 
 insert into pmndispensing (
 	PATID
@@ -1838,9 +1859,35 @@ end PCORNetDispensing;
 /
 
 
+----------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------
+-- 11. Death - by Jeff Klann, PhD
+-- Simple transform only pulls death date from patient dimension, does not rely on an ontology
+-- Translated from MSSQL script by Matthew Joss
+----------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+create or replace procedure PCORNetDeath as
+
+begin
+
+insert into pmndeath( patid, death_date, death_date_impute, death_source, death_match_confidence) 
+select  distinct pat.patient_num, pat.death_date, case 
+when vital_status_cd like 'X%' then 'B'
+when vital_status_cd like 'M%' then 'D'
+when vital_status_cd like 'Y%' then 'N'
+else 'OT'	
+end, 'NI','NI'
+from i2b2patient pat
+where (pat.death_date is not null or vital_status_cd like 'Z%') and pat.patient_num in (select patid from pmndemographic);
+
+end;
+/
+
 
 ----------------------------------------------------------------------------------------------------------------------------------------
--- 11. Report Results - Original authors: by Aaron Abend and Jeff Klann
+-- 12. Report Results - Original authors: by Aaron Abend and Jeff Klann
 -- This version is useful to check against i2b2, but consider running the more detailed annotated data dictionary tool also.
 ----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -1908,7 +1955,34 @@ end pcornetReport;
 
 
 ----------------------------------------------------------------------------------------------------------------------------------------
--- 12. Load and Run Program
+----------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------
+-- 13. clear Program - includes all tables
+----------------------------------------------------------------------------------------------------------------------------------------
+
+
+create or replace procedure pcornetclear as 
+begin
+
+DELETE FROM pmndispensing;
+DELETE FROM pmnprescribing;
+DELETE FROM pmnprocedure;
+DELETE FROM pmndiagnosis;
+DELETE FROM pmncondition;
+DELETE FROM pmnvital;
+DELETE FROM pmnenrollment;
+DELETE FROM pmnlabresults_cm;
+DELETE FROM pmndeath;
+DELETE FROM pmnencounter;
+DELETE FROM pmndemographic;
+DELETE FROM pmnharvest;
+
+end;
+/
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+-- 14. Load and Run Program
 ----------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -1926,18 +2000,17 @@ PCORNetEnroll;
 PCORNetLabResultCM;
 PCORNetPrescribing;
 PCORNetDispensing;
+PCORNetDeath;
 
 end pcornetloader;
 /
 
 
-BEGIN
-pcornetloader; --- you may want to run sql statements one by one in the pcornetloader procedure :)
+BEGIN          -- RUN PROGRAM 
+pcornetclear;
+pcornetloader; -- you may want to run sql statements one by one in the pcornetloader procedure :)
 END;
 /
 
 select concept "Data Type",sourceval "From i2b2",destval "In PopMedNet", diff "Difference" from i2preport where RUNID = (select max(RUNID) from I2PREPORT)
 /
-
-
-
