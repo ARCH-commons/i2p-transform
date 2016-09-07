@@ -736,6 +736,65 @@ ALTER TABLE [dbo].[pmnpro_cm]  WITH CHECK ADD FOREIGN KEY([ENCOUNTERID])
 REFERENCES [dbo].[pmnENCOUNTER] ([ENCOUNTERID])
 GO
 
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+-- Create synonyms for the pmn tables for use by the MENU DRIVEN QUERY TOOL (you may need to edit the database name)
+-- Written by Matthew Joss
+----------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+create synonym CONDITION for PMNCONDITION
+GO
+create synonym DEATH for PMNDEATH
+GO
+create synonym DEATH_CAUSE for PMNDEATH_CAUSE
+GO 
+create synonym DEMOGRAPHIC for PMNDEMOGRAPHIC 
+GO
+create synonym DIAGNOSIS for PMNDIAGNOSIS
+GO
+create synonym DISPENSING for PMNDISPENSING
+GO
+create synonym ENCOUNTER for PMNENCOUNTER
+GO
+create synonym ENROLLMENT for PMNENROLLMENT
+GO
+create synonym HARVEST for PMNHARVEST
+GO
+create synonym LAB_RESULT_CM for PMNLABRESULTS_CM
+GO
+create synonym PCORNET_TRIAL for PMNPCORNET_TRIAL
+GO
+create synonym PRESCRIBING for PMNPRESCRIBING
+GO
+create synonym PRO_CM for PMNPRO_CM
+GO
+create synonym PROCEDURES for PMNPROCEDURE
+GO
+create synonym VITAL for PMNVITAL
+GO
+
+
+
+/* --Example query for the MDQ using the above synonyms
+SELECT
+    1 AS [C1],
+    [GroupBy1].[A1] AS [C2]
+    FROM ( SELECT
+        [Filter1].[K1] AS [K1],
+        COUNT([Filter1].[A1]) AS [A1]
+        FROM ( SELECT
+            cast(1 as bit) AS [K1],
+            1 AS [A1]
+            FROM [dbo].[DEMOGRAPHIC] AS [Extent1]
+            WHERE [Extent1].[BIRTH_DATE] IS NOT NULL
+        )  AS [Filter1]
+        GROUP BY [K1]
+    )  AS [GroupBy1]
+*/
+
 ----------------------------------------------------------------------------------------------------------------------------------------
 -- Prep-to-transform code
 ----------------------------------------------------------------------------------------------------------------------------------------

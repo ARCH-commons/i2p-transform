@@ -20,6 +20,7 @@
 ----------------------------------------------------------------------------------------------------------------------------------------
 -- This first section creates a few procedures that are unique to this Oracle script. These are necessary in order to execute certain commands
 -- Skip to the next section to change the synonym names to point to your database objects 
+-- There are more synonyms that need to be edited in section 4 (after all of the create table statements).
 ----------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -794,6 +795,77 @@ pcornet_popcodelist;
 END;
 /
 
+
+----------------------------------------------------------------------------------------------------------------------------------------
+-- Create synonyms for use with the Menu Driven Query - please edit these so that the synonyms point to your database objects
+-- Written by Matthew Joss
+----------------------------------------------------------------------------------------------------------------------------------------
+
+
+CREATE OR REPLACE SYNONYM CONDITION FOR  PMNCONDITION
+/
+
+CREATE OR REPLACE SYNONYM DEATH FOR  PMNDEATH
+/
+
+CREATE OR REPLACE SYNONYM DEATH_CAUSE FOR  PMNDEATH_CAUSE
+/
+
+CREATE OR REPLACE SYNONYM DEMOGRAPHIC FOR  PMNDEMOGRAPHIC
+/
+
+CREATE OR REPLACE SYNONYM DIAGNOSIS FOR  PMNDIAGNOSIS
+/
+
+CREATE OR REPLACE SYNONYM DISPENSING FOR  PMNDISPENSING
+/
+
+CREATE OR REPLACE SYNONYM ENCOUNTER FOR  PMNENCOUNTER
+/
+
+CREATE OR REPLACE SYNONYM ENROLLMENT FOR  PMNENROLLMENT
+/
+
+CREATE OR REPLACE SYNONYM HARVEST FOR  PMNHARVEST
+/
+
+CREATE OR REPLACE SYNONYM LAB_RESULT_CM FOR  PMNLABRESULTS_CM
+/
+
+CREATE OR REPLACE SYNONYM PCORNET_TRIAL FOR  PMNPCORNET_TRIAL
+/
+
+CREATE OR REPLACE SYNONYM PRESCRIBING FOR  PMNPRESCRIBING
+/
+
+CREATE OR REPLACE SYNONYM PRO_CM FOR  PMNPRO_CM
+/
+
+CREATE OR REPLACE SYNONYM PROCEDURES FOR  PMNPROCEDURE
+/
+
+CREATE OR REPLACE SYNONYM VITAL FOR  PMNVITAL
+/
+
+
+
+/* --Example query for the MDQ using the above synonyms
+SELECT
+    1 AS "C1",
+    "GroupBy1"."A1" AS "C2"
+    FROM ( SELECT
+        "Filter1"."K1" AS "K1",
+        COUNT("Filter1"."A1") AS "A1"
+        FROM ( SELECT
+            1 AS "K1",
+            1 AS "A1"
+            FROM "DEMOGRAPHIC" "Extent1"
+            WHERE ("Extent1"."BIRTH_DATE" IS NOT NULL)
+        )  "Filter1"
+        GROUP BY "K1"
+    )  "GroupBy1" 
+/
+*/
 --- Load the procedures
 
 
