@@ -739,7 +739,7 @@ GO
 
 
 ----------------------------------------------------------------------------------------------------------------------------------------
--- Create synonyms for the pmn tables for use by the MENU DRIVEN QUERY TOOL (you may need to edit the database name)
+-- Create synonyms for the pmn tables for use by the MENU DRIVEN QUERY TOOL 
 -- Written by Matthew Joss
 ----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -775,7 +775,6 @@ create synonym PROCEDURES for PMNPROCEDURE
 GO
 create synonym VITAL for PMNVITAL
 GO
-
 
 
 /* --Example query for the MDQ using the above synonyms
