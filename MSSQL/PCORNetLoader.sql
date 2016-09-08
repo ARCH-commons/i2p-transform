@@ -1793,6 +1793,7 @@ select @i2b2Pats =count(*)  from i2b2patient
 select @i2b2Encounters=count(*)   from i2b2visit i inner join pmndemographic d on i.patient_num=d.patid
 --select @i2b2Facts=count(*)   from i2b2fact where concept_Cd like 'ICD9%'
 
+-- Counts in PMN tables
 select @pmnPats=count(*)   from pmndemographic
 select @pmnencounters=count(*)   from pmnencounter e 
 select @pmndx=count(*)   from pmndiagnosis
@@ -1804,6 +1805,7 @@ select @pmnlabs =count(*)  from pmnlabresults_cm
 select @pmnprescribings =count(*)  from pmnprescribing
 select @pmndispensings =count(*)  from pmndispensing
 
+-- Distinct patients in PMN tables
 select @pmnencountersd=count(distinct patid)  from pmnencounter e 
 select @pmndxd=count(distinct patid)   from pmndiagnosis
 select @pmnprocsd =count(distinct patid)  from pmnprocedure
@@ -1814,14 +1816,16 @@ select @pmnlabsd =count(distinct patid)  from pmnlabresults_cm
 select @pmnprescribingsd =count(distinct patid)  from pmnprescribing
 select @pmndispensingsd =count(distinct patid)  from pmndispensing
 
+-- Distinct patients in i2b2 (unfinished)
 select @i2b2pxd=count(distinct patient_num) from i2b2fact fact
  inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
 where pr.c_fullname like '\PCORI\PROCEDURE\%'
 
-select @i2b2pxde=count(distinct patient_num) from i2b2fact fact
+-- Counts in i2b2
+/*select @i2b2pxde=count(distinct patient_num) from i2b2fact fact
  inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
  inner join pmnENCOUNTER enc on enc.patid = fact.patient_num and enc.encounterid = fact.encounter_Num
-where pr.c_fullname like '\PCORI\PROCEDURE\%'
+where pr.c_fullname like '\PCORI\PROCEDURE\%'*/
 /*select @i2b2dxd=count(distinct patient_num) from i2b2fact fact
  inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
 where pr.c_fullname like '\PCORI\PROCEDURE\%'
