@@ -1795,7 +1795,7 @@ begin
 PCORNetDemographic;
 PCORNetEncounter;
 PCORNetDiagnosis;
--- TODO: Put this back - avoid performance issues for now: PCORNetCondition;
+PCORNetCondition;
 PCORNetProcedure; 
 PCORNetVital;
 PCORNetEnroll;
