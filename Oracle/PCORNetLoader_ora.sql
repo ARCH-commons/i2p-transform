@@ -20,7 +20,7 @@
 ----------------------------------------------------------------------------------------------------------------------------------------
 -- This first section creates a few procedures that are unique to this Oracle script. These are necessary in order to execute certain commands
 -- Skip to the next section to change the synonym names to point to your database objects 
--- There are more synonyms that need to be edited in section 4 (after all of the create table statements).
+-- There are more synonyms in section 4 (after all of the create table statements). These should not be edited.
 ----------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -781,12 +781,15 @@ CREATE TABLE pmndemographic(
 )
 /
 
+
+-- create the reporting table - don't do this once you are running stuff and you want to track loads
+
 BEGIN
 PMN_DROPSQL('DROP TABLE i2pReport');
 END;
 /
 
-create table i2pReport (runid number, rundate date, concept varchar(20), sourceval number, destval number, diff number)
+create table i2pReport (runid number, rundate date, concept varchar(20), sourceval number, sourcedistinct number, destval number, diff number, destdistinct number)
 /
 
 BEGIN
@@ -797,8 +800,7 @@ END;
 
 
 ----------------------------------------------------------------------------------------------------------------------------------------
--- Create synonyms for use with the Menu Driven Query - please edit these so that the synonyms point to your database objects
--- Written by Matthew Joss
+-- Create synonyms for use with the Menu Driven Query - 
 ----------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -1268,9 +1270,9 @@ create or replace procedure PCORNetProcedure as
 begin
 
 insert into pmnprocedure( 
-				patid,			encounterid,	enc_type, admit_date, providerid, px, px_type) 
-select  distinct fact.patient_num, enc.encounterid,	enc.enc_type, fact.start_date, 
-		fact.provider_id, SUBSTR(pr.pcori_basecode,INSTR(pr.pcori_basecode, ':')+1,11) px, SUBSTR(pr.c_fullname,18,2) pxtype 
+				patid,			encounterid,	enc_type, admit_date, providerid, px, px_type, px_source,px_date) 
+select  distinct fact.patient_num, enc.encounterid,	enc.enc_type, enc.admit_date, 
+		fact.provider_id, SUBSTR(pr.pcori_basecode,INSTR(pr.pcori_basecode, ':')+1,11) px, SUBSTR(pr.c_fullname,18,2) pxtype, 'NI' px_source, fact.start_date
 from i2b2fact fact
  inner join pmnENCOUNTER enc on enc.patid = fact.patient_num and enc.encounterid = fact.encounter_Num
  inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
@@ -1332,32 +1334,43 @@ from (
     , enc.admit_date
   from pmndemographic pd
   left join (
+-- Begin gather facts and modifier facts
     select 
-      obs.patient_num patid, obs.encounter_num encounterid, 
-	to_char(obs.start_Date,'YYYY-MM-DD') measure_date, 
-	to_char(obs.start_Date,'HH:MI') measure_time, 
-      nval_num, pcori_basecode, codes.pcori_code
-    from i2b2fact obs
-    inner join (select c_basecode concept_cd, c_fullname pcori_code, pcori_basecode
-      from (
-        select '\PCORI\VITAL\BP\DIASTOLIC\' concept_path  FROM DUAL
+      patient_num patid, encounter_num encounterid, 
+	to_char(start_Date,'YYYY-MM-DD') measure_date, 
+	to_char(start_Date,'HH:MI') measure_time, 
+      nval_num, pcori_basecode, pcori_code from
+    (select obs.patient_num, obs.encounter_num, obs.start_Date, nval_num, pcori_basecode, codes.pcori_code
+        from i2b2fact obs
+        inner join (select c_basecode concept_cd, c_fullname pcori_code, pcori_basecode
+          from (
+            select '\PCORI\VITAL\BP\DIASTOLIC\' concept_path  FROM DUAL
+            union all
+            select '\PCORI\VITAL\BP\SYSTOLIC\' concept_path  FROM DUAL
+            union all
+            select '\PCORI\VITAL\HT\' concept_path FROM DUAL
+            union all
+            select '\PCORI\VITAL\WT\' concept_path FROM DUAL
+            union all
+            select '\PCORI\VITAL\ORIGINAL_BMI\' concept_path FROM DUAL
+            union all
+            select '\PCORI\VITAL\TOBACCO\' concept_path FROM DUAL
+            ) bp, pcornet_vital pm
+          where pm.c_fullname like bp.concept_path || '%'
+          ) codes on (codes.concept_cd = obs.concept_cd)
         union all
-        select '\PCORI\VITAL\BP\SYSTOLIC\' concept_path  FROM DUAL
-        union all
-        select '\PCORI\VITAL\HT\' concept_path FROM DUAL
-        union all
-        select '\PCORI\VITAL\WT\' concept_path FROM DUAL
-        union all
-        select '\PCORI\VITAL\ORIGINAL_BMI\' concept_path FROM DUAL
-        union all
-        select '\PCORI_MOD\BP_POSITION\' concept_path FROM DUAL
-        union all
-        select '\PCORI_MOD\VITAL_SOURCE\' concept_path FROM DUAL
-        union all
-        select '\PCORI\VITAL\TOBACCO\' concept_path FROM DUAL
-        ) bp, pcornet_vital pm
-      where pm.c_fullname like bp.concept_path || '%'
-      ) codes on codes.concept_cd = obs.concept_cd
+            select obs.patient_num, obs.encounter_num, obs.start_Date, nval_num, pcori_basecode, codes.pcori_code
+            from i2b2fact obs
+            inner join (select c_basecode concept_cd, c_fullname pcori_code, pcori_basecode
+          from (
+            select '\PCORI_MOD\BP_POSITION\' concept_path FROM DUAL
+            union all
+            select '\PCORI_MOD\VITAL_SOURCE\' concept_path FROM DUAL
+            ) bp, pcornet_vital pm
+          where pm.c_fullname like bp.concept_path || '%'
+         ) codes on codes.concept_cd = obs.modifier_cd
+     ) fx
+-- End gather facts and modifier facts
     ) vit on vit.patid = pd.patid
   join pmnencounter enc on enc.encounterid = vit.encounterid
   ) x
@@ -1374,8 +1387,12 @@ group by patid, encounterid, measure_date, measure_time, admit_date) y;
 
 Commit;
 
+
+
 end PCORNetVital;
 /
+
+
 
 
 
@@ -1599,7 +1616,6 @@ Commit;
 
 end PCORNetHarvest;
 /
-
 
 ----------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------------
@@ -1967,6 +1983,8 @@ end;
 
 create or replace PROCEDURE pcornetReport
 as
+i2b2pxd number;
+i2b2encountersd number;
 i2b2pats  number;
 i2b2Encounters  number;
 i2b2facts number;
@@ -1982,20 +2000,31 @@ pmnfacts number;
 pmnenroll number;
 pmnvital number;
 
-
-
 pmnlabs number;
 pmnprescribings number;
 pmndispensings number;
 pmncond number;
 
+pmnencountersd number;
+pmndxd number;
+pmnprocsd number;
+pmnfactsd number;
+pmnenrolld number;
+pmnvitald number;
+pmnlabsd number;
+pmnprescribingsd number;
+pmndispensingsd number;
+pmncondd number;
 
 v_runid number;
+--declare @runid numeric
+
+
 begin
 select count(*) into i2b2Pats   from i2b2patient;
 select count(*) into i2b2Encounters   from i2b2visit i inner join pmndemographic d on i.patient_num=d.patid;
 
-
+-- Counts in PMN tables
 select count(*) into pmnPats   from pmndemographic;
 select count(*) into pmnencounters   from pmnencounter e ;
 select count(*) into pmndx   from pmndiagnosis;
@@ -2008,19 +2037,63 @@ select count(*) into pmnlabs from pmnlabresults_cm;
 select count(*) into pmnprescribings from pmnprescribing;
 select count(*) into pmndispensings from pmndispensing;
 
-select max(runid) into v_runid from i2pReport;
-v_runid := v_runid + 1;
-insert into i2pReport values( v_runid, SYSDATE, 'Pats', i2b2pats, pmnpats, i2b2pats-pmnpats);
-insert into i2pReport values( v_runid, SYSDATE, 'Enrollment', i2b2pats, pmnenroll, i2b2pats-pmnpats);
 
-insert into i2pReport values(v_runid, SYSDATE, 'Encounters', i2b2Encounters, pmnEncounters, i2b2encounters-pmnencounters);
-insert into i2pReport values(v_runid, SYSDATE, 'DX',		null,		pmndx,		null);
-insert into i2pReport values(v_runid, SYSDATE, 'PX',		null,		pmnprocs,	null);
-insert into i2pReport values(v_runid, SYSDATE, 'Condition',	null,		pmncond,	null);
-insert into i2pReport values(v_runid, SYSDATE, 'Vital',		null,		pmnvital,	null);
-insert into i2pReport values(v_runid, SYSDATE, 'Labs',		null,		pmnlabs,	null);
-insert into i2pReport values(v_runid, SYSDATE, 'Prescribing',	null,		pmnprescribings,null);
-insert into i2pReport values(v_runid, SYSDATE, 'Dispensing',	null,		pmndispensings,	null);
+-- Distinct patients in PMN tables
+select count(distinct patid) into pmnencountersd   from pmnencounter e;
+select count(distinct patid) into pmndxd   from pmndiagnosis;
+select count(distinct patid) into pmnprocsd   from pmnprocedure; 
+select count(distinct patid) into pmncondd   from pmncondition; 
+select count(distinct patid) into pmnenrolld   from pmnenrollment; 
+select count(distinct patid) into pmnvitald   from pmnvital; 
+select count(distinct patid) into pmnlabsd   from pmnlabresults_cm; 
+select count(distinct patid) into pmnprescribingsd   from pmnprescribing; 
+select count(distinct patid) into pmndispensingsd   from pmndispensing; 
+
+-- Distinct patients in i2b2 (unfinished)
+select count(distinct patient_num) into i2b2pxd from i2b2fact fact
+ inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
+where pr.c_fullname like '\PCORI\PROCEDURE\%';
+
+select count(distinct patient_num) into i2b2pxd from i2b2fact fact --//////////////////////////////////////////ERROR i2b2pxd
+ inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
+ inner join pmnENCOUNTER enc on enc.patid = fact.patient_num and enc.encounterid = fact.encounter_Num
+where pr.c_fullname like '\PCORI\PROCEDURE\%';
+
+-- Counts in i2b2
+/*select @i2b2pxde=count(distinct patient_num) from i2b2fact fact
+ inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
+ inner join pmnENCOUNTER enc on enc.patid = fact.patient_num and enc.encounterid = fact.encounter_Num
+where pr.c_fullname like '\PCORI\PROCEDURE\%'*/
+/*select @i2b2dxd=count(distinct patient_num) from i2b2fact fact
+ inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
+where pr.c_fullname like '\PCORI\PROCEDURE\%'
+select @i2b2vitald=count(distinct patient_num) from i2b2fact fact
+ inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
+where pr.c_fullname like '\PCORI\PROCEDURE\%'
+*/
+
+select count(distinct patient_num) into i2b2encountersd from i2b2visit ;
+
+
+select max(runid) into v_runid from i2pReport;
+v_runid := v_ + 1;
+insert into i2pReport values( v_runid, SYSDATE, 'Pats', i2b2pats, pmnpats, null);
+insert into i2pReport values( v_runid, SYSDATE, 'Enrollment', i2b2pats, pmnenroll, pmnenrolld);
+
+insert into i2pReport values(v_runid, SYSDATE, 'Encounters', i2b2Encounters, null,  pmnEncounters, pmnEncountersd);
+insert into i2pReport values(v_runid, SYSDATE, 'DX',		null, i2b2dxd,		pmndx,		pmndxd);
+insert into i2pReport values(v_runid, SYSDATE, 'PX',		null, i2b2pxd,		pmnprocs,	pmnprocsd);
+insert into i2pReport values(v_runid, SYSDATE, 'Condition',	null, null,		pmncond,	pmncondd);
+insert into i2pReport values(v_runid, SYSDATE, 'Vital',		null, i2b2vitald,	pmnvital,	pmnvitald);
+insert into i2pReport values(v_runid, SYSDATE, 'Labs',		null, null,		pmnlabs,	pmnlabsd);
+insert into i2pReport values(v_runid, SYSDATE, 'Prescribing',	null, null,		pmnprescribings, pmnprescribingsd);
+insert into i2pReport values(v_runid, SYSDATE, 'Dispensing',	null, null,		pmndispensings,	pmndispensingsd);
+
+
+select concept "Data Type",sourceval "From i2b2", sourcedistinct 'Patients in i2b2' , destval "In PopMedNet", destdistinct 'Patients in PopMedNet' from i2preport where RUNID = v_runid;
+/
+
+  
 
 end pcornetReport;
 /
@@ -2074,6 +2147,8 @@ PCORNetPrescribing;
 PCORNetDispensing;
 PCORNetDeath;
 
+pcornetReport;
+
 end pcornetloader;
 /
 
@@ -2084,5 +2159,7 @@ pcornetloader; -- you may want to run sql statements one by one in the pcornetlo
 END;
 /
 
-select concept "Data Type",sourceval "From i2b2",destval "In PopMedNet", diff "Difference" from i2preport where RUNID = (select max(RUNID) from I2PREPORT)
-/
+
+
+
+
