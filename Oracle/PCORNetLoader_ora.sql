@@ -1983,6 +1983,7 @@ end;
 
 create or replace PROCEDURE pcornetReport
 as
+i2b2dxd number;
 i2b2pxd number;
 i2b2encountersd number;
 i2b2pats  number;
@@ -2147,7 +2148,7 @@ PCORNetPrescribing;
 PCORNetDispensing;
 PCORNetDeath;
 
-pcornetReport;
+--pcornetReport; --pcornetreport is incomplete and broken at the moment. You can run an old version of this procedure if need be in the interim. 
 
 end pcornetloader;
 /
@@ -2158,8 +2159,6 @@ pcornetclear;
 pcornetloader; -- you may want to run sql statements one by one in the pcornetloader procedure :)
 END;
 /
-
-
 
 
 
