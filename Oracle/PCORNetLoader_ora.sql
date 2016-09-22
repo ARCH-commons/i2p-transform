@@ -19,10 +19,37 @@
 
 ----------------------------------------------------------------------------------------------------------------------------------------
 -- This first section creates a few procedures that are unique to this Oracle script. These are necessary in order to execute certain commands
+-- Also in the first section, assign '1' to the variables 'unit_inch' and 'unit_pound' if the base units at your site are in inches and pounds respectively. 
+-- Assign '0' to the variables 'unit_inch' and 'unit_pound' if the base units at your site are in centimeters and kilograms respectively. 
 -- Skip to the next section to change the synonym names to point to your database objects 
 -- There are more synonyms in section 4 (after all of the create table statements). These should not be edited.
-----------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------
+ 
+create or replace procedure unit_converter as 
+   unit_inch   NUMBER; 
+   unit_pound   NUMBER; 
 
+    begin
+
+        unit_inch := 1; -- Unit_inch should be = 1 if the base units of height at your site are in inches. Unit_inch should be = 0 if your base units are in centimeters. 
+        unit_pound := 1; -- Unit_pound should be = 1 if the base units of weight at your site are in pounds. Unit_inch should be = 0 if your base units are in kilograms.
+
+        IF unit_inch = 0
+            THEN Update pmnVITAL 
+            SET ht = ht*0.393701;
+            else null;
+        end IF;
+
+        IF unit_pound = 0
+            THEN Update pmnVITAL 
+            SET wt = wt*2.20462;
+            else null;
+        end IF;
+
+
+end unit_converter;
+/
+ 
 
 create or replace PROCEDURE PMN_DROPSQL(sqlstring VARCHAR2) AS 
   BEGIN
@@ -1385,6 +1412,10 @@ where ht is not null
   or tobacco is not null
 group by patid, encounterid, measure_date, measure_time, admit_date) y;
 
+
+unit_converter; --runs the stored procedure at the beginning of the script.
+
+
 Commit;
 
 
@@ -2155,7 +2186,7 @@ end pcornetloader;
 
 
 BEGIN          -- RUN PROGRAM 
-pcornetclear;
+pcornetclear;  -- Make sure to run this before re-populating any pmn tables.
 pcornetloader; -- you may want to run sql statements one by one in the pcornetloader procedure :)
 END;
 /
