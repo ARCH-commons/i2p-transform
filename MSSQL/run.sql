@@ -102,8 +102,6 @@ delete from pmnvital
 GO
 exec PCORNetVital
 GO
-exec unit_converter --runs the stored procedure that converts a site's base units of centimeters to inches or kilograms to pounds in PMNVital. Make sure to run right after PCORNetVital.
-GO
 delete from PMNenrollment
 GO
 exec PCORNetEnroll

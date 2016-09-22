@@ -34,9 +34,9 @@
 -- 1. Edit the "create synonym" statements, datamart parameters, loyalty cohort table location,
 --      and the USE statement at the top of this script to point at your objects. 
 --    This script will be run from the PopMedNet database you created.
--- 2. In the Second of this preamble: 
---      Assign '1' to the variables 'unit_inch' and 'unit_pound' if the base units at your site are in inches and pounds respectively. 
---      Assign '0' to the variables 'unit_inch' and 'unit_pound' if the base units at your site are in centimeters and kilograms respectively. 
+-- 2. In the Second part of this preamble, there are two functions that need to be edited depending on the base units used at your site: unit_ht() and unit_wt(). 
+--      Use the corresponding RETURN statement depending on which units your site uses: 
+--      Inches (RETURN 1) versus Centimeters(RETURN 0.393701) and Pounds (RETURN 1) versus Kilograms(RETURN 2.20462). 
 -- 3. USE that new database and make sure it has privileges to read from the various locations that the synonyms point to.
 -- 4. Run this script to set up pcornetloader
 -- 5. Use the included run_*.sql script to execute the procedure, or run manually via "exec PCORNetLoader" (will transform all patients)
@@ -125,33 +125,23 @@ go
 
 ----------------------------------------------------------------------------------------------------------------------------------------
 -- Unit Converter - By Matthew Joss
--- Assign '1' to the variables 'unit_inch' and 'unit_pound' if the base units at your site are in inches and pounds respectively. 
--- Assign '0' to the variables 'unit_inch' and 'unit_pound' if the base units at your site are in centimeters and kilograms respectively. 
+-- Here are two functions that need to be edited depending on the base units used at your site: unit_ht() and unit_wt(). 
+-- Use the corresponding RETURN statement depending on which units your site uses: 
+-- Inches (RETURN 1) versus Centimeters(RETURN 0.393701) and Pounds (RETURN 1) versus Kilograms(RETURN 2.20462).  
 ----------------------------------------------------------------------------------------------------------------------------------------
 
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'unit_converter') AND type in (N'P', N'PC')) DROP PROCEDURE unit_converter;
+CREATE FUNCTION unit_ht() RETURNS float(10) AS BEGIN 
+    RETURN 1 -- Use this statement if your site stores HT data in units of Inches 
+--    RETURN 0.393701 -- Use this statement if your site stores HT data in units of Centimeters 
+END
 GO
-create procedure unit_converter as
 
-declare @unit_inch numeric
-declare @unit_pound numeric
-
-    begin
-
-        set @unit_inch = 1 -- Unit_inch should be = 1 if the base units of height at your site are in inches. Unit_inch should be = 0 if your base units are in centimeters. 
-        set @unit_pound = 1 -- Unit_pound should be = 1 if the base units of weight at your site are in pounds. Unit_inch should be = 0 if your base units are in kilograms.
-
-        IF @unit_inch = 0
-            Update pmnVITAL 
-            SET ht = ht*0.393701;
-            
-        IF @unit_pound = 0
-            Update pmnVITAL 
-            SET wt = wt*2.20462;
-           
-end 
+CREATE FUNCTION unit_wt() RETURNS float(10) AS BEGIN 
+    RETURN 1 -- Use this statement if your site stores WT data in units of Pounds 
+--    RETURN 2.20462 -- Use this statement if your site stores WT data in units of Kilograms  
+END
 GO
- 
+
 
 ----------------------------------------------------------------------------------------------------------------------------------------
 -- CREATE THE TABLES - note that all tables have changed since v5
@@ -1299,8 +1289,8 @@ isnull(isnull(max(smoking),max(unk_tobacco)),'NI') smoking,
 isnull(isnull(max(tobacco),max(unk_tobacco)),'NI') tobacco
 from (
   select vit.patid, vit.encounterid, vit.measure_date, vit.measure_time 
-    , case when vit.pcori_code like '\PCORI\VITAL\HT%' then vit.nval_num else null end ht
-    , case when vit.pcori_code like '\PCORI\VITAL\WT%' then vit.nval_num else null end wt
+    , case when vit.pcori_code like '\PCORI\VITAL\HT%' then vit.nval_num*(dbo.unit_ht()) else null end ht -- unit_ht() converts from centimeters to inches
+    , case when vit.pcori_code like '\PCORI\VITAL\WT%' then vit.nval_num*(dbo.unit_wt()) else null end wt -- unit_wt() converts from kilograms to pounds
     , case when vit.pcori_code like '\PCORI\VITAL\BP\DIASTOLIC%' then vit.nval_num else null end diastolic
     , case when vit.pcori_code like '\PCORI\VITAL\BP\SYSTOLIC%' then vit.nval_num else null end systolic
     , case when vit.pcori_code like '\PCORI\VITAL\ORIGINAL_BMI%' then vit.nval_num else null end original_bmi

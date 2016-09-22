@@ -19,37 +19,29 @@
 
 ----------------------------------------------------------------------------------------------------------------------------------------
 -- This first section creates a few procedures that are unique to this Oracle script. These are necessary in order to execute certain commands
--- Also in the first section, assign '1' to the variables 'unit_inch' and 'unit_pound' if the base units at your site are in inches and pounds respectively. 
--- Assign '0' to the variables 'unit_inch' and 'unit_pound' if the base units at your site are in centimeters and kilograms respectively. 
+-- Also in the first section, there are two functions that need to be edited depending on the base units used at your site: unit_ht() and unit_wt(). 
+-- Use the corresponding RETURN statement depending on which units your site uses: 
+-- Inches (RETURN 1) versus Centimeters(RETURN 0.393701) and Pounds (RETURN 1) versus Kilograms(RETURN 2.20462). 
 -- Skip to the next section to change the synonym names to point to your database objects 
 -- There are more synonyms in section 4 (after all of the create table statements). These should not be edited.
 ---------------------------------------------------------------------------------------------------------------------------------------
  
-create or replace procedure unit_converter as 
-   unit_inch   NUMBER; 
-   unit_pound   NUMBER; 
 
-    begin
-
-        unit_inch := 1; -- Unit_inch should be = 1 if the base units of height at your site are in inches. Unit_inch should be = 0 if your base units are in centimeters. 
-        unit_pound := 1; -- Unit_pound should be = 1 if the base units of weight at your site are in pounds. Unit_inch should be = 0 if your base units are in kilograms.
-
-        IF unit_inch = 0
-            THEN Update pmnVITAL 
-            SET ht = ht*0.393701;
-            else null;
-        end IF;
-
-        IF unit_pound = 0
-            THEN Update pmnVITAL 
-            SET wt = wt*2.20462;
-            else null;
-        end IF;
-
-
-end unit_converter;
+create or replace FUNCTION unit_ht RETURN NUMBER IS 
+BEGIN  
+    RETURN 1; -- Use this statement if your site stores HT data in units of Inches 
+--    RETURN 0.393701; -- Use this statement if your site stores HT data in units of Centimeters 
+END;
 /
- 
+
+
+create or replace FUNCTION unit_wt RETURN NUMBER IS 
+BEGIN 
+    RETURN 1; -- Use this statement if your site stores WT data in units of Pounds 
+--    RETURN 2.20462; -- Use this statement if your site stores WT data in units of Kilograms 
+END;
+/
+
 
 create or replace PROCEDURE PMN_DROPSQL(sqlstring VARCHAR2) AS 
   BEGIN
@@ -1348,8 +1340,8 @@ NVL(NVL(max(smoking),max(unk_tobacco)),'NI') smoking,
 NVL(NVL(max(tobacco),max(unk_tobacco)),'NI') tobacco
 from (
   select vit.patid, vit.encounterid, vit.measure_date, vit.measure_time 
-    , case when vit.pcori_code like '\PCORI\VITAL\HT%' then vit.nval_num else null end ht
-    , case when vit.pcori_code like '\PCORI\VITAL\WT%' then vit.nval_num else null end wt
+    , case when vit.pcori_code like '\PCORI\VITAL\HT%' then vit.nval_num * (unit_ht()) else null end ht --unit_ht() converts from centimeters to inches
+    , case when vit.pcori_code like '\PCORI\VITAL\WT%' then vit.nval_num * (unit_wt()) else null end wt --unit_wt() converts from kilograms to pounds
     , case when vit.pcori_code like '\PCORI\VITAL\BP\DIASTOLIC%' then vit.nval_num else null end diastolic
     , case when vit.pcori_code like '\PCORI\VITAL\BP\SYSTOLIC%' then vit.nval_num else null end systolic
     , case when vit.pcori_code like '\PCORI\VITAL\ORIGINAL_BMI%' then vit.nval_num else null end original_bmi
@@ -1412,12 +1404,7 @@ where ht is not null
   or tobacco is not null
 group by patid, encounterid, measure_date, measure_time, admit_date) y;
 
-
-unit_converter; --runs the stored procedure at the beginning of the script.
-
-
 Commit;
-
 
 
 end PCORNetVital;
@@ -2190,6 +2177,3 @@ pcornetclear;  -- Make sure to run this before re-populating any pmn tables.
 pcornetloader; -- you may want to run sql statements one by one in the pcornetloader procedure :)
 END;
 /
-
-
-
