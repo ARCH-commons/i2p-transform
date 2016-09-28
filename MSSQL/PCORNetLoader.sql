@@ -34,9 +34,12 @@
 -- 1. Edit the "create synonym" statements, datamart parameters, loyalty cohort table location,
 --      and the USE statement at the top of this script to point at your objects. 
 --    This script will be run from the PopMedNet database you created.
--- 2. USE that new database and make sure it has privileges to read from the various locations that the synonyms point to.
--- 3. Run this script to set up pcornetloader
--- 4. Use the included run_*.sql script to execute the procedure, or run manually via "exec PCORNetLoader" (will transform all patients)
+-- 2. In the Second part of this preamble, there are two functions that need to be edited depending on the base units used at your site: unit_ht() and unit_wt(). 
+--      Use the corresponding RETURN statement depending on which units your site uses: 
+--      Inches (RETURN 1) versus Centimeters(RETURN 0.393701) and Pounds (RETURN 1) versus Kilograms(RETURN 2.20462). 
+-- 3. USE that new database and make sure it has privileges to read from the various locations that the synonyms point to.
+-- 4. Run this script to set up pcornetloader
+-- 5. Use the included run_*.sql script to execute the procedure, or run manually via "exec PCORNetLoader" (will transform all patients)
 
 ----------------------------------------------------------------------------------------------------------------------------------------
 -- create synonyms to make the code portable - please edit these
@@ -81,7 +84,7 @@ create synonym pcornet_lab for PCORI_Mart..pcornet_lab
 GO
 create synonym pcornet_diag for PCORI_Mart..pcornet_diag
 GO 
-create synonym pcornet_demo for PCORI_Mart..pcornet_demographics 
+create synonym pcornet_demo for PCORI_Mart..pcornet_demo 
 GO
 create synonym pcornet_proc for PCORI_Mart..pcornet_proc
 GO
@@ -117,6 +120,28 @@ GO
 
 create table pcornet_codelist (codetype varchar(20), code varchar(20))
 go
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+-- Unit Converter - By Matthew Joss
+-- Here are two functions that need to be edited depending on the base units used at your site: unit_ht() and unit_wt(). 
+-- Use the corresponding RETURN statement depending on which units your site uses: 
+-- Inches (RETURN 1) versus Centimeters(RETURN 0.393701) and Pounds (RETURN 1) versus Kilograms(RETURN 2.20462).  
+----------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE FUNCTION unit_ht() RETURNS float(10) AS BEGIN 
+    RETURN 1 -- Use this statement if your site stores HT data in units of Inches 
+--    RETURN 0.393701 -- Use this statement if your site stores HT data in units of Centimeters 
+END
+GO
+
+CREATE FUNCTION unit_wt() RETURNS float(10) AS BEGIN 
+    RETURN 1 -- Use this statement if your site stores WT data in units of Pounds 
+--    RETURN 2.20462 -- Use this statement if your site stores WT data in units of Kilograms  
+END
+GO
+
 
 ----------------------------------------------------------------------------------------------------------------------------------------
 -- CREATE THE TABLES - note that all tables have changed since v5
@@ -1264,8 +1289,8 @@ isnull(isnull(max(smoking),max(unk_tobacco)),'NI') smoking,
 isnull(isnull(max(tobacco),max(unk_tobacco)),'NI') tobacco
 from (
   select vit.patid, vit.encounterid, vit.measure_date, vit.measure_time 
-    , case when vit.pcori_code like '\PCORI\VITAL\HT%' then vit.nval_num else null end ht
-    , case when vit.pcori_code like '\PCORI\VITAL\WT%' then vit.nval_num else null end wt
+    , case when vit.pcori_code like '\PCORI\VITAL\HT%' then vit.nval_num*(dbo.unit_ht()) else null end ht -- unit_ht() converts from centimeters to inches
+    , case when vit.pcori_code like '\PCORI\VITAL\WT%' then vit.nval_num*(dbo.unit_wt()) else null end wt -- unit_wt() converts from kilograms to pounds
     , case when vit.pcori_code like '\PCORI\VITAL\BP\DIASTOLIC%' then vit.nval_num else null end diastolic
     , case when vit.pcori_code like '\PCORI\VITAL\BP\SYSTOLIC%' then vit.nval_num else null end systolic
     , case when vit.pcori_code like '\PCORI\VITAL\ORIGINAL_BMI%' then vit.nval_num else null end original_bmi
@@ -1509,7 +1534,7 @@ create procedure PCORNetPrescribing as
 begin
 
 -- Griffin's optimization: use temp tables rather than left joining directly - 12/9/15
-    select pcori_basecode,c_fullname,encounter_num,concept_cd 
+    select pcori_basecode,c_fullname,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd
 		into #basis
 		from i2b2fact basis
 			inner join pmnENCOUNTER enc on enc.patid = basis.patient_num and enc.encounterid = basis.encounter_Num
@@ -1517,7 +1542,7 @@ begin
 			on basis.modifier_cd = basiscode.c_basecode
 			and basiscode.c_fullname like '\PCORI_MOD\RX_BASIS\%'
 
-    select pcori_basecode,encounter_num,concept_cd 
+    select pcori_basecode,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd 
 		into #freq
 		from i2b2fact freq
 			inner join pmnENCOUNTER enc on enc.patid = freq.patient_num and enc.encounterid = freq.encounter_Num
@@ -1525,7 +1550,7 @@ begin
 			on freq.modifier_cd = freqcode.c_basecode
 			and freqcode.c_fullname like '\PCORI_MOD\RX_FREQUENCY\%'
 
-    select nval_num,encounter_num,concept_cd 
+    select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd
 		into #quantity
 		from i2b2fact quantity
 			inner join pmnENCOUNTER enc on enc.patid = quantity.patient_num and enc.encounterid = quantity.encounter_Num
@@ -1533,7 +1558,7 @@ begin
 			on quantity.modifier_cd = quantitycode.c_basecode
 			and quantitycode.c_fullname like '\PCORI_MOD\RX_QUANTITY\'
 
-	select nval_num,encounter_num,concept_cd 
+	select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd 
 		into #refills
 		from i2b2fact refills
 			inner join pmnENCOUNTER enc on enc.patid = refills.patient_num and enc.encounterid = refills.encounter_Num
@@ -1541,7 +1566,7 @@ begin
 			on refills.modifier_cd = refillscode.c_basecode
 			and refillscode.c_fullname like '\PCORI_MOD\RX_REFILLS\'
 
-    select nval_num,encounter_num,concept_cd 
+    select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd 
 		into #supply
 		from i2b2fact supply
 			inner join pmnENCOUNTER enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num
@@ -1577,22 +1602,37 @@ inner join pmnENCOUNTER enc on enc.encounterid = m.encounter_Num
     left join #basis basis
     on m.encounter_num = basis.encounter_num
     and m.concept_cd = basis.concept_Cd
+    and m.start_date = basis.start_date
+    and m.provider_id = basis.provider_id
+    and m.modifier_cd = basis.modifier_cd
 
     left join #freq freq
     on m.encounter_num = freq.encounter_num
     and m.concept_cd = freq.concept_Cd
+    and m.start_date = freq.start_date
+    and m.provider_id = freq.provider_id
+    and m.modifier_cd = freq.modifier_cd
 
     left join #quantity quantity 
     on m.encounter_num = quantity.encounter_num
     and m.concept_cd = quantity.concept_Cd
+    and m.start_date = quantity.start_date
+    and m.provider_id = quantity.provider_id
+    and m.modifier_cd = quantity.modifier_cd
 
     left join #refills refills
     on m.encounter_num = refills.encounter_num
     and m.concept_cd = refills.concept_Cd
+    and m.start_date = refills.start_date
+    and m.provider_id = refills.provider_id
+    and m.modifier_cd = refills.modifier_cd
 
     left join #supply supply
     on m.encounter_num = supply.encounter_num
     and m.concept_cd = supply.concept_Cd
+    and m.start_date = supply.start_date
+    and m.provider_id = supply.provider_id
+    and m.modifier_cd = supply.modifier_cd
 
 where (basis.c_fullname is null or basis.c_fullname like '\PCORI_MOD\RX_BASIS\PR\%') -- jgk 11/2 bugfix: filter for PR, not DI
 
