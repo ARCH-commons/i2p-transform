@@ -1754,6 +1754,8 @@ go
 
 CREATE PROCEDURE [dbo].[pcornetReport] 
 as
+declare @i2b2dxd numeric
+declare @i2b2cond numeric
 declare @i2b2pxd numeric
 declare @i2b2encountersd numeric
 declare @i2b2pats  numeric
@@ -1821,6 +1823,35 @@ select @i2b2pxd=count(distinct patient_num) from i2b2fact fact
  inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
 where pr.c_fullname like '\PCORI\PROCEDURE\%'
 
+select  patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode dxsource, dxsource.c_fullname
+ into #sourcefact
+from i2b2fact factline
+inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode  
+where dxsource.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\%'
+
+select @i2b2dxd=count(distinct factline.patient_num) from i2b2fact factline
+ left outer join #sourcefact sf
+on	factline.patient_num=sf.patient_num
+and factline.encounter_num=sf.encounter_num
+and factline.provider_id=sf.provider_id
+and factline.concept_cd=sf.concept_Cd
+and factline.start_date=sf.start_Date 
+ inner join	pcornet_diag dx on dx.c_basecode  = factline.concept_cd   
+where dx.c_fullname like '\PCORI\DIAGNOSIS\%' 
+and (sf.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\%' or sf.c_fullname is null)
+
+select @i2b2cond=count(distinct factline.patient_num) from i2b2fact factline
+ left outer join #sourcefact sf
+on	factline.patient_num=sf.patient_num
+and factline.encounter_num=sf.encounter_num
+and factline.provider_id=sf.provider_id
+and factline.concept_cd=sf.concept_Cd
+and factline.start_date=sf.start_Date 
+ inner join	pcornet_diag dx on dx.c_basecode  = factline.concept_cd   
+where dx.c_fullname like '\PCORI\DIAGNOSIS\%' 
+and (sf.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\CONDITION_SOURCE\%')
+
+
 -- Counts in i2b2
 /*select @i2b2pxde=count(distinct patient_num) from i2b2fact fact
  inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
@@ -1844,7 +1875,7 @@ insert into i2pReport select @runid, getdate(), 'Enrollment',	@i2b2pats, @i2b2pa
 insert into i2pReport select @runid, getdate(), 'Encounters',	@i2b2Encounters,null,@pmnEncounters,		@pmnEncountersd
 insert into i2pReport select @runid, getdate(), 'DX',		null,@i2b2dxd,@pmndx,	@pmndxd
 insert into i2pReport select @runid, getdate(), 'PX',		null,@i2b2pxd,@pmnprocs,	@pmnprocsd
-insert into i2pReport select @runid, getdate(), 'Condition',		null,null,		@pmncond,	@pmncondd
+insert into i2pReport select @runid, getdate(), 'Condition',		null,@i2b2cond,		@pmncond,	@pmncondd
 insert into i2pReport select @runid, getdate(), 'Vital',		null,@i2b2vitald,		@pmnvital,	@pmnvitald
 insert into i2pReport select @runid, getdate(), 'Labs',		null,null,		@pmnlabs,	@pmnlabsd
 insert into i2pReport select @runid, getdate(), 'Prescribing',		null,null,	@pmnprescribings,	@pmnprescribingsd

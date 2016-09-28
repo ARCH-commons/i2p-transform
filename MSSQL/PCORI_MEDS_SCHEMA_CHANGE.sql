@@ -3,8 +3,8 @@
 ---------------------------------------------------------------------------------------------------
 -- Jeff Klann, PhD and
 -- Aaron Abend, aabend@gmail.com, 978-621-7745
--- Version 1.0 - 2015-10-14  
-
+-- Version 1.1 - 2016-9-21
+-- 1.1: Fixed a bug where null sourcesystem_cd not being transferred to pcori_ndc/rxnorm
 ----------------------------------------------------------------------------------------------------------------------------------------
 --NOTE: This script alters data structures - it should be carefully reviewed before using
 --      and it is best if each statement is run separately
@@ -21,13 +21,13 @@ GO
 -- Update the NDC codes for non-integration rows
 update pcornet_med set pcori_ndc=pcori_basecode 
 from pcornet_med where len(pcori_basecode)=11
- and c_hlevel>2 and sourcesystem_cd not in ('integration_tool') and pcori_basecode not like 'N%'
+ and c_hlevel>2 and (sourcesystem_cd is null or sourcesystem_cd not in ('integration_tool')) and pcori_basecode not like 'N%'
 GO
 
 -- Update RxNorm NDC codes for non-integration and non-RxNorm rows
 update pcornet_med set pcori_cui=pcori_basecode
 from pcornet_med where len(pcori_basecode)<11 
- and c_hlevel>2 and sourcesystem_cd not in ('integration_tool') and pcori_basecode not like 'N%' and m_applied_path='@' and c_basecode not like 'NDFRT%'
+ and c_hlevel>2 and (sourcesystem_cd is null or sourcesystem_cd not in ('integration_tool')) and pcori_basecode not like 'N%' and m_applied_path='@' and c_basecode not like 'NDFRT%'
 GO
 
 -- Update integration and NDC rows for RxNorm 
