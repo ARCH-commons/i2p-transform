@@ -1207,7 +1207,8 @@ inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode
 where dxsource.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\%'
 
 insert into pmncondition (patid, encounterid, report_date, resolve_date, condition, condition_type, condition_status, condition_source)
-select distinct factline.patient_num, min(factline.encounter_num) encounterid, min(factline.start_date) report_date, isnull(max(factline.end_date),null) resolve_date, diag.pcori_basecode, 
+select distinct factline.patient_num, min(factline.encounter_num) encounterid, min(factline.start_date) report_date, isnull(max(factline.end_date),null) resolve_date, 
+substring(diag.pcori_basecode,charindex(':',diag.pcori_basecode)+1,10), -- jgk bugfix 10/3 
 substring(diag.c_fullname,18,2) condition_type,  
 	case max(factline.end_date) when null then 'NI' else 'RS' end condition_status, -- Imputed so might not be entirely accurate
 	isnull(substring(max(dxsource),charindex(':',max(dxsource))+1,2),'NI') condition_source
