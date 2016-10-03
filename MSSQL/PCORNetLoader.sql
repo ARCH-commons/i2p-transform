@@ -1159,7 +1159,8 @@ inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode
 and dxsource.c_fullname like '\PCORI_MOD\PDX\%'
 
 insert into pmndiagnosis (patid,			encounterid,	enc_type, admit_date, providerid, dx, dx_type, dx_source, pdx)
-select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, factline.start_date, factline.provider_id, diag.pcori_basecode, 
+select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, factline.start_date, factline.provider_id, 
+substring(diag.pcori_basecode,charindex(':',diag.pcori_basecode)+1,10), -- jgk bugfix 10/3 
 substring(diag.c_fullname,18,2) dxtype,  
 	CASE WHEN enc_type='AV' THEN 'FI' ELSE isnull(substring(dxsource,charindex(':',dxsource)+1,2) ,'NI') END,
 	isnull(substring(pdxsource,charindex(':',pdxsource)+1,2),'NI') -- jgk bugfix 9/28/15 
