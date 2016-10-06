@@ -410,7 +410,7 @@ CREATE TABLE pmnlabresults_cm(
 	LAB_ORDER_DATE date NULL,
 	SPECIMEN_DATE date NULL,
 	SPECIMEN_TIME varchar(5) NULL,
-	RESULT_DATE date NULL,
+	RESULT_DATE date NOT NULL,
 	RESULT_TIME varchar(5) NULL,
 	RESULT_QUAL varchar(12) NULL,
 	RESULT_NUM number (18,5) NULL,
@@ -1568,7 +1568,7 @@ NVL(lab.pcori_basecode, 'NI') LAB_PX,
 m.start_date LAB_ORDER_DATE, 
 m.start_date SPECIMEN_DATE,
 to_char(m.start_date,'HH24:MI')  SPECIMEN_TIME,
-m.end_date RESULT_DATE,
+NVL(m.end_date, m.start_date) RESULT_DATE,    -- Bug fix MJ 10/06/16
 to_char(m.end_date,'HH24:MI') RESULT_TIME,
 CASE WHEN m.ValType_Cd='T' THEN NVL(nullif(m.TVal_Char,''),'NI') ELSE 'NI' END RESULT_QUAL, -- TODO: Should be a standardized value
 CASE WHEN m.ValType_Cd='N' THEN m.NVAL_NUM ELSE null END RESULT_NUM,
