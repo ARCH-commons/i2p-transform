@@ -906,7 +906,7 @@ cursor getsql is
 	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
 	'	select ''1'',patient_num, '||
 	'	birth_date, '||
-	'	to_char(birth_date,''HH:MI''), '||
+	'	to_char(birth_date,''HH24:MI''), '||
 	''''||sex.pcori_basecode||''','||
 	'''NI'','||
 	''''||race.pcori_basecode||''''||
@@ -923,7 +923,7 @@ union -- A - S,R,H
 select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
 	'	select ''A'',patient_num, '||
 	'	birth_date, '||
-	'	to_char(birth_date,''HH:MI''), '||
+	'	to_char(birth_date,''HH24:MI''), '||
 	''''||sex.pcori_basecode||''','||
 	''''||hisp.pcori_basecode||''','||
 	''''||race.pcori_basecode||''''||
@@ -943,7 +943,7 @@ union --2 S, nR, nH
 	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
 	'	select ''2'',patient_num, '||
 	'	birth_date, '||
-	'	to_char(birth_date,''HH:MI''), '||
+	'	to_char(birth_date,''HH24:MI''), '||
 	''''||sex.pcori_basecode||''','||
 	'''NI'','||
 	'''NI'''||
@@ -958,7 +958,7 @@ union --3 -- nS,R, NH
 	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
 	'	select ''3'',patient_num, '||
 	'	birth_date, '||
-	'	to_char(birth_date,''HH:MI''), '||
+	'	to_char(birth_date,''HH24:MI''), '||
 	'''NI'','||
 	'''NI'','||
 	''''||race.pcori_basecode||''''||
@@ -973,7 +973,7 @@ union --B -- nS,R, H
 	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
 	'	select ''B'',patient_num, '||
 	'	birth_date, '||
-	'	to_char(birth_date,''HH:MI''), '||
+	'	to_char(birth_date,''HH24:MI''), '||
 	'''NI'','||
 	''''||hisp.pcori_basecode||''','||
 	''''||race.pcori_basecode||''''||
@@ -991,7 +991,7 @@ union --4 -- S, NR, H
 	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
 	'	select ''4'',patient_num, '||
 	'	birth_date, '||
-	'	to_char(birth_date,''HH:MI''), '||
+	'	to_char(birth_date,''HH24:MI''), '||
 	''''||sex.pcori_basecode||''','||
 	'''Y'','||
 	'''NI'''||
@@ -1006,7 +1006,7 @@ union --5 -- NS, NR, H
 	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
 	'	select ''5'',patient_num, '||
 	'	birth_date, '||
-	'	to_char(birth_date,''HH:MI''), '||
+	'	to_char(birth_date,''HH24:MI''), '||
 	'''NI'','||
 	'''Y'','||
 	'''NI'''||
@@ -1019,7 +1019,7 @@ union --6 -- NS, NR, nH
 	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
 	'	select ''6'',patient_num, '||
 	'	birth_date, '||
-	'	to_char(birth_date,''HH:MI''), '||
+	'	to_char(birth_date,''HH24:MI''), '||
 	'''NI'','||
 	'''NI'','||
 	'''NI'''||
@@ -1081,9 +1081,9 @@ insert into pmnencounter(PATID,ENCOUNTERID,admit_date ,ADMIT_TIME ,
 		DISCHARGE_STATUS ,DRG ,DRG_TYPE ,ADMITTING_SOURCE) 
 select distinct v.patient_num, v.encounter_num,  
 	start_Date, 
-	to_char(start_Date,'HH:MI'), 
+	to_char(start_Date,'HH24:MI'), 
 	end_Date, 
-	to_char(end_Date,'HH:MI'), 
+	to_char(end_Date,'HH24:MI'), 
 	providerid,location_zip, 
 (case when pcori_enctype is not null then pcori_enctype else 'UN' end) enc_type, facility_id,  CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE  discharge_disposition END , CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE discharge_status END  , drg.drg, drg_type, CASE WHEN admitting_source IS NULL THEN 'NI' ELSE admitting_source END  
 from i2b2visit v inner join pmndemographic d on v.patient_num=d.patid
@@ -1363,7 +1363,7 @@ from (
     select 
       patient_num patid, encounter_num encounterid, 
 	to_char(start_Date,'YYYY-MM-DD') measure_date, 
-	to_char(start_Date,'HH:MI') measure_time, 
+	to_char(start_Date,'HH24:MI') measure_time, 
       nval_num, pcori_basecode, pcori_code from
     (select obs.patient_num, obs.encounter_num, obs.start_Date, nval_num, pcori_basecode, codes.pcori_code
         from i2b2fact obs
@@ -1567,9 +1567,9 @@ NVL(lab.pcori_basecode, 'NI') LAB_PX,
 'LC'  LAB_PX_TYPE,
 m.start_date LAB_ORDER_DATE, 
 m.start_date SPECIMEN_DATE,
-to_char(m.start_date,'HH:MI')  SPECIMEN_TIME,
+to_char(m.start_date,'HH24:MI')  SPECIMEN_TIME,
 m.end_date RESULT_DATE,
-to_char(m.end_date,'HH:MI') RESULT_TIME,
+to_char(m.end_date,'HH24:MI') RESULT_TIME,
 CASE WHEN m.ValType_Cd='T' THEN NVL(nullif(m.TVal_Char,''),'NI') ELSE 'NI' END RESULT_QUAL, -- TODO: Should be a standardized value
 CASE WHEN m.ValType_Cd='N' THEN m.NVAL_NUM ELSE null END RESULT_NUM,
 CASE WHEN m.ValType_Cd='N' THEN (CASE NVL(nullif(m.TVal_Char,''),'NI') WHEN 'E' THEN 'EQ' WHEN 'NE' THEN 'OT' WHEN 'L' THEN 'LT' WHEN 'LE' THEN 'LE' WHEN 'G' THEN 'GT' WHEN 'GE' THEN 'GE' ELSE 'NI' END)  ELSE 'TX' END RESULT_MODIFIER,
