@@ -281,7 +281,7 @@ CREATE TABLE [dbo].[pmnlabresults_cm](
 	[LAB_ORDER_DATE] [datetime] NULL,
 	[SPECIMEN_DATE] [datetime] NULL,
 	[SPECIMEN_TIME] [varchar](5) NULL,
-	[RESULT_DATE] [datetime] NULL,
+	[RESULT_DATE] [datetime] NOT NULL,
 	[RESULT_TIME] [varchar](5) NULL,
 	[RESULT_QUAL] [varchar](12) NULL,
 	[RESULT_NUM] [decimal] (18,5) NULL,
@@ -1454,7 +1454,7 @@ isnull(lab.pcori_basecode, 'NI') LAB_PX,
 m.start_date LAB_ORDER_DATE, 
 m.start_date SPECIMEN_DATE,
 CAST(CONVERT(char(5), M.start_date, 108) as TIME)  SPECIMEN_TIME,
-m.end_date RESULT_DATE,
+isnull (m.end_date, m.start_date) RESULT_DATE,   -- Bug fix MJ 10/06/16
 CAST(CONVERT(char(5), M.end_date, 108) as TIME) RESULT_TIME,
 CASE WHEN m.ValType_Cd='T' THEN isnull(nullif(m.TVal_Char,''),'NI') ELSE 'NI' END RESULT_QUAL, -- TODO: Should be a standardized value
 CASE WHEN m.ValType_Cd='N' THEN m.NVAL_NUM ELSE null END RESULT_NUM,
