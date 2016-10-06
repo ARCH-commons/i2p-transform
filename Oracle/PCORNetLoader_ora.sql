@@ -1158,7 +1158,7 @@ create or replace procedure PCORNetDiagnosis as
 sqltext varchar2(4000);
 begin
 
-PMN_DROPSQL('DELETE FROM sourcefact'); -- clear data ffrom temp table
+PMN_DROPSQL('DELETE FROM sourcefact'); -- clear data from temp table
 
 sqltext := 'insert into sourcefact '||
 	'select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode dxsource, dxsource.c_fullname '||
@@ -1180,7 +1180,8 @@ PMN_EXECUATESQL(sqltext);
 
 
 sqltext := 'insert into pmndiagnosis (patid,			encounterid,	enc_type, admit_date, providerid, dx, dx_type, dx_source, pdx) '||
-'select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, factline.start_date, factline.provider_id, diag.pcori_basecode,  '||
+'select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, factline.start_date, factline.provider_id,   '||
+'SUBSTR(diag.pcori_basecode, INSTR(diag.pcori_basecode,'':'')+1,10),'|| -- MJ bug fix based off of JK's MSSQL fix, 10/6/16
 'SUBSTR(diag.c_fullname,18,2) dxtype,   '||
 '	CASE WHEN enc_type=''AV'' THEN ''FI'' ELSE nvl(SUBSTR(dxsource,INSTR(dxsource,'':'')+1,2) ,''NI'')END, '||
 '	nvl(SUBSTR(pdxsource,INSTR(pdxsource, '':'')+1,2),''NI'') '|| -- jgk bugfix 9/28/15 
@@ -1208,6 +1209,10 @@ Commit;
 
 end PCORNetDiagnosis;
 /
+
+--substring truncation example
+--substring(diag.pcori_basecode,charindex(':',diag.pcori_basecode)+1,10)
+--SUBSTR(diag.pcori_basecode, INSTR(diag.pcori_basecode,'':'')+1,10)
 
 
 ----------------------------------------------------------------------------------------------------------------------------------------
@@ -1252,7 +1257,8 @@ sqltext := 'insert into sourcefact2 '||
 PMN_EXECUATESQL(sqltext);
 
 sqltext := 'insert into pmncondition (patid, encounterid, report_date, resolve_date, condition, condition_type, condition_status, condition_source) '||
-'select distinct factline.patient_num, min(factline.encounter_num) encounterid, min(factline.start_date) report_date, NVL(max(factline.end_date),null) resolve_date, diag.pcori_basecode,  '||
+'select distinct factline.patient_num, min(factline.encounter_num) encounterid, min(factline.start_date) report_date, NVL(max(factline.end_date),null) resolve_date,  '||
+'SUBSTR(diag.pcori_basecode, INSTR(diag.pcori_basecode,'':'')+1,10),'|| -- MJ bug fix based off of JK's MSSQL fix, 10/6/16
 'SUBSTR(diag.c_fullname,18,2) condition_type,   '||
 '	NVL2(max(factline.end_date) , ''RS'', ''NI'') condition_status,  '|| -- Imputed so might not be entirely accurate
 '	NVL(SUBSTR(max(dxsource),INSTR(max(dxsource), '':'')+1,2),''NI'') condition_source '||
