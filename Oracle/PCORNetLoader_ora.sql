@@ -782,6 +782,12 @@ CREATE TABLE pmnENCOUNTER(
 )
 /
 
+
+CREATE INDEX index_patid  --New index on PATID for fast searching, MJ 10/10/16
+ON pmnENCOUNTER (PATID)
+/
+
+
 BEGIN
 PMN_DROPSQL('DROP TABLE pmndemographic');
 END;
@@ -1180,7 +1186,7 @@ PMN_EXECUATESQL(sqltext);
 
 
 sqltext := 'insert into pmndiagnosis (patid,			encounterid,	enc_type, admit_date, providerid, dx, dx_type, dx_source, pdx) '||
-'select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, factline.start_date, factline.provider_id,   '||
+'select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, enc.admit_date, enc.providerid,   '|| --bug fix MJ 10/7/16
 'SUBSTR(diag.pcori_basecode, INSTR(diag.pcori_basecode,'':'')+1,10),'|| -- MJ bug fix based off of JK's MSSQL fix, 10/6/16
 'SUBSTR(diag.c_fullname,18,2) dxtype,   '||
 '	CASE WHEN enc_type=''AV'' THEN ''FI'' ELSE nvl(SUBSTR(dxsource,INSTR(dxsource,'':'')+1,2) ,''NI'')END, '||
@@ -1190,15 +1196,15 @@ sqltext := 'insert into pmndiagnosis (patid,			encounterid,	enc_type, admit_date
 ' left outer join sourcefact '||
 'on	factline.patient_num=sourcefact.patient_num '||
 'and factline.encounter_num=sourcefact.encounter_num '||
-'and factline.provider_id=sourcefact.provider_id '||
+'and enc.providerid=sourcefact.provider_id '|| --bug fix MJ 10/7/16
 'and factline.concept_cd=sourcefact.concept_Cd '||
-'and factline.start_date=sourcefact.start_Date '||
+'and enc.admit_date=sourcefact.start_Date '|| --bug fix MJ 10/7/16 
 'left outer join pdxfact '||
 'on	factline.patient_num=pdxfact.patient_num '||
 'and factline.encounter_num=pdxfact.encounter_num '||
-'and factline.provider_id=pdxfact.provider_id '||
+'and enc.providerid=pdxfact.provider_id '|| --bug fix MJ 10/7/16
 'and factline.concept_cd=pdxfact.concept_cd '||
-'and factline.start_date=pdxfact.start_Date '||
+'and enc.admit_date=pdxfact.start_Date '|| --bug fix MJ 10/7/16
 'inner join pcornet_diag diag on diag.c_basecode  = factline.concept_cd '||
 'where diag.c_fullname like ''\PCORI\DIAGNOSIS\%''  '||
 'and (sourcefact.c_fullname like ''\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\%'' or sourcefact.c_fullname is null) ';
@@ -1297,7 +1303,7 @@ begin
 insert into pmnprocedure( 
 				patid,			encounterid,	enc_type, admit_date, providerid, px, px_type, px_source,px_date) 
 select  distinct fact.patient_num, enc.encounterid,	enc.enc_type, enc.admit_date, 
-		fact.provider_id, SUBSTR(pr.pcori_basecode,INSTR(pr.pcori_basecode, ':')+1,11) px, SUBSTR(pr.c_fullname,18,2) pxtype, 'NI' px_source, fact.start_date
+		enc.providerid, SUBSTR(pr.pcori_basecode,INSTR(pr.pcori_basecode, ':')+1,11) px, SUBSTR(pr.c_fullname,18,2) pxtype, 'NI' px_source, fact.start_date
 from i2b2fact fact
  inner join pmnENCOUNTER enc on enc.patid = fact.patient_num and enc.encounterid = fact.encounter_Num
  inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
@@ -1587,12 +1593,16 @@ NULL RAW_UNIT,
 NULL RAW_ORDER_DEPT,
 NULL RAW_FACILITY_CODE
 
-FROM i2b2fact M
-inner join pmnENCOUNTER enc on enc.patid = m.patient_num and enc.encounterid = m.encounter_Num -- Constraint to selected encounters
 
+FROM i2b2fact M   --JK bug fix 10/7/16
+inner join pmnENCOUNTER enc on enc.patid = m.patient_num and enc.encounterid = m.encounter_Num -- Constraint to selected encounters
 inner join pcornet_lab lab on lab.c_basecode  = M.concept_cd and lab.c_fullname like '\PCORI\LAB_RESULT_CM\%'
-inner JOIN pcornet_lab ont_parent on lab.c_path=ont_parent.c_fullname
+inner join pcornet_lab ont_loinc on lab.pcori_basecode=ont_loinc.pcori_basecode and ont_loinc.c_basecode like 'LOINC:%'
+inner JOIN pcornet_lab ont_parent on ont_loinc.c_path=ont_parent.c_fullname
 inner join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
+
+
+
 
 LEFT OUTER JOIN priority p
  
@@ -1939,7 +1949,7 @@ insert into pmndispensing (
     ,DISPENSE_AMT  -- modifier nval_num
 --    ,RAW_NDC
 )
-select  m.patient_num, null,m.start_date, NVL(mo.pcori_ndc,'NA')
+select  m.patient_num, null,m.start_date, NVL(mo.pcori_ndc,'00000000000')
     ,max(DISP_SUPPLY.nval_num) sup, max(amount.nval_num) amt 
 from i2b2fact m inner join pcornet_med mo
 on m.concept_cd = mo.c_basecode
