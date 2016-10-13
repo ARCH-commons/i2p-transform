@@ -1794,6 +1794,7 @@ go
 
 CREATE PROCEDURE [dbo].[pcornetReport] 
 as
+declare @i2b2vitald numeric
 declare @i2b2dxd numeric
 declare @i2b2cond numeric
 declare @i2b2pxd numeric
