@@ -91,25 +91,17 @@ CREATE OR REPLACE SYNONYM I2B2FACT FOR I2B2DEMODATA.OBSERVATION_FACT
 /
 
 
-BEGIN
-PMN_DROPSQL('DROP TABLE i2b2patient_list');
-END;
-/
+-- extracted i2b2patient_list create table statement and inserted into the new run script. MJ 10/10/16
 
-CREATE table i2b2patient_list as 
-select * from
-(
-select DISTINCT f.PATIENT_NUM from I2B2FACT f 
-inner join i2b2visit v on f.patient_num=v.patient_num
-where f.START_DATE >= to_date('01-Jan-2010','dd-mon-rrrr') and v.START_DATE >= to_date('01-Jan-2010','dd-mon-rrrr')
-) where ROWNUM<100000000
-/
+
 
 create or replace VIEW i2b2patient as select * from I2B2DEMODATA.PATIENT_DIMENSION where PATIENT_NUM in (select PATIENT_NUM from i2b2patient_list)
 /
 
 create or replace view i2b2visit as select * from I2B2DEMODATA.VISIT_DIMENSION where START_DATE >= to_date('01-Jan-2010','dd-mon-rrrr') and (END_DATE is NULL or END_DATE < CURRENT_DATE) and (START_DATE <CURRENT_DATE)
 /
+
+
 
 
 CREATE OR REPLACE SYNONYM pcornet_med FOR  i2b2metadata.pcornet_med
@@ -410,7 +402,7 @@ CREATE TABLE pmnlabresults_cm(
 	LAB_ORDER_DATE date NULL,
 	SPECIMEN_DATE date NULL,
 	SPECIMEN_TIME varchar(5) NULL,
-	RESULT_DATE date NULL,
+	RESULT_DATE date NOT NULL,
 	RESULT_TIME varchar(5) NULL,
 	RESULT_QUAL varchar(12) NULL,
 	RESULT_NUM number (18,5) NULL,
@@ -782,6 +774,12 @@ CREATE TABLE pmnENCOUNTER(
 )
 /
 
+
+CREATE INDEX index_patid  --New index on PATID for fast searching, MJ 10/10/16
+ON pmnENCOUNTER (PATID)
+/
+
+
 BEGIN
 PMN_DROPSQL('DROP TABLE pmndemographic');
 END;
@@ -906,7 +904,7 @@ cursor getsql is
 	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
 	'	select ''1'',patient_num, '||
 	'	birth_date, '||
-	'	to_char(birth_date,''HH:MI''), '||
+	'	to_char(birth_date,''HH24:MI''), '||
 	''''||sex.pcori_basecode||''','||
 	'''NI'','||
 	''''||race.pcori_basecode||''''||
@@ -923,7 +921,7 @@ union -- A - S,R,H
 select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
 	'	select ''A'',patient_num, '||
 	'	birth_date, '||
-	'	to_char(birth_date,''HH:MI''), '||
+	'	to_char(birth_date,''HH24:MI''), '||
 	''''||sex.pcori_basecode||''','||
 	''''||hisp.pcori_basecode||''','||
 	''''||race.pcori_basecode||''''||
@@ -943,7 +941,7 @@ union --2 S, nR, nH
 	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
 	'	select ''2'',patient_num, '||
 	'	birth_date, '||
-	'	to_char(birth_date,''HH:MI''), '||
+	'	to_char(birth_date,''HH24:MI''), '||
 	''''||sex.pcori_basecode||''','||
 	'''NI'','||
 	'''NI'''||
@@ -958,7 +956,7 @@ union --3 -- nS,R, NH
 	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
 	'	select ''3'',patient_num, '||
 	'	birth_date, '||
-	'	to_char(birth_date,''HH:MI''), '||
+	'	to_char(birth_date,''HH24:MI''), '||
 	'''NI'','||
 	'''NI'','||
 	''''||race.pcori_basecode||''''||
@@ -973,7 +971,7 @@ union --B -- nS,R, H
 	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
 	'	select ''B'',patient_num, '||
 	'	birth_date, '||
-	'	to_char(birth_date,''HH:MI''), '||
+	'	to_char(birth_date,''HH24:MI''), '||
 	'''NI'','||
 	''''||hisp.pcori_basecode||''','||
 	''''||race.pcori_basecode||''''||
@@ -991,7 +989,7 @@ union --4 -- S, NR, H
 	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
 	'	select ''4'',patient_num, '||
 	'	birth_date, '||
-	'	to_char(birth_date,''HH:MI''), '||
+	'	to_char(birth_date,''HH24:MI''), '||
 	''''||sex.pcori_basecode||''','||
 	'''Y'','||
 	'''NI'''||
@@ -1006,7 +1004,7 @@ union --5 -- NS, NR, H
 	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
 	'	select ''5'',patient_num, '||
 	'	birth_date, '||
-	'	to_char(birth_date,''HH:MI''), '||
+	'	to_char(birth_date,''HH24:MI''), '||
 	'''NI'','||
 	'''Y'','||
 	'''NI'''||
@@ -1019,7 +1017,7 @@ union --6 -- NS, NR, nH
 	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
 	'	select ''6'',patient_num, '||
 	'	birth_date, '||
-	'	to_char(birth_date,''HH:MI''), '||
+	'	to_char(birth_date,''HH24:MI''), '||
 	'''NI'','||
 	'''NI'','||
 	'''NI'''||
@@ -1081,9 +1079,9 @@ insert into pmnencounter(PATID,ENCOUNTERID,admit_date ,ADMIT_TIME ,
 		DISCHARGE_STATUS ,DRG ,DRG_TYPE ,ADMITTING_SOURCE) 
 select distinct v.patient_num, v.encounter_num,  
 	start_Date, 
-	to_char(start_Date,'HH:MI'), 
+	to_char(start_Date,'HH24:MI'), 
 	end_Date, 
-	to_char(end_Date,'HH:MI'), 
+	to_char(end_Date,'HH24:MI'), 
 	providerid,location_zip, 
 (case when pcori_enctype is not null then pcori_enctype else 'UN' end) enc_type, facility_id,  CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE  discharge_disposition END , CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE discharge_status END  , drg.drg, drg_type, CASE WHEN admitting_source IS NULL THEN 'NI' ELSE admitting_source END  
 from i2b2visit v inner join pmndemographic d on v.patient_num=d.patid
@@ -1158,7 +1156,7 @@ create or replace procedure PCORNetDiagnosis as
 sqltext varchar2(4000);
 begin
 
-PMN_DROPSQL('DELETE FROM sourcefact'); -- clear data ffrom temp table
+PMN_DROPSQL('DELETE FROM sourcefact'); -- clear data from temp table
 
 sqltext := 'insert into sourcefact '||
 	'select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode dxsource, dxsource.c_fullname '||
@@ -1180,7 +1178,8 @@ PMN_EXECUATESQL(sqltext);
 
 
 sqltext := 'insert into pmndiagnosis (patid,			encounterid,	enc_type, admit_date, providerid, dx, dx_type, dx_source, pdx) '||
-'select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, factline.start_date, factline.provider_id, diag.pcori_basecode,  '||
+'select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, enc.admit_date, enc.providerid,   '|| --bug fix MJ 10/7/16
+'SUBSTR(diag.pcori_basecode, INSTR(diag.pcori_basecode,'':'')+1,10),'|| -- MJ bug fix based off of JK's MSSQL fix, 10/6/16
 'SUBSTR(diag.c_fullname,18,2) dxtype,   '||
 '	CASE WHEN enc_type=''AV'' THEN ''FI'' ELSE nvl(SUBSTR(dxsource,INSTR(dxsource,'':'')+1,2) ,''NI'')END, '||
 '	nvl(SUBSTR(pdxsource,INSTR(pdxsource, '':'')+1,2),''NI'') '|| -- jgk bugfix 9/28/15 
@@ -1189,15 +1188,15 @@ sqltext := 'insert into pmndiagnosis (patid,			encounterid,	enc_type, admit_date
 ' left outer join sourcefact '||
 'on	factline.patient_num=sourcefact.patient_num '||
 'and factline.encounter_num=sourcefact.encounter_num '||
-'and factline.provider_id=sourcefact.provider_id '||
+'and enc.providerid=sourcefact.provider_id '|| --bug fix MJ 10/7/16
 'and factline.concept_cd=sourcefact.concept_Cd '||
-'and factline.start_date=sourcefact.start_Date '||
+'and enc.admit_date=sourcefact.start_Date '|| --bug fix MJ 10/7/16 
 'left outer join pdxfact '||
 'on	factline.patient_num=pdxfact.patient_num '||
 'and factline.encounter_num=pdxfact.encounter_num '||
-'and factline.provider_id=pdxfact.provider_id '||
+'and enc.providerid=pdxfact.provider_id '|| --bug fix MJ 10/7/16
 'and factline.concept_cd=pdxfact.concept_cd '||
-'and factline.start_date=pdxfact.start_Date '||
+'and enc.admit_date=pdxfact.start_Date '|| --bug fix MJ 10/7/16
 'inner join pcornet_diag diag on diag.c_basecode  = factline.concept_cd '||
 'where diag.c_fullname like ''\PCORI\DIAGNOSIS\%''  '||
 'and (sourcefact.c_fullname like ''\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\%'' or sourcefact.c_fullname is null) ';
@@ -1208,6 +1207,10 @@ Commit;
 
 end PCORNetDiagnosis;
 /
+
+--substring truncation example
+--substring(diag.pcori_basecode,charindex(':',diag.pcori_basecode)+1,10)
+--SUBSTR(diag.pcori_basecode, INSTR(diag.pcori_basecode,'':'')+1,10)
 
 
 ----------------------------------------------------------------------------------------------------------------------------------------
@@ -1252,7 +1255,8 @@ sqltext := 'insert into sourcefact2 '||
 PMN_EXECUATESQL(sqltext);
 
 sqltext := 'insert into pmncondition (patid, encounterid, report_date, resolve_date, condition, condition_type, condition_status, condition_source) '||
-'select distinct factline.patient_num, min(factline.encounter_num) encounterid, min(factline.start_date) report_date, NVL(max(factline.end_date),null) resolve_date, diag.pcori_basecode,  '||
+'select distinct factline.patient_num, min(factline.encounter_num) encounterid, min(factline.start_date) report_date, NVL(max(factline.end_date),null) resolve_date,  '||
+'SUBSTR(diag.pcori_basecode, INSTR(diag.pcori_basecode,'':'')+1,10),'|| -- MJ bug fix based off of JK's MSSQL fix, 10/6/16
 'SUBSTR(diag.c_fullname,18,2) condition_type,   '||
 '	NVL2(max(factline.end_date) , ''RS'', ''NI'') condition_status,  '|| -- Imputed so might not be entirely accurate
 '	NVL(SUBSTR(max(dxsource),INSTR(max(dxsource), '':'')+1,2),''NI'') condition_source '||
@@ -1291,7 +1295,7 @@ begin
 insert into pmnprocedure( 
 				patid,			encounterid,	enc_type, admit_date, providerid, px, px_type, px_source,px_date) 
 select  distinct fact.patient_num, enc.encounterid,	enc.enc_type, enc.admit_date, 
-		fact.provider_id, SUBSTR(pr.pcori_basecode,INSTR(pr.pcori_basecode, ':')+1,11) px, SUBSTR(pr.c_fullname,18,2) pxtype, 'NI' px_source, fact.start_date
+		enc.providerid, SUBSTR(pr.pcori_basecode,INSTR(pr.pcori_basecode, ':')+1,11) px, SUBSTR(pr.c_fullname,18,2) pxtype, 'NI' px_source, fact.start_date
 from i2b2fact fact
  inner join pmnENCOUNTER enc on enc.patid = fact.patient_num and enc.encounterid = fact.encounter_Num
  inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
@@ -1357,7 +1361,7 @@ from (
     select 
       patient_num patid, encounter_num encounterid, 
 	to_char(start_Date,'YYYY-MM-DD') measure_date, 
-	to_char(start_Date,'HH:MI') measure_time, 
+	to_char(start_Date,'HH24:MI') measure_time, 
       nval_num, pcori_basecode, pcori_code from
     (select obs.patient_num, obs.encounter_num, obs.start_Date, nval_num, pcori_basecode, codes.pcori_code
         from i2b2fact obs
@@ -1561,9 +1565,9 @@ NVL(lab.pcori_basecode, 'NI') LAB_PX,
 'LC'  LAB_PX_TYPE,
 m.start_date LAB_ORDER_DATE, 
 m.start_date SPECIMEN_DATE,
-to_char(m.start_date,'HH:MI')  SPECIMEN_TIME,
-m.end_date RESULT_DATE,
-to_char(m.end_date,'HH:MI') RESULT_TIME,
+to_char(m.start_date,'HH24:MI')  SPECIMEN_TIME,
+NVL(m.end_date, m.start_date) RESULT_DATE,    -- Bug fix MJ 10/06/16
+to_char(m.end_date,'HH24:MI') RESULT_TIME,
 CASE WHEN m.ValType_Cd='T' THEN NVL(nullif(m.TVal_Char,''),'NI') ELSE 'NI' END RESULT_QUAL, -- TODO: Should be a standardized value
 CASE WHEN m.ValType_Cd='N' THEN m.NVAL_NUM ELSE null END RESULT_NUM,
 CASE WHEN m.ValType_Cd='N' THEN (CASE NVL(nullif(m.TVal_Char,''),'NI') WHEN 'E' THEN 'EQ' WHEN 'NE' THEN 'OT' WHEN 'L' THEN 'LT' WHEN 'LE' THEN 'LE' WHEN 'G' THEN 'GT' WHEN 'GE' THEN 'GE' ELSE 'NI' END)  ELSE 'TX' END RESULT_MODIFIER,
@@ -1581,12 +1585,16 @@ NULL RAW_UNIT,
 NULL RAW_ORDER_DEPT,
 NULL RAW_FACILITY_CODE
 
-FROM i2b2fact M
-inner join pmnENCOUNTER enc on enc.patid = m.patient_num and enc.encounterid = m.encounter_Num -- Constraint to selected encounters
 
+FROM i2b2fact M   --JK bug fix 10/7/16
+inner join pmnENCOUNTER enc on enc.patid = m.patient_num and enc.encounterid = m.encounter_Num -- Constraint to selected encounters
 inner join pcornet_lab lab on lab.c_basecode  = M.concept_cd and lab.c_fullname like '\PCORI\LAB_RESULT_CM\%'
-inner JOIN pcornet_lab ont_parent on lab.c_path=ont_parent.c_fullname
+inner join pcornet_lab ont_loinc on lab.pcori_basecode=ont_loinc.pcori_basecode and ont_loinc.c_basecode like 'LOINC:%'
+inner JOIN pcornet_lab ont_parent on ont_loinc.c_path=ont_parent.c_fullname
 inner join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
+
+
+
 
 LEFT OUTER JOIN priority p
  
@@ -1933,7 +1941,7 @@ insert into pmndispensing (
     ,DISPENSE_AMT  -- modifier nval_num
 --    ,RAW_NDC
 )
-select  m.patient_num, null,m.start_date, NVL(mo.pcori_ndc,'NA')
+select  m.patient_num, null,m.start_date, NVL(mo.pcori_ndc,'00000000000')
     ,max(DISP_SUPPLY.nval_num) sup, max(amount.nval_num) amt 
 from i2b2fact m inner join pcornet_med mo
 on m.concept_cd = mo.c_basecode
@@ -2171,9 +2179,4 @@ PCORNetDeath;
 end pcornetloader;
 /
 
-
-BEGIN          -- RUN PROGRAM 
-pcornetclear;  -- Make sure to run this before re-populating any pmn tables.
-pcornetloader; -- you may want to run sql statements one by one in the pcornetloader procedure :)
-END;
-/
+--new run script executes pcornet clear and pcornet loader. 
