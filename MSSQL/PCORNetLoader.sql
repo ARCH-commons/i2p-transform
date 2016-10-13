@@ -1446,6 +1446,10 @@ INSERT INTO dbo.[pmnlabresults_cm]
       ,[RAW_UNIT]
       ,[RAW_ORDER_DEPT]
       ,[RAW_FACILITY_CODE])
+
+--select max(len(raw_result)),max(len(specimen_time)),max(len(result_time)),max(len(result_unit))
+--max(len(lab_name)),max(len(lab_loinc)),max(len(priority)), max(len(result_loc)), max(len(lab_px)),max(len(result_qual)),max(len(result_num)) 
+
 SELECT DISTINCT  M.patient_num patid,
 M.encounter_num encounterid,
 CASE WHEN ont_parent.C_BASECODE LIKE 'LAB_NAME%' then SUBSTRING (ont_parent.c_basecode,10, 10) ELSE 'NI' END LAB_NAME,
@@ -1457,7 +1461,7 @@ isnull(lab.pcori_basecode, 'NI') LAB_PX,
 'LC'  LAB_PX_TYPE,
 m.start_date LAB_ORDER_DATE, 
 m.start_date SPECIMEN_DATE,
-CAST(CONVERT(char(5), M.start_date, 108) as TIME)  SPECIMEN_TIME,
+CAST(CONVERT(char(5), M.start_date, 108) as TIME) SPECIMEN_TIME,
 isnull (m.end_date, m.start_date) RESULT_DATE,   -- Bug fix MJ 10/06/16
 CAST(CONVERT(char(5), M.end_date, 108) as TIME) RESULT_TIME,
 CASE WHEN m.ValType_Cd='T' THEN isnull(substring(nullif(m.TVal_Char,''),1,12),'NI') ELSE 'NI' END RESULT_QUAL, -- TODO: Should be a standardized value
@@ -1472,7 +1476,7 @@ CASE isnull(nullif(m.VALUEFLAG_CD,''),'NI') WHEN 'H' THEN 'AH' WHEN 'L' THEN 'AL
 NULL [RAW_LAB_NAME],
 NULL [RAW_LAB_CODE],
 NULL [RAW_PANEL],
-CASE WHEN m.ValType_Cd='T' THEN m.TVal_Char ELSE cast(m.NVal_Num as varchar) END RAW_RESULT,
+CASE WHEN m.ValType_Cd='T' THEN substring(m.TVal_Char,1,50) ELSE substring(cast(m.NVal_Num as varchar),1,50) END RAW_RESULT,
 NULL [RAW_UNIT],
 NULL [RAW_ORDER_DEPT],
 NULL [RAW_FACILITY_CODE]
@@ -1507,7 +1511,7 @@ and ont_parent.C_BASECODE LIKE 'LAB_NAME%' -- Exclude non-pcori labs
 and m.MODIFIER_CD='@'
 
 END
-GO
+GO  
 
 ----------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------------
