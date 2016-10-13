@@ -1446,7 +1446,6 @@ INSERT INTO dbo.[pmnlabresults_cm]
       ,[RAW_UNIT]
       ,[RAW_ORDER_DEPT]
       ,[RAW_FACILITY_CODE])
-
 SELECT DISTINCT  M.patient_num patid,
 M.encounter_num encounterid,
 CASE WHEN ont_parent.C_BASECODE LIKE 'LAB_NAME%' then SUBSTRING (ont_parent.c_basecode,10, 10) ELSE 'NI' END LAB_NAME,
@@ -1461,7 +1460,7 @@ m.start_date SPECIMEN_DATE,
 CAST(CONVERT(char(5), M.start_date, 108) as TIME)  SPECIMEN_TIME,
 isnull (m.end_date, m.start_date) RESULT_DATE,   -- Bug fix MJ 10/06/16
 CAST(CONVERT(char(5), M.end_date, 108) as TIME) RESULT_TIME,
-CASE WHEN m.ValType_Cd='T' THEN isnull(nullif(m.TVal_Char,''),'NI') ELSE 'NI' END RESULT_QUAL, -- TODO: Should be a standardized value
+CASE WHEN m.ValType_Cd='T' THEN isnull(substring(nullif(m.TVal_Char,''),1,12),'NI') ELSE 'NI' END RESULT_QUAL, -- TODO: Should be a standardized value
 CASE WHEN m.ValType_Cd='N' THEN m.NVAL_NUM ELSE null END RESULT_NUM,
 CASE WHEN m.ValType_Cd='N' THEN (CASE isnull(nullif(m.TVal_Char,''),'NI') WHEN 'E' THEN 'EQ' WHEN 'NE' THEN 'OT' WHEN 'L' THEN 'LT' WHEN 'LE' THEN 'LE' WHEN 'G' THEN 'GT' WHEN 'GE' THEN 'GE' ELSE 'NI' END)  ELSE 'TX' END RESULT_MODIFIER,
 isnull(m.Units_CD,'NI') RESULT_UNIT, -- TODO: Should be standardized units
