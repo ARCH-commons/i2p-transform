@@ -1554,6 +1554,7 @@ INSERT INTO pmnlabresults_cm
       ,RAW_FACILITY_CODE)
 
 
+
 SELECT DISTINCT  M.patient_num patid,
 M.encounter_num encounterid,
 CASE WHEN ont_parent.C_BASECODE LIKE 'LAB_NAME%' then SUBSTR (ont_parent.c_basecode,10, 10) ELSE 'NI' END LAB_NAME,
@@ -1565,10 +1566,10 @@ NVL(lab.pcori_basecode, 'NI') LAB_PX,
 'LC'  LAB_PX_TYPE,
 m.start_date LAB_ORDER_DATE, 
 m.start_date SPECIMEN_DATE,
-to_char(m.start_date,'HH24:MI')  SPECIMEN_TIME,
+to_char(m.start_date,'HH24:MI') SPECIMEN_TIME,
 NVL(m.end_date, m.start_date) RESULT_DATE,    -- Bug fix MJ 10/06/16
 to_char(m.end_date,'HH24:MI') RESULT_TIME,
-CASE WHEN m.ValType_Cd='T' THEN NVL(nullif(m.TVal_Char,''),'NI') ELSE 'NI' END RESULT_QUAL, -- TODO: Should be a standardized value
+CASE WHEN m.ValType_Cd='T' THEN NVL(SUBSTR(nullif(m.TVal_Char,''),1,12),'NI') ELSE 'NI' END RESULT_QUAL, -- TODO: Should be a standardized value -- bug fix trnaslated by MJ from JK's MSSQL fix 10/17/16
 CASE WHEN m.ValType_Cd='N' THEN m.NVAL_NUM ELSE null END RESULT_NUM,
 CASE WHEN m.ValType_Cd='N' THEN (CASE NVL(nullif(m.TVal_Char,''),'NI') WHEN 'E' THEN 'EQ' WHEN 'NE' THEN 'OT' WHEN 'L' THEN 'LT' WHEN 'LE' THEN 'LE' WHEN 'G' THEN 'GT' WHEN 'GE' THEN 'GE' ELSE 'NI' END)  ELSE 'TX' END RESULT_MODIFIER,
 NVL(m.Units_CD,'NI') RESULT_UNIT, -- TODO: Should be standardized units
@@ -1580,7 +1581,7 @@ CASE NVL(nullif(m.VALUEFLAG_CD,''),'NI') WHEN 'H' THEN 'AH' WHEN 'L' THEN 'AL' W
 NULL RAW_LAB_NAME,
 NULL RAW_LAB_CODE,
 NULL RAW_PANEL,
-CASE WHEN m.ValType_Cd='T' THEN m.TVal_Char ELSE to_char(m.NVal_Num) END RAW_RESULT,
+CASE WHEN m.ValType_Cd='T' THEN SUBSTR(m.TVal_Char,1,50) ELSE SUBSTR(to_char(m.NVal_Num),1,50) END RAW_RESULT, --bug fix MJ 10/17/16 translated from JK's MSSQL fix
 NULL RAW_UNIT,
 NULL RAW_ORDER_DEPT,
 NULL RAW_FACILITY_CODE
@@ -1620,7 +1621,6 @@ Commit;
 
 END PCORNetLabResultCM;
 /
-
 
 ----------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------------
@@ -2009,6 +2009,8 @@ end;
 
 create or replace PROCEDURE pcornetReport
 as
+
+i2b2vitald number;
 i2b2dxd number;
 i2b2pxd number;
 i2b2encountersd number;
