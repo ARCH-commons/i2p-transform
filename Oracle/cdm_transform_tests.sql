@@ -25,6 +25,44 @@ comment on column test_cases.distinct_patid_n is 'patient count';
 comment on column test_cases.pass is '1 for pass, 0 for fail';
 
 
+/* Test that we have some height/weight measurements
+*/
+insert into test_cases (query_name, description, pass, obs, record_n, record_pct)
+with total_vital as (
+  select count(*) qty from pcornet_cdm.vital
+  ),
+ht as (
+  select count(*) qty from pcornet_cdm.vital
+  where ht is not null
+  ),
+wt as (
+  select count(*) qty from pcornet_cdm.vital
+  where wt is not null
+  ),
+results as (
+  select 
+    round((ht.qty/total_vital.qty) * 100) pct_ht,
+    round((wt.qty/total_vital.qty) * 100) pct_wt
+  from total_vital cross join ht cross join wt
+  )
+select 'some_height_measurements_4335' query_name
+     , 'Make sure we have at least some height records' description
+     , case when ht.qty > 0 then 1 else 0 end pass
+     , rownum obs
+     , ht.qty record_n
+     , results.pct_ht record_pct
+from total_vital cross join ht cross join results
+union all
+select 'some_weight_measurements_4335' query_name
+     , 'Make sure we have at least some weight records' description
+     , case when wt.qty > 0 then 1 else 0 end pass
+     , rownum obs
+     , wt.qty record_n
+     , results.pct_wt record_pct
+from total_vital cross join wt cross join results
+;
+commit;
+
 /* Test to make sure we got about the same number of patients in the CDM 
 diagnoses that we do in i2b2.
 */
