@@ -68,6 +68,8 @@ connect ${pcornet_cdm_user}/${pcornet_cdm}
 
 set echo on;
 set timing on;
+set linesize 3000;
+set pagesize 5000;
 
 WHENEVER SQLERROR CONTINUE;
 
@@ -100,6 +102,7 @@ define terms_table=${terms_table}
 define min_pat_list_date_dd_mon_rrrr=${min_pat_list_date_dd_mon_rrrr}
 define min_visit_date_dd_mon_rrrr=${min_visit_date_dd_mon_rrrr}
 define enrollment_months_back=${enrollment_months_back}
+define pcornet_cdm_user=${pcornet_cdm_user}
 
 -- Local terminology mapping
 start pcornet_mapping.sql
@@ -112,6 +115,9 @@ start PCORNetLoader_ora.sql
 
 -- Post-process steps
 start cdm_postproc.sql
+
+-- Report stats
+start cdm_stats.sql
 
 -- CDM transform tests
 start cdm_transform_tests.sql
