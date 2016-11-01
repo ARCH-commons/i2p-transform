@@ -69,6 +69,25 @@ BEGIN
 END PMN_ExecuateSQL;
 /
 
+--ACK: http://dba.stackexchange.com/questions/9441/how-to-catch-and-handle-only-specific-oracle-exceptions
+create or replace procedure create_error_table(table_name varchar2) as
+sqltext varchar2(4000); 
+
+begin
+  dbms_errlog.create_error_log(dml_table_name => table_name);
+EXCEPTION
+  WHEN OTHERS THEN
+    IF SQLCODE = -955 THEN
+      NULL; -- suppresses ORA-00955 exception ("name is already used by an existing object")
+    ELSE
+       RAISE;
+    END IF;
+-- Delete rows from a previous run in case the table already existed
+sqltext := 'delete from ERR$_' || table_name;
+PMN_Execuatesql(sqltext);
+end;
+/
+
 
 
 
@@ -1042,6 +1061,8 @@ sqltext := 'create table sourcefact2 as '||
 	'where dxsource.c_fullname like ''\PCORI_MOD\CONDITION_OR_DX\%''';
 PMN_EXECUATESQL(sqltext);
 
+create_error_table('CONDITION');
+
 sqltext := 'insert into condition (patid, encounterid, report_date, resolve_date, condition, condition_type, condition_status, condition_source) '||
 'select distinct factline.patient_num, min(factline.encounter_num) encounterid, min(factline.start_date) report_date, NVL(max(factline.end_date),null) resolve_date, diag.pcori_basecode,  '||
 'SUBSTR(diag.c_fullname,18,2) condition_type,   '||
@@ -1058,7 +1079,9 @@ sqltext := 'insert into condition (patid, encounterid, report_date, resolve_date
 'and factline.start_date=sf.start_Date   '||
 'where diag.c_fullname like ''\PCORI\DIAGNOSIS\%'' '||
 'and sf.c_fullname like ''\PCORI_MOD\CONDITION_OR_DX\CONDITION_SOURCE\%'' '||
-'group by factline.patient_num, diag.pcori_basecode, diag.c_fullname ';
+'group by factline.patient_num, diag.pcori_basecode, diag.c_fullname ' ||
+'log errors into ERR$_CONDITION reject limit unlimited'
+;
 
 PMN_EXECUATESQL(sqltext);
 
