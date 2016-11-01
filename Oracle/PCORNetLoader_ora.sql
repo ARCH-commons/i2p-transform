@@ -2006,7 +2006,6 @@ end;
 ----------------------------------------------------------------------------------------------------------------------------------------
 
 
-
 create or replace PROCEDURE pcornetReport
 as
 
@@ -2080,24 +2079,24 @@ select count(distinct patid) into pmndispensingsd   from pmndispensing;
 
 -- Distinct patients in i2b2 (unfinished)
 select count(distinct patient_num) into i2b2pxd from i2b2fact fact
- inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
+ inner join    pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
 where pr.c_fullname like '\PCORI\PROCEDURE\%';
 
 select count(distinct patient_num) into i2b2pxd from i2b2fact fact --//////////////////////////////////////////ERROR i2b2pxd
- inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
+ inner join    pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
  inner join pmnENCOUNTER enc on enc.patid = fact.patient_num and enc.encounterid = fact.encounter_Num
 where pr.c_fullname like '\PCORI\PROCEDURE\%';
 
 -- Counts in i2b2
 /*select @i2b2pxde=count(distinct patient_num) from i2b2fact fact
- inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
+ inner join    pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
  inner join pmnENCOUNTER enc on enc.patid = fact.patient_num and enc.encounterid = fact.encounter_Num
 where pr.c_fullname like '\PCORI\PROCEDURE\%'*/
 /*select @i2b2dxd=count(distinct patient_num) from i2b2fact fact
- inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
+ inner join    pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
 where pr.c_fullname like '\PCORI\PROCEDURE\%'
 select @i2b2vitald=count(distinct patient_num) from i2b2fact fact
- inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
+ inner join    pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
 where pr.c_fullname like '\PCORI\PROCEDURE\%'
 */
 
@@ -2110,21 +2109,18 @@ insert into i2pReport values( v_runid, SYSDATE, 'Pats', i2b2pats, pmnpats, null)
 insert into i2pReport values( v_runid, SYSDATE, 'Enrollment', i2b2pats, pmnenroll, pmnenrolld);
 
 insert into i2pReport values(v_runid, SYSDATE, 'Encounters', i2b2Encounters, null,  pmnEncounters, pmnEncountersd);
-insert into i2pReport values(v_runid, SYSDATE, 'DX',		null, i2b2dxd,		pmndx,		pmndxd);
-insert into i2pReport values(v_runid, SYSDATE, 'PX',		null, i2b2pxd,		pmnprocs,	pmnprocsd);
-insert into i2pReport values(v_runid, SYSDATE, 'Condition',	null, null,		pmncond,	pmncondd);
-insert into i2pReport values(v_runid, SYSDATE, 'Vital',		null, i2b2vitald,	pmnvital,	pmnvitald);
-insert into i2pReport values(v_runid, SYSDATE, 'Labs',		null, null,		pmnlabs,	pmnlabsd);
-insert into i2pReport values(v_runid, SYSDATE, 'Prescribing',	null, null,		pmnprescribings, pmnprescribingsd);
-insert into i2pReport values(v_runid, SYSDATE, 'Dispensing',	null, null,		pmndispensings,	pmndispensingsd);
+insert into i2pReport values(v_runid, SYSDATE, 'DX',        null, i2b2dxd,        pmndx,        pmndxd);
+insert into i2pReport values(v_runid, SYSDATE, 'PX',        null, i2b2pxd,        pmnprocs,    pmnprocsd);
+insert into i2pReport values(v_runid, SYSDATE, 'Condition',    null, null,        pmncond,    pmncondd);
+insert into i2pReport values(v_runid, SYSDATE, 'Vital',        null, i2b2vitald,    pmnvital,    pmnvitald);
+insert into i2pReport values(v_runid, SYSDATE, 'Labs',        null, null,        pmnlabs,    pmnlabsd);
+insert into i2pReport values(v_runid, SYSDATE, 'Prescribing',    null, null,        pmnprescribings, pmnprescribingsd);
+insert into i2pReport values(v_runid, SYSDATE, 'Dispensing',    null, null,        pmndispensings,    pmndispensingsd);
 
 
-select concept "Data Type",sourceval "From i2b2", sourcedistinct 'Patients in i2b2' , destval "In PopMedNet", destdistinct 'Patients in PopMedNet' from i2preport where RUNID = v_runid;
-/
+select concept "Data Type",sourceval "From i2b2", sourcedistinct "Patients in i2b2" , destval "In PopMedNet", destdistinct "Patients in PopMedNet" from i2preport where RUNID = v_runid;
 
-  
-
-end pcornetReport;
+end;
 /
 
 
@@ -2175,10 +2171,6 @@ PCORNetLabResultCM;
 PCORNetPrescribing;
 PCORNetDispensing;
 PCORNetDeath;
-
---pcornetReport; --pcornetreport is incomplete and broken at the moment. You can run an old version of this procedure if need be in the interim. 
-
-end pcornetloader;
+end;
 /
-
 --new run script executes pcornet clear and pcornet loader. 
