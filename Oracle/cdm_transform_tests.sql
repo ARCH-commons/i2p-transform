@@ -24,6 +24,23 @@ comment on column test_cases.record_pct is 'percent of all observations';
 comment on column test_cases.distinct_patid_n is 'patient count';
 comment on column test_cases.pass is '1 for pass, 0 for fail';
 
+/* Report how many condition table rows were rejected.
+*/
+insert into test_cases (query_name, description, pass, obs, record_n, record_pct)
+with err as (
+  select count(*) qty from pcornet_cdm.ERR$_CONDITION
+  ),
+total_condition as (
+  select count(*) qty from pcornet_cdm.condition
+  )
+select 'rejected_condition_rows' query_name
+     , 'Report how many rows were rejected from the condition table due to table constraints.' description
+     , case when err.qty < 1000 then 1 else 0 end pass
+     , rownum obs
+     , err.qty record_n
+     , (err.qty / tc.qty) * 100 record_pct
+from total_condition tc cross join err
+;
 
 /* Test that we have some height/weight measurements
 */
