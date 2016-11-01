@@ -993,7 +993,8 @@ sqltext := 'insert into diagnosis (patid,			encounterid,	enc_type, admit_date, p
 'select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, factline.start_date, factline.provider_id, diag.pcori_basecode,  '||
 'SUBSTR(diag.c_fullname,18,2) dxtype,   '||
 '	CASE WHEN enc_type=''AV'' THEN ''FI'' ELSE nvl(SUBSTR(dxsource,INSTR(dxsource,'':'')+1,2) ,''NI'')END, '||
-'	nvl(SUBSTR(pdxsource,INSTR(pdxsource, '':'')+1,2),''NI'') '|| -- jgk bugfix 9/28/15 
+'	CASE WHEN enc_type in (''ED'', ''AV'', ''OA'') THEN ''X''  -- PDX is "relevant only on IP and IS encounters"
+             ELSE nvl(SUBSTR(pdxsource,INSTR(pdxsource, '':'')+1,2),''NI'') END '||
 'from i2b2fact factline '||
 'inner join encounter enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num '||
 ' left outer join sourcefact '||
