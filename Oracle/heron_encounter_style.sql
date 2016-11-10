@@ -154,13 +154,35 @@ using (
   join "&&i2b2_data_schema".concept_dimension cd on cd.concept_path like pm.local_path || '%'
   where pm.pcori_path like '\PCORI\ENCOUNTER\ENC_TYPE\%'
   )
--- Note: our patient-day style encounters etc. may result in
--- multiple encounter types for a single encounter.
-select obs.encounter_num, max(et.pcori_code) pcori_code
-from "&&i2b2_data_schema".observation_fact obs
-join enc_type_codes et on et.concept_cd = obs.concept_cd
-group by obs.encounter_num
-) et on ( vd.encounter_num = et.encounter_num )
+  /* Note: our patient-day style encounters etc. may result in
+     multiple encounter types for a single encounter.
+     Therefore we need to pivot to all the encounter types associated with each
+     encounter and then choose (intentionally and deterministically) the
+     single encounter type that will prevail for each encounter
+   */
+ , obs_enc_type_pivot as (
+   select * 
+   from (select obs.encounter_num, et.pcori_code 
+         from "&&i2b2_data_schema".observation_fact obs
+   join enc_type_codes et on et.concept_cd = obs.concept_cd)
+   pivot
+   (
+    max(pcori_code)
+    for pcori_code in ('EI' as ei, 'IP' as ip, 'ED' as ed, 'IS' as e_is 
+                     , 'AV' as av, 'OA' as oa, 'OT' as ot
+                     , 'NI' as ni, 'UN' as un)
+   )
+  )
+  /* Single Encounter type to Encounter coercion:
+     IP + ED = EI
+     EI > IP || ED > IS > AV > OA > OT > NI > UN
+   */
+  select encounter_num,
+         case when ip is not null and ed is not null then 'EI'
+              else coalesce(ei, ip, ed, e_is, av, oa, ot, ni, un, 'UN')
+         end as pcori_code
+  from obs_enc_type_pivot) et 
+on ( vd.encounter_num = et.encounter_num )
 when matched then update
 set inout_cd = et.pcori_code;
 -- 11,085,911 rows merged.
