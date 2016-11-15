@@ -168,7 +168,7 @@ CREATE TABLE [dbo].[pmnENROLLMENT](
 	[ENR_BASIS] [varchar](1) NOT NULL, -- jgk fixed 1/11/16 should be ENR_BASIS, not BASIS
 	[RAW_CHART] [varchar](50) NULL,
 	[RAW_BASIS] [varchar](50) NULL,
- CONSTRAINT [PK_pmnENROLLMENT] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_pmnENROLLMENT] PRIMARY KEY NONCLUSTERED 
 (
 	[PATID] ASC,
 	[ENR_START_DATE] ASC,
@@ -177,6 +177,11 @@ CREATE TABLE [dbo].[pmnENROLLMENT](
 ) ON [PRIMARY]
 
 GO
+
+CREATE CLUSTERED INDEX enrollment_clustered_index   
+ON pmnenrollment (ENR_BASIS)
+go   
+
 
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[pmnvital]') AND type in (N'U'))
 DROP TABLE [dbo].[pmnvital]
@@ -206,13 +211,19 @@ CREATE TABLE [dbo].[pmnVITAL](
 	[RAW_SMOKING] [varchar] (50),
 	[Raw_TOBACCO] [varchar] (50),
 	[Raw_TOBACCO_TYPE] [varchar] (50),
- CONSTRAINT [PK_pmnVITAL] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_pmnVITAL] PRIMARY KEY NONCLUSTERED 
 (
 	[VITALID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 
 GO
+
+/*
+CREATE CLUSTERED INDEX vital_clustered_index   
+ON pmnvital ()
+go   
+*/
 
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[pmnPROCEDURE]') AND type in (N'U'))
 DROP TABLE [dbo].[pmnPROCEDURE]
@@ -231,13 +242,19 @@ CREATE TABLE [dbo].[pmnPROCEDURE](
 	[PX_SOURCE] [varchar](2) NULL,
 	[RAW_PX] [varchar](50) NULL,
 	[RAW_PX_TYPE] [varchar](50) NULL,
-PRIMARY KEY CLUSTERED 
+PRIMARY KEY NONCLUSTERED 
 (
 	[PROCEDURESID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 
 GO
+
+
+CREATE CLUSTERED INDEX procedure_clustered_index   
+ON pmnprocedure (PX)
+go   
+
 
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[pmndiagnosis]') AND type in (N'U'))
 DROP TABLE [dbo].[pmndiagnosis]
@@ -258,12 +275,17 @@ CREATE TABLE [dbo].[pmndiagnosis](
 	[RAW_DX_SOURCE] [varchar](50) NULL,
 	[RAW_ORIGDX] [varchar](50) NULL,
 	[RAW_PDX] [varchar](50) NULL,
-PRIMARY KEY CLUSTERED 
+PRIMARY KEY NONCLUSTERED 
 (
 	[DIAGNOSISID]  ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+
+CREATE CLUSTERED INDEX diagnosis_clustered_index   
+ON pmndiagnosis (DX)
+go   
+
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[pmnlabresults_cm]') AND type in (N'U'))
 DROP TABLE [dbo].[pmnlabresults_cm]
 GO
@@ -299,13 +321,18 @@ CREATE TABLE [dbo].[pmnlabresults_cm](
 	[RAW_UNIT] [varchar](50) NULL,
 	[RAW_ORDER_DEPT] [varchar](50) NULL,
 	[RAW_FACILITY_CODE] [varchar](50) NULL,
-PRIMARY KEY CLUSTERED 
+PRIMARY KEY NONCLUSTERED 
 (
 	[LAB_RESULT_CM_ID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 
 GO
+
+CREATE CLUSTERED INDEX labresults_clustered_index   
+ON pmnlabresults_cm (LAB_LOINC)
+go   
+
 
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[PMN_LabNormal]') AND type in (N'U'))
 DROP TABLE [dbo].[PMN_LabNormal]
@@ -410,13 +437,18 @@ CREATE TABLE [dbo].[pmndispensing](
 	[DISPENSE_AMT] [int], 
 	[RAW_NDC] [varchar] (50),
 	
-PRIMARY KEY CLUSTERED 
+PRIMARY KEY NONCLUSTERED 
 (
 	[DISPENSINGID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 
 GO
+
+CREATE CLUSTERED INDEX dispensing_clustered_index   
+ON pmndispensing (NDC)
+go   
+
 
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[pmnprescribing]') AND type in (N'U'))
 DROP TABLE [dbo].[pmnprescribing]
@@ -439,13 +471,18 @@ CREATE TABLE [dbo].[pmnprescribing](
 	[RAW_RX_MED_NAME] [varchar] (50) NULL,
 	[RAW_RX_FREQUENCY] [varchar] (50) NULL,
 	[RAW_RXNORM_CUI] [varchar] (50) NULL,
-PRIMARY KEY CLUSTERED 
+PRIMARY KEY NONCLUSTERED 
 (
 	[PRESCRIBINGID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 
 GO
+
+CREATE CLUSTERED INDEX prescribing_clustered_index   
+ON pmnprescribing (RXNORM_CUI)
+go   
+
 
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[pmnpcornet_trial]') AND type in (N'U'))
 DROP TABLE [dbo].[pmnpcornet_trial]
@@ -487,13 +524,19 @@ CREATE TABLE [dbo].[pmncondition](
 	[RAW_CONDITION] [varchar](18) NULL,
 	[RAW_CONDITION_TYPE] [varchar](2) NULL,
 	[RAW_CONDITION_SOURCE] [varchar](2) NULL,
-PRIMARY KEY CLUSTERED 
+PRIMARY KEY NONCLUSTERED 
 (
 	[CONDITIONID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 
 GO
+
+
+CREATE CLUSTERED INDEX condition_clustered_index   
+ON pmncondition (condition)   
+go
+
 
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[pmnpro_cm]') AND type in (N'U'))
 DROP TABLE [dbo].[pmnpro_cm]
@@ -597,12 +640,18 @@ CREATE TABLE [dbo].[pmnENCOUNTER](
 	[RAW_DISCHARGE_STATUS] [varchar](50) NULL,
 	[RAW_DRG_TYPE] [varchar](50) NULL,
 	[RAW_ADMITTING_SOURCE] [varchar](50) NULL,
-PRIMARY KEY CLUSTERED 
+PRIMARY KEY NONCLUSTERED 
 (
 	[ENCOUNTERID] ASC
 )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+
+
+CREATE CLUSTERED INDEX encounter_clustered_index   
+ON pmnencounter (encounterid, patid, admit_date, discharge_date)   
+go
+
 
 
 CREATE INDEX index_patid  --New index on PATID for fast searching, MJ 10/10/16
@@ -623,7 +672,7 @@ CREATE TABLE [dbo].[pmndemographic](
 	[RAW_SEX] [varchar](50) NULL,
 	[RAW_HISPANIC] [varchar](50) NULL,
 	[RAW_RACE] [varchar](50) NULL,
-PRIMARY KEY CLUSTERED 
+PRIMARY KEY NONCLUSTERED 
 (
 	[PATID] ASC
 )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
@@ -631,6 +680,12 @@ PRIMARY KEY CLUSTERED
 GO
 SET ANSI_PADDING OFF
 GO
+
+
+CREATE CLUSTERED INDEX demo_clustered_index   
+ON pmndemographic (patid)   
+go
+
 
 ALTER TABLE dbo.pmndemographic
 ADD CONSTRAINT biobank_default
@@ -1184,7 +1239,12 @@ and enc.providerid=pf.provider_id --bug fix MJ 10/7/16
 and factline.concept_cd=pf.concept_cd
 and enc.admit_date=pf.start_Date --bug fix MJ 10/7/16
 inner join pcornet_diag diag on diag.c_basecode  = factline.concept_cd
-where diag.c_fullname like '\PCORI\DIAGNOSIS\%'
+-- Skip ICD-9 V codes in 10 ontology, ICD-9 E codes in 10 ontology, ICD-10 numeric codes in 10 ontology
+-- Note: makes the assumption that ICD-9 Ecodes are not ICD-10 Ecodes; same with ICD-9 V codes. On inspection seems to be true.
+where (diag.c_fullname not like '\PCORI\DIAGNOSIS\10\%' or
+  ( not ( diag.pcori_basecode like '[V]%' and diag.c_fullname not like '\PCORI\DIAGNOSIS\10\([V]%\([V]%\([V]%' )
+  and not ( diag.pcori_basecode like '[E]%' and diag.c_fullname not like '\PCORI\DIAGNOSIS\10\([E]%\([E]%\([E]%' ) 
+  and not (diag.c_fullname like '\PCORI\DIAGNOSIS\10\' and diag.pcori_basecode like '[0-9]%') )) 
 and (sf.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\%' or sf.c_fullname is null)
 
 end

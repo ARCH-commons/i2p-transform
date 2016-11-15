@@ -1198,7 +1198,12 @@ sqltext := 'insert into pmndiagnosis (patid,			encounterid,	enc_type, admit_date
 'and factline.concept_cd=pdxfact.concept_cd '||
 'and enc.admit_date=pdxfact.start_Date '|| --bug fix MJ 10/7/16
 'inner join pcornet_diag diag on diag.c_basecode  = factline.concept_cd '||
-'where diag.c_fullname like ''\PCORI\DIAGNOSIS\%''  '||
+-- Skip ICD-9 V codes in 10 ontology, ICD-9 E codes in 10 ontology, ICD-10 numeric codes in 10 ontology
+-- Note: makes the assumption that ICD-9 Ecodes are not ICD-10 Ecodes; same with ICD-9 V codes. On inspection seems to be true.
+'where (diag.c_fullname not like ''\PCORI\DIAGNOSIS\10\%'' or ' ||
+'( not ( diag.pcori_basecode like ''[V]%'' and diag.c_fullname not like ''\PCORI\DIAGNOSIS\10\([V]%\([V]%\([V]%'' ) '||
+'and not ( diag.pcori_basecode like ''[E]%'' and diag.c_fullname not like ''\PCORI\DIAGNOSIS\10\([E]%\([E]%\([E]%'' ) '|| 
+'and not (diag.c_fullname like ''\PCORI\DIAGNOSIS\10\'' and diag.pcori_basecode like ''[0-9]%'') )) '||
 'and (sourcefact.c_fullname like ''\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\%'' or sourcefact.c_fullname is null) ';
 
 PMN_EXECUATESQL(sqltext);
