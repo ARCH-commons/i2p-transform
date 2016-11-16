@@ -1244,7 +1244,7 @@ inner join pcornet_diag diag on diag.c_basecode  = factline.concept_cd
 where (diag.c_fullname not like '\PCORI\DIAGNOSIS\10\%' or
   ( not ( diag.pcori_basecode like '[V]%' and diag.c_fullname not like '\PCORI\DIAGNOSIS\10\([V]%\([V]%\([V]%' )
   and not ( diag.pcori_basecode like '[E]%' and diag.c_fullname not like '\PCORI\DIAGNOSIS\10\([E]%\([E]%\([E]%' ) 
-  and not (diag.c_fullname like '\PCORI\DIAGNOSIS\10\' and diag.pcori_basecode like '[0-9]%') )) 
+  and not (diag.c_fullname like '\PCORI\DIAGNOSIS\10\%' and diag.pcori_basecode like '[0-9]%') )) 
 and (sf.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\%' or sf.c_fullname is null)
 
 end
