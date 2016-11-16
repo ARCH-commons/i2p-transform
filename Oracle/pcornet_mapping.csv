@@ -55,6 +55,11 @@ pcori_path,local_path
 \PCORI_MOD\PDX\P\,\Diagnosis\\modifier_dx\billing_diagnosis\discharge\discharge_primary\
 \PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\DI\,\Diagnosis\\modifier_dx\billing_diagnosis\discharge\
 \PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\AD\,\Diagnosis\\modifier_dx\billing_diagnosis\admit\
+"\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\UN\","\Diagnosis\Billing\UHC_DIAGNOSIS\"
+"\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\FI\","\Diagnosis\Billing\UKP\"
+"\PCORI_MOD\PDX\X\","\Diagnosis\Billing\Primary\"
+"\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\FI\","\Diagnosis\\modifier_dx\billing_diagnosis\professional\"
+"\PCORI_MOD\PDX\X\","\Diagnosis\\modifier_dx\billing_diagnosis\professional\professional_primary\"
 \PCORI_MOD\CONDITION_OR_DX\CONDITION_SOURCE\HC\,\Diagnosis\Clinical\HOSPITAL_PL_YN\
 \PCORI_MOD\CONDITION_OR_DX\CONDITION_SOURCE\HC\,\Diagnosis\Clinical\PAT_ENC_DX\
 \PCORI_MOD\CONDITION_OR_DX\CONDITION_SOURCE\HC\,\Diagnosis\Clinical\PRINCIPAL_PL_YN\
