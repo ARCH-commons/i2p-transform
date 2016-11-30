@@ -27,6 +27,8 @@
 ---------------------------------------------------------------------------------------------------------------------------------------
  
 
+------------------------------------  UNIT CONVERTER FCUNTIONS   ---------------------------------------------------
+
 create or replace FUNCTION unit_ht RETURN NUMBER IS 
 BEGIN  
     RETURN 1; -- Use this statement if your site stores HT data in units of Inches 
@@ -41,6 +43,8 @@ BEGIN
 --    RETURN 2.20462; -- Use this statement if your site stores WT data in units of Kilograms 
 END;
 /
+------------------------------------- END UNIT CONVERTER  ----------------------------------------------------------
+
 
 
 create or replace PROCEDURE PMN_DROPSQL(sqlstring VARCHAR2) AS 
@@ -1574,7 +1578,7 @@ m.start_date SPECIMEN_DATE,
 to_char(m.start_date,'HH24:MI') SPECIMEN_TIME,
 NVL(m.end_date, m.start_date) RESULT_DATE,    -- Bug fix MJ 10/06/16
 to_char(m.end_date,'HH24:MI') RESULT_TIME,
-CASE WHEN m.ValType_Cd='T' THEN NVL(SUBSTR(nullif(m.TVal_Char,''),1,12),'NI') ELSE 'NI' END RESULT_QUAL, -- TODO: Should be a standardized value -- bug fix trnaslated by MJ from JK's MSSQL fix 10/17/16
+CASE WHEN m.ValType_Cd='T' THEN CASE WHEN m.Tval_Char IS NOT NULL THEN 'OT' ELSE 'NI' END END RESULT_QUAL, -- TODO: Should be a standardized value -- bug fix translated by MJ from JK's MSSQL fix 11/30/16
 CASE WHEN m.ValType_Cd='N' THEN m.NVAL_NUM ELSE null END RESULT_NUM,
 CASE WHEN m.ValType_Cd='N' THEN (CASE NVL(nullif(m.TVal_Char,''),'NI') WHEN 'E' THEN 'EQ' WHEN 'NE' THEN 'OT' WHEN 'L' THEN 'LT' WHEN 'LE' THEN 'LE' WHEN 'G' THEN 'GT' WHEN 'GE' THEN 'GE' ELSE 'NI' END)  ELSE 'TX' END RESULT_MODIFIER,
 NVL(m.Units_CD,'NI') RESULT_UNIT, -- TODO: Should be standardized units

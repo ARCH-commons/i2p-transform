@@ -1524,7 +1524,7 @@ m.start_date SPECIMEN_DATE,
 CAST(CONVERT(char(5), M.start_date, 108) as TIME) SPECIMEN_TIME,
 isnull (m.end_date, m.start_date) RESULT_DATE,   -- Bug fix MJ 10/06/16
 CAST(CONVERT(char(5), M.end_date, 108) as TIME) RESULT_TIME,
-CASE WHEN m.ValType_Cd='T' THEN isnull(substring(nullif(m.TVal_Char,''),1,12),'NI') ELSE 'NI' END RESULT_QUAL, -- TODO: Should be a standardized value
+CASE WHEN m.ValType_Cd='T' THEN CASE WHEN m.Tval_Char IS NOT NULL THEN 'OT' ELSE 'NI' END END RESULT_QUAL, -- TODO: Should be a standardized value
 CASE WHEN m.ValType_Cd='N' THEN m.NVAL_NUM ELSE null END RESULT_NUM,
 CASE WHEN m.ValType_Cd='N' THEN (CASE isnull(nullif(m.TVal_Char,''),'NI') WHEN 'E' THEN 'EQ' WHEN 'NE' THEN 'OT' WHEN 'L' THEN 'LT' WHEN 'LE' THEN 'LE' WHEN 'G' THEN 'GT' WHEN 'GE' THEN 'GE' ELSE 'NI' END)  ELSE 'TX' END RESULT_MODIFIER,
 isnull(m.Units_CD,'NI') RESULT_UNIT, -- TODO: Should be standardized units
