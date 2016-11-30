@@ -56,11 +56,16 @@ wt as (
   select count(*) qty from pcornet_cdm.vital
   where wt is not null
   ),
+bmi as (
+  select count(*) qty from pcornet_cdm.vital
+  where original_bmi is not null
+  ),
 results as (
   select 
     round((ht.qty/total_vital.qty) * 100) pct_ht,
-    round((wt.qty/total_vital.qty) * 100) pct_wt
-  from total_vital cross join ht cross join wt
+    round((wt.qty/total_vital.qty) * 100) pct_wt,
+    round((bmi.qty/total_vital.qty) * 100) pct_bmi
+  from total_vital cross join ht cross join wt cross join bmi
   )
 select 'some_height_measurements_4335' query_name
      , 'Make sure we have at least some height records' description
@@ -77,6 +82,14 @@ select 'some_weight_measurements_4335' query_name
      , wt.qty record_n
      , results.pct_wt record_pct
 from total_vital cross join wt cross join results
+union all
+select 'some_bmi_measurements_4335' query_name
+     , 'Make sure we have at least some bmi records' description
+     , case when bmi.qty > 0 then 1 else 0 end pass
+     , rownum obs
+     , bmi.qty record_n
+     , results.pct_bmi record_pct
+from total_vital cross join bmi cross join results
 ;
 commit;
 
