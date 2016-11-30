@@ -420,6 +420,7 @@ select
 from BLUEHERONMETADATA.HERON_TERMS
 where c_fullname like '\i2b2\Medications%'
 	and c_basecode like 'NDC:%'
+	and length(substr(c_basecode, 5)) < 12 -- Make sure we have 11 digit NDC
 ;
 
 delete 
