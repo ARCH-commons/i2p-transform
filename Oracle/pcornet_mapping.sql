@@ -415,7 +415,7 @@ select
   c_columnname, c_columndatatype, c_operator, c_dimcode, c_comment,
   c_tooltip, m_applied_path, update_date, download_date, import_date,
   sourcesystem_cd, valuetype_cd, m_exclusion_cd, c_path, c_symbol,
-  null pcori_basecode, null pcori_cui, -- This might not work
+  null pcori_basecode, null pcori_cui,
   substr(c_basecode, 5) pcori_ndc
 from "&&i2b2_meta_schema"."&&terms_table"
 where c_fullname like '\i2b2\Medications%'
