@@ -417,7 +417,7 @@ select
   sourcesystem_cd, valuetype_cd, m_exclusion_cd, c_path, c_symbol,
   null pcori_basecode, null pcori_cui, -- This might not work
   substr(c_basecode, 5) pcori_ndc
-from BLUEHERONMETADATA.HERON_TERMS
+from "&&i2b2_meta_schema"."&&terms_table"
 where c_fullname like '\i2b2\Medications%'
 	and c_basecode like 'NDC:%'
 	and length(substr(c_basecode, 5)) < 12 -- Make sure we have 11 digit NDC
