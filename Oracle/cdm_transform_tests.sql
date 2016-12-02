@@ -584,6 +584,38 @@ order by 2
 */
 
 
+/* "Low bar" test to verify that DISPENSING is not empty */
+insert into test_cases (query_name, description, obs, by_value1, by_value2, record_pct, pass)
+select
+    'DISPENSING' ,
+    'Make sure that there are at least 10 dispensing fact' description,
+    count(*) obs,
+    null by_value1,
+    null by_value2,
+    null record_pct,
+    case when count(*) >= 10 then 1 else 0 end pass
+from dispensing
+;
+
+
+/* Test that there are at least a handful of distinct patients associated with
+ * DISPENSING facts.
+ */
+insert into test_cases (query_name, description, obs, by_value1, by_value2, record_pct, pass)
+select
+  'DISPENSING_PATS',
+  'Make sure that there are at least 3 distinct patients with dispensing facts',
+  count(distinct dis.patid) obs,
+  null by_value1,
+    null by_value2,
+    null record_pct,
+    case when count(distinct dis.patid) >= 3 then 1 else 0 end pass
+from dispensing dis
+inner join demographic dem
+  on dis.patid=dem.patid
+;
+
+
 /*  Verify that LAB_RESULT_CM contains data associated with a least half of the 
 labs defined in PMN_LABLOCAL.
 */
