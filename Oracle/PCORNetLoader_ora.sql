@@ -1866,7 +1866,7 @@ http://listserv.kumc.edu/pipermail/gpc-dev/attachments/20160223/8d79fa70/attachm
 > LV: the dispensing side [?] is not mandatory? we just did Rx, since that
 > what we have in our i2b2
 */
---PCORNetDispensing;
+PCORNetDispensing;
 PCORNetHarvest;
 
 end pcornetloader;
