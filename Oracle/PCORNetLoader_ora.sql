@@ -1016,12 +1016,12 @@ with icd10_transition as (
 /* DX_IDs may have mappings to both ICD9 and ICD10 */
 , has9 as (
   select distinct c_basecode, pcori_basecode icd9_code
-  from blueheronmetadata.pcornet_diag diag
+  from "&&i2b2_meta_schema".pcornet_diag diag
   where diag.c_fullname like '\PCORI\DIAGNOSIS\09%'
 )
 , has10 as (
   select distinct c_basecode, pcori_basecode icd10_code
-  from blueheronmetadata.pcornet_diag diag
+  from "&&i2b2_meta_schema".pcornet_diag diag
   where diag.c_fullname like '\PCORI\DIAGNOSIS\10%'
 )
 , has9_and_10 as (
