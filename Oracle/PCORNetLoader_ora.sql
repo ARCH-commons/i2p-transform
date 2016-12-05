@@ -1036,7 +1036,7 @@ with icd10_transition as (
   where diag.c_fullname like '\PCORI\DIAGNOSIS\%'
 )
 
-select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, enc.admit_date, factline.provider_id
+select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, enc.admit_date, enc.providerid
      , case
        when diag.pcori_basecode is not null           then diag.pcori_basecode
        when enc.admit_date >= icd10_transition.cutoff then diag.icd10_code
