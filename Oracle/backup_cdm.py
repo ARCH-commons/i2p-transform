@@ -1,14 +1,20 @@
 ''' backup_cdm - back up cdm tables that have at least one row
 '''
+import csv
+import pkg_resources as pkg
+
+
 # Allow --dry run even without cx_Oracle
 try:
     from cx_Oracle import DatabaseError
 except:
     pass
 
-CDM3_TABLES = ['HARVEST', 'DEMOGRAPHIC', 'ENCOUNTER', 'DIAGNOSIS',
-               'CONDITION', 'PROCEDURES', 'VITAL', 'ENROLLMENT',
-               'LAB_RESULT_CM', 'PRESCRIBING', 'DISPENSING']
+CDM_SPEC = '../2015-06-01-PCORnet-Common-Data-Model-v3dot0-parseable-fields.csv'  # noqa
+
+CDM3_TABLES = sorted(set(f['TABLE_NAME']
+                         for f in csv.DictReader(
+                                 pkg.resource_stream(__name__, CDM_SPEC))))
 
 
 def main(get_cursor):
