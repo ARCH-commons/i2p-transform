@@ -1009,7 +1009,7 @@ execute immediate 'create index pdxfact_idx on pdxfact (patient_num, encounter_n
 GATHER_TABLE_STATS('PDXFACT');
 
 insert into diagnosis (patid,			encounterid,	enc_type, admit_date, providerid, dx, dx_type, dx_source, pdx)
-select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, factline.start_date, factline.provider_id, diag.pcori_basecode,
+select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, enc.admit_date, factline.provider_id, diag.pcori_basecode,
 SUBSTR(diag.c_fullname,18,2) dxtype,
 	CASE WHEN enc_type='AV' THEN 'FI' ELSE nvl(SUBSTR(dxsource,INSTR(dxsource,':')+1,2) ,'NI') END,
 	CASE WHEN enc_type in ('IP', 'IS')  -- PDX is "relevant only on IP and IS encounters"
