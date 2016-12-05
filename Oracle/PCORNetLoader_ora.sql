@@ -1714,6 +1714,24 @@ insert into dispensing (
     ,DISPENSE_AMT  -- modifier nval_num
 --    ,RAW_NDC
 )
+/* Below is the Cycle 2 fix for populating the DISPENSING table  */
+select distinct
+  ibf.patient_num patid,
+  null prescribingid,
+  ibf.start_date dispense_date,
+  substr(ibf.concept_cd, 5) ndc,
+  null dispense_sup,
+  null dispense_amt
+from i2b2fact ibf
+join BLUEHERONMETADATA.pcornet_med pnm
+  on ibf.modifier_cd=pnm.c_basecode
+where pnm.c_fullname like '\PCORI_MOD\RX_BASIS\DI\%'
+  and length(substr(ibf.concept_cd, 5)) < 12
+; 
+
+/* NOTE: Once DISPENSING related encounters have made it into the CDM (via the visit
+   dimension) then the original SCILHS code below should work.
+
 select  m.patient_num, null,m.start_date, NVL(mo.pcori_ndc,'NA')
     ,max(supply.nval_num) sup, max(amount.nval_num) amt 
 from i2b2fact m inner join pcornet_med mo
@@ -1739,6 +1757,7 @@ inner join encounter enc on enc.encounterid = m.encounter_Num
     and m.concept_cd = amount.concept_Cd
 
 group by m.encounter_num ,m.patient_num, m.start_date,  mo.pcori_ndc;
+*/
 
 execute immediate 'create index dispensing_patid on dispensing (PATID)';
 
@@ -1847,7 +1866,7 @@ http://listserv.kumc.edu/pipermail/gpc-dev/attachments/20160223/8d79fa70/attachm
 > LV: the dispensing side [?] is not mandatory? we just did Rx, since that
 > what we have in our i2b2
 */
---PCORNetDispensing;
+PCORNetDispensing;
 PCORNetHarvest;
 
 end pcornetloader;

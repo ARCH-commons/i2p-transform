@@ -170,52 +170,33 @@ join "&&i2b2_meta_schema"."&&terms_table" i2b2 on i2b2.c_fullname like pcornet_m
 
 commit;
 
---select *
-delete 
-from "&&i2b2_meta_schema".PCORNET_PROC
-where c_fullname like '\PCORI\PROCEDURE\09\_%'
+-- TODO may be better represented in pcornet_mapping.csv
+create or replace view proc_local_to_pcori as
+select           '\PCORI\PROCEDURE\09\' as pcori_path, '\i2b2\Procedures\PRC\ICD9 (Inpatient)\' as local_path from dual 
+union all select '\PCORI\PROCEDURE\10\' as pcori_path, '\i2b2\Procedures\ICD10\' as local_path from dual 
+union all select '\PCORI\PROCEDURE\C4\' as pcori_path, '\i2b2\Procedures\PRC\Metathesaurus CPT Hierarchical Terms\' as local_path from dual
 ;
 
-/* Replace PCORNet Procedure (ICD9) hierarchy with the local hierarchy.
-*/
+--select *
+delete
+from "&&i2b2_meta_schema".PCORNET_PROC p_proc
+where exists (select 1
+              from proc_local_to_pcori m
+              where p_proc.c_fullname like m.pcori_path || '%');
+
 insert into "&&i2b2_meta_schema".PCORNET_PROC
 select 
   ht.c_hlevel, 
-  replace(ht.c_fullname, '\i2b2\Procedures\PRC\ICD9 (Inpatient)', '\PCORI\PROCEDURE\09') c_fullname, 
+  replace(ht.c_fullname, m.local_path, m.pcori_path) c_fullname, 
   ht.c_name, ht.c_synonym_cd, ht.c_visualattributes,
   ht.c_totalnum, ht.c_basecode, ht.c_metadataxml, ht.c_facttablecolumn, ht.c_tablename, 
   ht.c_columnname, ht.c_columndatatype, ht.c_operator, ht.c_dimcode, ht.c_comment, 
   ht.c_tooltip, ht.m_applied_path, ht.update_date, ht.download_date, ht.import_date, 
   ht.sourcesystem_cd, ht.valuetype_cd, ht.m_exclusion_cd, ht.c_path, ht.c_symbol,
-  ht.c_basecode pcori_basecode 
-from 
-  "&&i2b2_meta_schema"."&&terms_table" ht
-where c_fullname like '\i2b2\Procedures\PRC\ICD9 (Inpatient)\_%' order by c_hlevel 
-;
-
-
---select *
-delete 
-from "&&i2b2_meta_schema".PCORNET_PROC
-where c_fullname like '\PCORI\PROCEDURE\C4\%'
-;
-
-/* Replace PCORNet Procedure (ICD9) hierarchy with the local hierarchy.
-*/
-insert into "&&i2b2_meta_schema".PCORNET_PROC
-select 
-  ht.c_hlevel, 
-  replace(ht.c_fullname, '\i2b2\Procedures\PRC\Metathesaurus CPT Hierarchical Terms', '\PCORI\PROCEDURE\C4') c_fullname, 
-  ht.c_name, ht.c_synonym_cd, ht.c_visualattributes,
-  ht.c_totalnum, ht.c_basecode, ht.c_metadataxml, ht.c_facttablecolumn, ht.c_tablename, 
-  ht.c_columnname, ht.c_columndatatype, ht.c_operator, ht.c_dimcode, ht.c_comment, 
-  ht.c_tooltip, ht.m_applied_path, ht.update_date, ht.download_date, ht.import_date, 
-  ht.sourcesystem_cd, ht.valuetype_cd, ht.m_exclusion_cd, ht.c_path, ht.c_symbol,
-  ht.c_basecode pcori_basecode 
-from 
-  "&&i2b2_meta_schema"."&&terms_table" ht
-where c_fullname like '\i2b2\Procedures\PRC\Metathesaurus CPT Hierarchical Terms\%' order by c_hlevel 
-;
+  ht.c_basecode pcori_basecode
+from  "&&i2b2_meta_schema"."&&terms_table" ht
+join proc_local_to_pcori m on ht.c_fullname like m.local_path || '%'
+order by ht.c_hlevel;
 
 /* MS-DRGs
 */
@@ -380,7 +361,8 @@ terms_rx as (
     "&&i2b2_meta_schema"."&&terms_table" ht
   left join rxnorm_mapping cm2rx on to_char(cm2rx.clarity_med_id) = replace(ht.c_basecode, 'KUH|MEDICATION_ID:', '')
   where c_fullname like '\i2b2\Medications%'
-  and ht.c_visualattributes not like '%H%'
+		and c_basecode not like 'NDC:%' -- We'll handle NDCs seperately below
+  	and ht.c_visualattributes not like '%H%'
   )
 select
   rx.c_hlevel + 1 c_hlevel, 
@@ -403,6 +385,24 @@ select
     from terms_rx trx
     --order by trx.c_hlevel
     ) rx;
+
+-- Handle mapping NDC codes for DISPENSING
+insert into "&&i2b2_meta_schema".PCORNET_MED
+select
+	c_hlevel + 1 c_hlevel,
+	replace(c_fullname, '\i2b2\Medications\', '\PCORI\MEDICATION\RXNORM_CUI\') c_fullname,
+  c_name, c_synonym_cd, c_visualattributes,
+  c_totalnum, c_basecode, c_metadataxml, c_facttablecolumn, c_tablename,
+  c_columnname, c_columndatatype, c_operator, c_dimcode, c_comment,
+  c_tooltip, m_applied_path, update_date, download_date, import_date,
+  sourcesystem_cd, valuetype_cd, m_exclusion_cd, c_path, c_symbol,
+  null pcori_basecode, null pcori_cui,
+  substr(c_basecode, 5) pcori_ndc
+from "&&i2b2_meta_schema"."&&terms_table"
+where c_fullname like '\i2b2\Medications%'
+	and c_basecode like 'NDC:%'
+	and length(substr(c_basecode, 5)) < 12 -- Make sure we have 11 digit NDC
+;
 
 delete 
 from "&&i2b2_meta_schema".PCORNET_MED where sourcesystem_cd='MAPPING';
