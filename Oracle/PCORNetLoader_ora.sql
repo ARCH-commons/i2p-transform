@@ -1008,32 +1008,31 @@ PMN_EXECUATESQL(sqltext);
 execute immediate 'create index pdxfact_idx on pdxfact (patient_num, encounter_num, provider_id, concept_cd, start_date)';
 GATHER_TABLE_STATS('PDXFACT');
 
-sqltext := 'insert into diagnosis (patid,			encounterid,	enc_type, admit_date, providerid, dx, dx_type, dx_source, pdx) '||
-'select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, factline.start_date, factline.provider_id, diag.pcori_basecode,  '||
-'SUBSTR(diag.c_fullname,18,2) dxtype,   '||
-'	CASE WHEN enc_type=''AV'' THEN ''FI'' ELSE nvl(SUBSTR(dxsource,INSTR(dxsource,'':'')+1,2) ,''NI'') END, '||
-'	CASE WHEN enc_type in (''IP'', ''IS'')  -- PDX is "relevant only on IP and IS encounters"
-             THEN nvl(SUBSTR(pdxsource,INSTR(pdxsource, '':'')+1,2),''NI'')
-             ELSE ''X'' END '||
-'from i2b2fact factline '||
-'inner join encounter enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num '||
-' left outer join sourcefact '||
-'on	factline.patient_num=sourcefact.patient_num '||
-'and factline.encounter_num=sourcefact.encounter_num '||
-'and factline.provider_id=sourcefact.provider_id '||
-'and factline.concept_cd=sourcefact.concept_Cd '||
-'and factline.start_date=sourcefact.start_Date '||
-'left outer join pdxfact '||
-'on	factline.patient_num=pdxfact.patient_num '||
-'and factline.encounter_num=pdxfact.encounter_num '||
-'and factline.provider_id=pdxfact.provider_id '||
-'and factline.concept_cd=pdxfact.concept_cd '||
-'and factline.start_date=pdxfact.start_Date '||
-'inner join pcornet_diag diag on diag.c_basecode  = factline.concept_cd '||
-'where diag.c_fullname like ''\PCORI\DIAGNOSIS\%''  '||
-'and (sourcefact.c_fullname like ''\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\%'' or sourcefact.c_fullname is null) ';
+insert into diagnosis (patid,			encounterid,	enc_type, admit_date, providerid, dx, dx_type, dx_source, pdx)
+select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, factline.start_date, factline.provider_id, diag.pcori_basecode,
+SUBSTR(diag.c_fullname,18,2) dxtype,
+	CASE WHEN enc_type='AV' THEN 'FI' ELSE nvl(SUBSTR(dxsource,INSTR(dxsource,':')+1,2) ,'NI') END,
+	CASE WHEN enc_type in ('IP', 'IS')  -- PDX is "relevant only on IP and IS encounters"
+             THEN nvl(SUBSTR(pdxsource,INSTR(pdxsource, ':')+1,2),'NI')
+             ELSE 'X' END
+from i2b2fact factline
+inner join encounter enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num
+ left outer join sourcefact
+on	factline.patient_num=sourcefact.patient_num
+and factline.encounter_num=sourcefact.encounter_num
+and factline.provider_id=sourcefact.provider_id
+and factline.concept_cd=sourcefact.concept_Cd
+and factline.start_date=sourcefact.start_Date
+left outer join pdxfact
+on	factline.patient_num=pdxfact.patient_num
+and factline.encounter_num=pdxfact.encounter_num
+and factline.provider_id=pdxfact.provider_id
+and factline.concept_cd=pdxfact.concept_cd
+and factline.start_date=pdxfact.start_Date
+inner join pcornet_diag diag on diag.c_basecode  = factline.concept_cd
+where diag.c_fullname like '\PCORI\DIAGNOSIS\%'
+and (sourcefact.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\%' or sourcefact.c_fullname is null);
 
-PMN_EXECUATESQL(sqltext);
 
 execute immediate 'create index diagnosis_patid on diagnosis (PATID)';
 execute immediate 'create index diagnosis_encounterid on diagnosis (ENCOUNTERID)';
