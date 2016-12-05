@@ -102,7 +102,7 @@ update "&&i2b2_meta_schema".pcornet_diag pd set pd.pcori_basecode = 'PDX:X' wher
 the pcornet_basecode with the expected values.
 */
 
--- select *
+--select *
 delete 
 from "&&i2b2_meta_schema".PCORNET_DIAG
 where c_fullname like '\PCORI\DIAGNOSIS\09\%'
@@ -111,6 +111,7 @@ where c_fullname like '\PCORI\DIAGNOSIS\09\%'
 
 
 insert into "&&i2b2_meta_schema".PCORNET_DIAG
+-- TODO: Stop cheating by going back to Clarity
 with edg9 as (
     select dx_id, code from clarity.edg_current_icd9@id
 )
@@ -121,6 +122,7 @@ with edg9 as (
   select case
          when ht.c_basecode like 'KUH|DX_ID:%'
          then to_number(replace(ht.c_basecode, 'KUH|DX_ID:', ''))
+         else null
          end dx_id
        , ht.*
   from "&&i2b2_meta_schema"."&&terms_table" ht
@@ -140,9 +142,9 @@ with edg9 as (
        , ht.*
   from heron_dx ht
   left join edg9
-         on to_char(edg9.dx_id) = ht.dx_id
+         on edg9.dx_id = ht.dx_id
   left join edg10
-         on to_char(edg10.dx_id) = ht.dx_id
+         on edg10.dx_id = ht.dx_id
 )
 select
   td.c_hlevel,
