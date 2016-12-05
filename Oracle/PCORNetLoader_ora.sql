@@ -1008,32 +1008,69 @@ PMN_EXECUATESQL(sqltext);
 execute immediate 'create index pdxfact_idx on pdxfact (patient_num, encounter_num, provider_id, concept_cd, start_date)';
 GATHER_TABLE_STATS('PDXFACT');
 
-sqltext := 'insert into diagnosis (patid,			encounterid,	enc_type, admit_date, providerid, dx, dx_type, dx_source, pdx) '||
-'select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, factline.start_date, factline.provider_id, diag.pcori_basecode,  '||
-'SUBSTR(diag.c_fullname,18,2) dxtype,   '||
-'	CASE WHEN enc_type=''AV'' THEN ''FI'' ELSE nvl(SUBSTR(dxsource,INSTR(dxsource,'':'')+1,2) ,''NI'') END, '||
-'	CASE WHEN enc_type in (''IP'', ''IS'')  -- PDX is "relevant only on IP and IS encounters"
-             THEN nvl(SUBSTR(pdxsource,INSTR(pdxsource, '':'')+1,2),''NI'')
-             ELSE ''X'' END '||
-'from i2b2fact factline '||
-'inner join encounter enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num '||
-' left outer join sourcefact '||
-'on	factline.patient_num=sourcefact.patient_num '||
-'and factline.encounter_num=sourcefact.encounter_num '||
-'and factline.provider_id=sourcefact.provider_id '||
-'and factline.concept_cd=sourcefact.concept_Cd '||
-'and factline.start_date=sourcefact.start_Date '||
-'left outer join pdxfact '||
-'on	factline.patient_num=pdxfact.patient_num '||
-'and factline.encounter_num=pdxfact.encounter_num '||
-'and factline.provider_id=pdxfact.provider_id '||
-'and factline.concept_cd=pdxfact.concept_cd '||
-'and factline.start_date=pdxfact.start_Date '||
-'inner join pcornet_diag diag on diag.c_basecode  = factline.concept_cd '||
-'where diag.c_fullname like ''\PCORI\DIAGNOSIS\%''  '||
-'and (sourcefact.c_fullname like ''\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\%'' or sourcefact.c_fullname is null) ';
+insert into diagnosis (patid,			encounterid,	enc_type, admit_date, providerid, dx, dx_type, dx_source, pdx)
+/* KUMC started billing with ICD10 on Oct 1, 2015. */
+with icd10_transition as (
+  select date '2015-10-01' as cutoff from dual
+)
+/* DX_IDs may have mappings to both ICD9 and ICD10 */
+, has9 as (
+  select distinct c_basecode, pcori_basecode icd9_code
+  from "&&i2b2_meta_schema".pcornet_diag diag
+  where diag.c_fullname like '\PCORI\DIAGNOSIS\09%'
+)
+, has10 as (
+  select distinct c_basecode, pcori_basecode icd10_code
+  from "&&i2b2_meta_schema".pcornet_diag diag
+  where diag.c_fullname like '\PCORI\DIAGNOSIS\10%'
+)
+, has9_and_10 as (
+  select has9.c_basecode, has9.icd9_code, has10.icd10_code
+  from has9 join has10 on has9.c_basecode = has10.c_basecode
+)
+, diag as ( -- replace diag rows by 9_and_10 rows and avoid dups
+  select distinct diag.c_basecode, diag.pcori_basecode, icd9_code, icd10_code
+       , case when has9_and_10.c_basecode is null then SUBSTR(diag.c_fullname,18,2) else null end dx_type
+  from pcornet_diag diag
+  left join has9_and_10 on has9_and_10.c_basecode = diag.c_basecode
+  where diag.c_fullname like '\PCORI\DIAGNOSIS\%'
+)
 
-PMN_EXECUATESQL(sqltext);
+select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, enc.admit_date, enc.providerid
+     , case
+       when diag.pcori_basecode is not null           then diag.pcori_basecode
+       when enc.admit_date >= icd10_transition.cutoff then diag.icd10_code
+                                                      else diag.icd9_code
+       end dx
+     , case
+       when diag.dx_type is not null                  then diag.dx_type
+       when enc.admit_date >= icd10_transition.cutoff then '10'
+                                                      else '09'
+       end dxtype,
+	CASE WHEN enc_type='AV' THEN 'FI' ELSE nvl(SUBSTR(dxsource,INSTR(dxsource,':')+1,2) ,'NI') END dx_source,
+	CASE WHEN enc_type in ('IP', 'IS')  -- PDX is "relevant only on IP and IS encounters"
+             THEN nvl(SUBSTR(pdxsource,INSTR(pdxsource, ':')+1,2),'NI')
+             ELSE 'X' END PDX
+from i2b2fact factline
+inner join encounter enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num
+ left outer join sourcefact
+on	factline.patient_num=sourcefact.patient_num
+and factline.encounter_num=sourcefact.encounter_num
+and factline.provider_id=sourcefact.provider_id
+and factline.concept_cd=sourcefact.concept_Cd
+and factline.start_date=sourcefact.start_Date
+left outer join pdxfact
+on	factline.patient_num=pdxfact.patient_num
+and factline.encounter_num=pdxfact.encounter_num
+and factline.provider_id=pdxfact.provider_id
+and factline.concept_cd=pdxfact.concept_cd
+and factline.start_date=pdxfact.start_Date
+inner join diag on diag.c_basecode  = factline.concept_cd
+cross join icd10_transition
+where (sourcefact.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\%' or sourcefact.c_fullname is null)
+-- order by enc.admit_date desc
+;
+
 
 execute immediate 'create index diagnosis_patid on diagnosis (PATID)';
 execute immediate 'create index diagnosis_encounterid on diagnosis (ENCOUNTERID)';

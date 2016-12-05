@@ -98,7 +98,7 @@ update "&&i2b2_meta_schema".pcornet_diag pd set pd.pcori_basecode = 'PDX:P' wher
 update "&&i2b2_meta_schema".pcornet_diag pd set pd.pcori_basecode = 'PDX:X' where c_fullname = '\PCORI_MOD\PDX\X\';
 
 
-/* Replace PCORNet ICD9 diagnoses hierarchy with the local hierarchy filling in
+/* Replace PCORNet ICD9, ICD10 diagnoses hierarchy with the local hierarchy filling in
 the pcornet_basecode with the expected values.
 */
 
@@ -106,34 +106,57 @@ the pcornet_basecode with the expected values.
 delete 
 from "&&i2b2_meta_schema".PCORNET_DIAG
 where c_fullname like '\PCORI\DIAGNOSIS\09\%'
+   or c_fullname like '\PCORI\DIAGNOSIS\10\%'
 ;
 
 
 insert into "&&i2b2_meta_schema".PCORNET_DIAG
-with terms_dxi as (
-  select 
-    cicd.code dxicd, ht.* 
-  from 
-    "&&i2b2_meta_schema"."&&terms_table" ht
-  -- TODO: Stop cheating by going back to Clarity
-  left join clarity.edg_current_icd9@id cicd on to_char(cicd.dx_id) = replace(ht.c_basecode, 'KUH|DX_ID:', '')
-  where c_fullname like '\i2b2\Diagnoses\ICD9\%' order by c_hlevel 
-  )
+-- TODO: Stop cheating by going back to Clarity
+with edg9 as (
+    select dx_id, code from clarity.edg_current_icd9@id
+)
+, edg10 as (
+    select dx_id, code from clarity.edg_current_icd10@id
+)
+, heron_dx as (
+  select case
+         when ht.c_basecode like 'KUH|DX_ID:%'
+         then to_number(replace(ht.c_basecode, 'KUH|DX_ID:', ''))
+         else null
+         end dx_id
+       , ht.*
+  from "&&i2b2_meta_schema"."&&terms_table" ht
+  where c_fullname like '\i2b2\Diagnoses\ICD%'
+)
+, terms_dxi as (
+  select case
+         when ht.c_basecode like 'ICD9:%' then replace(ht.c_basecode, 'ICD9:', '')
+         when ht.c_basecode like 'ICD10:%' then replace(ht.c_basecode, 'ICD10:', '')
+         when ht.c_basecode like 'KUH|DX_ID:%'
+          and ht.c_fullname like '\i2b2\Diagnoses\ICD9\%'
+              then edg9.code
+         when ht.c_basecode like 'KUH|DX_ID:%'
+          and ht.c_fullname like '\i2b2\Diagnoses\ICD10\%'
+              then edg10.code
+         end pcori_basecode
+       , ht.*
+  from heron_dx ht
+  left join edg9
+         on edg9.dx_id = ht.dx_id
+  left join edg10
+         on edg10.dx_id = ht.dx_id
+)
 select
-  td.c_hlevel, 
-  replace(td.c_fullname, '\i2b2\Diagnoses\ICD9\', '\PCORI\DIAGNOSIS\09\') c_fullname, 
+  td.c_hlevel,
+  replace(replace(td.c_fullname, '\i2b2\Diagnoses\ICD9\', '\PCORI\DIAGNOSIS\09\')
+                               , '\i2b2\Diagnoses\ICD10\', '\PCORI\DIAGNOSIS\10\') c_fullname, 
   td.c_name, td.c_synonym_cd, td.c_visualattributes,
   td.c_totalnum, td.c_basecode, td.c_metadataxml, td.c_facttablecolumn, td.c_tablename, 
   td.c_columnname, td.c_columndatatype, td.c_operator, td.c_dimcode, td.c_comment, 
   td.c_tooltip, td.m_applied_path, td.update_date, td.download_date, td.import_date, 
   td.sourcesystem_cd, td.valuetype_cd, td.m_exclusion_cd, td.c_path, td.c_symbol,
-  case 
-    when td.dxicd is not null then td.dxicd
-    when td.c_basecode like 'ICD9:%' then replace(td.c_basecode, 'ICD9:', '')
-    else null 
-  end pcori_basecode
+  td.pcori_basecode
 from terms_dxi td
-order by c_hlevel
 ;
 
 
