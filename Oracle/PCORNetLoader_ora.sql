@@ -1817,15 +1817,15 @@ create or replace procedure PCORNetDeath as
 
 begin
 
-insert into pmndeath( patid, death_date, death_date_impute, death_source, death_match_confidence) 
+insert into death( patid, death_date, death_date_impute, death_source, death_match_confidence) 
 select  distinct pat.patient_num, pat.death_date, case 
 when vital_status_cd like 'X%' then 'B'
 when vital_status_cd like 'M%' then 'D'
-when vital_status_cd like 'Y%' then 'N'
+when upper(vital_status_cd) like 'Y%' then 'N'
 else 'OT'	
 end, 'NI','NI'
 from i2b2patient pat
-where (pat.death_date is not null or vital_status_cd like 'Z%') and pat.patient_num in (select patid from pmndemographic);
+where (pat.death_date is not null or vital_status_cd like 'Z%') and pat.patient_num in (select patid from demographic);
 
 end;
 /
