@@ -1,8 +1,10 @@
 ''' backup_cdm - back up cdm tables that have at least one row
 '''
+from __future__ import print_function
+
 import csv
 import pkg_resources as pkg
-
+from sys import stderr
 
 # Allow --dry run even without cx_Oracle
 try:
@@ -24,20 +26,24 @@ def main(get_cursor):
         bak_schema_table = ('%(backup_schema)s.%(table)s' %
                             dict(backup_schema=backup_schema,
                                  table=table))
-        rcount = count_rows(cursor, table)
-        print ('%(table)s (to be backed up) currently has %(rcount)s rows.'
-               % dict(table=table, rcount=rcount))
+        eprint('%(table)s (to be backed up) currently has %(rcount)s rows.'
+               % dict(table=table, rcount=count_rows(cursor, table)))
 
-        if rcount:
-            drop(cursor, bak_schema_table)
-            copy(cursor, table, bak_schema_table)
-            print ('%(bak_schema_table)s now has %(rows)s rows.' %
-                   dict(bak_schema_table=bak_schema_table,
-                        rows=count_rows(cursor, bak_schema_table)))
+        drop(cursor, bak_schema_table)
+        copy(cursor, table, bak_schema_table)
+        eprint('%(bak_schema_table)s now has %(rows)s rows.' %
+               dict(bak_schema_table=bak_schema_table,
+                    rows=count_rows(cursor, bak_schema_table)))
+
+
+def eprint(*args, **kwargs):
+    ''' ACK: http://stackoverflow.com/questions/5574702/how-to-print-to-stderr-in-python  # noqa
+    '''
+    print(*args, file=stderr, **kwargs)
 
 
 def drop(cursor, schema_table):
-    print ('Dropping %(schema_table)s (%(rows)s rows).' %
+    eprint('Dropping %(schema_table)s (%(rows)s rows).' %
            dict(schema_table=schema_table,
                 rows=count_rows(cursor, schema_table)))
     try:
@@ -60,7 +66,7 @@ def count_rows(cursor, schema_table):
 
 
 def copy(cursor, table, bak_schema_table):
-    print ('Copying %(table)s to %(bak_schema_table)s.' %
+    eprint('Copying %(table)s to %(bak_schema_table)s.' %
            dict(table=table, bak_schema_table=bak_schema_table))
     cursor.execute('create table %(bak_schema_table)s as '
                    'select * from %(table)s' %
@@ -72,12 +78,12 @@ class MockCursor(object):
         self.fetch_count = 1
 
     def execute(self, sql):
-        print 'execute: ' + sql
+        eprint('execute: ' + sql)
 
     def fetchall(self):
         r = [(self.fetch_count, )]
         self.fetch_count += 1
-        print 'fetch returning: ' + str(r)
+        eprint('fetch returning: ' + str(r))
         return r
 
 if __name__ == '__main__':
