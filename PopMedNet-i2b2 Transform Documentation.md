@@ -67,6 +67,7 @@ grant all on visit_dimension to username;
  * datamart parameters that will go in the Harvest table
  * pointer to loyalty_cohort_summary 
  * (loyalty cohort date range - you will probably not need to change this - by the time the range has changed we will release a new version that does not require manual entry)
+ * Enable or Diasble the Height and Weight unit conversion functions depending on whether your data mart uses inches versus centimeters or pounds versus kilograms (unit conversion disabled by deafault; Presumes your datamart uses inches and pounds).
 
 5. This script will delete your existing PopMedNet tables. If you do not want this behavior, please back them up.
 
@@ -128,9 +129,7 @@ The following features have not been developed yet:
 * Code translation in Encounters (other than DRG and inout_cd) - v6 assumes all other visit_dimension columns use PCORI codes.
 * Vitals unit conversions - v6 assumes the fact table uses the units PCORI is expecting.
 * The Demographics transform assumes all data is in the patient dimension and there are no local children added below the PCORI leaf nodes.
-* The lab transform does not: 
- * translate units_cd into PCORI's expected units
- * verify qualitative results (tval_char) match the metadata
+* The lab transform does not verify qualitative results (tval_char) match the metadata
 
 Other issues:
 

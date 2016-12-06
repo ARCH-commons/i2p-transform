@@ -27,6 +27,8 @@
 ---------------------------------------------------------------------------------------------------------------------------------------
  
 
+------------------------------------  UNIT CONVERTER FCUNTIONS   ---------------------------------------------------
+
 create or replace FUNCTION unit_ht RETURN NUMBER IS 
 BEGIN  
     RETURN 1; -- Use this statement if your site stores HT data in units of Inches 
@@ -41,6 +43,8 @@ BEGIN
 --    RETURN 2.20462; -- Use this statement if your site stores WT data in units of Kilograms 
 END;
 /
+------------------------------------- END UNIT CONVERTER  ----------------------------------------------------------
+
 
 
 create or replace PROCEDURE PMN_DROPSQL(sqlstring VARCHAR2) AS 
@@ -91,25 +95,17 @@ CREATE OR REPLACE SYNONYM I2B2FACT FOR I2B2DEMODATA.OBSERVATION_FACT
 /
 
 
-BEGIN
-PMN_DROPSQL('DROP TABLE i2b2patient_list');
-END;
-/
+-- extracted i2b2patient_list create table statement and inserted into the new run script. MJ 10/10/16
 
-CREATE table i2b2patient_list as 
-select * from
-(
-select DISTINCT f.PATIENT_NUM from I2B2FACT f 
-inner join i2b2visit v on f.patient_num=v.patient_num
-where f.START_DATE >= to_date('01-Jan-2010','dd-mon-rrrr') and v.START_DATE >= to_date('01-Jan-2010','dd-mon-rrrr')
-) where ROWNUM<100000000
-/
+
 
 create or replace VIEW i2b2patient as select * from I2B2DEMODATA.PATIENT_DIMENSION where PATIENT_NUM in (select PATIENT_NUM from i2b2patient_list)
 /
 
 create or replace view i2b2visit as select * from I2B2DEMODATA.VISIT_DIMENSION where START_DATE >= to_date('01-Jan-2010','dd-mon-rrrr') and (END_DATE is NULL or END_DATE < CURRENT_DATE) and (START_DATE <CURRENT_DATE)
 /
+
+
 
 
 CREATE OR REPLACE SYNONYM pcornet_med FOR  i2b2metadata.pcornet_med
@@ -1206,7 +1202,12 @@ sqltext := 'insert into pmndiagnosis (patid,			encounterid,	enc_type, admit_date
 'and factline.concept_cd=pdxfact.concept_cd '||
 'and enc.admit_date=pdxfact.start_Date '|| --bug fix MJ 10/7/16
 'inner join pcornet_diag diag on diag.c_basecode  = factline.concept_cd '||
-'where diag.c_fullname like ''\PCORI\DIAGNOSIS\%''  '||
+-- Skip ICD-9 V codes in 10 ontology, ICD-9 E codes in 10 ontology, ICD-10 numeric codes in 10 ontology
+-- Note: makes the assumption that ICD-9 Ecodes are not ICD-10 Ecodes; same with ICD-9 V codes. On inspection seems to be true.
+'where (diag.c_fullname not like ''\PCORI\DIAGNOSIS\10\%'' or ' ||
+'( not ( diag.pcori_basecode like ''[V]%'' and diag.c_fullname not like ''\PCORI\DIAGNOSIS\10\([V]%\([V]%\([V]%'' ) '||
+'and not ( diag.pcori_basecode like ''[E]%'' and diag.c_fullname not like ''\PCORI\DIAGNOSIS\10\([E]%\([E]%\([E]%'' ) '|| 
+'and not (diag.c_fullname like ''\PCORI\DIAGNOSIS\10\%'' and diag.pcori_basecode like ''[0-9]%'') )) '||
 'and (sourcefact.c_fullname like ''\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\%'' or sourcefact.c_fullname is null) ';
 
 PMN_EXECUATESQL(sqltext);
@@ -1562,6 +1563,7 @@ INSERT INTO pmnlabresults_cm
       ,RAW_FACILITY_CODE)
 
 
+
 SELECT DISTINCT  M.patient_num patid,
 M.encounter_num encounterid,
 CASE WHEN ont_parent.C_BASECODE LIKE 'LAB_NAME%' then SUBSTR (ont_parent.c_basecode,10, 10) ELSE 'NI' END LAB_NAME,
@@ -1573,10 +1575,10 @@ NVL(lab.pcori_basecode, 'NI') LAB_PX,
 'LC'  LAB_PX_TYPE,
 m.start_date LAB_ORDER_DATE, 
 m.start_date SPECIMEN_DATE,
-to_char(m.start_date,'HH24:MI')  SPECIMEN_TIME,
+to_char(m.start_date,'HH24:MI') SPECIMEN_TIME,
 NVL(m.end_date, m.start_date) RESULT_DATE,    -- Bug fix MJ 10/06/16
 to_char(m.end_date,'HH24:MI') RESULT_TIME,
-CASE WHEN m.ValType_Cd='T' THEN NVL(nullif(m.TVal_Char,''),'NI') ELSE 'NI' END RESULT_QUAL, -- TODO: Should be a standardized value
+CASE WHEN m.ValType_Cd='T' THEN CASE WHEN m.Tval_Char IS NOT NULL THEN 'OT' ELSE 'NI' END END RESULT_QUAL, -- TODO: Should be a standardized value -- bug fix translated by MJ from JK's MSSQL fix 11/30/16
 CASE WHEN m.ValType_Cd='N' THEN m.NVAL_NUM ELSE null END RESULT_NUM,
 CASE WHEN m.ValType_Cd='N' THEN (CASE NVL(nullif(m.TVal_Char,''),'NI') WHEN 'E' THEN 'EQ' WHEN 'NE' THEN 'OT' WHEN 'L' THEN 'LT' WHEN 'LE' THEN 'LE' WHEN 'G' THEN 'GT' WHEN 'GE' THEN 'GE' ELSE 'NI' END)  ELSE 'TX' END RESULT_MODIFIER,
 NVL(m.Units_CD,'NI') RESULT_UNIT, -- TODO: Should be standardized units
@@ -1588,7 +1590,7 @@ CASE NVL(nullif(m.VALUEFLAG_CD,''),'NI') WHEN 'H' THEN 'AH' WHEN 'L' THEN 'AL' W
 NULL RAW_LAB_NAME,
 NULL RAW_LAB_CODE,
 NULL RAW_PANEL,
-CASE WHEN m.ValType_Cd='T' THEN m.TVal_Char ELSE to_char(m.NVal_Num) END RAW_RESULT,
+CASE WHEN m.ValType_Cd='T' THEN SUBSTR(m.TVal_Char,1,50) ELSE SUBSTR(to_char(m.NVal_Num),1,50) END RAW_RESULT, --bug fix MJ 10/17/16 translated from JK's MSSQL fix
 NULL RAW_UNIT,
 NULL RAW_ORDER_DEPT,
 NULL RAW_FACILITY_CODE
@@ -1628,7 +1630,6 @@ Commit;
 
 END PCORNetLabResultCM;
 /
-
 
 ----------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------------
@@ -2014,9 +2015,10 @@ end;
 ----------------------------------------------------------------------------------------------------------------------------------------
 
 
-
 create or replace PROCEDURE pcornetReport
 as
+
+i2b2vitald number;
 i2b2dxd number;
 i2b2pxd number;
 i2b2encountersd number;
@@ -2086,24 +2088,24 @@ select count(distinct patid) into pmndispensingsd   from pmndispensing;
 
 -- Distinct patients in i2b2 (unfinished)
 select count(distinct patient_num) into i2b2pxd from i2b2fact fact
- inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
+ inner join    pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
 where pr.c_fullname like '\PCORI\PROCEDURE\%';
 
 select count(distinct patient_num) into i2b2pxd from i2b2fact fact --//////////////////////////////////////////ERROR i2b2pxd
- inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
+ inner join    pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
  inner join pmnENCOUNTER enc on enc.patid = fact.patient_num and enc.encounterid = fact.encounter_Num
 where pr.c_fullname like '\PCORI\PROCEDURE\%';
 
 -- Counts in i2b2
 /*select @i2b2pxde=count(distinct patient_num) from i2b2fact fact
- inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
+ inner join    pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
  inner join pmnENCOUNTER enc on enc.patid = fact.patient_num and enc.encounterid = fact.encounter_Num
 where pr.c_fullname like '\PCORI\PROCEDURE\%'*/
 /*select @i2b2dxd=count(distinct patient_num) from i2b2fact fact
- inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
+ inner join    pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
 where pr.c_fullname like '\PCORI\PROCEDURE\%'
 select @i2b2vitald=count(distinct patient_num) from i2b2fact fact
- inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
+ inner join    pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
 where pr.c_fullname like '\PCORI\PROCEDURE\%'
 */
 
@@ -2116,21 +2118,18 @@ insert into i2pReport values( v_runid, SYSDATE, 'Pats', i2b2pats, pmnpats, null)
 insert into i2pReport values( v_runid, SYSDATE, 'Enrollment', i2b2pats, pmnenroll, pmnenrolld);
 
 insert into i2pReport values(v_runid, SYSDATE, 'Encounters', i2b2Encounters, null,  pmnEncounters, pmnEncountersd);
-insert into i2pReport values(v_runid, SYSDATE, 'DX',		null, i2b2dxd,		pmndx,		pmndxd);
-insert into i2pReport values(v_runid, SYSDATE, 'PX',		null, i2b2pxd,		pmnprocs,	pmnprocsd);
-insert into i2pReport values(v_runid, SYSDATE, 'Condition',	null, null,		pmncond,	pmncondd);
-insert into i2pReport values(v_runid, SYSDATE, 'Vital',		null, i2b2vitald,	pmnvital,	pmnvitald);
-insert into i2pReport values(v_runid, SYSDATE, 'Labs',		null, null,		pmnlabs,	pmnlabsd);
-insert into i2pReport values(v_runid, SYSDATE, 'Prescribing',	null, null,		pmnprescribings, pmnprescribingsd);
-insert into i2pReport values(v_runid, SYSDATE, 'Dispensing',	null, null,		pmndispensings,	pmndispensingsd);
+insert into i2pReport values(v_runid, SYSDATE, 'DX',        null, i2b2dxd,        pmndx,        pmndxd);
+insert into i2pReport values(v_runid, SYSDATE, 'PX',        null, i2b2pxd,        pmnprocs,    pmnprocsd);
+insert into i2pReport values(v_runid, SYSDATE, 'Condition',    null, null,        pmncond,    pmncondd);
+insert into i2pReport values(v_runid, SYSDATE, 'Vital',        null, i2b2vitald,    pmnvital,    pmnvitald);
+insert into i2pReport values(v_runid, SYSDATE, 'Labs',        null, null,        pmnlabs,    pmnlabsd);
+insert into i2pReport values(v_runid, SYSDATE, 'Prescribing',    null, null,        pmnprescribings, pmnprescribingsd);
+insert into i2pReport values(v_runid, SYSDATE, 'Dispensing',    null, null,        pmndispensings,    pmndispensingsd);
 
 
-select concept "Data Type",sourceval "From i2b2", sourcedistinct 'Patients in i2b2' , destval "In PopMedNet", destdistinct 'Patients in PopMedNet' from i2preport where RUNID = v_runid;
-/
+select concept "Data Type",sourceval "From i2b2", sourcedistinct "Patients in i2b2" , destval "In PopMedNet", destdistinct "Patients in PopMedNet" from i2preport where RUNID = v_runid;
 
-  
-
-end pcornetReport;
+end;
 /
 
 
@@ -2181,15 +2180,6 @@ PCORNetLabResultCM;
 PCORNetPrescribing;
 PCORNetDispensing;
 PCORNetDeath;
-
---pcornetReport; --pcornetreport is incomplete and broken at the moment. You can run an old version of this procedure if need be in the interim. 
-
-end pcornetloader;
+end;
 /
-
-
-BEGIN          -- RUN PROGRAM 
-pcornetclear;  -- Make sure to run this before re-populating any pmn tables.
-pcornetloader; -- you may want to run sql statements one by one in the pcornetloader procedure :)
-END;
-/
+--new run script executes pcornet clear and pcornet loader. 
