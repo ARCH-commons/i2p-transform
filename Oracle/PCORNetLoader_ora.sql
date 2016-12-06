@@ -1018,11 +1018,13 @@ with icd10_transition as (
   select distinct c_basecode, pcori_basecode icd9_code
   from "&&i2b2_meta_schema".pcornet_diag diag
   where diag.c_fullname like '\PCORI\DIAGNOSIS\09%'
+  and pcori_basecode is not null
 )
 , has10 as (
   select distinct c_basecode, pcori_basecode icd10_code
   from "&&i2b2_meta_schema".pcornet_diag diag
   where diag.c_fullname like '\PCORI\DIAGNOSIS\10%'
+  and pcori_basecode is not null
 )
 , has9_and_10 as (
   select has9.c_basecode, has9.icd9_code, has10.icd10_code
