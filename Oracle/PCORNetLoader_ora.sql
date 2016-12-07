@@ -1843,35 +1843,35 @@ inner join pmnENCOUNTER enc on enc.encounterid = m.encounter_Num
     and m.concept_cd = basis.concept_Cd
     and m.start_date = basis.start_date
     and m.provider_id = basis.provider_id
-    and m.instance_num = basis.modifier_cd
+    and m.instance_num = basis.instance_num
 
     left join  freq
     on m.encounter_num = freq.encounter_num
     and m.concept_cd = freq.concept_Cd
     and m.start_date = freq.start_date
     and m.provider_id = freq.provider_id
-    and m.instance_num = freq.modifier_cd
+    and m.instance_num = freq.instance_num
 
     left join quantity 
     on m.encounter_num = quantity.encounter_num
     and m.concept_cd = quantity.concept_Cd
     and m.start_date = quantity.start_date
     and m.provider_id = quantity.provider_id
-    and m.instance_num = quantity.modifier_cd
+    and m.instance_num = quantity.instance_num
 
     left join refills
     on m.encounter_num = refills.encounter_num
     and m.concept_cd = refills.concept_Cd
     and m.start_date = refills.start_date
     and m.provider_id = refills.provider_id
-    and m.instance_num = refills.modifier_cd
+    and m.instance_num = refills.instance_num
 
     left join supply
     on m.encounter_num = supply.encounter_num
     and m.concept_cd = supply.concept_Cd
     and m.start_date = supply.start_date
     and m.provider_id = supply.provider_id
-    and m.instance_num = supply.modifier_cd
+    and m.instance_num = supply.instance_num
 
 where (basis.c_fullname is null or basis.c_fullname= '\PCORI_MOD\RX_BASIS\PR\%'); -- jgk 11/2 bugfix: filter for PR, not DI
 
