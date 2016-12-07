@@ -1036,6 +1036,7 @@ with icd10_transition as (
   from pcornet_diag diag
   left join has9_and_10 on has9_and_10.c_basecode = diag.c_basecode
   where diag.c_fullname like '\PCORI\DIAGNOSIS\%'
+  and diag.pcori_basecode is not null
 )
 
 select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, enc.admit_date, enc.providerid
