@@ -129,6 +129,10 @@ go
 -- Use the corresponding RETURN statement depending on which units your site uses: 
 -- Inches (RETURN 1) versus Centimeters(RETURN 0.393701) and Pounds (RETURN 1) versus Kilograms(RETURN 2.20462).  
 ----------------------------------------------------------------------------------------------------------------------------------------
+IF OBJECTPROPERTY (object_id('dbo.unit_ht'), 'IsScalarFunction') = 1 DROP function unit_ht
+
+IF OBJECTPROPERTY (object_id('dbo.unit_wt'), 'IsScalarFunction') = 1 DROP function unit_wt
+go
 
 CREATE FUNCTION unit_ht() RETURNS float(10) AS BEGIN 
     RETURN 1 -- Use this statement if your site stores HT data in units of Inches 
@@ -827,6 +831,37 @@ GO
 -- Create synonyms for the pmn tables for use by the MENU DRIVEN QUERY TOOL 
 -- Written by Matthew Joss
 ----------------------------------------------------------------------------------------------------------------------------------------
+
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'CONDITION') DROP SYNONYM CONDITION
+
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'DEATH') DROP SYNONYM DEATH
+
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'DEATH_CAUSE') DROP SYNONYM DEATH_CAUSE
+
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'DEMOGRAPHIC') DROP SYNONYM DEMOGRAPHIC
+
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'DIAGNOSIS') DROP SYNONYM DIAGNOSIS
+
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'DISPENSING') DROP SYNONYM DISPENSING
+
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'ENCOUNTER') DROP SYNONYM ENCOUNTER
+
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'ENROLLMENT') DROP SYNONYM ENROLLMENT
+
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'HARVEST') DROP SYNONYM HARVEST
+
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'LAB_RESULT_CM') DROP SYNONYM LAB_RESULT_CM
+
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'PCORNET_TRIAL') DROP SYNONYM PCORNET_TRIAL
+
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'PRESCRIBING') DROP SYNONYM PRESCRIBING
+
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'PRO_CM') DROP SYNONYM PRO_CM
+
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'PROCEDURES') DROP SYNONYM PROCEDURES
+
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'VITAL') DROP SYNONYM VITAL
+
 
 
 

@@ -254,7 +254,9 @@ CREATE TABLE pmnENROLLMENT (
 	RAW_CHART varchar(50) NULL,
 	RAW_BASIS varchar(50) NULL
 )
-/
+--organization index
+--including ENR_BASIS;
+--/
 
 
 
