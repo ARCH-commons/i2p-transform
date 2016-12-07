@@ -68,6 +68,7 @@ grant all on visit_dimension to username;
  * pointer to loyalty_cohort_summary 
  * (loyalty cohort date range - you will probably not need to change this - by the time the range has changed we will release a new version that does not require manual entry)
  * Enable or Diasble the Height and Weight unit conversion functions depending on whether your data mart uses inches versus centimeters or pounds versus kilograms (unit conversion disabled by deafault; Presumes your datamart uses inches and pounds).
+ * Change 'LOINC:' in the lab results procedure to whatever term your local site uses. 
 
 5. This script will delete your existing PopMedNet tables. If you do not want this behavior, please back them up.
 
