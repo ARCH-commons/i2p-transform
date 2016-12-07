@@ -1580,7 +1580,7 @@ NULL [RAW_FACILITY_CODE]
 FROM i2b2fact M   --JK bug fix 10/7/16
 inner join pmnENCOUNTER enc on enc.patid = m.patient_num and enc.encounterid = m.encounter_Num -- Constraint to selected encounters
 inner join pcornet_lab lab on lab.c_basecode  = M.concept_cd and lab.c_fullname like '\PCORI\LAB_RESULT_CM\%'
-inner join pcornet_lab ont_loinc on lab.pcori_basecode=ont_loinc.pcori_basecode and ont_loinc.c_basecode like 'LOINC:%'
+inner join pcornet_lab ont_loinc on lab.pcori_basecode=ont_loinc.pcori_basecode and ont_loinc.c_basecode like 'LOINC:%' --NOTE: You will need to change 'LOINC:' to our local term.
 inner JOIN pcornet_lab ont_parent on ont_loinc.c_path=ont_parent.c_fullname
 inner join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
 
@@ -1711,35 +1711,35 @@ inner join pmnENCOUNTER enc on enc.encounterid = m.encounter_Num
     and m.concept_cd = basis.concept_Cd
     and m.start_date = basis.start_date
     and m.provider_id = basis.provider_id
-    and m.modifier_cd = basis.modifier_cd
+    and m.instance_num = basis.modifier_cd
 
     left join #freq freq
     on m.encounter_num = freq.encounter_num
     and m.concept_cd = freq.concept_Cd
     and m.start_date = freq.start_date
     and m.provider_id = freq.provider_id
-    and m.modifier_cd = freq.modifier_cd
+    and m.instance_num = freq.modifier_cd
 
     left join #quantity quantity 
     on m.encounter_num = quantity.encounter_num
     and m.concept_cd = quantity.concept_Cd
     and m.start_date = quantity.start_date
     and m.provider_id = quantity.provider_id
-    and m.modifier_cd = quantity.modifier_cd
+    and m.instance_num = quantity.modifier_cd
 
     left join #refills refills
     on m.encounter_num = refills.encounter_num
     and m.concept_cd = refills.concept_Cd
     and m.start_date = refills.start_date
     and m.provider_id = refills.provider_id
-    and m.modifier_cd = refills.modifier_cd
+    and m.instance_num = refills.modifier_cd
 
     left join #supply supply
     on m.encounter_num = supply.encounter_num
     and m.concept_cd = supply.concept_Cd
     and m.start_date = supply.start_date
     and m.provider_id = supply.provider_id
-    and m.modifier_cd = supply.modifier_cd
+    and m.instance_num = supply.modifier_cd
 
 where (basis.c_fullname is null or basis.c_fullname like '\PCORI_MOD\RX_BASIS\PR\%') -- jgk 11/2 bugfix: filter for PR, not DI
 
