@@ -124,9 +124,4 @@ set imf.instance_num = (
   from med_order_instance_map moim
   where imf.instance_num=moim.deid_instance_num
 )
-where exists (
-  select moim.deid_order_id
-  from med_order_instance_map moim
-  where imf.instance_num=moim.deid_instance_num
-)
 ;
