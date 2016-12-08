@@ -79,7 +79,9 @@ create bitmap index MED_OBS_FACT_MOD_CODE_BI
    from (select 7 as num_bytes from dual);
  
 -- Generate deid instance_num order_id mapping
+whenever sqlerror continue;
 drop table med_order_instance_map;
+whenever sqlerror exit;
 
 create table med_order_instance_map as 
 with id_med_instance as (
