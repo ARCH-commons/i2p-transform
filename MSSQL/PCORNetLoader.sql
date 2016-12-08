@@ -1272,7 +1272,7 @@ and factline.start_date=sf.start_Date --bug fix MJ 10/7/16, JK 12/7/16
 left outer join #pdxfact pf
 on	factline.patient_num=pf.patient_num
 and factline.encounter_num=pf.encounter_num
-and factline.providerid=pf.provider_id --bug fix MJ 10/7/16, JK 12/7/16
+and factline.provider_id=pf.provider_id --bug fix MJ 10/7/16, JK 12/7/16
 and factline.concept_cd=pf.concept_cd
 and factline.start_date=pf.start_Date --bug fix MJ 10/7/16, JK 12/7/16
 inner join pcornet_diag diag on diag.c_basecode  = factline.concept_cd
