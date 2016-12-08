@@ -120,36 +120,42 @@ join deid_id_order_id_mapping dim
 ;
 
 -- Updated instance_nums in ib2bmedfact with order_ids
-create table i2b2medfact2 as
+create table observation_fact_meds_2 as
 select 
-	imf.ENCOUNTER_NUM,
-	imf.PATIENT_NUM,
-	imf.CONCEPT_CD,
-	imf.PROVIDER_ID,
-	imf.START_DATE,
-	imf.MODIFIER_CD,
+	ofm.ENCOUNTER_NUM,
+	ofm.PATIENT_NUM,
+	ofm.CONCEPT_CD,
+	ofm.PROVIDER_ID,
+	ofm.START_DATE,
+	ofm.MODIFIER_CD,
 	moim.deid_order_id,
-	imf.VALTYPE_CD,
-	imf.TVAL_CHAR,
-	imf.NVAL_NUM,
-	imf.VALUEFLAG_CD,
-	imf.QUANTITY_NUM,
-	imf.UNITS_CD,
-	imf.END_DATE,
-	imf.LOCATION_CD,
-	imf.OBSERVATION_BLOB,
-	imf.CONFIDENCE_NUM,
-	imf.UPDATE_DATE,
-	imf.DOWNLOAD_DATE,
-	imf.IMPORT_DATE,
-	imf.SOURCESYSTEM_CD,
-	imf.UPLOAD_ID,
-	imf.SUB_ENCOUNTER
-from i2b2medfact imf
+	ofm.VALTYPE_CD,
+	ofm.TVAL_CHAR,
+	ofm.NVAL_NUM,
+	ofm.VALUEFLAG_CD,
+	ofm.QUANTITY_NUM,
+	ofm.UNITS_CD,
+	ofm.END_DATE,
+	ofm.LOCATION_CD,
+	ofm.OBSERVATION_BLOB,
+	ofm.CONFIDENCE_NUM,
+	ofm.UPDATE_DATE,
+	ofm.DOWNLOAD_DATE,
+	ofm.IMPORT_DATE,
+	ofm.SOURCESYSTEM_CD,
+	ofm.UPLOAD_ID,
+	ofm.SUB_ENCOUNTER
+from observation_fact_meds ofm
 join med_order_instance_map moim
-	on imf.instance_num=moim.deid_instance_num
+	on ofm.instance_num=moim.deid_instance_num
 ;
 
-drop table i2b2medfact;
-rename table i2b2medfact2 to i2b2medfact;
-;
+whenever sqlerror continue;
+drop table observation_fact_meds;
+whenever sqlerror exit;
+
+rename table observation_fact_meds_2 to observation_fact_meds;
+
+whenever sqlerror continue;
+drop table observation_fact_meds_2;
+whenever sqlerror exit;
