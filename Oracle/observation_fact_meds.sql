@@ -63,3 +63,64 @@ create bitmap index MED_OBS_FACT_NVAL_NUM_BI
 create bitmap index MED_OBS_FACT_MOD_CODE_BI 
  on observation_fact_meds (MODIFIER_CD)
  nologging parallel 6;
+
+/*
+ * NOTE: The below code is a fix for Cycle 2 which replaces deid instance_nums
+ * with deid order_ids in i2b2medfacts inorder to allow the SCILHS PRESCRIBING
+ * code to merge facts correctly (see PCORNetPrescribing in 
+ * PCORNetLoader_ora.sql).
+ */
+
+ -- Please excuse the copy and paste from i2b2_facts_deid.sql, but this is
+ -- needed for the mapping below (portions of which are also copied from
+ -- i2b2_facts_deid.sql).
+ create or replace view byte_conv as
+ select num_bytes, rpad('x', num_bytes * 2, 'x') as xfill
+   from (select 7 as num_bytes from dual);
+ 
+-- Generate deid instance_num order_id mapping
+drop table med_order_instance_map;
+
+create table med_order_instance_map as 
+with id_med_instance as (
+  select instance_num
+  from nightherondata.observation_fact@id
+  where concept_cd like 'KUH|MEDICATION_ID:%'
+),
+-- based on instance_num deid in i2b2_facts_deid.sql.
+order_id_mapping as (
+  select
+  to_number(substr(instance_num, -1)) val,
+    case when to_number(substr(instance_num, -1)) < 3 then floor(instance_num / 1e5)
+    else floor(instance_num / 1e6) end order_id, -- Corrects for bug in HERON ETL
+    instance_num,
+    to_number(
+      rawtohex(
+       UTL_RAW.SUBSTR(
+        DBMS_CRYPTO.Hash(UTL_RAW.CAST_FROM_NUMBER(instance_num),
+                         /* typ 3 is HASH_SH1 */
+                         3),
+        1, (select num_bytes from byte_conv))),
+      (select xfill from byte_conv)) deid_instance_num
+  from id_med_instance
+),
+distinct_order_ids as (
+  select distinct order_id from order_id_mapping
+),
+deid_id_order_id_mapping as (
+  select rownum deid_order_id, order_id
+  from distinct_order_ids
+)
+select distinct dim.deid_order_id, oim.deid_instance_num 
+from order_id_mapping oim
+join deid_id_order_id_mapping dim
+  on oim.order_id=dim.order_id
+;
+
+-- Updated instance_nums in ib2bmedfact with order_ids
+merge into i2b2medfact imf
+  using med_order_instance_map moim
+  on imf.instance_num=moim.deid_instance_num
+  when matched then
+    update set imf.instance_num=moim.deid_order_id
+;
