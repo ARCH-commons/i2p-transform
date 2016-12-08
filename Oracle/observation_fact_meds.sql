@@ -155,7 +155,3 @@ drop table observation_fact_meds;
 whenever sqlerror exit;
 
 alter table OBSERVATION_FACT_MEDS_2 rename to OBSERVATION_FACT_MEDS;
-
-whenever sqlerror continue;
-drop table observation_fact_meds_2;
-whenever sqlerror exit;
