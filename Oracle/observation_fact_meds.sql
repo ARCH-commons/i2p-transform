@@ -118,9 +118,15 @@ join deid_id_order_id_mapping dim
 ;
 
 -- Updated instance_nums in ib2bmedfact with order_ids
-merge into i2b2medfact imf
-  using med_order_instance_map moim
-  on imf.instance_num=moim.deid_instance_num
-  when matched then
-    update set imf.instance_num=moim.deid_order_id
+update i2b2medfact imf
+set imf.instance_num = (
+  select moim.deid_order_id
+  from med_order_instance_map moim
+  where imf.instance_num=moim.deid_instance_num
+)
+where exists (
+  select moim.deid_order_id
+  from med_order_instance_map moim
+  where imf.instance_num=moim.deid_instance_num
+)
 ;
