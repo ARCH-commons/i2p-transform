@@ -120,10 +120,36 @@ join deid_id_order_id_mapping dim
 ;
 
 -- Updated instance_nums in ib2bmedfact with order_ids
-update i2b2medfact imf
-set imf.instance_num = (
-  select moim.deid_order_id
-  from med_order_instance_map moim
-  where imf.instance_num=moim.deid_instance_num
-)
+create table i2b2medfact2 as
+select 
+	imf.ENCOUNTER_NUM,
+	imf.PATIENT_NUM,
+	imf.CONCEPT_CD,
+	imf.PROVIDER_ID,
+	imf.START_DATE,
+	imf.MODIFIER_CD,
+	moim.deid_order_id,
+	imf.VALTYPE_CD,
+	imf.TVAL_CHAR,
+	imf.NVAL_NUM,
+	imf.VALUEFLAG_CD,
+	imf.QUANTITY_NUM,
+	imf.UNITS_CD,
+	imf.END_DATE,
+	imf.LOCATION_CD,
+	imf.OBSERVATION_BLOB,
+	imf.CONFIDENCE_NUM,
+	imf.UPDATE_DATE,
+	imf.DOWNLOAD_DATE,
+	imf.IMPORT_DATE,
+	imf.SOURCESYSTEM_CD,
+	imf.UPLOAD_ID,
+	imf.SUB_ENCOUNTER
+from i2b2medfact imf
+join med_order_instance_map moim
+	on imf.instance_num=moim.deid_instance_num
+;
+
+drop table i2b2medfact;
+rename table i2b2medfact2 to i2b2medfact;
 ;
