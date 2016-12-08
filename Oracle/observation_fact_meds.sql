@@ -84,7 +84,7 @@ drop table med_order_instance_map;
 create table med_order_instance_map as 
 with id_med_instance as (
   select instance_num
-  from "&&i2b2_id_data_schema".observation_fact"&&i2b2_id_data_link"
+  from "&&i2b2_id_data_schema".observation_fact@id
   where concept_cd like 'KUH|MEDICATION_ID:%'
 ),
 -- based on instance_num deid in i2b2_facts_deid.sql.
