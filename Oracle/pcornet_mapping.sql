@@ -401,7 +401,7 @@ with pcornet_spec as (
     select distinct clarity_med_id medication_id, med_map.rxcui
          , coalesce(spec_order, '9) HERON mapping misc.') spec_order
     from "&&i2b2_etl_schema".clarity_med_id_to_rxcui@id med_map
-    join cui_pref on cui_pref.rxcui = med_map.rxcui
+    left join cui_pref on cui_pref.rxcui = med_map.rxcui
 )
 , med_map_best as (
   -- Take the mapping with the best (i.e. min) spec_order, just like...
@@ -426,19 +426,33 @@ from all_med
 left join med_map_best on all_med.concept_cd = 'KUH|MEDICATION_ID:' || med_map_best.medication_id
 ;
 ;
-/*
-select *  -- 26,647 rows with facts
-from medication_id_to_rxcui mitr
+/* Eyeball it:
+
+select *
+from medication_id_to_best_rxcui mitr
 join blueheronmetadata.counts_by_concept cbc on cbc.concept_cd = mitr.concept_cd
-  -- where rxcui is null -- 5,570 rows where rxcui is null
 order by facts desc
 ;
 
+How many of each spec_order?
+
+select count(*), spec_order from medication_id_to_best_rxcui
+group by spec_order order by 1 desc;
+
+45773	1) Semantic generic clinical drug (SCD)
+ 5442	9) HERON mapping misc.
+ 3475	   *null* lots of IVP. TODO: med mixes
+  473	3) Generic drug pack (GPCK)
+   97	2) Semantic Branded clinical drug (SBC)
+    2	4) Branded drug pack (BPCK)
 */
 
 /* test cases (TODO: formalize these)
-select RXCUI from medication_id_to_rxcui where concept_cd = 'KUH|MEDICATION_ID:85051'; -- -> 1360019
-select concept_cd, name_char from medication_id_to_rxcui where rxcui = 892246; -- -> LEVOTHROID 100 MCG PO TAB etc.
+
+Don't map ENOXAPARIN 100 MG/ML SC SYRG to just any RXCUI:
+select rxcui, spec_order from medication_id_to_best_rxcui where concept_cd = 'KUH|MEDICATION_ID:85051'; -- -> 1360019, 1) SCD
+
+select rxcui, spec_order from medication_id_to_best_rxcui where concept_cd = 'KUH|MEDICATION_ID:150171'; -- -> 892246,	1) SCD
 */
 
 
