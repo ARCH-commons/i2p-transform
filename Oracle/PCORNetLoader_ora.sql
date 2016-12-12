@@ -1822,7 +1822,7 @@ insert into death( patid, death_date, death_date_impute, death_source, death_mat
 select distinct pat.patient_num, pat.death_date,
 case when vital_status_cd like 'X%' then 'B'
   when vital_status_cd like 'M%' then 'D'
-  when upper(vital_status_cd) like 'Y%' then 'N'
+  when vital_status_cd like 'Y%' then 'N'
   else 'OT'
   end death_date_impute,
   'NI' death_source,
@@ -1831,7 +1831,7 @@ from (
 	/* KUMC specific fix to address unknown death dates */
   select
     ibp.patient_num,
-    case when ibf.concept_cd is not null then DATE '2100-12-31'
+    case when ibf.concept_cd is not null then DATE '2100-12-31' -- in accordance with the CDM v3 spec
       else ibp.death_date end death_date,
     case when ibf.concept_cd is not null then 'OT'
       else upper(ibp.vital_status_cd) end vital_status_cd
