@@ -1819,13 +1819,27 @@ create or replace procedure PCORNetDeath as
 begin
 
 insert into death( patid, death_date, death_date_impute, death_source, death_match_confidence) 
-select  distinct pat.patient_num, pat.death_date, case 
-when vital_status_cd like 'X%' then 'B'
-when vital_status_cd like 'M%' then 'D'
-when upper(vital_status_cd) like 'Y%' then 'N'
-else 'OT'	
-end, 'NI','NI'
-from i2b2patient pat
+select distinct pat.patient_num, pat.death_date,
+case when vital_status_cd like 'X%' then 'B'
+  when vital_status_cd like 'M%' then 'D'
+  when upper(vital_status_cd) like 'Y%' then 'N'
+  else 'OT'
+  end death_date_impute,
+  'NI' death_source,
+  'NI' death_match_confidence
+from (
+	/* KUMC specific fix to address unknown death dates */
+  select
+    ibp.patient_num,
+    case when ibf.concept_cd is not null then DATE '2100-12-31'
+      else ibp.death_date end death_date,
+    case when ibf.concept_cd is not null then 'OT'
+      else upper(ibp.vital_status_cd) end vital_status_cd
+  from i2b2patient ibp
+  left join i2b2fact ibf
+    on ibp.patient_num=ibf.patient_num
+    and ibf.CONCEPT_CD='DEM|VITAL:yu'
+) pat
 where (pat.death_date is not null or vital_status_cd like 'Z%') and pat.patient_num in (select patid from demographic);
 
 end;
