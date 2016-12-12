@@ -363,26 +363,88 @@ and ht.m_exclusion_cd is null
 and ht.c_basecode is not null;
   
 
-insert into "&&i2b2_meta_schema".PCORNET_MED
-with 
-rxnorm_mapping as (
-  /* TODO: Consider whether we want just one rxcui for a clarity medication?
-  Without picking just one this query results in duplicate c_fullnames and causes
-  errors in the webclient.
+
+/** medication_id_to_best_rxcui
+
+Spec for PRESCRIBING.RXNORM_CUI says:
+
+  Where an RxNorm mapping exists for the source
+  medication, this field contains the RxNorm concept
+  identifier (CUI) at the highest possible specificity.
+
+  If more than one option exists for mapping, the
+  following ordered strategy may be adopted:
+  1)Semantic generic clinical drug
+  2)Semantic Branded clinical drug
+  3)Generic drug pack
+  4)Branded drug pack
+
+*/
+create or replace view medication_id_to_best_rxcui as
+with pcornet_spec as (
+  select '1) Semantic generic clinical drug (SCD)' spec_order, 1 ix, 'SCD' tty from dual union all
+  select '2) Semantic Branded clinical drug (SBC)', 2, 'SBD' from dual union all
+  select '3) Generic drug pack (GPCK)', 3, 'GPCK' from dual union all
+  select '4) Branded drug pack (BPCK)', 4, 'BPCK' from dual
+)
+, cui_pref as (  -- Rx concepts joined with spec order
+  select rxcui, ix, spec_order
+  from rxnorm.rxnconso@id con
+  join pcornet_spec on pcornet_spec.tty = con.tty
+)
+, med_map_pref as ( -- HERON clarity_med_id_to_rxcui joined with spec order
+/*
   TODO: Consider changing HERON paths to be RXCUIs or including the RXCUI column
   so that we don't have to reach back to the clarity_med_id_to_rxcui map. See
   also https://informatics.gpcnetwork.org/trac/Project/ticket/390.
-  */
-  select min(rxcui) rxcui, clarity_med_id 
-  from "&&i2b2_etl_schema". clarity_med_id_to_rxcui@id
-  group by clarity_med_id
-  ),
+*/
+    select distinct clarity_med_id medication_id, med_map.rxcui
+         , coalesce(spec_order, '9) HERON mapping misc.') spec_order
+    from "&&i2b2_etl_schema".clarity_med_id_to_rxcui@id med_map
+    join cui_pref on cui_pref.rxcui = med_map.rxcui
+)
+, med_map_best as (
+  select *
+  from (select medication_id, rxcui, spec_order
+             , rank() over (partition by medication_id order by spec_order, rxcui) rnk
+        from med_map_pref)
+  where rnk = 1
+)
+, all_med as (
+  select cd. concept_cd, max(name_char) name_char
+  from blueherondata.concept_dimension cd
+  where cd.concept_cd like 'KUH|MEDICATION_ID:%'
+  group by cd.concept_cd
+)
+select all_med.*, med_map_best.*
+from all_med
+left join med_map_best on all_med.concept_cd = 'KUH|MEDICATION_ID:' || med_map_best.medication_id
+;
+;
+/*
+select *  -- 26,647 rows with facts
+from medication_id_to_rxcui mitr
+join blueheronmetadata.counts_by_concept cbc on cbc.concept_cd = mitr.concept_cd
+  -- where rxcui is null -- 5,570 rows where rxcui is null
+order by facts desc
+;
+
+*/
+
+/* test cases (TODO: formalize these)
+select RXCUI from medication_id_to_rxcui where concept_cd = 'KUH|MEDICATION_ID:85051'; -- -> 1360019
+select concept_cd, name_char from medication_id_to_rxcui where rxcui = 892246; -- -> LEVOTHROID 100 MCG PO TAB etc.
+*/
+
+
+insert into "&&i2b2_meta_schema".PCORNET_MED
+with
 terms_rx as (
   select 
-    cm2rx.rxcui mapped_rxcui, ht.* 
+    best.rxcui mapped_rxcui, ht.*
   from 
     "&&i2b2_meta_schema"."&&terms_table" ht
-  left join rxnorm_mapping cm2rx on to_char(cm2rx.clarity_med_id) = replace(ht.c_basecode, 'KUH|MEDICATION_ID:', '')
+  left join medication_id_to_best_rxcui best on best.concept_cd = ht.c_basecode
   where c_fullname like '\i2b2\Medications%'
 		and c_basecode not like 'NDC:%' -- We'll handle NDCs seperately below
   	and ht.c_visualattributes not like '%H%'
