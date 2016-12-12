@@ -404,6 +404,11 @@ with pcornet_spec as (
     join cui_pref on cui_pref.rxcui = med_map.rxcui
 )
 , med_map_best as (
+  -- Take the mapping with the best (i.e. min) spec_order, just like...
+  --  Taking the record with the max date
+  --  http://stackoverflow.com/a/8898142
+  -- This may result in multiple rxcuis per medication_id, so while we're
+  -- at it, take the minimum rxcui among those with the best spec_order.
   select *
   from (select medication_id, rxcui, spec_order
              , rank() over (partition by medication_id order by spec_order, rxcui) rnk
