@@ -128,7 +128,7 @@ select
 	ofm.PROVIDER_ID,
 	ofm.START_DATE,
 	ofm.MODIFIER_CD,
-	moim.deid_order_id,
+	moim.deid_order_id instance_num,
 	ofm.VALTYPE_CD,
 	ofm.TVAL_CHAR,
 	ofm.NVAL_NUM,
