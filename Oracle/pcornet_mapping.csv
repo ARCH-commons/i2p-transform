@@ -1,57 +1,9 @@
 pcori_path,local_path
-\PCORI_MOD\RX_BASIS\PR\,\Medication\Inpatient\
-\PCORI_MOD\RX_BASIS\PR\,\Medication\Other Orders\
-\PCORI_MOD\RX_BASIS\PR\,\Medication\Outpatient\
-\PCORI_MOD\RX_BASIS\PR\,\Medication\PRN Inpatient Order\
-\PCORI_MOD\RX_BASIS\PR\01\,\Medication\Dispensed\
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Automatically Held\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Bolus from Syringe\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Bolus.\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Bolus\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Cabinet Pull\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Canceled Entry\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Downtime Given - New Bag\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Downtime Given\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Downtime Not Given\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Due\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\ED-Infusing Upon Admit\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Given -  Without Order\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Given - Patient Supplied\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Given - Without Order\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Given by another Provider\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Given\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Held\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Infusion Completed\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Infusion Home with Patient\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\MAR Hold\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\MAR Unhold\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Med Not Available\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Med Not Given - Resch\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Missed\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\NPO\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\New Bag\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\PCA Check/Change\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\PHTN Order Verified\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Patch Applied\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Patch Removed\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Patient/Family Admin\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Paused\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Peak/Trough\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Pending\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Per Protocol\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Piggyback Rate Change\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Push\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Rate Change\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Rate Verify\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Refused\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Restarted\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\See Alternative\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\See ED Trauma Flowsheet\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\See OR/Proc Flowsheet\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Stopped\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Waste\"
-"\PCORI_MOD\RX_BASIS\PR\02\","\Medication\MAR Result\Wasted\"
+\PCORI_MOD\RX_BASIS\DI\,\Medication\Surescripts\
+\PCORI_MOD\RX_BASIS\PR\02\,\Medication\Inpatient\
+\PCORI_MOD\RX_BASIS\PR\OT\,\Medication\Other Orders\
+\PCORI_MOD\RX_BASIS\PR\01\,\Medication\Outpatient\
+\PCORI_MOD\RX_BASIS\PR\02\,\Medication\PRN Inpatient Order\
 \PCORI_MOD\PDX\P\,\Diagnosis\\modifier_dx\billing_diagnosis\discharge\discharge_primary\
 \PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\DI\,\Diagnosis\\modifier_dx\billing_diagnosis\discharge\
 \PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\AD\,\Diagnosis\\modifier_dx\billing_diagnosis\admit\
@@ -97,7 +49,7 @@ pcori_path,local_path
 \PCORI\VITAL\HT\,\i2b2\Visit Details\Vitals\HEIGHT\
 \PCORI\VITAL\BP\DIASTOLIC\,\i2b2\Flowsheet\KU\GEN TMP CARD ECHO VITALS T:900426\KU GEN CARD GRP CV COMMON VITALS G:910000 I#2\BLOOD PRESSURE M:5 I#2\DIASTOLIC\
 \PCORI\VITAL\BP\SYSTOLIC\,\i2b2\Flowsheet\KU\GEN TMP CARD ECHO VITALS T:900426\KU GEN CARD GRP CV COMMON VITALS G:910000 I#2\BLOOD PRESSURE M:5 I#2\SYSTOLIC\
-\PCORI\VITAL\ORIGINAL_BMI\,\i2b2\Flowsheet\MODEL\VITAL SIGNS COMPLEX T:31010\KU IP GRP ADULT HEIGHT/WEIGHT G:300220 I#4\KU IP ROW BMI M:301070 I#6\
+\PCORI\VITAL\ORIGINAL_BMI\,\i2b2\Visit Details\Vitals\BMI\
 \PCORI\VITAL\WT\,\i2b2\Visit Details\Vitals\WEIGHT\
 \PCORI\VITAL\TOBACCO\SMOKING\YES\01\,\i2b2\History\Social History\Tobacco Usage\Smoking Tobacco Use\Current Every Day Smoker\
 \PCORI\VITAL\TOBACCO\SMOKING\YES\02\,\i2b2\History\Social History\Tobacco Usage\Smoking Tobacco Use\Current Some Day Smoker\

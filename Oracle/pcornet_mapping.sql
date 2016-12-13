@@ -98,7 +98,7 @@ update "&&i2b2_meta_schema".pcornet_diag pd set pd.pcori_basecode = 'PDX:P' wher
 update "&&i2b2_meta_schema".pcornet_diag pd set pd.pcori_basecode = 'PDX:X' where c_fullname = '\PCORI_MOD\PDX\X\';
 
 
-/* Replace PCORNet ICD9 diagnoses hierarchy with the local hierarchy filling in
+/* Replace PCORNet ICD9, ICD10 diagnoses hierarchy with the local hierarchy filling in
 the pcornet_basecode with the expected values.
 */
 
@@ -106,34 +106,57 @@ the pcornet_basecode with the expected values.
 delete 
 from "&&i2b2_meta_schema".PCORNET_DIAG
 where c_fullname like '\PCORI\DIAGNOSIS\09\%'
+   or c_fullname like '\PCORI\DIAGNOSIS\10\%'
 ;
 
 
 insert into "&&i2b2_meta_schema".PCORNET_DIAG
-with terms_dxi as (
-  select 
-    cicd.code dxicd, ht.* 
-  from 
-    "&&i2b2_meta_schema"."&&terms_table" ht
-  -- TODO: Stop cheating by going back to Clarity
-  left join clarity.edg_current_icd9@id cicd on to_char(cicd.dx_id) = replace(ht.c_basecode, 'KUH|DX_ID:', '')
-  where c_fullname like '\i2b2\Diagnoses\ICD9\%' order by c_hlevel 
-  )
+-- TODO: Stop cheating by going back to Clarity
+with edg9 as (
+    select dx_id, code from clarity.edg_current_icd9@id
+)
+, edg10 as (
+    select dx_id, code from clarity.edg_current_icd10@id
+)
+, heron_dx as (
+  select case
+         when ht.c_basecode like 'KUH|DX_ID:%'
+         then to_number(replace(ht.c_basecode, 'KUH|DX_ID:', ''))
+         else null
+         end dx_id
+       , ht.*
+  from "&&i2b2_meta_schema"."&&terms_table" ht
+  where c_fullname like '\i2b2\Diagnoses\ICD%'
+)
+, terms_dxi as (
+  select case
+         when ht.c_basecode like 'ICD9:%' then replace(ht.c_basecode, 'ICD9:', '')
+         when ht.c_basecode like 'ICD10:%' then replace(ht.c_basecode, 'ICD10:', '')
+         when ht.c_basecode like 'KUH|DX_ID:%'
+          and ht.c_fullname like '\i2b2\Diagnoses\ICD9\%'
+              then edg9.code
+         when ht.c_basecode like 'KUH|DX_ID:%'
+          and ht.c_fullname like '\i2b2\Diagnoses\ICD10\%'
+              then edg10.code
+         end pcori_basecode
+       , ht.*
+  from heron_dx ht
+  left join edg9
+         on edg9.dx_id = ht.dx_id
+  left join edg10
+         on edg10.dx_id = ht.dx_id
+)
 select
-  td.c_hlevel, 
-  replace(td.c_fullname, '\i2b2\Diagnoses\ICD9\', '\PCORI\DIAGNOSIS\09\') c_fullname, 
+  td.c_hlevel,
+  replace(replace(td.c_fullname, '\i2b2\Diagnoses\ICD9\', '\PCORI\DIAGNOSIS\09\')
+                               , '\i2b2\Diagnoses\ICD10\', '\PCORI\DIAGNOSIS\10\') c_fullname, 
   td.c_name, td.c_synonym_cd, td.c_visualattributes,
   td.c_totalnum, td.c_basecode, td.c_metadataxml, td.c_facttablecolumn, td.c_tablename, 
   td.c_columnname, td.c_columndatatype, td.c_operator, td.c_dimcode, td.c_comment, 
   td.c_tooltip, td.m_applied_path, td.update_date, td.download_date, td.import_date, 
   td.sourcesystem_cd, td.valuetype_cd, td.m_exclusion_cd, td.c_path, td.c_symbol,
-  case 
-    when td.dxicd is not null then td.dxicd
-    when td.c_basecode like 'ICD9:%' then replace(td.c_basecode, 'ICD9:', '')
-    else null 
-  end pcori_basecode
+  td.pcori_basecode
 from terms_dxi td
-order by c_hlevel
 ;
 
 
@@ -340,28 +363,137 @@ and ht.m_exclusion_cd is null
 and ht.c_basecode is not null;
   
 
-insert into "&&i2b2_meta_schema".PCORNET_MED
-with 
-rxnorm_mapping as (
-  /* TODO: Consider whether we want just one rxcui for a clarity medication?
-  Without picking just one this query results in duplicate c_fullnames and causes
-  errors in the webclient.
+
+/** medication_id_to_best_rxcui
+
+Spec for PRESCRIBING.RXNORM_CUI says:
+
+  Where an RxNorm mapping exists for the source
+  medication, this field contains the RxNorm concept
+  identifier (CUI) at the highest possible specificity.
+
+  If more than one option exists for mapping, the
+  following ordered strategy may be adopted:
+  1)Semantic generic clinical drug
+  2)Semantic Branded clinical drug
+  3)Generic drug pack
+  4)Branded drug pack
+
+*/
+create or replace view medication_id_to_best_rxcui as
+with pcornet_spec as (
+  select '1) Semantic generic clinical drug (SCD)' spec_order, 1 ix, 'SCD' tty from dual union all
+  select '2) Semantic Branded clinical drug (SBC)', 2, 'SBD' from dual union all
+  select '3) Generic drug pack (GPCK)', 3, 'GPCK' from dual union all
+  select '4) Branded drug pack (BPCK)', 4, 'BPCK' from dual
+)
+, cui_pref as (  -- Rx concepts joined with spec order
+  select rxcui, str rxnorm_str, ix, spec_order
+  from rxnorm.rxnconso@id con
+  join pcornet_spec on pcornet_spec.tty = con.tty
+)
+/*
   TODO: Consider changing HERON paths to be RXCUIs or including the RXCUI column
   so that we don't have to reach back to the clarity_med_id_to_rxcui map. See
   also https://informatics.gpcnetwork.org/trac/Project/ticket/390.
-  */
-  select min(rxcui) rxcui, clarity_med_id 
-  from "&&i2b2_etl_schema". clarity_med_id_to_rxcui@id
-  group by clarity_med_id
-  ),
+*/
+, clarity_med_id_to_rxcui as (
+  select cmed.medication_id clarity_med_id, rxn.rxnorm_code rxcui, '1) Clarity'  dose_pref
+  from clarity.rxnorm_codes@id rxn
+  join clarity.clarity_medication@id cmed on cmed.medication_id = rxn.medication_id
+  union all
+  select clarity_med_id, rxcui, '2) GCN'
+  from "&&i2b2_etl_schema".clarity_med_id_to_rxcui_gcn@id
+  union all
+  select clarity_med_id, rxcui, '3) NDC'
+  from "&&i2b2_etl_schema".clarity_med_id_to_rxcui_ndc@id
+)
+, med_map_pref as ( -- HERON clarity_med_id_to_rxcui joined with spec order
+    select distinct clarity_med_id medication_id
+         , med_map.rxcui, cui_pref.rxnorm_str, med_map.dose_pref
+         , coalesce(spec_order, '9) HERON mapping misc.') spec_order
+    from clarity_med_id_to_rxcui med_map
+    left join cui_pref on cui_pref.rxcui = med_map.rxcui
+)
+, med_map_best as (
+  -- Take the mapping with the best (i.e. min) spec_order and dose_pref, just like...
+  --  Taking the record with the max date
+  --  http://stackoverflow.com/a/8898142
+  -- This may result in multiple rxcuis per medication_id, so while we're
+  -- at it, take the minimum rxcui among those with the best spec_order.
+  select *
+  from (select medication_id, rxcui, rxnorm_str, spec_order, dose_pref
+             , rank() over (partition by medication_id order by spec_order, dose_pref, rxcui) rnk
+        from med_map_pref)
+  where rnk = 1
+)
+, all_med as (
+  select cd. concept_cd, max(name_char) name_char
+  from blueherondata.concept_dimension cd
+  where cd.concept_cd like 'KUH|MEDICATION_ID:%'
+  group by cd.concept_cd
+)
+select all_med.*, med_map_best.*
+from all_med
+left join med_map_best on all_med.concept_cd = 'KUH|MEDICATION_ID:' || med_map_best.medication_id
+;
+;
+/* Eyeball it:
+
+select *
+from medication_id_to_best_rxcui mitr
+join blueheronmetadata.counts_by_concept cbc on cbc.concept_cd = mitr.concept_cd
+order by facts desc
+;
+*/
+
+/* test cases (TODO: formalize these)
+
+Picking out just one row per CUI from RXNORM can be tricky; did we goof?
+select count(*), medication_id
+from medication_id_to_best_rxcui
+where medication_id is not null
+group by medication_id having count(*) > 1;
+
+How many of each spec_order?
+
+select count(*), spec_order, dose_pref from medication_id_to_best_rxcui
+group by spec_order, dose_pref order by 1 desc;
+
+27825	1) Semantic generic clinical drug (SCD)	1) Clarity
+17527	1) Semantic generic clinical drug (SCD)	2) GCN
+ 3475		 *null* lots of IVP. TODO: med mixes
+ 2888	9) HERON mapping misc.	2) GCN
+ 2550	9) HERON mapping misc.	1) Clarity
+  421	1) Semantic generic clinical drug (SCD)	3) NDC
+  295	3) Generic drug pack (GPCK)	1) Clarity
+  177	3) Generic drug pack (GPCK)	2) GCN
+   97	2) Semantic Branded clinical drug (SBC)	3) NDC
+    4	9) HERON mapping misc.	3) NDC
+    2	4) Branded drug pack (BPCK)	3) NDC
+    1	3) Generic drug pack (GPCK)	3) NDC
+
+Be sure RXCUI for 0.4 ML ENOXAPARIN 100 MG/ML SC SYRG includes the 0.4 ML dose info:
+select concept_cd, name_char, rxcui, rxnorm_str, spec_order, dose_pref from medication_id_to_best_rxcui where concept_cd = 'KUH|MEDICATION_ID:85052'; -- -> 854235, 1) SCD
+
+select concept_cd, name_char, rxcui, rxnorm_str, spec_order, dose_pref from medication_id_to_best_rxcui where concept_cd = 'KUH|MEDICATION_ID:85051'; -- -> 854248, 1) SCD
+
+This one goes from "LEVOTHYROXINE PO" to "Levothyroxine Sodium 0.1 MG Oral Tablet"; is that right?
+select concept_cd, name_char, rxcui, rxnorm_str, spec_order, dose_pref from medication_id_to_best_rxcui where concept_cd = 'KUH|MEDICATION_ID:150171'; -- -> 892246,	1) SCD
+*/
+
+
+insert into "&&i2b2_meta_schema".PCORNET_MED
+with
 terms_rx as (
   select 
-    cm2rx.rxcui mapped_rxcui, ht.* 
+    best.rxcui mapped_rxcui, ht.*
   from 
     "&&i2b2_meta_schema"."&&terms_table" ht
-  left join rxnorm_mapping cm2rx on to_char(cm2rx.clarity_med_id) = replace(ht.c_basecode, 'KUH|MEDICATION_ID:', '')
+  left join medication_id_to_best_rxcui best on best.concept_cd = ht.c_basecode
   where c_fullname like '\i2b2\Medications%'
-  and ht.c_visualattributes not like '%H%'
+		and c_basecode not like 'NDC:%' -- We'll handle NDCs seperately below
+  	and ht.c_visualattributes not like '%H%'
   )
 select
   rx.c_hlevel + 1 c_hlevel, 
@@ -384,6 +516,24 @@ select
     from terms_rx trx
     --order by trx.c_hlevel
     ) rx;
+
+-- Handle mapping NDC codes for DISPENSING
+insert into "&&i2b2_meta_schema".PCORNET_MED
+select
+	c_hlevel + 1 c_hlevel,
+	replace(c_fullname, '\i2b2\Medications\', '\PCORI\MEDICATION\RXNORM_CUI\') c_fullname,
+  c_name, c_synonym_cd, c_visualattributes,
+  c_totalnum, c_basecode, c_metadataxml, c_facttablecolumn, c_tablename,
+  c_columnname, c_columndatatype, c_operator, c_dimcode, c_comment,
+  c_tooltip, m_applied_path, update_date, download_date, import_date,
+  sourcesystem_cd, valuetype_cd, m_exclusion_cd, c_path, c_symbol,
+  null pcori_basecode, null pcori_cui,
+  substr(c_basecode, 5) pcori_ndc
+from "&&i2b2_meta_schema"."&&terms_table"
+where c_fullname like '\i2b2\Medications%'
+	and c_basecode like 'NDC:%'
+	and length(substr(c_basecode, 5)) < 12 -- Make sure we have 11 digit NDC
+;
 
 delete 
 from "&&i2b2_meta_schema".PCORNET_MED where sourcesystem_cd='MAPPING';

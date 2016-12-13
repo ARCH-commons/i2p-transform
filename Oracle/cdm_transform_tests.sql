@@ -42,6 +42,39 @@ select 'rejected_condition_rows' query_name
 from total_condition tc cross join err
 ;
 
+
+/* "Low bar" test to verify that DISPENSING is not empty */
+insert into test_cases (query_name, description, obs, by_value1, by_value2, record_pct, pass)
+select
+    'DISPENSING' ,
+    'Make sure that there are at least 10 dispensing fact' description,
+    count(*) obs,
+    null by_value1,
+    null by_value2,
+    null record_pct,
+    case when count(*) >= 10 then 1 else 0 end pass
+from dispensing
+;
+
+
+/* Test that there are at least a handful of distinct patients associated with
+ * DISPENSING facts.
+ */
+insert into test_cases (query_name, description, obs, by_value1, by_value2, record_pct, pass)
+select
+  'DISPENSING_PATS',
+  'Make sure that there are at least 3 distinct patients with dispensing facts',
+  count(distinct dis.patid) obs,
+  null by_value1,
+    null by_value2,
+    null record_pct,
+    case when count(distinct dis.patid) >= 3 then 1 else 0 end pass
+from dispensing dis
+inner join demographic dem
+  on dis.patid=dem.patid
+;
+
+
 /* Test that we have some height/weight measurements
 */
 insert into test_cases (query_name, description, pass, obs, record_n, record_pct)
@@ -56,11 +89,16 @@ wt as (
   select count(*) qty from pcornet_cdm.vital
   where wt is not null
   ),
+bmi as (
+  select count(*) qty from pcornet_cdm.vital
+  where original_bmi is not null
+  ),
 results as (
   select 
     round((ht.qty/total_vital.qty) * 100) pct_ht,
-    round((wt.qty/total_vital.qty) * 100) pct_wt
-  from total_vital cross join ht cross join wt
+    round((wt.qty/total_vital.qty) * 100) pct_wt,
+    round((bmi.qty/total_vital.qty) * 100) pct_bmi
+  from total_vital cross join ht cross join wt cross join bmi
   )
 select 'some_height_measurements_4335' query_name
      , 'Make sure we have at least some height records' description
@@ -77,6 +115,14 @@ select 'some_weight_measurements_4335' query_name
      , wt.qty record_n
      , results.pct_wt record_pct
 from total_vital cross join wt cross join results
+union all
+select 'some_bmi_measurements_4335' query_name
+     , 'Make sure we have at least some bmi records' description
+     , case when bmi.qty > 0 then 1 else 0 end pass
+     , rownum obs
+     , bmi.qty record_n
+     , results.pct_bmi record_pct
+from total_vital cross join bmi cross join results
 ;
 commit;
 

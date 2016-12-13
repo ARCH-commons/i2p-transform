@@ -1008,32 +1008,72 @@ PMN_EXECUATESQL(sqltext);
 execute immediate 'create index pdxfact_idx on pdxfact (patient_num, encounter_num, provider_id, concept_cd, start_date)';
 GATHER_TABLE_STATS('PDXFACT');
 
-sqltext := 'insert into diagnosis (patid,			encounterid,	enc_type, admit_date, providerid, dx, dx_type, dx_source, pdx) '||
-'select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, factline.start_date, factline.provider_id, diag.pcori_basecode,  '||
-'SUBSTR(diag.c_fullname,18,2) dxtype,   '||
-'	CASE WHEN enc_type=''AV'' THEN ''FI'' ELSE nvl(SUBSTR(dxsource,INSTR(dxsource,'':'')+1,2) ,''NI'') END, '||
-'	CASE WHEN enc_type in (''IP'', ''IS'')  -- PDX is "relevant only on IP and IS encounters"
-             THEN nvl(SUBSTR(pdxsource,INSTR(pdxsource, '':'')+1,2),''NI'')
-             ELSE ''X'' END '||
-'from i2b2fact factline '||
-'inner join encounter enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num '||
-' left outer join sourcefact '||
-'on	factline.patient_num=sourcefact.patient_num '||
-'and factline.encounter_num=sourcefact.encounter_num '||
-'and factline.provider_id=sourcefact.provider_id '||
-'and factline.concept_cd=sourcefact.concept_Cd '||
-'and factline.start_date=sourcefact.start_Date '||
-'left outer join pdxfact '||
-'on	factline.patient_num=pdxfact.patient_num '||
-'and factline.encounter_num=pdxfact.encounter_num '||
-'and factline.provider_id=pdxfact.provider_id '||
-'and factline.concept_cd=pdxfact.concept_cd '||
-'and factline.start_date=pdxfact.start_Date '||
-'inner join pcornet_diag diag on diag.c_basecode  = factline.concept_cd '||
-'where diag.c_fullname like ''\PCORI\DIAGNOSIS\%''  '||
-'and (sourcefact.c_fullname like ''\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\%'' or sourcefact.c_fullname is null) ';
+insert into diagnosis (patid,			encounterid,	enc_type, admit_date, providerid, dx, dx_type, dx_source, pdx)
+/* KUMC started billing with ICD10 on Oct 1, 2015. */
+with icd10_transition as (
+  select date '2015-10-01' as cutoff from dual
+)
+/* DX_IDs may have mappings to both ICD9 and ICD10 */
+, has9 as (
+  select distinct c_basecode, pcori_basecode icd9_code
+  from "&&i2b2_meta_schema".pcornet_diag diag
+  where diag.c_fullname like '\PCORI\DIAGNOSIS\09%'
+  and pcori_basecode is not null
+)
+, has10 as (
+  select distinct c_basecode, pcori_basecode icd10_code
+  from "&&i2b2_meta_schema".pcornet_diag diag
+  where diag.c_fullname like '\PCORI\DIAGNOSIS\10%'
+  and pcori_basecode is not null
+)
+, has9_and_10 as (
+  select has9.c_basecode, has9.icd9_code, has10.icd10_code
+  from has9 join has10 on has9.c_basecode = has10.c_basecode
+)
+, diag as ( -- replace diag rows by 9_and_10 rows and avoid dups
+  select distinct diag.c_basecode, diag.pcori_basecode, icd9_code, icd10_code
+       , case when has9_and_10.c_basecode is null then SUBSTR(diag.c_fullname,18,2) else null end dx_type
+  from pcornet_diag diag
+  left join has9_and_10 on has9_and_10.c_basecode = diag.c_basecode
+  where diag.c_fullname like '\PCORI\DIAGNOSIS\%'
+  and diag.pcori_basecode is not null
+)
 
-PMN_EXECUATESQL(sqltext);
+select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, enc.admit_date, enc.providerid
+     , case
+       when diag.pcori_basecode is not null           then diag.pcori_basecode
+       when enc.admit_date >= icd10_transition.cutoff then diag.icd10_code
+                                                      else diag.icd9_code
+       end dx
+     , case
+       when diag.dx_type is not null                  then diag.dx_type
+       when enc.admit_date >= icd10_transition.cutoff then '10'
+                                                      else '09'
+       end dxtype,
+	CASE WHEN enc_type='AV' THEN 'FI' ELSE nvl(SUBSTR(dxsource,INSTR(dxsource,':')+1,2) ,'NI') END dx_source,
+	CASE WHEN enc_type in ('IP', 'IS')  -- PDX is "relevant only on IP and IS encounters"
+             THEN nvl(SUBSTR(pdxsource,INSTR(pdxsource, ':')+1,2),'NI')
+             ELSE 'X' END PDX
+from i2b2fact factline
+inner join encounter enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num
+ left outer join sourcefact
+on	factline.patient_num=sourcefact.patient_num
+and factline.encounter_num=sourcefact.encounter_num
+and factline.provider_id=sourcefact.provider_id
+and factline.concept_cd=sourcefact.concept_Cd
+and factline.start_date=sourcefact.start_Date
+left outer join pdxfact
+on	factline.patient_num=pdxfact.patient_num
+and factline.encounter_num=pdxfact.encounter_num
+and factline.provider_id=pdxfact.provider_id
+and factline.concept_cd=pdxfact.concept_cd
+and factline.start_date=pdxfact.start_Date
+inner join diag on diag.c_basecode  = factline.concept_cd
+cross join icd10_transition
+where (sourcefact.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\%' or sourcefact.c_fullname is null)
+-- order by enc.admit_date desc
+;
+
 
 execute immediate 'create index diagnosis_patid on diagnosis (PATID)';
 execute immediate 'create index diagnosis_encounterid on diagnosis (ENCOUNTERID)';
@@ -1601,13 +1641,14 @@ insert into prescribing (
     ,RX_DAYS_SUPPLY -- modifier nval_num
     ,RX_FREQUENCY --modifier with basecode lookup
     ,RX_BASIS --modifier with basecode lookup
---    ,RAW_RX_MED_NAME, --not filling these right now
+    ,RAW_RX_MED_NAME
 --    ,RAW_RX_FREQUENCY,
---    ,RAW_RXNORM_CUI
+    ,RAW_RXNORM_CUI
 )
 select distinct  m.patient_num, m.Encounter_Num,m.provider_id,  m.start_date order_date,  to_char(m.start_date,'HH:MI'), m.start_date start_date, m.end_date, mo.pcori_cui
     ,quantity.nval_num quantity, refills.nval_num refills, supply.nval_num supply, substr(freq.pcori_basecode, instr(freq.pcori_basecode, ':') + 1, 2) frequency, 
     substr(basis.pcori_basecode, instr(basis.pcori_basecode, ':') + 1, 2) basis
+    , substr(mo.c_name, 1, 50) raw_rx_med_name, substr(mo.c_basecode, 1, 50) raw_rxnorm_cui
  from i2b2medfact m inner join pcornet_med mo on m.concept_cd = mo.c_basecode 
 inner join encounter enc on enc.encounterid = m.encounter_Num
 -- TODO: This join adds several minutes to the load - must be debugged
@@ -1617,35 +1658,35 @@ inner join encounter enc on enc.encounterid = m.encounter_Num
     and m.concept_cd = basis.concept_Cd
     and m.start_date = basis.start_date
     and m.provider_id = basis.provider_id
-    and m.modifier_cd = basis.modifier_cd
+    and m.instance_num = basis.instance_num
 
     left join  freq
     on m.encounter_num = freq.encounter_num
     and m.concept_cd = freq.concept_Cd
     and m.start_date = freq.start_date
     and m.provider_id = freq.provider_id
-    and m.modifier_cd = freq.modifier_cd
+    and m.instance_num = freq.instance_num
 
     left join quantity 
     on m.encounter_num = quantity.encounter_num
     and m.concept_cd = quantity.concept_Cd
     and m.start_date = quantity.start_date
     and m.provider_id = quantity.provider_id
-    and m.modifier_cd = quantity.modifier_cd
+    and m.instance_num = quantity.instance_num
 
     left join refills
     on m.encounter_num = refills.encounter_num
     and m.concept_cd = refills.concept_Cd
     and m.start_date = refills.start_date
     and m.provider_id = refills.provider_id
-    and m.modifier_cd = refills.modifier_cd
+    and m.instance_num = refills.instance_num
 
     left join supply
     on m.encounter_num = supply.encounter_num
     and m.concept_cd = supply.concept_Cd
     and m.start_date = supply.start_date
     and m.provider_id = supply.provider_id
-    and m.modifier_cd = supply.modifier_cd
+    and m.instance_num = supply.instance_num
 
 where (basis.c_fullname is null or basis.c_fullname like '\PCORI_MOD\RX_BASIS\PR\%');
 
@@ -1714,6 +1755,24 @@ insert into dispensing (
     ,DISPENSE_AMT  -- modifier nval_num
 --    ,RAW_NDC
 )
+/* Below is the Cycle 2 fix for populating the DISPENSING table  */
+select distinct
+  ibf.patient_num patid,
+  null prescribingid,
+  ibf.start_date dispense_date,
+  substr(ibf.concept_cd, 5) ndc,
+  null dispense_sup,
+  null dispense_amt
+from i2b2fact ibf
+join BLUEHERONMETADATA.pcornet_med pnm
+  on ibf.modifier_cd=pnm.c_basecode
+where pnm.c_fullname like '\PCORI_MOD\RX_BASIS\DI\%'
+  and length(substr(ibf.concept_cd, 5)) < 12
+; 
+
+/* NOTE: Once DISPENSING related encounters have made it into the CDM (via the visit
+   dimension) then the original SCILHS code below should work.
+
 select  m.patient_num, null,m.start_date, NVL(mo.pcori_ndc,'NA')
     ,max(supply.nval_num) sup, max(amount.nval_num) amt 
 from i2b2fact m inner join pcornet_med mo
@@ -1739,6 +1798,7 @@ inner join encounter enc on enc.encounterid = m.encounter_Num
     and m.concept_cd = amount.concept_Cd
 
 group by m.encounter_num ,m.patient_num, m.start_date,  mo.pcori_ndc;
+*/
 
 execute immediate 'create index dispensing_patid on dispensing (PATID)';
 
@@ -1746,9 +1806,45 @@ end PCORNetDispensing;
 /
 
 
+----------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------
+-- 11. Death - by Jeff Klann, PhD
+-- Simple transform only pulls death date from patient dimension, does not rely on an ontology
+-- Translated from MSSQL script by Matthew Joss
+----------------------------------------------------------------------------------------------------------------------------------------
 
 
 
+create or replace procedure PCORNetDeath as
+
+begin
+
+insert into death( patid, death_date, death_date_impute, death_source, death_match_confidence) 
+select distinct pat.patient_num, pat.death_date,
+case when vital_status_cd like 'X%' then 'B'
+  when vital_status_cd like 'M%' then 'D'
+  when vital_status_cd like 'Y%' then 'N'
+  else 'OT'
+  end death_date_impute,
+  'NI' death_source,
+  'NI' death_match_confidence
+from (
+	/* KUMC specific fix to address unknown death dates */
+  select
+    ibp.patient_num,
+    case when ibf.concept_cd is not null then DATE '2100-12-31' -- in accordance with the CDM v3 spec
+      else ibp.death_date end death_date,
+    case when ibf.concept_cd is not null then 'OT'
+      else upper(ibp.vital_status_cd) end vital_status_cd
+  from i2b2patient ibp
+  left join i2b2fact ibf
+    on ibp.patient_num=ibf.patient_num
+    and ibf.CONCEPT_CD='DEM|VITAL:yu'
+) pat
+where (pat.death_date is not null or vital_status_cd like 'Z%') and pat.patient_num in (select patid from demographic);
+
+end;
+/
 
 
 create or replace PROCEDURE pcornetReport
@@ -1847,7 +1943,8 @@ http://listserv.kumc.edu/pipermail/gpc-dev/attachments/20160223/8d79fa70/attachm
 > LV: the dispensing side [?] is not mandatory? we just did Rx, since that
 > what we have in our i2b2
 */
---PCORNetDispensing;
+PCORNetDispensing;
+PCORNetDeath;
 PCORNetHarvest;
 
 end pcornetloader;

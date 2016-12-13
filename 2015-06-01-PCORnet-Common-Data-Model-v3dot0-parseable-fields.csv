@@ -1,0 +1,954 @@
+TABLE_NAME,FIELD_NAME,RDBMS_DATA_TYPE,SAS_DATA_TYPE,DATA_FORMAT,REPLICATED,UNIT_OF_MEASURE,VALUE_SET,VALUE_DESCRIPTION,DEFINITION,CDM_ORDER
+DEMOGRAPHIC,PATID,RDBMS Text(x),SAS Char(x),,NO,,,,"Arbitrary person-level identifier used to link across tables. 
+
+PATID is a pseudoidentifier with a consistent crosswalk to the true identifier retained by the source Data Partner. For analytical data sets requiring patient-level data, only the pseudoidentifier is used to link across all information belonging to a patient.
+
+The PATID must be unique within the data source being queried. Creating a unique identifier within a CDRN would be beneficial and acceptable. The PATID is not the basis for linkages across partners.",1
+DEMOGRAPHIC,BIRTH_DATE,RDBMS Date,SAS Date (Numeric),,NO,DATE,,,Date of birth.,2
+DEMOGRAPHIC,BIRTH_TIME,RDBMS Text(5),SAS Time (Numeric), HH:MI using 24-hour clock and zero-padding for hour and minute,NO,TIME,,,Time of birth.,3
+DEMOGRAPHIC,SEX,RDBMS Text(2),SAS Char(2),,NO,,A;F;M;NI;UN;OT,"A = Ambiguous 
+F = Female
+M = Male
+NI = No information
+UN = Unknown
+OT = Other","Administrative sex. 
+
+v2.0 guidance added: The ?Ambiguous? category may be used for individuals who are physically undifferentiated from birth. The ?Other? category may be used for individuals who are undergoing gender re-assignment.",4
+DEMOGRAPHIC,HISPANIC,RDBMS Text(2),SAS Char(2),,NO,,Y;N;R;NI;UN;OT,"Y = Yes
+N = No
+R = Refuse to answer
+NI = No information
+UN = Unknown
+OT = Other","A person of Cuban, Mexican, Puerto Rican, South or Central American, or other Spanish culture or origin, regardless of race.
+
+v2.0 amendment: The new categorical value of ?Refuse to answer? has been added.",5
+DEMOGRAPHIC,RACE,RDBMS Text(2),SAS Char(2),,NO,,01;02;03;04;05;06;07;NI;UN;OT,"01 = American Indian or Alaska Native
+02 = Asian
+03 = Black or African American
+04 = Native Hawaiian or Other Pacific Islander
+05 = White
+06 = Multiple race
+07 = Refuse to answer
+NI = No information
+UN = Unknown
+OT = Other","Please use only one race value per patient.
+
+Details of categorical definitions:
+American Indian or Alaska Native: A person having origins in any of the original peoples of North and South America (including Central America), and who maintains tribal affiliation or community attachment.
+
+Asian: A person having origins in any of the original peoples of the Far East, Southeast Asia, or the Indian subcontinent including, for example, Cambodia, China, India, Japan, Korea, Malaysia, Pakistan, the Philippine Islands, Thailand, and Vietnam.
+
+Black or African American: A person having origins in any of the black racial groups of Africa.
+
+Native Hawaiian or Other Pacific Islander: A person having origins in any of the original peoples of Hawaii, Guam, Samoa, or other Pacific Islands.
+
+White: A person having origins in any of the original peoples of Europe, the Middle East, or North Africa.",6
+DEMOGRAPHIC,BIOBANK_FLAG,RDBMS Text(1),SAS Char(1),,NO,,Y;N,"Y = Yes
+N = No","Flag to indicate that one or more biobanked specimens are stored and available for research use. Examples of biospecimens could include plasma, urine, or tissue. If biospecimens are available, locally maintained ?mapping tables? would be necessary to map between the DEMOGRAPHIC record and the originating biobanking system(s).
+
+If no known biobanked specimens are available, this field should be marked ?No?.",7
+DEMOGRAPHIC,RAW_SEX,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to mapping into the PCORnet CDM value set.",8
+DEMOGRAPHIC,RAW_HISPANIC,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to mapping into the PCORnet CDM value set.",9
+DEMOGRAPHIC,RAW_RACE,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to mapping into the PCORnet CDM value set.",10
+ENROLLMENT,PATID,RDBMS Text(x),SAS Char(x),,NO,,,,Arbitrary person-level identifier used to link across tables.,11
+ENROLLMENT,ENR_START_DATE,RDBMS Date,SAS Date (Numeric),,NO,DATE,,,"Date of the beginning of the enrollment period. If the exact date is unknown, use the first day of the month.
+
+For implementation of the CDM, a long span of longitudinal data is desirable; however, especially for historical data more than a decade old, the appropriate beginning date should be determined by the partner?s knowledge of the validity and usability of the data. More specific guidance can be provided through implementation discussions.",12
+ENROLLMENT,ENR_END_DATE,RDBMS Date,SAS Date (Numeric),,NO,DATE,,,"Date of the end of the enrollment period. If the exact date is unknown, use the last day of the month.",13
+ENROLLMENT,CHART,RDBMS Text(1),SAS Char(1),,NO,,Y;N,"Y = Yes
+N = No","Chart abstraction flag is intended to answer the question, ""Are you able to request (or review) charts for this person?"" This flag does not address chart availability. Mark as ""Yes"" if there are no contractual or other restrictions between you and the individual (or sponsor) that would prohibit you from requesting any chart for this member.
+
+Note: This field is most relevant for health insurers that can request charts from affiliated providers. This field allows exclusion of patients from studies that require chart review to validate exposures and/or outcomes. It identifies patients for whom charts are never available and for whom the chart can never be requested.",14
+ENROLLMENT,ENR_BASIS,RDBMS Text(1),SAS Char(1),,NO,,I;G;A;E,"I = Insurance
+G = Geography
+A = Algorithmic
+E = Encounter-based","When insurance information is not available but complete capture can be asserted some other way, please identify the basis on which complete capture is defined. Additional information on the approach identified will be required from each partner.
+
+ENR_BASIS is a property of the time period defined. A patient can have multiple entries in the table.
+
+Details of categorical definitions:
+Insurance: The start and stop dates are based upon the concept of enrollment with health plan insurance
+
+Geography: An assertion of complete data capture between the start and end dates based upon geographic characteristics, such as regional isolation
+
+Algorithmic: An assertion of complete data capture between the start and end dates, based on a locally developed or applied algorithm, often using multiple criteria 
+
+Encounter-based: The start and stop dates are populated from the earliest-observed encounter and latest-observed encounter.",15
+ENCOUNTER,ENCOUNTERID,RDBMS Text(x),SAS Char(x),,NO,,,,"Arbitrary encounter-level identifier. Used to link across tables, including the ENCOUNTER, DIAGNOSIS, and PROCEDURE tables.",16
+ENCOUNTER,PATID,RDBMS Text(x),SAS Char(x),,NO,,,,Arbitrary person-level identifier used to link across tables.,17
+ENCOUNTER,ADMIT_DATE,RDBMS Date,SAS Date (Numeric),,NO,DATE,,,Encounter or admission date.,18
+ENCOUNTER,ADMIT_TIME,RDBMS Text(5),SAS Time (Numeric), HH:MI using 24-hour clock and zero-padding for hour and minute,NO,TIME,,,Encounter or admission time.,19
+ENCOUNTER,DISCHARGE_DATE,RDBMS Date,SAS Date (Numeric),,NO,DATE,,,Discharge date. Should be populated for all Inpatient Hospital Stay (IP) and Non-Acute Institutional Stay (IS) encounter types. May be populated for Emergency Department (ED) and ED-to-Inpatient (EI) encounter types. Should be missing for ambulatory visit (AV or OA) encounter types. (Additional guidance added in v3.0 for the EI encounter type.),20
+ENCOUNTER,DISCHARGE_TIME,RDBMS Text(5),SAS Time (Numeric), HH:MI using 24-hour clock and zero-padding for hour and minute,NO,TIME,,,Discharge time.,21
+ENCOUNTER,PROVIDERID,RDBMS Text(x),SAS Char(x),,NO,,,,"Provider code for the provider who is most responsible for this encounter. For encounters with multiple providers choose one so the encounter can be linked to the diagnosis and procedure tables. As with the PATID, the provider code is a pseudoidentifier with a consistent crosswalk to the real identifier.",22
+ENCOUNTER,FACILITY_LOCATION,RDBMS Text(3),SAS Char(3),,NO,,,,Geographic location (3 digit zip code). Should be  null if not recorded in source system (modification made from ?blank? to ?null? in v3.0).,23
+ENCOUNTER,ENC_TYPE,RDBMS Text(2),SAS Char(2),,NO,,AV;ED;EI;IP;IS;OA;NI;UN;OT,"AV = Ambulatory Visit
+ED = Emergency Department
+EI = Emergency Department Admit to Inpatient Hospital Stay (permissible substitution)
+IP = Inpatient Hospital Stay
+IS = Non-Acute Institutional Stay
+OA = Other Ambulatory Visit
+NI = No information
+UN = Unknown
+OT = Other","Encounter type.
+
+Details of categorical definitions:
+Ambulatory Visit: Includes visits at outpatient clinics, physician offices, same day/ambulatory surgery centers, urgent care facilities, and other same-day ambulatory hospital encounters, but excludes emergency department encounters.
+
+Emergency Department (ED): Includes ED encounters that become inpatient stays (in which case inpatient stays would be a separate encounter). Excludes urgent care visits. ED claims should be pulled before hospitalization claims to ensure that ED with subsequent admission won't be rolled up in the hospital event.
+
+Emergency Department Admit to Inpatient Hospital Stay: Permissible substitution for preferred state of separate ED and IP records. Only for use with data sources where the individual records for ED and IP cannot be distinguished (new to v2.0).
+
+Inpatient Hospital Stay: Includes all inpatient stays, including: same-day hospital discharges, hospital transfers, and acute hospital care where the discharge is after the admission date.
+
+Non-Acute Institutional Stay: Includes hospice, skilled nursing facility (SNF), rehab center, nursing home, residential, overnight non-hospital dialysis and other non-hospital stays.
+
+Other Ambulatory Visit: Includes other non-overnight AV encounters such as hospice visits, home health visits, skilled nursing facility visits, other non-hospital visits, as well as telemedicine, telephone and email consultations. May also include ""lab only"" visits (when a lab is ordered outside of a patient visit), ""pharmacy only"" (e.g., when a patient has a refill ordered without a face-to-face visit), ""imaging only"", etc.",24
+ENCOUNTER,FACILITYID,RDBMS Text(x),SAS Char(x),,NO,,,,"Arbitrary local facility code that identifies the hospital or clinic. Used for chart abstraction and validation.
+
+FACILITYID can be a true identifier, or a pseudoidentifier with a consistent crosswalk to the true identifier retained by the source Data Partner.",25
+ENCOUNTER,DISCHARGE_DISPOSITION,RDBMS Text(2),SAS Char(2),,NO,,A;E;NI;UN;OT,"A = Discharged alive
+E = Expired
+NI = No information
+UN = Unknown
+OT = Other",Vital status at discharge. Should be populated for Inpatient Hospital Stay (IP) and Non-Acute Institutional Stay (IS) encounter types. May be populated for Emergency Department (ED) and ED-to-Inpatient (EI) encounter types. Should be missing for ambulatory visit (AV or OA) encounter types. (Additional guidance added in v3.0 for the EI encounter type.),26
+ENCOUNTER,DISCHARGE_STATUS,RDBMS Text(2),SAS Char(2),,NO,,AF;AL;AM;AW;EX;HH;HO;HS;IP;NH;RH;RS;SH;SN;NI;UN;OT,"AF = Adult Foster Home
+AL = Assisted Living Facility
+AM = Against Medical Advice
+AW = Absent without leave
+EX = Expired
+HH = Home Health
+HO = Home / Self Care
+HS = Hospice
+IP = Other Acute Inpatient Hospital
+NH = Nursing Home (Includes ICF)
+RH = Rehabilitation Facility
+RS = Residential Facility
+SH = Still In Hospital
+SN = Skilled Nursing Facility
+NI = No information
+UN = Unknown
+OT = Other",Discharge status. Should be populated for Inpatient Hospital Stay (IP) and Non-Acute Institutional Stay (IS) encounter types. May be populated for Emergency Department (ED) and ED-to-Inpatient (EI) encounter types. Should be missing for ambulatory visit (AV or OA) encounter types. (Additional guidance added in v3.0 for the EI encounter type.),27
+ENCOUNTER,DRG,RDBMS Text(3),SAS Char(3),,NO,,,,"3-digit Diagnosis Related Group (DRG). Should be populated for IP and IS encounter types. May be populated for Emergency Department (ED) and ED-to-Inpatient (EI) encounter types. Should be missing for AV or OA encounters. Use leading zeroes for codes less than 100. (Additional guidance added in v3.0 for the EI encounter type.)
+
+The DRG is used for reimbursement for inpatient encounters. It is a Medicare requirement that combines diagnoses into clinical concepts for billing. Frequently used in observational data analyses.
+",28
+ENCOUNTER,DRG_TYPE,RDBMS Text(2),SAS Char(2),,NO,,01;02;NI;UN;OT,"01 = CMS-DRG (old system)
+02 = MS-DRG (current system)
+NI = No information
+UN = Unknown
+OT = Other",DRG code version. MS-DRG (current system) began on 10/1/2007. Should be populated for IP and IS encounter types. May be populated for Emergency Department (ED) and ED-to-Inpatient (EI) encounter types. Should be missing for AV or OA encounters.  (Additional guidance added in v3.0 for the EI encounter type.),29
+ENCOUNTER,ADMITTING_SOURCE,RDBMS Text(2),SAS Char(2),,NO,,AF;AL;AV;ED;HH;HO;HS;IP;NH;RH;RS;SN;NI;UN;OT,"AF = Adult Foster Home
+AL = Assisted Living Facility
+AV = Ambulatory Visit
+ED = Emergency Department
+HH = Home Health
+HO = Home / Self Care
+HS = Hospice
+IP = Other Acute Inpatient Hospital
+NH = Nursing Home (Includes ICF)
+RH = Rehabilitation Facility
+RS = Residential Facility
+SN = Skilled Nursing Facility
+NI = No information
+UN = Unknown
+OT = Other",Admitting source. Should be populated for Inpatient Hospital Stay (IP) and Non-Acute Institutional Stay (IS) encounter types. May be populated for Emergency Department (ED) and ED-to-Inpatient (EI) encounter types. Should be missing for ambulatory visit (AV or OA) encounter types. (Additional guidance added in v3.0 for the EI encounter type.),30
+ENCOUNTER,RAW_SITEID,RDBMS Text(x),SAS Char(x),,NO,,,,"This field is new to v2.0.
+
+Optional field for locally-defined identifier intended for local use; for example, where a network may have multiple sites contributing to a central data repository.
+
+This attribute may be sensitive in certain contexts; the intent is for internal network use only, and not to enable site quality comparisons.",31
+ENCOUNTER,RAW_ENC_TYPE,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to mapping into the PCORnet CDM value set.",32
+ENCOUNTER,RAW_DISCHARGE_DISPOSITION,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to mapping into the PCORnet CDM value set.",33
+ENCOUNTER,RAW_DISCHARGE_STATUS,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to mapping into the PCORnet CDM value set.",34
+ENCOUNTER,RAW_DRG_TYPE,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to mapping into the PCORnet CDM value set.",35
+ENCOUNTER,RAW_ADMITTING_SOURCE,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to mapping into the PCORnet CDM value set.",36
+DIAGNOSIS,DIAGNOSISID,RDBMS Text(x),SAS Char(x),,NO,,,,"Arbitrary identifier for each unique record. Does not need to be persistent across refreshes, and may be created by methods such as sequence or GUID. New field added in v3.0.",37
+DIAGNOSIS,PATID,RDBMS Text(x),SAS Char(x),,NO,,,,Arbitrary person-level identifier. Used to link across tables.,38
+DIAGNOSIS,ENCOUNTERID,RDBMS Text(x),SAS Char(x),,NO,,,,Arbitrary encounter-level identifier. Used to link across tables.,39
+DIAGNOSIS,ENC_TYPE,RDBMS Text(2),SAS Char(2),,YES,,AV;ED;EI;IP;IS;OA;NI;UN;OT,"AV = Ambulatory Visit
+ED = Emergency Department
+EI=Emergency Department Admit to Inpatient Hospital Stay (permissible substitution)
+IP = Inpatient Hospital Stay
+IS = Non-Acute Institutional Stay
+OA = Other Ambulatory Visit
+NI = No information
+UN = Unknown
+OT = Other",Please note: This is a field replicated from the ENCOUNTER table. See the ENCOUNTER table for definitions. ,40
+DIAGNOSIS,ADMIT_DATE,RDBMS Date,SAS Date (Numeric),,YES,DATE,,,Please note: This is a field replicated from the ENCOUNTER table. See the ENCOUNTER table for definitions. ,41
+DIAGNOSIS,PROVIDERID,RDBMS Text(x),SAS Char(x),,YES,,,,Please note: This is a field replicated from the ENCOUNTER table. See the ENCOUNTER table for definitions. ,42
+DIAGNOSIS,DX,RDBMS Text(18),SAS Char(18),,NO,,,,"Diagnosis code. 
+
+Leading zeroes and different levels of decimal precision are permissible in this field. Please populate the exact textual value of this diagnosis code, but remove source-specific suffixes and prefixes. Other codes should be listed as recorded in the source data.",43
+DIAGNOSIS,DX_TYPE,RDBMS Text(2),SAS Char(2),,NO,,09;10;11;SM;NI;UN;OT,"09 = ICD-9-CM
+10 = ICD-10-CM
+11 = ICD-11-CM
+SM = SNOMED CT
+NI = No information
+UN = Unknown
+OT = Other","Diagnosis code type. 
+
+We provide values for ICD and SNOMED code types. Other code types will be added as new terminologies are more widely used.
+
+Please note: The ?Other? category is meant to identify internal use ontologies and codes.",44
+DIAGNOSIS,DX_SOURCE,RDBMS Text(2),SAS Char(2),,NO,,AD;DI;FI;IN;NI;UN;OT,"AD = Admitting
+DI = Discharge
+FI = Final
+IN = Interim
+NI = No information
+UN = Unknown
+OT = Other","Classification of diagnosis source. We include these categories to allow some flexibility in implementation. The context is to capture available diagnoses recorded during a specific encounter. It is not necessary to populate interim diagnoses unless readily available.
+
+Ambulatory encounters would generally be expected to have a source of ?Final.?",45
+DIAGNOSIS,PDX,RDBMS Text(2),SAS Char(2),,NO,,P;S;X;NI;UN;OT,"P = Principal
+S = Secondary
+X = Unable to Classify
+NI = No information
+UN = Unknown
+OT = Other","Principal discharge diagnosis flag. Relevant only on IP and IS encounters. 
+
+For ED, AV, and OA encounter types, mark as X = Unable to Classify. (Billing systems do not require a primary diagnosis for ambulatory visits (eg, professional services))
+
+One principal diagnosis per encounter is expected, although in some instances more than one diagnosis may be flagged as principal.  (Modification made in v3.0 to specify ?per encounter.?)",46
+DIAGNOSIS,RAW_DX,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to mapping into the PCORnet CDM value set.",47
+DIAGNOSIS,RAW_DX_TYPE,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to mapping into the PCORnet CDM value set.",48
+DIAGNOSIS,RAW_DX_SOURCE,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to mapping into the PCORnet CDM value set.",49
+DIAGNOSIS,RAW_PDX,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to mapping into the PCORnet CDM value set.",50
+PROCEDURES,PROCEDURESID,RDBMS Text(x),SAS Char(x),,,,,,"Arbitrary identifier for each unique record. Does not need to be persistent across refreshes, and may be created by methods such as sequence or GUID. New field added in v3.0.",51
+PROCEDURES,PATID,RDBMS Text(x),SAS Char(x),,NO,,,,Arbitrary person-level identifier. Used to link across tables.,52
+PROCEDURES,ENCOUNTERID,RDBMS Text(x),SAS Char(x),,NO,,,,Arbitrary encounter-level identifier. Used to link across tables.,53
+PROCEDURES,ENC_TYPE,RDBMS Text(2),SAS Char(2),,YES,,AV;ED;EI;IP;IS;OA;NI;UN;OT,"AV = Ambulatory Visit
+ED = Emergency Department
+EI=Emergency Department Admit to Inpatient Hospital Stay (permissible substitution)
+IP = Inpatient Hospital Stay
+IS = Non-Acute Institutional Stay
+OA = Other Ambulatory Visit
+NI = No information
+UN = Unknown
+OT = Other",Please note: This is a field replicated from the ENCOUNTER table. See ENCOUNTER table for definitions.,54
+PROCEDURES,ADMIT_DATE,RDBMS Date,SAS Date (Numeric),,YES,DATE,,,Please note: This is a field replicated from the ENCOUNTER table. See ENCOUNTER table for definitions.,55
+PROCEDURES,PROVIDERID,RDBMS Text(x),SAS Char(x),,YES,,,,Please note: This is a field replicated from the ENCOUNTER table. See ENCOUNTER table for definitions.,56
+PROCEDURES,PX_DATE,RDBMS Date,SAS Date (Numeric),,NO,DATE,,,"New to v2.0.
+
+Date the procedure was performed.",57
+PROCEDURES,PX,RDBMS Text(11),SAS Char(11),,NO,,,,Procedure code.,58
+PROCEDURES,PX_TYPE,RDBMS Text(2),SAS Char(2),,NO,,09;10;11;C2;C3;C4;H3;HC;LC;ND;RE;NI;UN;OT,"09 = ICD-9-CM
+10 = ICD-10-PCS
+11 = ICD-11-PCS
+C2 = CPT Category II
+C3 = CPT Category III
+C4 = CPT-4 (i.e., HCPCS Level I)
+H3 = HCPCS Level III
+HC = HCPCS (i.e., HCPCS Level II)
+LC = LOINC
+ND = NDC
+RE = Revenue
+NI = No information
+UN = Unknown
+OT = Other","Procedure code type.
+
+We include a number of code types for flexibility, but the basic requirement that the code refer to a medical procedure remains.
+
+Revenue codes are a standard concept in Medicare billing and can be useful for defining care settings. If those codes are available they can be included.
+
+Medications administered by clinicians can be captured in billing data and Electronic Health Records (EHRs) as HCPCS procedure codes. Administration (infusion) of chemotherapy is an example. 
+
+We are now seeing NDCs captured as part of procedures because payers are demanding it for payment authorization. Inclusion of this code type enables those data partners that capture the NDC along with the procedure to include the data.
+
+Please note: The ?Other? category is meant to identify internal use ontologies and codes.",59
+PROCEDURES,PX_SOURCE,RDBMS Text(x),SAS Char(x),,NO,,OD;BI;CL;NI;UN;OT,"OD=Order
+BI=Billing
+CL=Claim
+NI=No information
+UN=Unknown
+OT=Other","New to v2.0.
+
+Source of the procedure information.
+
+Order and billing pertain to internal healthcare processes and data sources. Claim pertains to data from the bill fulfillment, generally data sources held by insurers and other health plans.",60
+PROCEDURES,RAW_PX,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to mapping into the PCORnet CDM value set.",61
+PROCEDURES,RAW_PX_TYPE,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to mapping into the PCORnet CDM value set.",62
+VITAL,VITALID,RDBMS Text(x),SAS Char(x),,,,,,"Arbitrary identifier for each unique VITAL record. Does not need to be persistent across refreshes, and may be created by methods such as sequence or GUID.
+
+(New field added to v3.0.)",63
+VITAL,PATID,RDBMS Text(x),SAS Char(x),,NO,,,,Arbitrary person-level identifier. Used to link across tables.,64
+VITAL,ENCOUNTERID,RDBMS Text(x),SAS Char(x),,NO,,,,Arbitrary encounter-level identifier. This is an optional relationship; the ENCOUNTERID should generally be present if the vitals were measured as part of healthcare delivery captured by this datamart (guidance added in v3.0).,65
+VITAL,MEASURE_DATE,RDBMS Date,SAS Date (Numeric),,NO,DATE,,,Date of vitals measure.,66
+VITAL,MEASURE_TIME,RDBMS Text(5),SAS Time (Numeric), HH:MI using 24-hour clock and zero-padding for hour and minute,NO,TIME,,,Time of vitals measure.,67
+VITAL,VITAL_SOURCE,RDBMS Text(2),SAS Char(2),,NO,,PR;PD;HC;HD;NI;UN;OT,"PR = Patient-reported
+PD=Patient device direct feed
+HC = Healthcare delivery setting
+HD=Healthcare device direct feed
+NI = No information
+UN = Unknown
+OT = Other","Please note: The ?Patient-reported? category can include reporting by patient?s family or guardian.
+
+v2.0 amendment: The new categorical value of PD and HD have been added.
+
+v2.0 guidance added with slight modification in v3.0: If unknown whether data are received directly from a device feed, use the more general context (such as patient-reported or healthcare delivery setting).",68
+VITAL,HT,RDBMS Number(8),NUMERIC(8),,NO,INCH,,,"Height (in inches) measured by standing. Only populated if measure was taken on this date. If missing, this value should be null. Decimal precision is permissible. (Modification of wording made from ?blank? to ?null? in v3.0).",69
+VITAL,WT,RDBMS Number(8),NUMERIC(8),,NO,POUND,,,"Weight (in pounds). Only populated if measure was taken on this date. If missing, this value should be null. Decimal precision is permissible. (Modification of wording made from ?blank? to ?null? in v3.0).",70
+VITAL,DIASTOLIC,RDBMS Number(4),NUMERIC(),,NO,MMHG,,,"Diastolic blood pressure (in mmHg). Only populated if measure was taken on this date. If missing, this value should be null. (Modification of wording made from ?blank? to ?null? in v3.0).",71
+VITAL,SYSTOLIC,RDBMS Number(4),NUMERIC(4),,NO,MMHG,,,"Systolic blood pressure (in mmHg). Only populated if measure was taken on this date. If missing, this value should be null. (Modification of wording made from ?blank? to ?null? in v3.0).",72
+VITAL,ORIGINAL_BMI,RDBMS Number(8),NUMERIC(8),,NO,,,,"BMI if calculated in the source system.
+
+Important: Please do not calculate BMI during CDM implementation. This field should only reflect originating source system calculations, if height and weight are not stored in the source.",73
+VITAL,BP_POSITION,RDBMS Text(2),SAS Char(2),,NO,,01;02;03;NI;UN;OT,"01 = Sitting
+02 = Standing
+03 = Supine
+NI = No information
+UN = Unknown
+OT = Other",Position for orthostatic blood pressure. This value should be null if blood pressure was not measured. (Modification of wording made from ?blank? to ?null? in v3.0).,74
+VITAL,SMOKING,RDBMS Text(2),SAS Char(2),,,,01;02;03;04;05;06;07;08;NI;UN;OT,"01=Current every day smoker
+02=Current some day smoker
+03=Former smoker
+04=Never smoker
+05=Smoker, current status unknown
+06=Unknown if ever smoked
+07=Heavy tobacco smoker
+08=Light tobacco smoker
+NI=No information
+UN=Unknown
+OT=Other","This field is new to v3.0. 
+
+Indicator for any form of tobacco that is smoked.
+
+Per Meaningful Use guidance, ??smoking status includes any form of tobacco that is smoked, but not all tobacco use.?
+
+??Light smoker? is interpreted to mean less than 10 cigarettes per day, or an equivalent (but less concretely defined) quantity of cigar or pipe smoke. ?Heavy smoker? is interpreted to mean greater than 10 cigarettes per day or an equivalent (but less concretely defined) quantity of cigar or pipe smoke.?
+
+??we understand that a ?current every day smoker? or ?current some day smoker? is an individual who has smoked at least 100 cigarettes during his/her lifetime and still regularly smokes every day or periodically, yet consistently; a ?former smoker? would be an individual who has smoked at least 100 cigarettes during his/her lifetime but does not currently smoke; and a ?never smoker? would be an individual who has not smoked 100 or more cigarettes during his/her lifetime.?
+
+http://www.healthit.gov/sites/default/files/standards-certification/2014-edition-draft-test-procedures/170-314-a-11-smoking-status-2014-test-procedure-draft-v1.0.pdf
+[retrieved May 11, 2015]
+",75
+VITAL,TOBACCO,RDBMS Text(2),SAS Char(2),,NO,,01;02;03;04;06;NI;UN;OT,"01=Current user
+02=Never
+03=Quit/former user
+04=Passive or environmental exposure
+06=Not asked
+NI=No information
+UN=Unknown
+OT=Other
+","This field is new to v2.0 with revised value set and field definition in v3.0.
+
+Indicator for any form of tobacco.",76
+VITAL,TOBACCO_TYPE,RDBMS Text(2),SAS Char(2),,NO,,"01;02;03;04;05;NI;UN;OT
+","01=Smoked tobacco only
+02=Non-smoked tobacco only
+03=Use of both smoked and non-smoked tobacco products
+04=None
+05=Use of smoked tobacco but no information about non-smoked tobacco use
+NI=No information
+UN=Unknown
+OT=Other
+","This field is new to v2.0, with revised value set in v3.0.
+
+Type(s) of tobacco used.",77
+VITAL,RAW_DIASTOLIC,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to formatting into the PCORnet CDM.",78
+VITAL,RAW_SYSTOLIC,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to formatting into the PCORnet CDM.",79
+VITAL,RAW_BP_POSITION,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to mapping into the PCORnet CDM value set.",80
+VITAL,RAW_SMOKING,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to mapping into the PCORnet CDM value set. New to v3.0.",81
+VITAL,RAW_TOBACCO,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to mapping into the PCORnet CDM value set. New to v2.0.",82
+VITAL,RAW_TOBACCO_TYPE,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to mapping into the PCORnet CDM value set. New to v2.0.",83
+DISPENSING,DISPENSINGID,RDBMS Text(x),SAS Char(x),,,,,,"Arbitrary identifier for each unique record. Does not need to be persistent across refreshes, and may be created by methods such as sequence or GUID. New field added in v3.0.",84
+DISPENSING,PATID,RDBMS Text(x),SAS Char(x),,NO,,,,Arbitrary person-level identifier. Used to link across tables.,85
+DISPENSING,PRESCRIBINGID,RDBMS Text(x),SAS Char(x),,,,,,"This is an optional relationship to the PRESCRIBING table, and may not be generally available. One prescribing order may generate multiple dispensing records. New field added in v3.0.",86
+DISPENSING,DISPENSE_DATE,RDBMS Date,SAS Date (Numeric),,NO,DATE,,,Dispensing date (as close as possible to date the person received the dispensing).,87
+DISPENSING,NDC,RDBMS Text(11),SAS Char(11),,NO,,,,"National Drug Code in the 11-digit, no-dash, HIPAA format. 
+
+Please expunge any place holders (such as dashes or extra digits).
+
+If needed, guidance on normalization for other forms of NDC can be found: http://www.nlm.nih.gov/research/umls/rxnorm/docs/2012/rxnorm_doco_full_2012-1.html (see section 6)",88
+DISPENSING,DISPENSE_SUP,RDBMS Number(8),Numeric(8),,NO,DAYS,,,"Days supply. Number of days that the medication supports based on the number of doses as reported by the pharmacist. This amount is typically found on the dispensing record. Integer values are expected.
+
+Important: Please do not calculate during CDM implementation. This field should only reflect originating source system calculations.",89
+DISPENSING,DISPENSE_AMT,RDBMS Number(8),Numeric(8),,NO,UNITS,,,"Number of units (pills, tablets, vials) dispensed. Net amount per NDC per dispensing. This amount is typically found on the dispensing record. Positive values are expected.
+
+Important: Please do not calculate during CDM implementation. This field should only reflect originating source system calculations.
+",90
+DISPENSING,RAW_NDC,RDBMS Text(x),Numeric(x),,NO,,,,"Optional field for originating value of field, prior to mapping into the PCORnet CDM value set.",91
+LAB_RESULT_CM ,LAB_RESULT_CM_ID,RDBMS Text(x),SAS Char(x),,,,,,"Arbitrary identifier for each unique LAB_RESULT_CM record. Does not need to be persistent across refreshes, and may be created by methods such as sequence or GUID.
+
+(New field added to v3.0.)",92
+LAB_RESULT_CM ,PATID,RDBMS Text(x),SAS Char(x),,NO,,,,Arbitrary person-level identifier. Used to link across tables.,93
+LAB_RESULT_CM ,ENCOUNTERID,RDBMS Text(x),SAS Char(x),,NO,,,,"Arbitrary encounter-level identifier used to link across tables. This is an optional field, and should only be populated if the lab was collected as part of a healthcare encounter.",94
+LAB_RESULT_CM ,LAB_NAME,RDBMS Text(10),SAS Char(10),,NO,,A1C;CK;CK_MB;CK_MBI;CREATININE;HGB;LDL;INR;TROP_I;TROP_T_QL;TROP_T_QN,"A1C=Hemoglobin A1c
+CK=Creatine kinase total
+CK_MB=Creatine kinase MB
+CK_MBI=Creatine kinase MB/creatine kinase total
+CREATININE=Creatinine
+HGB=Hemoglobin
+LDL=Low-density lipoprotein
+INR=International normalized ratio
+TROP_I=Troponin I cardiac
+TROP_T_QL=Troponin T cardiac (qualitative)
+TROP_T_QN=Troponin T cardiac (quantitative)","Laboratory result common measure, a categorical identification for the type of test, which is harmonized across all contributing data partners.
+
+Please note that it is possible for more than one LOINC code, CPT code, and/or local code to be associated with one LAB_NAME.",95
+LAB_RESULT_CM ,SPECIMEN_SOURCE,RDBMS Text(10),SAS Char(10),,NO,,BLOOD;CSF;PLASMA;PPP;SERUM;SR_PLS;URINE;NI;UN;OT,"BLOOD=blood
+CSF=cerebrospinal fluid
+PLASMA=plasma
+PPP=platelet poor plasma
+SERUM=serum
+SR_PLS=serum/plasma
+URINE=urine
+NI=No information
+UN=Unknown
+OT=Other",Specimen source. All records will have a specimen source; some tests have several possible values for SPECIMEN_SOURCE. Please see the reference tables for additional details.,96
+LAB_RESULT_CM ,LAB_LOINC,RDBMS Text(10),SAS Char(10),,NO,,,,"Logical Observation Identifiers, Names, and Codes (LOINC) from the Regenstrief Institute. Results with local versions of LOINC codes (e.g., LOINC candidate codes) should be included in the RAW_table field, but the LOINC variable should be set to missing. Current LOINC codes are from 3-7 characters long but Regenstrief suggests a length of 10 for future growth. The last digit of the LOINC code is a check digit and is always preceded by a hyphen. All parts of the LOINC code, including the hyphen, must be included. Do not pad the LOINC code with leading zeros. 
+
+Please see the LOINC reference table for known LOINC codes for each LAB_NAME.
+",97
+LAB_RESULT_CM ,PRIORITY,RDBMS Text(2),SAS Char(2),,NO,,E;R;S;NI;UN;OT,"E=Expedite
+R=Routine
+S=Stat
+NI=No information
+UN=Unknown
+OT=Other",Immediacy of test. The intent of this variable is to determine whether the test was obtained as part of routine care or as an emergent/urgent diagnostic test (designated as Stat or Expedite).,98
+LAB_RESULT_CM ,RESULT_LOC,RDBMS Text(2),SAS Char(2),,NO,,L;P;NI;UN;OT,"L=Lab
+P=Point of Care
+NI=No information
+UN=Unknown
+OT=Other","Location of the test result. Point of Care locations may include anticoagulation clinic, newborn nursery, finger stick in provider office, or home. The default value is ?L? unless the result is Point of Care. There should not be any missing values.",99
+LAB_RESULT_CM ,LAB_PX,RDBMS Text(11),SAS Char(11),,NO,,,,"Optional variable for local and standard procedure codes, used to identify the originating order for the lab test.",100
+LAB_RESULT_CM ,LAB_PX_TYPE,RDBMS Text(2),SAS Char(2),,NO,,09;10;11;C2;C3;C4;H3;HC;LC;ND;RE;NI;UN;OT,"09=ICD-9-CM
+10=ICD-10-PCS
+11=ICD-11-PCS
+C2=CPT Category II
+C3=CPT Category III
+C4=CPT-4 (i.e., HCPCS Level I)
+H3=HCPCS Level III
+HC=HCPCS (i.e., HCPCS Level II)
+LC=LOINC
+ND=NDC
+RE=Revenue
+NI=No information
+UN=Unknown
+OT=Other","Procedure code type, if applicable.",101
+LAB_RESULT_CM ,LAB_ORDER_DATE,RDBMS Date,SAS Date (Numeric),,NO,DATE,,,Date test was ordered.,102
+LAB_RESULT_CM ,SPECIMEN_DATE,RDBMS Date,SAS Date (Numeric),,NO,DATE,,,Date specimen was collected.,103
+LAB_RESULT_CM ,SPECIMEN_TIME,RDBMS Text(5),SAS Time (Numeric), HH:MI using 24-hour clock and zero-padding for hour and minute,NO,TIME,,,Time specimen was collected.,104
+LAB_RESULT_CM ,RESULT_DATE,RDBMS Date,SAS Date (Numeric),,NO,DATE,,,Result date.,105
+LAB_RESULT_CM ,RESULT_TIME,RDBMS Text(5),SAS Time (Numeric), HH:MI using 24-hour clock and zero-padding for hour and minute,NO,TIME,,,Result time.,106
+LAB_RESULT_CM ,RESULT_QUAL,RDBMS Text(12),SAS Char(12),,NO,,"BORDERLINE;POSITIVE;NEGATIVE;UNDETERMINED;NI=No information;UN=Unknown;OT=Other
+","BORDERLINE
+POSITIVE
+NEGATIVE
+UNDETERMINED
+NI=No information
+UN=Unknown
+OT=Other",Standardized result for qualitative results. This variable should be NI for quantitative results. Please see the reference tables for additional details and information on acceptable values for each qualitative LAB_NAME.,107
+LAB_RESULT_CM ,RESULT_NUM,RDBMS Number(8),SAS Char(8),,NO,,,,Standardized/converted result for quantitative results. This variable should be null for qualitative results. Please see the reference tables for additional details. (Modification of wording made from ?blank? to ?null? in v3.0).,108
+LAB_RESULT_CM ,RESULT_MODIFIER,RDBMS Text(2),SAS Char(2),,NO,,EQ;GE;GT;LE;LT;TX;NI;UN;OT,"EQ=Equal
+GE=Greater than or equal to
+GT=Greater than
+LE=Less than or equal to
+LT=Less than
+TX=Text
+NI=No information
+UN=Unknown
+OT=Other","Modifier for result values. Any symbols in the RAW_RESULT value should be reflected in the RESULT_MODIFIER variable. 
+
+For example, if the original source data value is ""<=200"" then RAW_RESULT=200 and RESULT_MODIFIER=LE. If the original source data value is text then RESULT_MODIFIER=TX. If the original source data value is a numeric value then RESULT_MODIFIER=EQ.",109
+LAB_RESULT_CM ,RESULT_UNIT,RDBMS Text(11),SAS Char(11),,NO,,,,Converted/standardized units for the result. Please see the standard abbreviations reference table for additional details.,110
+LAB_RESULT_CM ,NORM_RANGE_LOW,RDBMS Text(10),SAS Char(10),,NO,,,,"Lower bound of the normal range assigned by the laboratory. Value should only contain the value of the lower bound. The symbols >, <, >=, <= should be removed. For example, if the normal range for a test is >100 and <300, then ""100"" should be entered.",111
+LAB_RESULT_CM ,NORM_MODIFIER_LOW,RDBMS Text(2),SAS Char(2),,NO,,EQ;GE;GT;NO;NI;UN;OT,"EQ=Equal
+GE=Greater than or equal to
+GT=Greater than
+NO=No lower limit
+NI=No information
+UN=Unknown
+OT=Other","Modifier for NORM_RANGE_LOW values.
+
+v3.0 modification made to field name. 
+
+For numeric results one of the following needs to be true: 
+1) Both MODIFIER_LOW and MODIFIER_HIGH contain EQ (e.g. normal values fall in the range 3-10)
+2) MODIFIER_LOW contains GT or GE and MODIFIER_HIGH contains NO (e.g. normal values are >3 with no upper boundary)
+3) MODIFIER_HIGH contains LT or LE and MODIFIER_LOW contains NO (e.g. normal values are <=10 with no lower boundary)
+
+For numeric results one of the following needs to be true: 
+1) Both MODIFIER_LOW and MODIFIER_HIGH contain EQ (e.g. normal values fall in the range 3-10)
+2) MODIFIER_LOW contains GT or GE and MODIFIER_HIGH contains NO (e.g. normal values are >3 with no upper boundary)
+3) MODIFIER_HIGH contains LT or LE and MODIFIER_LOW contains NO (e.g. normal values are <=10 with no lower boundary)",112
+LAB_RESULT_CM ,NORM_RANGE_HIGH,RDBMS Text(10),SAS Char(10),,NO,,,,"Upper bound of the normal range assigned by the laboratory. Value should only contain the value of the upper bound. The symbols >, <, >=, <= should be removed. For example, if the normal range for a test is >100 and <300, then ""300"" should be entered.",113
+LAB_RESULT_CM ,NORM_MODIFIER_HIGH,RDBMS Text(2),SAS Char(2),,NO,,EQ;LE;LT;NO;NI;UN;OT,"EQ=Equal
+LE=Less than or equal to
+LT=Less than
+NO=No higher limit
+NI=No information
+UN=Unknown
+OT=Other","Modifier for NORM_RANGE_HIGH values.
+
+v3.0 modification made to field name. 
+
+For numeric results one of the following needs to be true: 
+1) Both MODIFIER_LOW and MODIFIER_HIGH contain EQ (e.g. normal values fall in the range 3-10)
+2) MODIFIER_LOW contains GT or GE and MODIFIER_HIGH contains NO (e.g. normal values are >3 with no upper boundary)
+3) MODIFIER_HIGH contains LT or LE and MODIFIER_LOW contains NO (e.g. normal values are <=10 with no lower boundary)",114
+LAB_RESULT_CM ,ABN_IND,RDBMS Text(2),SAS Char(2),,NO,,AB;AH;AL;CH;CL;CR;IN;NL;NI;UN;OT,"AB=Abnormal
+AH=Abnormally high
+AL=Abnormally low
+CH=Critically high
+CL=Critically low
+CR=Critical
+IN=Inconclusive
+NL=Normal
+NI=No information
+UN=Unknown
+OT=Other",Abnormal result indicator. This value comes from the source data; do not apply logic to create it.,115
+LAB_RESULT_CM ,RAW_LAB_NAME,RDBMS Text(x),SAS Char(x),,NO,,,,"Local code related to an individual lab test. This variable will not be used in queries, but may be used by local programmers to associate a record with a particular LAB_NAME.",116
+LAB_RESULT_CM ,RAW_LAB_CODE,RDBMS Text(x),SAS Char(x),,NO,,,,"Local code related to an individual lab test. This variable will not be used in queries, but may be used by local programmers to associate a record with a particular LAB_NAME.",117
+LAB_RESULT_CM ,RAW_PANEL,RDBMS Text(x),SAS Char(x),,NO,,,,"Local code related to a battery or panel of lab tests. This variable will not be used in queries, but may be used by local programmers to associate a record with a particular LAB_NAME.",118
+LAB_RESULT_CM ,RAW_RESULT,RDBMS Text(x),SAS Char(x),,NO,,,,"The original test result value as seen in your source data. Values may include a decimal point, a sign or text (e.g., POSITIVE, NEGATIVE, DETECTED). The symbols >, <, >=, <= should be removed from the value and stored in the Modifier variable instead.",119
+LAB_RESULT_CM ,RAW_UNIT,RDBMS Text(x),SAS Char(x),,NO,,,,Original units for the result in your source data.,120
+LAB_RESULT_CM ,RAW_ORDER_DEPT,RDBMS Text(x),SAS Char(x),,NO,,,,Local code for ordering provider department.,121
+LAB_RESULT_CM ,RAW_FACILITY_CODE,RDBMS Text(x),SAS Char(x),,NO,,,,Local facility code that identifies the hospital or clinic. Taken from facility claims.,122
+CONDITION,CONDITIONID,RDBMS Text(x),SAS Char(x),,,,,,"Arbitrary identifier for each unique record. Does not need to be persistent across refreshes, and may be created by methods such as sequence or GUID. New field added in v3.0.",123
+CONDITION,PATID,RDBMS Text(x),SAS Char(x),,NO,,,,Arbitrary person-level identifier. Used to link across tables.,124
+CONDITION,ENCOUNTERID,RDBMS Text(x),SAS Char(x),,NO,,,,"Arbitrary encounter-level identifier used to link across tables. This is an optional field, and should only be populated if the item was collected as part of a healthcare encounter.
+
+If more than one encounter association is present, this field should be populated with the ID of the encounter when the condition was first entered into the system. However, please note that many conditions may be recorded outside of an encounter context. (Guidance added in v3.0.)",125
+CONDITION,REPORT_DATE,RDBMS Date,SAS Date (Numeric),,NO,DATE,,,"Date condition was noted, which may be the date when it was recorded by a provider or nurse, or the date on which the patient reported it. Please note that this date may not correspond to onset date. (Additional guidance added in v3.0.)",126
+CONDITION,RESOLVE_DATE,RDBMS Date,SAS Date (Numeric),,NO,DATE,,,"Date condition was resolved, if resolution of a transient condition has been achieved. A resolution date is not generally expected for chronic conditions, even if the condition is managed.",127
+CONDITION,ONSET_DATE,RDBMS Date,SAS Date (Numeric),,,,,,"New field added in v3.0.
+
+Please note that onset date is a very precise concept. Please do not map data unless they precisely match this definition. The REPORT_DATE concept may be a better fit for many systems.",128
+CONDITION,CONDITION_STATUS,RDBMS Text(2),SAS Char(2),,NO,,AC;RS;IN;NI;UN;OT,"AC=Active
+RS=Resolved
+IN=Inactive
+NI=No information
+UN=Unknown
+OT=Other","Condition status corresponding with REPORT_DATE.
+
+Guidance: The value of IN=Inactive may be used in situations where a condition is not resolved, but is not currently active (for example, psoriasis).",129
+CONDITION,CONDITION,RDBMS Text(18),SAS Char(18),,NO,,,,"Condition code. 
+
+Leading zeroes and different levels of decimal precision are permissible in this field. Please populate the exact textual value of this diagnosis code, but remove source-specific suffixes and prefixes. Other codes should be listed as recorded in the source data.",130
+CONDITION,CONDITION_TYPE,RDBMS Text(2),SAS Char(2),,NO,,09;10;11;SM;HP;AG;NI;UN;OT,"09=ICD-9-CM
+10=ICD-10-CM
+11=ICD-11-CM
+SM=SNOMED CT
+HP=Human Phenotype Ontology
+AG=Algorithmic
+NI=No information
+UN=Unknown
+OT=Other","Condition code type. 
+
+Please note: The ?Other? category is meant to identify internal use ontologies and codes.
+
+v3.0 amendment: The new categorical value of AG has been added. ",131
+CONDITION,CONDITION_SOURCE,RDBMS Text(2),SAS Char(2),,NO,,PR;HC;RG;PC;NI;UN;OT,"PR=Patient-reported medical history
+HC=Healthcare problem list
+RG=Registry cohort
+PC=PCORnet-defined condition algorithm
+NI=No information
+UN=Unknown
+OT=Other","Please note: The ?Patient-reported? category can include reporting by a proxy, such as patient?s family or guardian.
+
+Guidance: ?Registry cohort? generally refers to cohorts of patients flagged with a certain set of characteristics for management within a health system.
+
+?Patient-reported? can include self-reported medical history and/or current medical conditions, not captured via healthcare problem lists or registry cohorts.
+
+v3.0 amendment: The new categorical value of PC has been added.",132
+CONDITION,RAW_CONDITION_STATUS,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to mapping into the PCORnet CDM value set.",133
+CONDITION,RAW_CONDITION,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to mapping into the PCORnet CDM value set.",134
+CONDITION,RAW_CONDITION_TYPE,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to mapping into the PCORnet CDM value set.",135
+CONDITION,RAW_CONDITION_SOURCE,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to mapping into the PCORnet CDM value set.",136
+PRO_CM,PRO_CM_ID,RDBMS Text(x),SAS Char(x),,,,,,"Arbitrary identifier for each unique record. Does not need to be persistent across refreshes, and may be created by methods such as sequence or GUID. New field added in v3.0.",137
+PRO_CM,PATID,RDBMS Text(x),SAS Char(x),,NO,,,,Arbitrary person-level identifier for the patient for whom the PRO response was captured. Used to link across tables.,138
+PRO_CM,ENCOUNTERID,RDBMS Text(x),SAS Char(x),,NO,,,,"Arbitrary encounter-level identifier used to link across tables. This is an optional field, and should only be populated if the item was collected as part of a healthcare encounter.",139
+PRO_CM,PRO_ITEM,RDBMS Text(7),SAS Char(7),,NO,,PN_0001;PN_0002;PN_0003;PN_0004;PN_0005;PN_0006;PN_0007;PN_0008;PN_0009;PN_0010;PN_0011;PN_0012;PN_0013;PN_0014;PN_0015;PN_0016;PN_0017;PN_0018;PN_0019;PN_0020;PN_0021,"PN_0001=GLOBAL01
+PN_0002=GLOBAL02
+PN_0003=GLOBAL06
+PN_0004=PFA53
+PN_0005=EDDEP29
+PN_0006=HI7
+PN_0007=SLEEP20
+PN_0008=SRPPER11_CAPS
+PN_0009=PAININ9
+PN_0010=3793R1
+PN_0011=28676R1
+PN_0012=EOS_P_011
+PN_0013=PEDSGLOBAL2
+PN_0014=PEDSGLOBAL5
+PN_0015=PEDSGLOBAL6
+PN_0016=GLOBAL03
+PN_0017=GLOBAL04
+PN_0018=EDANX53
+PN_0019=SAMHSA
+PN_0020=CAHPS 4.0
+PN_0021=PA070",PCORnet identifier for the specific Common Measure item. Please see the Common Measures reference table for more details.,140
+PRO_CM,PRO_LOINC,RDBMS Text(10),SAS Char(10),,NO,,,,"LOINC code for item context and stem. Please see the reference table for known LOINC codes for each common measure.
+
+Logical Observation Identifiers, Names, and Codes (LOINC) from the Regenstrief Institute. Results with local versions of LOINC codes (e.g., LOINC candidate codes) should be included in the RAW_table field, but the PRO_LOINC variable should be set to missing. Current LOINC codes are from 3-7 characters long but Regenstrief suggests a length of 10 for future growth. The last digit of the LOINC code is a check digit and is always preceded by a hyphen. All parts of the LOINC code, including the hyphen, must be included. Do not pad the LOINC code with leading zeros. 
+",141
+PRO_CM,PRO_DATE,RDBMS Date,SAS Date (Numeric),,NO,DATE,,,The date of the response.,142
+PRO_CM,PRO_TIME,RDBMS Text(5),SAS Time (Numeric), HH:MI using 24-hour clock and zero-padding for hour and minute,NO,TIME,,,The time of the response.,143
+PRO_CM,PRO_RESPONSE,NUMBER(8),Numeric(8),,NO,,,,The numeric response recorded for the item. Please see the Common Measures reference table for the list of valid responses for each item.,144
+PRO_CM,PRO_METHOD,RDBMS Text(2),SAS Char(2),,NO,,PA;EC;PH;IV;NI;UN;OT,"PA=Paper 
+EC=Electronic 
+PH=Telephonic
+IV=Telephonic with interactive voice response (IVR) technology
+NI=No information
+UN=Unknown
+OT=Other","Method of administration. Electronic includes responses captured via a personal or tablet computer, at web kiosks, or via a smartphone.",145
+PRO_CM,PRO_MODE,RDBMS Text(2),SAS Char(2),,NO,,"SF;SA;PR;PA;NI;UN;OT
+","SF=Self without assistance
+SA= Self with assistance
+PR=Proxy without assistance
+PA=Proxy with assistance
+NI=No information
+UN=Unknown
+OT=Other","The person who responded on behalf of the patient for whom the response was captured. A proxy report is a measurement based on a report by someone other than the patient reporting as if he or she is the patient, such as a parent responding for a child, or a caregiver responding for an individual unable to report for themselves. Assistance excludes providing interpretation of the patient?s response. ",146
+PRO_CM,PRO_CAT,RDBMS Text(2),SAS Char(2),,NO,,"Y;N;NI;UN;OT
+","Y=Yes
+N=No
+NI=No information
+UN=Unknown
+OT=Other",Indicates whether Computer Adaptive Testing (CAT) was used to administer the survey or instrument that the item was part of. May apply to electronic (EC) and telephonic (PH or IV) modes. ,147
+PRO_CM,RAW_PRO_CODE,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating code, such as LOINC candidate codes that have not yet been adopted",148
+PRO_CM,RAW_PRO_RESPONSE,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to mapping into the PCORnet CDM value set.",149
+PRESCRIBING,PRESCRIBINGID,RDBMS Text(x),SAS Char(x),,NO,,,,"Arbitrary identifier for each unique PRESCRIBING record. Does not need to be persistent across refreshes, and may be created by methods such as sequence or GUID.",150
+PRESCRIBING,PATID,RDBMS Text(x),SAS Char(x),,NO,,,,Arbitrary person-level identifier used to link across tables. ,151
+PRESCRIBING,ENCOUNTERID,RDBMS Text(x),SAS Char(x),,NO,,,,Arbitrary encounter-level identifier. This is an optional relationship; the ENCOUNTERID should be present if the prescribing activity is directly associated with an encounter.,152
+PRESCRIBING,RX_PROVIDERID,RDBMS Text(x),SAS Char(x),,NO,,,,Provider code for the provider who prescribed the medication. The provider code is a pseudoidentifier with a consistent crosswalk to the real identifier. ,153
+PRESCRIBING,RX_ORDER_DATE,RDBMS Date,SAS Date (Numeric),,NO,,,,Order date of the prescription by the provider.,154
+PRESCRIBING,RX_ORDER_TIME,RDBMS Text(5),SAS Time (Numeric), HH:MI using 24-hour clock and zero-padding for hour and minute,NO,,,,Order time of the prescription by the provider.,155
+PRESCRIBING,RX_START_DATE,RDBMS Date,SAS Date (Numeric),,NO,,,,Start date of order. This attribute may not be consistent with the date on which the patient actually begin taking the medication.,156
+PRESCRIBING,RX_END_DATE,RDBMS Date,SAS Date (Numeric),,NO,,,,End date of order (if available).,157
+PRESCRIBING,RX_QUANTITY,RDBMS Number(8),Numeric(8),,NO,,,,Quantity ordered.,158
+PRESCRIBING,RX_REFILLS,RDBMS Number(8),Numeric(8),,NO,,,,"Number of refills ordered (not including the original prescription). If no refills are ordered, the value should be zero.",159
+PRESCRIBING,RX_DAYS_SUPPLY,RDBMS Number(8),Numeric(8),,NO,,,,"Number of days supply ordered, as specified by the prescription.",160
+PRESCRIBING,RX_FREQUENCY,RDBMS Text(2),SAS Char(2),,NO,,01;02;03;04;05;06;07;08;09;NI;UN;OT,"01=Every day
+02=Two times a day (BID)
+03=Three times a day (TID)
+04=Four times a day (QID)
+05=Every morning
+06=Every afternoon
+07=Before meals
+08=After meals
+09=As needed (PRN)
+NI=No information
+UN=Unknown
+OT=Other
+",Specified frequency of medication.,161
+PRESCRIBING,RX_BASIS,RDBMS Text(2),SAS Char(2),,NO,,01;02;NI;UN;OT,"01=Dispensing
+02=Administration
+NI=No information
+UN=Unknown
+OT=Other
+",Basis of the medication order,162
+PRESCRIBING,RXNORM_CUI,RDBMS Number (8),Numeric(8),,NO,,,,"Where an RxNorm mapping exists for the source medication, this field contains the RxNorm concept identifier (CUI) at the highest possible specificity.
+
+If more than one option exists for mapping, the following ordered strategy may be adopted:
+1)Semantic generic clinical drug
+2)Semantic Branded clinical drug
+3)Generic drug pack
+4)Branded drug pack
+",163
+PRESCRIBING,RAW_RX_MED_NAME,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating, full textual medication name from the source.",164
+PRESCRIBING,RAW_RX_FREQUENCY,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to mapping into the PCORnet CDM value set.",165
+PRESCRIBING,RAW_RXNORM_CUI,RDBMS Text(x),SAS Char(x),,NO,,,,"Optional field for originating value of field, prior to mapping into the PCORnet CDM value set.",166
+PCORNET_TRIAL,PATID,RDBMS Text(x),SAS Char(x),,NO,,,,Arbitrary person-level identifier used to link across tables. ,167
+PCORNET_TRIAL,TRIALID,RDBMS Text(20),SAS Char(20),,NO,,,,Each TRIALID is assigned by the PCORnet trial?s coordinating center.,168
+PCORNET_TRIAL,PARTICIPANTID,RDBMS Text(x),SAS Char(x),,NO,,,,"Arbitrary person-level identifier used to uniquely identify a participant in a PCORnet trial.
+
+PARTICIPANTID is never repeated or reused for a specific clinical trial, and is generally assigned by trial-specific processes. It may be the same as a randomization ID.
+",169
+PCORNET_TRIAL,TRIAL_SITEID,RDBMS Text(x),SAS Char(x),,NO,,,,Each TRIAL_SITEID is assigned by the PCORnet trial coordinating center.,170
+PCORNET_TRIAL,TRIAL_ENROLL_DATE,RDBMS Date,SAS Date (Numeric),,NO,,,,Date on which the participant enrolled in the trial (generally coincides with trial consent process).,171
+PCORNET_TRIAL,TRIAL_END_DATE,RDBMS Date,SAS Date (Numeric),,NO,,,,Date on which the participant completes participation in the trial.,172
+PCORNET_TRIAL,TRIAL_WITHDRAW_DATE,RDBMS Date,SAS Date (Numeric),,NO,,,,"If applicable, date on which the participant withdraws consent from the trial.",173
+PCORNET_TRIAL,TRIAL_INVITE_CODE,RDBMS Text(20),SAS Char(20),,NO,,,,"Textual strings used to uniquely identify invitations sent to potential participants, and allows acceptances to be associated back to the originating source.
+
+Where used, there should generally be a unique combination of PATID, TRIAL_NAME, and INVITE_CODE within each datamart.
+
+For example, this might include ?co-enrollment ID strings? for e-mail invites or ?verification codes? for letter invites.
+",174
+DEATH,PATID,RDBMS Text(x),SAS Char(x),,NO,,,,Arbitrary person-level identifier used to link across tables. ,175
+DEATH,DEATH_DATE,RDBMS Date,SAS Date (Numeric),,NO,,,,Date of death.,176
+DEATH,DEATH_DATE_IMPUTE,RDBMS Text(2),SAS Char(2),,NO,,B;D;M;N;NI;UN;OT,"B=Both month and day imputed
+D=Day imputed
+M=Month imputed
+N=Not imputed
+NI=No information
+UN=Unknown
+OT=Other
+","When date of death is imputed, this field indicates which parts of the date were imputed.",177
+DEATH,DEATH_SOURCE,RDBMS Text(2),SAS Char(2),,NO,,L;N;D;S;T;NI;UN;OT,"L=Other, locally defined
+N=National Death Index
+D=Social Security
+S=State Death files
+T=Tumor data
+NI=No information
+UN=Unknown
+OT=Other
+","Guidance: ?Other, locally defined? may be used to indicate presence of deaths reported from EHR systems, such as in-patient hospital deaths or dead on arrival.",178
+DEATH,DEATH_MATCH_CONFIDENCE,RDBMS Text(2),SAS Char(2),,NO,,E;F;P;NI;UN;OT,"E=Excellent
+F=Fair
+P=Poor
+NI=No information
+UN=Unknown
+OT=Other
+","For situations where a probabilistic patient matching strategy is used, this field indicates the confidence that the patient drawn from external source data represents the actual patient.
+
+Should not be present where DEATH_SOURCE is L (locally-defined). May not be applicable for DEATH_SOURCE=T (tumor registry data)
+",179
+DEATH_CAUSE,PATID,RDBMS Text(x),SAS Char(x),,NO,,,,Arbitrary person-level identifier used to link across tables. ,180
+DEATH_CAUSE,DEATH_CAUSE,RDBMS Text(8),SAS Char(8),,NO,,,,Cause of death code. Please include the decimal point in ICD codes (if any).,181
+DEATH_CAUSE,DEATH_CAUSE_CODE,RDBMS Text(2),SAS Char(2),,NO,,09;10;NI;UN;OT,"09=ICD-9
+10=ICD-10
+NI=No information
+UN=Unknown
+OT=Other
+",Cause of death code type.,182
+DEATH_CAUSE,DEATH_CAUSE_TYPE,RDBMS Text(2),SAS Char(2),,NO,,C;I;O;U;NI;UN;OT,"C=Contributory
+I=Immediate/Primary
+O=Other
+U=Underlying
+NI=No information
+UN=Unknown
+OT=Other
+",Cause of death type. There should be only one underlying cause of death.,183
+DEATH_CAUSE,DEATH_CAUSE_SOURCE,RDBMS Text(2),SAS Char(2),,NO,,L;N;D;S;T;NI;UN;OT,"L=Other, locally defined
+N=National Death Index
+D=Social Security
+S=State Death files
+T=Tumor data
+NI=No information
+UN=Unknown
+OT=Other
+","Source of cause of death information.
+
+Guidance: ?Other, locally defined? may be used to indicate presence of deaths reported from EHR systems, such as in-patient hospital deaths or dead on arrival.
+",184
+DEATH_CAUSE,DEATH_CAUSE_CONFIDENCE,RDBMS Text(2),SAS Char(2),,NO,,E;F;P;NI;UN;OT,"E=Excellent
+F=Fair
+P=Poor
+NI=No information
+UN=Unknown
+OT=Other
+","Confidence in the accuracy of the cause of death based on source, match, number of reporting sources, discrepancies, etc.",185
+HARVEST,NETWORKID,RDBMS Text(10),SAS Char(10),,NO,,,,This identifier is assigned by DSSNI operations,186
+HARVEST,NETWORK_NAME,RDBMS Text(20),SAS Char(20),,NO,,,,Descriptive name of the network,187
+HARVEST,DATAMARTID,RDBMS Text(10),SAS Char(10),,NO,,,,This identifier is assigned by DSSNI operations,188
+HARVEST,DATAMART_NAME,RDBMS Text(20),SAS Char(20),,NO,,,,Descriptive name of the datamart,189
+HARVEST,DATAMART_PLATFORM,RDBMS Text(2),SAS Char(2),,NO,,"01;02;03;04;05;NI;UN;OT
+","01=SQL Server
+02=Oracle
+03=PostgreSQL
+04=MySQL
+05=SAS
+NI=No information
+UN=Unknown
+OT=Other
+",,190
+HARVEST,CDM_VERSION,NUMBER(8),Numeric(8),,NO,,,,"Version currently implemented within this datamart (for example, 1.0, 2.0, 3.0).",191
+HARVEST,DATAMART_CLAIMS,RDBMS Text(2),SAS Char(2),,NO,,01;02;NI;UN;OT,"01=Not present
+02=Present
+NI=No information
+UN=Unknown
+OT=Other
+",Datamart includes claims data source(s),192
+HARVEST,DATAMART_EHR,RDBMS Text(2),SAS Char(2),,NO,,01;02;NI;UN;OT,"01=Not present
+02=Present
+NI=No information
+UN=Unknown
+OT=Other
+",Datamart includes EHR data source(s),193
+HARVEST,BIRTH_DATE_MGMT,RDBMS Text(2),SAS Char(2),,NO,,01;02;03;04;NI;UN;OT,"01=No imputation or obfuscation
+02=Imputation for incomplete dates
+03=Date obfuscation
+04=Both imputation and obfuscation NI=No information
+UN=Unknown
+OT=Other
+","Data management strategy currently present in the BIRTH_DATE field on the DEMOGRAPHIC table
+
+Please see notes for additional definitions.
+",194
+HARVEST,ENR_START_DATE_MGMT,RDBMS Text(2),SAS Char(2),,NO,,01;02;03;04;NI;UN;OT,"01=No imputation or obfuscation
+02=Imputation for incomplete dates
+03=Date obfuscation
+04=Both imputation and obfuscation NI=No information
+UN=Unknown
+OT=Other
+","Data management strategy currently present in the ENR_START_DATE field on the ENROLLMENT table
+
+Please see notes for additional definitions.
+",195
+HARVEST,ENR_END_DATE_MGMT,RDBMS Text(2),SAS Char(2),,NO,,01;02;03;04;NI;UN;OT,"01=No imputation or obfuscation
+02=Imputation for incomplete dates
+03=Date obfuscation
+04=Both imputation and obfuscation NI=No information
+UN=Unknown
+OT=Other
+","Data management strategy currently present in the ENR_END_DATE field on the ENROLLMENT table
+
+Please see notes for additional definitions.
+",196
+HARVEST,ADMIT_DATE_MGMT,RDBMS Text(2),SAS Char(2),,NO,,01;02;03;04;NI;UN;OT,"01=No imputation or obfuscation
+02=Imputation for incomplete dates
+03=Date obfuscation
+04=Both imputation and obfuscation NI=No information
+UN=Unknown
+OT=Other
+","Data management strategy currently present in the ADMIT_DATE field on the ENCOUNTER table
+
+Please see notes for additional definitions.
+",197
+HARVEST,DISCHARGE_DATE_MGMT,RDBMS Text(2),SAS Char(2),,NO,,01;02;03;04;NI;UN;OT,"01=No imputation or obfuscation
+02=Imputation for incomplete dates
+03=Date obfuscation
+04=Both imputation and obfuscation NI=No information
+UN=Unknown
+OT=Other
+","Data management strategy currently present in the DISCHARGE_DATE field on the ENCOUNTER table
+
+Please see notes for additional definitions.
+",198
+HARVEST,PX_DATE_MGMT,RDBMS Text(2),SAS Char(2),,NO,,01;02;03;04;NI;UN;OT,"01=No imputation or obfuscation
+02=Imputation for incomplete dates
+03=Date obfuscation
+04=Both imputation and obfuscation NI=No information
+UN=Unknown
+OT=Other
+","Data management strategy currently present in the PX_DATE field on the PROCEDURES table
+
+Please see notes for additional definitions.
+",199
+HARVEST,RX_ORDER_DATE_MGMT,RDBMS Text(2),SAS Char(2),,NO,,01;02;03;04;NI;UN;OT,"01=No imputation or obfuscation
+02=Imputation for incomplete dates
+03=Date obfuscation
+04=Both imputation and obfuscation NI=No information
+UN=Unknown
+OT=Other
+","Data management strategy currently present in the RX_ORDER_DATE field on the PRESCRIBING table
+
+Please see notes for additional definitions.
+",200
+HARVEST,RX_START_DATE_MGMT,RDBMS Text(2),SAS Char(2),,NO,,01;02;03;04;NI;UN;OT,"01=No imputation or obfuscation
+02=Imputation for incomplete dates
+03=Date obfuscation
+04=Both imputation and obfuscation NI=No information
+UN=Unknown
+OT=Other
+","Data management strategy currently present in the RX_START_DATE field on the PRESCRIBING table
+
+Please see notes for additional definitions.
+",201
+HARVEST,RX_END_DATE_MGMT,RDBMS Text(2),SAS Char(2),,NO,,01;02;03;04;NI;UN;OT,"01=No imputation or obfuscation
+02=Imputation for incomplete dates
+03=Date obfuscation
+04=Both imputation and obfuscation NI=No information
+UN=Unknown
+OT=Other
+","Data management strategy currently present in the RX_END_DATE field on the PRESCRIBING table
+
+Please see notes for additional definitions.
+",202
+HARVEST,DISPENSE_DATE_MGMT,RDBMS Text(2),SAS Char(2),,NO,,01;02;03;04;NI;UN;OT,"01=No imputation or obfuscation
+02=Imputation for incomplete dates
+03=Date obfuscation
+04=Both imputation and obfuscation NI=No information
+UN=Unknown
+OT=Other
+","Data management strategy currently present in the DISPENSE_DATE field on the DISPENSING table
+
+Please see notes for additional definitions.
+",203
+HARVEST,LAB_ORDER_DATE_MGMT,RDBMS Text(2),SAS Char(2),,NO,,01;02;03;04;NI;UN;OT,"01=No imputation or obfuscation
+02=Imputation for incomplete dates
+03=Date obfuscation
+04=Both imputation and obfuscation NI=No information
+UN=Unknown
+OT=Other
+","Data management strategy currently present in the LAB_ORDER_DATE field on the LAB_RESULT_CM table
+
+Please see notes for additional definitions.
+",204
+HARVEST,SPECIMEN_DATE_MGMT,RDBMS Text(2),SAS Char(2),,NO,,01;02;03;04;NI;UN;OT,"01=No imputation or obfuscation
+02=Imputation for incomplete dates
+03=Date obfuscation
+04=Both imputation and obfuscation NI=No information
+UN=Unknown
+OT=Other
+","Data management strategy currently present in the SPECIMEN_DATE field on the LAB_RESULT_CM table
+
+Please see notes for additional definitions.
+",205
+HARVEST,RESULT_DATE_MGMT,RDBMS Text(2),SAS Char(2),,NO,,01;02;03;04;NI;UN;OT,"01=No imputation or obfuscation
+02=Imputation for incomplete dates
+03=Date obfuscation
+04=Both imputation and obfuscation NI=No information
+UN=Unknown
+OT=Other
+","Data management strategy currently present in the RESULT_DATE field on the LAB_RESULT_CM table
+
+Please see notes for additional definitions.
+",206
+HARVEST,MEASURE_DATE_MGMT,RDBMS Text(2),SAS Char(2),,NO,,01;02;03;04;NI;UN;OT,"01=No imputation or obfuscation
+02=Imputation for incomplete dates
+03=Date obfuscation
+04=Both imputation and obfuscation NI=No information
+UN=Unknown
+OT=Other
+","Data management strategy currently present in the MEASURE_DATE field on the VITAL table
+
+Please see notes for additional definitions.
+",207
+HARVEST,ONSET_DATE_MGMT,RDBMS Text(2),SAS Char(2),,NO,,01;02;03;04;NI;UN;OT,"01=No imputation or obfuscation
+02=Imputation for incomplete dates
+03=Date obfuscation
+04=Both imputation and obfuscation NI=No information
+UN=Unknown
+OT=Other
+","Data management strategy currently present in the ONSET_DATE field on the CONDITION table
+
+Please see notes for additional definitions.
+",208
+HARVEST,REPORT_DATE_MGMT,RDBMS Text(2),SAS Char(2),,NO,,01;02;03;04;NI;UN;OT,"01=No imputation or obfuscation
+02=Imputation for incomplete dates
+03=Date obfuscation
+04=Both imputation and obfuscation NI=No information
+UN=Unknown
+OT=Other
+","Data management strategy currently present in the REPORT_DATE field on the CONDITION table
+
+Please see notes for additional definitions.
+",209
+HARVEST,RESOLVE_DATE_MGMT,RDBMS Text(2),SAS Char(2),,NO,,01;02;03;04;NI;UN;OT,"01=No imputation or obfuscation
+02=Imputation for incomplete dates
+03=Date obfuscation
+04=Both imputation and obfuscation NI=No information
+UN=Unknown
+OT=Other
+","Data management strategy currently present in the RESOLVE_DATE field on the CONDITION table
+
+Please see notes for additional definitions.
+",210
+HARVEST,PRO_DATE_MGMT,RDBMS Text(2),SAS Char(2),,NO,,01;02;03;04;NI;UN;OT,"01=No imputation or obfuscation
+02=Imputation for incomplete dates
+03=Date obfuscation
+04=Both imputation and obfuscation NI=No information
+UN=Unknown
+OT=Other
+","Data management strategy currently present in the PRO_DATE field on the PRO_CM table
+
+Please see notes for additional definitions.
+",211
+HARVEST,REFRESH_DEMOGRAPHIC_DATE,RDBMS Date,SAS Date (Numeric),,NO,,,,Most recent date on which the present data were loaded into the DEMOGRAPHIC table. This date should be null if the table does not have records.,212
+HARVEST,REFRESH_ENROLLMENT_DATE,RDBMS Date,SAS Date (Numeric),,NO,,,,Most recent date on which the present data were loaded into the ENROLLMENT table. This date should be null if the table does not have records.,213
+HARVEST,REFRESH_ENCOUNTER_DATE,RDBMS Date,SAS Date (Numeric),,NO,,,,Most recent date on which the present data were loaded into the ENCOUNTER table. This date should be null if the table does not have records.,214
+HARVEST,REFRESH_DIAGNOSIS_DATE,RDBMS Date,SAS Date (Numeric),,NO,,,,Most recent date on which the present data were loaded into the DIAGNOSIS table. This date should be null if the table does not have records.,215
+HARVEST,REFRESH_PROCEDURES_DATE,RDBMS Date,SAS Date (Numeric),,NO,,,,Most recent date on which the present data were loaded into the PROCEDURES table. This date should be null if the table does not have records.,216
+HARVEST,REFRESH_VITAL_DATE,RDBMS Date,SAS Date (Numeric),,NO,,,,Most recent date on which the present data were loaded into the VITAL table. This date should be null if the table does not have records.,217
+HARVEST,REFRESH_DISPENSING_DATE,RDBMS Date,SAS Date (Numeric),,NO,,,,Most recent date on which the present data were loaded into the DISPENSING table. This date should be null if the table does not have records.,218
+HARVEST,REFRESH_LAB_RESULT_CM_DATE,RDBMS Date,SAS Date (Numeric),,NO,,,,Most recent date on which the present data were loaded into the LAB_RESULT_CM table. This date should be null if the table does not have records.,219
+HARVEST,REFRESH_CONDITION_DATE,RDBMS Date,SAS Date (Numeric),,NO,,,,Most recent date on which the present data were loaded into the CONDITION table. This date should be null if the table does not have records.,220
+HARVEST,REFRESH_PRO_CM_DATE,RDBMS Date,SAS Date (Numeric),,NO,,,,Most recent date on which the present data were loaded into the PRO_CM table. This date should be null if the table does not have records.,221
+HARVEST,REFRESH_PRESCRIBING_DATE,RDBMS Date,SAS Date (Numeric),,NO,,,,Most recent date on which the present data were loaded into the PRESCRIBING table. This date should be null if the table does not have records.,222
+HARVEST,REFRESH_PCORNET_TRIAL_DATE,RDBMS Date,SAS Date (Numeric),,NO,,,,Most recent date on which the present data were loaded into the PCORNET_TRIAL table. This date should be null if the table does not have records.,223
+HARVEST,REFRESH_DEATH_DATE,RDBMS Date,SAS Date (Numeric),,NO,,,,Most recent date on which the present data were loaded into the DEATH table. This date should be null if the table does not have records.,224
+HARVEST,REFRESH_DEATH_CAUSE_DATE,RDBMS Date,SAS Date (Numeric),,NO,,,,Most recent date on which the present data were loaded into the DEATH_CAUSE table. This date should be null if the table does not have records.,225
