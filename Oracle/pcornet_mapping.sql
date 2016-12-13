@@ -388,30 +388,46 @@ with pcornet_spec as (
   select '4) Branded drug pack (BPCK)', 4, 'BPCK' from dual
 )
 , cui_pref as (  -- Rx concepts joined with spec order
-  select rxcui, ix, spec_order
+  select rxcui, str rxnorm_str, ix, spec_order
   from rxnorm.rxnconso@id con
   join pcornet_spec on pcornet_spec.tty = con.tty
 )
-, med_map_pref as ( -- HERON clarity_med_id_to_rxcui joined with spec order
 /*
   TODO: Consider changing HERON paths to be RXCUIs or including the RXCUI column
   so that we don't have to reach back to the clarity_med_id_to_rxcui map. See
   also https://informatics.gpcnetwork.org/trac/Project/ticket/390.
 */
-    select distinct clarity_med_id medication_id, med_map.rxcui
+, clarity_med_id_to_rxcui as (
+  select cmed.medication_id clarity_med_id, rxn.rxnorm_code rxcui, '1) Clarity'  dose_pref
+  from clarity.rxnorm_codes@id rxn
+  join clarity.clarity_medication@id cmed on cmed.medication_id = rxn.medication_id
+
+  union all
+
+  select clarity_med_id, rxcui, '2) GCN'
+  from "&&i2b2_etl_schema".clarity_med_id_to_rxcui_gcn@id
+
+  union all
+
+  select clarity_med_id, rxcui, '3) NDC'
+  from "&&i2b2_etl_schema".clarity_med_id_to_rxcui_ndc@id
+)
+, med_map_pref as ( -- HERON clarity_med_id_to_rxcui joined with spec order
+    select distinct clarity_med_id medication_id
+         , med_map.rxcui, cui_pref.rxnorm_str, med_map.dose_pref
          , coalesce(spec_order, '9) HERON mapping misc.') spec_order
-    from "&&i2b2_etl_schema".clarity_med_id_to_rxcui@id med_map
+    from clarity_med_id_to_rxcui med_map
     left join cui_pref on cui_pref.rxcui = med_map.rxcui
 )
 , med_map_best as (
-  -- Take the mapping with the best (i.e. min) spec_order, just like...
+  -- Take the mapping with the best (i.e. min) spec_order and dose_pref, just like...
   --  Taking the record with the max date
   --  http://stackoverflow.com/a/8898142
   -- This may result in multiple rxcuis per medication_id, so while we're
   -- at it, take the minimum rxcui among those with the best spec_order.
   select *
-  from (select medication_id, rxcui, spec_order
-             , rank() over (partition by medication_id order by spec_order, rxcui) rnk
+  from (select medication_id, rxcui, rxnorm_str, spec_order, dose_pref
+             , rank() over (partition by medication_id order by spec_order, dose_pref, rxcui) rnk
         from med_map_pref)
   where rnk = 1
 )
@@ -433,26 +449,41 @@ from medication_id_to_best_rxcui mitr
 join blueheronmetadata.counts_by_concept cbc on cbc.concept_cd = mitr.concept_cd
 order by facts desc
 ;
-
-How many of each spec_order?
-
-select count(*), spec_order from medication_id_to_best_rxcui
-group by spec_order order by 1 desc;
-
-45773	1) Semantic generic clinical drug (SCD)
- 5442	9) HERON mapping misc.
- 3475	   *null* lots of IVP. TODO: med mixes
-  473	3) Generic drug pack (GPCK)
-   97	2) Semantic Branded clinical drug (SBC)
-    2	4) Branded drug pack (BPCK)
 */
 
 /* test cases (TODO: formalize these)
 
-Don't map ENOXAPARIN 100 MG/ML SC SYRG to just any RXCUI:
-select rxcui, spec_order from medication_id_to_best_rxcui where concept_cd = 'KUH|MEDICATION_ID:85051'; -- -> 1360019, 1) SCD
+Picking out just one row per CUI from RXNORM can be tricky; did we goof?
+select count(*), medication_id
+from medication_id_to_best_rxcui
+where medication_id is not null
+group by medication_id having count(*) > 1;
 
-select rxcui, spec_order from medication_id_to_best_rxcui where concept_cd = 'KUH|MEDICATION_ID:150171'; -- -> 892246,	1) SCD
+How many of each spec_order?
+
+select count(*), spec_order, dose_pref from medication_id_to_best_rxcui
+group by spec_order, dose_pref order by 1 desc;
+
+27825	1) Semantic generic clinical drug (SCD)	1) Clarity
+17527	1) Semantic generic clinical drug (SCD)	2) GCN
+ 3475		 *null* lots of IVP. TODO: med mixes
+ 2888	9) HERON mapping misc.	2) GCN
+ 2550	9) HERON mapping misc.	1) Clarity
+  421	1) Semantic generic clinical drug (SCD)	3) NDC
+  295	3) Generic drug pack (GPCK)	1) Clarity
+  177	3) Generic drug pack (GPCK)	2) GCN
+   97	2) Semantic Branded clinical drug (SBC)	3) NDC
+    4	9) HERON mapping misc.	3) NDC
+    2	4) Branded drug pack (BPCK)	3) NDC
+    1	3) Generic drug pack (GPCK)	3) NDC
+
+Be sure RXCUI for 0.4 ML ENOXAPARIN 100 MG/ML SC SYRG includes the 0.4 ML dose info:
+select concept_cd, name_char, rxcui, rxnorm_str, spec_order, dose_pref from medication_id_to_best_rxcui where concept_cd = 'KUH|MEDICATION_ID:85052'; -- -> 854235, 1) SCD
+
+select concept_cd, name_char, rxcui, rxnorm_str, spec_order, dose_pref from medication_id_to_best_rxcui where concept_cd = 'KUH|MEDICATION_ID:85051'; -- -> 854248, 1) SCD
+
+This one goes from "LEVOTHYROXINE PO" to "Levothyroxine Sodium 0.1 MG Oral Tablet"; is that right?
+select concept_cd, name_char, rxcui, rxnorm_str, spec_order, dose_pref from medication_id_to_best_rxcui where concept_cd = 'KUH|MEDICATION_ID:150171'; -- -> 892246,	1) SCD
 */
 
 
