@@ -401,14 +401,10 @@ with pcornet_spec as (
   select cmed.medication_id clarity_med_id, rxn.rxnorm_code rxcui, '1) Clarity'  dose_pref
   from clarity.rxnorm_codes@id rxn
   join clarity.clarity_medication@id cmed on cmed.medication_id = rxn.medication_id
-
   union all
-
   select clarity_med_id, rxcui, '2) GCN'
   from "&&i2b2_etl_schema".clarity_med_id_to_rxcui_gcn@id
-
   union all
-
   select clarity_med_id, rxcui, '3) NDC'
   from "&&i2b2_etl_schema".clarity_med_id_to_rxcui_ndc@id
 )
