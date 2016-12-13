@@ -1641,13 +1641,14 @@ insert into prescribing (
     ,RX_DAYS_SUPPLY -- modifier nval_num
     ,RX_FREQUENCY --modifier with basecode lookup
     ,RX_BASIS --modifier with basecode lookup
---    ,RAW_RX_MED_NAME, --not filling these right now
+    ,RAW_RX_MED_NAME
 --    ,RAW_RX_FREQUENCY,
---    ,RAW_RXNORM_CUI
+    ,RAW_RXNORM_CUI
 )
 select distinct  m.patient_num, m.Encounter_Num,m.provider_id,  m.start_date order_date,  to_char(m.start_date,'HH:MI'), m.start_date start_date, m.end_date, mo.pcori_cui
     ,quantity.nval_num quantity, refills.nval_num refills, supply.nval_num supply, substr(freq.pcori_basecode, instr(freq.pcori_basecode, ':') + 1, 2) frequency, 
     substr(basis.pcori_basecode, instr(basis.pcori_basecode, ':') + 1, 2) basis
+    , substr(mo.c_name, 1, 50) raw_rx_med_name, substr(mo.c_basecode, 1, 50) raw_rxnorm_cui
  from i2b2medfact m inner join pcornet_med mo on m.concept_cd = mo.c_basecode 
 inner join encounter enc on enc.encounterid = m.encounter_Num
 -- TODO: This join adds several minutes to the load - must be debugged
