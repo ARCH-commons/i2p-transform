@@ -1194,15 +1194,15 @@ sqltext := 'insert into pmndiagnosis (patid,			encounterid,	enc_type, admit_date
 ' left outer join sourcefact '||
 'on	factline.patient_num=sourcefact.patient_num '||
 'and factline.encounter_num=sourcefact.encounter_num '||
-'and enc.providerid=sourcefact.provider_id '|| --bug fix MJ 10/7/16
+'and factline.provider_id=sourcefact.provider_id '|| --bug fix MJ 10/7/16 --another change based off of Jeff's fix. 12/8/16 MJ
 'and factline.concept_cd=sourcefact.concept_Cd '||
-'and enc.admit_date=sourcefact.start_Date '|| --bug fix MJ 10/7/16 
+'and factline.start_date=sourcefact.start_Date '|| --bug fix MJ 10/7/16 --another change based off of Jeff's fix. 12/8/16 MJ
 'left outer join pdxfact '||
 'on	factline.patient_num=pdxfact.patient_num '||
 'and factline.encounter_num=pdxfact.encounter_num '||
-'and enc.providerid=pdxfact.provider_id '|| --bug fix MJ 10/7/16
+'and factline.provider_id=pdxfact.provider_id '|| --bug fix MJ 10/7/16 --another change based off of Jeff's fix. 12/8/16 MJ
 'and factline.concept_cd=pdxfact.concept_cd '||
-'and enc.admit_date=pdxfact.start_Date '|| --bug fix MJ 10/7/16
+'and factline.start_date=pdxfact.start_Date '|| --bug fix MJ 10/7/16 --another change based off of Jeff's fix. 12/8/16 MJ
 'inner join pcornet_diag diag on diag.c_basecode  = factline.concept_cd '||
 -- Skip ICD-9 V codes in 10 ontology, ICD-9 E codes in 10 ontology, ICD-10 numeric codes in 10 ontology
 -- Note: makes the assumption that ICD-9 Ecodes are not ICD-10 Ecodes; same with ICD-9 V codes. On inspection seems to be true.

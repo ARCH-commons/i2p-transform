@@ -95,7 +95,7 @@ GO
 
 -- Update your data mart info for the Harvest table!
 CREATE FUNCTION dbo.getDataMartID() RETURNS varchar(10) AS BEGIN 
-    RETURN 'PHS' END
+    RETURN 'C1PHS' END
 GO
 CREATE FUNCTION dbo.getDataMartName() RETURNS varchar(20) AS BEGIN 
     RETURN 'Partners' END
@@ -289,6 +289,14 @@ GO
 CREATE CLUSTERED INDEX diagnosis_clustered_index   
 ON pmndiagnosis (DX)
 go   
+
+CREATE INDEX diagnosis_patid_index 
+ON pmndiagnosis (PATID)
+go
+
+CREATE INDEX diagnosis_encounterid_index 
+ON pmndiagnosis (ENCOUNTERID)
+go
 
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[pmnlabresults_cm]') AND type in (N'U'))
 DROP TABLE [dbo].[pmnlabresults_cm]
@@ -656,11 +664,13 @@ CREATE CLUSTERED INDEX encounter_clustered_index
 ON pmnencounter (encounterid, patid, admit_date, discharge_date)   
 go
 
-
+CREATE INDEX encounter_encounterid_index 
+ON pmnencounter (ENCOUNTERID)
+go
 
 CREATE INDEX index_patid  --New index on PATID for fast searching, MJ 10/10/16
 ON pmnENCOUNTER (PATID)
-
+go
 
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[pmndemographic]') AND type in (N'U'))
 DROP TABLE [dbo].[pmndemographic]
@@ -690,6 +700,9 @@ CREATE CLUSTERED INDEX demo_clustered_index
 ON pmndemographic (patid)   
 go
 
+CREATE INDEX demographic_patid_index 
+ON pmndemographic (PATID)
+go
 
 ALTER TABLE dbo.pmndemographic
 ADD CONSTRAINT biobank_default
