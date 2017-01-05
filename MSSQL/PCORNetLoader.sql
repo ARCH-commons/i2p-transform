@@ -3,6 +3,8 @@
 -- PCORNetLoader Script
 -- Current version will not transform: Death_Condition, PCORnet_Trial, PRO_CM 
 -- Contributors: Jeff Klann, PhD; Aaron Abend; Arturo Torres
+-- Version now managed by changelog. Last update 12/7/16@6pm
+--
 -- Version 0.6.5, Harvest leading zero was still a bug!; wrong column referenced in pcornetprocedure; added simple (non-ontology) death transform; duplicate code in i2preport
 -- Version 0.6.4, Harvest leading zero bug, px_type default
 -- Version 0.6.3, typos found in field names in trial, enrollment, vital, and harvest tables - 1/11/16
@@ -1277,15 +1279,15 @@ inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounte
  left outer join #sourcefact sf
 on	factline.patient_num=sf.patient_num
 and factline.encounter_num=sf.encounter_num
-and enc.providerid=sf.provider_id --bug fix MJ 10/7/16
+and factline.provider_id=sf.provider_id --bug fix MJ 10/7/16, JK 12/7/16
 and factline.concept_cd=sf.concept_Cd
-and enc.admit_date=sf.start_Date --bug fix MJ 10/7/16
+and factline.start_date=sf.start_Date --bug fix MJ 10/7/16, JK 12/7/16
 left outer join #pdxfact pf
 on	factline.patient_num=pf.patient_num
 and factline.encounter_num=pf.encounter_num
-and enc.providerid=pf.provider_id --bug fix MJ 10/7/16
+and factline.provider_id=pf.provider_id --bug fix MJ 10/7/16, JK 12/7/16
 and factline.concept_cd=pf.concept_cd
-and enc.admit_date=pf.start_Date --bug fix MJ 10/7/16
+and factline.start_date=pf.start_Date --bug fix MJ 10/7/16, JK 12/7/16
 inner join pcornet_diag diag on diag.c_basecode  = factline.concept_cd
 -- Skip ICD-9 V codes in 10 ontology, ICD-9 E codes in 10 ontology, ICD-10 numeric codes in 10 ontology
 -- Note: makes the assumption that ICD-9 Ecodes are not ICD-10 Ecodes; same with ICD-9 V codes. On inspection seems to be true.
