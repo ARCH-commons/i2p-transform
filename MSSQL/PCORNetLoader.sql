@@ -877,6 +877,7 @@ IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'PROCEDURES') DROP SYNONYM 
 
 IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'VITAL') DROP SYNONYM VITAL
 
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'death_condition') DROP SYNONYM death_condition
 
 
 
@@ -910,6 +911,10 @@ create synonym PROCEDURES for PMNPROCEDURE
 GO
 create synonym VITAL for PMNVITAL
 GO
+create synonym death_condition for pmndeath_cause
+GO
+
+
 
 
 /* --Example query for the MDQ using the above synonyms
