@@ -231,11 +231,11 @@ ON pmnvital ()
 go   
 */
 
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[pmnPROCEDURE]') AND type in (N'U'))
-DROP TABLE [dbo].[pmnPROCEDURE]
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[pmnPROCEDURES]') AND type in (N'U'))
+DROP TABLE [dbo].[pmnPROCEDURES]
 GO
 
-CREATE TABLE [dbo].[pmnPROCEDURE](
+CREATE TABLE [dbo].[pmnPROCEDURES]( --Modified on 2/6/17 from procedure to procedures by Matthew Joss
 	[PROCEDURESID] [bigint]  IDENTITY(1,1) NOT NULL,
 	[PATID] [varchar](50) NOT NULL,
 	[ENCOUNTERID] [varchar](50) NOT NULL,
@@ -258,7 +258,7 @@ GO
 
 
 CREATE CLUSTERED INDEX procedure_clustered_index   
-ON pmnprocedure (PX)
+ON pmnprocedures (PX)
 go   
 
 
@@ -300,10 +300,10 @@ CREATE INDEX diagnosis_encounterid_index
 ON pmndiagnosis (ENCOUNTERID)
 go
 
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[pmnlabresults_cm]') AND type in (N'U'))
-DROP TABLE [dbo].[pmnlabresults_cm]
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[pmnlab_result_cm]') AND type in (N'U'))
+DROP TABLE [dbo].[pmnlab_result_cm]
 GO
-CREATE TABLE [dbo].[pmnlabresults_cm](
+CREATE TABLE [dbo].[pmnlab_result_cm]( --Modified on 2/6/17 from labresults_cm to lab_result_cm by Matthew Joss
 	[LAB_RESULT_CM_ID] [bigint]  IDENTITY (1,1) NOT NULL,
 	[PATID] [varchar](50) NOT NULL,
 	[ENCOUNTERID] [varchar](50) NULL,
@@ -344,7 +344,7 @@ PRIMARY KEY NONCLUSTERED
 GO
 
 CREATE CLUSTERED INDEX labresults_clustered_index   
-ON pmnlabresults_cm (LAB_LOINC)
+ON pmnlab_result_cm (LAB_LOINC)
 go   
 
 
@@ -416,10 +416,10 @@ CREATE TABLE [dbo].[pmndeath](
 
 GO
 
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[pmndeath_cause]') AND type in (N'U'))
-DROP TABLE [dbo].[pmndeath_cause]
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[pmndeath_condition]') AND type in (N'U'))
+DROP TABLE [dbo].[pmndeath_condition]
 GO
-CREATE TABLE [dbo].[pmndeath_cause](
+CREATE TABLE [dbo].[pmndeath_condition]( --Modified on 2/6/17 from death_cause to death_condition by Matthew Joss
 	[PATID] [varchar](50) NOT NULL,
 	[DEATH_CAUSE] [varchar](8) NOT NULL,
 	[DEATH_CAUSE_CODE] [varchar](2) NOT NULL,
@@ -728,11 +728,11 @@ ALTER TABLE [dbo].[pmnENROLLMENT]  WITH CHECK ADD FOREIGN KEY([PATID])
 REFERENCES [dbo].[pmndemographic] ([PATID])
 GO
 /****** Object:  ForeignKey [FK__pmnPROCED__ENCOU__0CBAE877]    Script Date: 10/02/2014 15:59:37 ******/
-ALTER TABLE [dbo].[pmnPROCEDURE]  WITH CHECK ADD FOREIGN KEY([ENCOUNTERID])
+ALTER TABLE [dbo].[pmnPROCEDURES]  WITH CHECK ADD FOREIGN KEY([ENCOUNTERID])
 REFERENCES [dbo].[pmnENCOUNTER] ([ENCOUNTERID])
 GO
 
-ALTER TABLE [dbo].[pmnPROCEDURE]  WITH CHECK ADD FOREIGN KEY([PATID])
+ALTER TABLE [dbo].[pmnPROCEDURES]  WITH CHECK ADD FOREIGN KEY([PATID])
 REFERENCES [dbo].[pmndemographic] ([PATID])
 GO
 
@@ -744,11 +744,11 @@ ALTER TABLE [dbo].[pmnVITAL]  WITH CHECK ADD FOREIGN KEY([PATID])
 REFERENCES [dbo].[pmndemographic] ([PATID])
 GO
 
-ALTER TABLE [dbo].[pmnlabresults_cm]  WITH CHECK ADD FOREIGN KEY([ENCOUNTERID])
+ALTER TABLE [dbo].[pmnlab_result_cm]  WITH CHECK ADD FOREIGN KEY([ENCOUNTERID])
 REFERENCES [dbo].[pmnENCOUNTER] ([ENCOUNTERID])
 GO
 
-ALTER TABLE [dbo].[pmnlabresults_cm]  WITH CHECK ADD FOREIGN KEY([PATID])
+ALTER TABLE [dbo].[pmnlab_result_cm]  WITH CHECK ADD FOREIGN KEY([PATID])
 REFERENCES [dbo].[pmndemographic] ([PATID])
 GO
 
@@ -756,7 +756,7 @@ ALTER TABLE [dbo].[pmndeath]  WITH CHECK ADD FOREIGN KEY([PATID])
 REFERENCES [dbo].[pmndemographic] ([PATID])
 GO
 
-ALTER TABLE [dbo].[pmndeath_cause]  WITH CHECK ADD FOREIGN KEY([PATID])
+ALTER TABLE [dbo].[pmndeath_condition]  WITH CHECK ADD FOREIGN KEY([PATID])
 REFERENCES [dbo].[pmndemographic] ([PATID])
 GO
 
@@ -800,7 +800,7 @@ ALTER TABLE [dbo].[pmndeath]  WITH CHECK ADD FOREIGN KEY([PATID])
 REFERENCES [dbo].[pmndemographic] ([PATID])
 GO
 
-ALTER TABLE [dbo].[pmndeath_cause]  WITH CHECK ADD FOREIGN KEY([PATID])
+ALTER TABLE [dbo].[pmndeath_condition]  WITH CHECK ADD FOREIGN KEY([PATID])
 REFERENCES [dbo].[pmndemographic] ([PATID])
 GO
 
@@ -867,6 +867,8 @@ IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'HARVEST') DROP SYNONYM HAR
 
 IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'LAB_RESULT_CM') DROP SYNONYM LAB_RESULT_CM
 
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'PMNLABRESULTS_CM') DROP SYNONYM PMNLABRESULTS_CM --old form
+
 IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'PCORNET_TRIAL') DROP SYNONYM PCORNET_TRIAL
 
 IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'PRESCRIBING') DROP SYNONYM PRESCRIBING
@@ -875,9 +877,13 @@ IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'PRO_CM') DROP SYNONYM PRO_
 
 IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'PROCEDURES') DROP SYNONYM PROCEDURES
 
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'PMNPROCEDURE') DROP SYNONYM PMNPROCEDURE --old form
+
 IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'VITAL') DROP SYNONYM VITAL
 
 IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'death_condition') DROP SYNONYM death_condition
+
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'pmndeath_cause') DROP SYNONYM pmndeath_cause --old form
 
 
 
@@ -899,7 +905,9 @@ create synonym ENROLLMENT for PMNENROLLMENT
 GO
 create synonym HARVEST for PMNHARVEST
 GO
-create synonym LAB_RESULT_CM for PMNLABRESULTS_CM
+create synonym LAB_RESULT_CM for PMNLAB_RESULT_CM
+GO
+create synonym PMNLABRESULTS_CM for PMNLAB_RESULT_CM --old table form
 GO
 create synonym PCORNET_TRIAL for PMNPCORNET_TRIAL
 GO
@@ -907,11 +915,15 @@ create synonym PRESCRIBING for PMNPRESCRIBING
 GO
 create synonym PRO_CM for PMNPRO_CM
 GO
-create synonym PROCEDURES for PMNPROCEDURE
+create synonym PROCEDURES for PMNPROCEDURES
+GO
+create synonym PMNPROCEDURE for PMNPROCEDURES --old table form
 GO
 create synonym VITAL for PMNVITAL
 GO
-create synonym death_condition for pmndeath_cause
+create synonym death_condition for pmndeath_condition
+GO
+create synonym pmndeath_cause for pmndeath_condition --old table form
 GO
 
 
@@ -2053,4 +2065,3 @@ select concept 'Data Type',sourceval 'From i2b2',sourcedistinct 'Patients in i2b
 
 end
 GO
-

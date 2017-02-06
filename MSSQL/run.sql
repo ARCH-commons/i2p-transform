@@ -94,7 +94,7 @@ delete from pmncondition
 GO
 exec PCORNetCondition
 GO
-delete from pmnprocedure
+delete from pmnprocedures
 GO
 exec PCORNetProcedure
 GO
@@ -106,7 +106,7 @@ delete from PMNenrollment
 GO
 exec PCORNetEnroll
 GO
-delete from pmnlabresults_cm
+delete from pmnlab_result_cm
 GO
 exec PCORNetLabResultCM
 GO
