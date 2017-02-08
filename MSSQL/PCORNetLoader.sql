@@ -1728,12 +1728,12 @@ insert into pmnprescribing (
     ,RX_DAYS_SUPPLY -- modifier nval_num
     ,RX_FREQUENCY --modifier with basecode lookup
     ,RX_BASIS --modifier with basecode lookup
---    ,RAW_RX_MED_NAME, --not filling these right now
---    ,RAW_RX_FREQUENCY,
+    ,RAW_RX_MED_NAME 
+--    ,RAW_RX_FREQUENCY, --not filling these right now
 --    ,RAW_RXNORM_CUI
 )
 select distinct  m.patient_num, m.Encounter_Num,m.provider_id,  m.start_date order_date,  substring(convert(varchar,m.start_date,8),1,5), m.start_date start_date, m.end_date, mo.pcori_cui
-    ,quantity.nval_num quantity, refills.nval_num refills, supply.nval_num supply, substring(freq.pcori_basecode,charindex(':',freq.pcori_basecode)+1,2) frequency, substring(basis.pcori_basecode,charindex(':',basis.pcori_basecode)+1,2) basis
+    ,quantity.nval_num quantity, refills.nval_num refills, supply.nval_num supply, substring(freq.pcori_basecode,charindex(':',freq.pcori_basecode)+1,2) frequency, substring(basis.pcori_basecode,charindex(':',basis.pcori_basecode)+1,2) basis, substring(mo.c_name,0,50)
  from i2b2fact m inner join pcornet_med mo on m.concept_cd = mo.c_basecode 
 inner join pmnENCOUNTER enc on enc.encounterid = m.encounter_Num
 -- TODO: This join adds several minutes to the load - must be debugged
