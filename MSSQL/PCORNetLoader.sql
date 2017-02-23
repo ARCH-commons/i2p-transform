@@ -1838,6 +1838,7 @@ inner join pmnENCOUNTER enc on enc.encounterid = m.encounter_Num
     on m.encounter_num = amount.encounter_num
     and m.concept_cd = amount.concept_Cd
 
+where mo.pcori_ndc is not null
 group by m.encounter_num ,m.patient_num, m.start_date,  mo.pcori_ndc
 
 end
