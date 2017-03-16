@@ -26,10 +26,14 @@ pcori_path,local_path
 \PCORI\DEMOGRAPHIC\HISPANIC\Y\,\i2b2\Demographics\Ethnicity\Hispanic or Latino\
 \PCORI\DEMOGRAPHIC\HISPANIC\Y\,"\i2b2\Demographics\Ethnicity\Hispanic, Latino or Spanish Origin\"
 \PCORI\ENCOUNTER\ENC_TYPE\AV\,\i2b2\Visit Details\ENC_TYPE\AV\
-\PCORI\ENCOUNTER\ENC_TYPE\AV\,\i2b2\Visit Details\ENC_TYPE\AV\
 \PCORI\ENCOUNTER\ENC_TYPE\ED\,\i2b2\Visit Details\ENC_TYPE\ED\
+\PCORI\ENCOUNTER\ENC_TYPE\EI\,\i2b2\Visit Details\ENC_TYPE\EI\
 \PCORI\ENCOUNTER\ENC_TYPE\IP\,\i2b2\Visit Details\ENC_TYPE\IP\
+\PCORI\ENCOUNTER\ENC_TYPE\IS\,\i2b2\Visit Details\ENC_TYPE\IS\
+\PCORI\ENCOUNTER\ENC_TYPE\NI\,\i2b2\Visit Details\ENC_TYPE\NI\
+\PCORI\ENCOUNTER\ENC_TYPE\OA\,\i2b2\Visit Details\ENC_TYPE\OA\
 \PCORI\ENCOUNTER\ENC_TYPE\OT\,\i2b2\Visit Details\ENC_TYPE\OT\
+\PCORI\ENCOUNTER\ENC_TYPE\UN\,\i2b2\Visit Details\ENC_TYPE\UN\
 \PCORI\DEMOGRAPHIC\SEX\F\,\i2b2\Demographics\Gender\Female\
 \PCORI\DEMOGRAPHIC\SEX\M\,\i2b2\Demographics\Gender\Male\
 \PCORI\DEMOGRAPHIC\SEX\NI\,\i2b2\Demographics\Gender\Unknown\Unknown-@\
