@@ -99,6 +99,10 @@ GO
 CREATE FUNCTION dbo.getDataMartID() RETURNS varchar(10) AS BEGIN 
     RETURN 'C1PHS' END
 GO
+--Data mart name table "harvest reference table"
+-- https://github.com/SCILHS/scilhs-internal/blob/master/HARVEST%20Reference%20Table.pdf
+
+
 CREATE FUNCTION dbo.getDataMartName() RETURNS varchar(20) AS BEGIN 
     RETURN 'Partners' END
 GO
