@@ -1748,27 +1748,57 @@ PMN_EXECUATESQL(sqltext);
 
 insert into dispensing (
 	PATID
-    ,PRESCRIBINGID
+  ,PRESCRIBINGID
 	,DISPENSE_DATE -- using start_date from i2b2
-    ,NDC --using pcornet_med pcori_ndc - new column!
-    ,DISPENSE_SUP ---- modifier nval_num
-    ,DISPENSE_AMT  -- modifier nval_num
+  ,NDC --using pcornet_med pcori_ndc - new column!
+  ,DISPENSE_SUP ---- modifier nval_num
+  ,DISPENSE_AMT  -- modifier nval_num
 --    ,RAW_NDC
 )
 /* Below is the Cycle 2 fix for populating the DISPENSING table  */
-select distinct
-  ibf.patient_num patid,
+with disp_status as (
+  select ibf.patient_num, ibf.encounter_num, ibf.concept_cd, ibf.instance_num, ibf.start_date, ibf.modifier_cd
+  from i2b2fact ibf
+  join BLUEHERONMETADATA.pcornet_med pnm
+    on ibf.modifier_cd=pnm.c_basecode
+  where pnm.c_fullname like '\PCORI_MOD\RX_BASIS\DI\%'
+    and length(substr(ibf.concept_cd, 5)) < 12
+)
+, disp_quantity as (
+  select ibf.patient_num, ibf.encounter_num, ibf.concept_cd, ibf.instance_num, ibf.start_date, ibf.modifier_cd, ibf.nval_num
+  from i2b2fact ibf
+  join BLUEHERONMETADATA.pcornet_med pnm
+    on ibf.modifier_cd=pnm.c_basecode
+  where pnm.c_fullname like '\PCORI_MOD\PCORI_MOD\RX_QUANTITY\%'
+)
+, disp_supply as (
+  select ibf.patient_num, ibf.encounter_num, ibf.concept_cd, ibf.instance_num, ibf.start_date, ibf.modifier_cd, ibf.nval_num
+  from i2b2fact ibf
+  join BLUEHERONMETADATA.pcornet_med pnm
+    on ibf.modifier_cd=pnm.c_basecode
+  where pnm.c_fullname like '\PCORI_MOD\PCORI_MOD\RX_DAYS_SUPPLY\%'
+)
+select
+  st.patient_num patid,
   null prescribingid,
-  ibf.start_date dispense_date,
-  substr(ibf.concept_cd, 5) ndc,
-  null dispense_sup,
-  null dispense_amt
-from i2b2fact ibf
-join BLUEHERONMETADATA.pcornet_med pnm
-  on ibf.modifier_cd=pnm.c_basecode
-where pnm.c_fullname like '\PCORI_MOD\RX_BASIS\DI\%'
-  and length(substr(ibf.concept_cd, 5)) < 12
-; 
+  st.start_date dispense_date,
+  substr(st.concept_cd, 5) ndc,
+  qt.nval_num dispense_sup,
+  qt.nval_num dispense_amt
+from disp_status st
+left outer join disp_quantity qt
+  on st.patient_num=qt.patient_num
+  and st.encounter_num=qt.encounter_num
+  and st.concept_cd=qt.concept_cd
+  and st.instance_num=qt.instance_num
+  and st.start_date=qt.start_date
+left outer join disp_supply ds
+  on st.patient_num=ds.patient_num
+  and st.encounter_num=ds.encounter_num
+  and st.concept_cd=ds.concept_cd
+  and st.instance_num=ds.instance_num
+  and st.start_date=ds.start_date
+;
 
 /* NOTE: Once DISPENSING related encounters have made it into the CDM (via the visit
    dimension) then the original SCILHS code below should work.
