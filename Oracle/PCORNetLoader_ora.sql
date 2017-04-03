@@ -1723,7 +1723,7 @@ whenever sqlerror exit;
 create or replace procedure PCORNetDispensing as
 sqltext varchar2(4000);
 begin
-
+/*
 PMN_DROPSQL('drop index dispensing_patid');
 
 PMN_DROPSQL('DROP TABLE supply');
@@ -1743,13 +1743,14 @@ sqltext := 'create table amount as '||
 '        on amount.modifier_cd = amountcode.c_basecode '||
 '        and amountcode.c_fullname like ''\PCORI_MOD\RX_QUANTITY\'') ';
 PMN_EXECUATESQL(sqltext);
-        
--- insert data with outer joins to ensure all records are included even if some data elements are missing
+*/
+    
+/* NOTE: New transformation developed by KUMC */
 
 insert into dispensing (
 	PATID
   ,PRESCRIBINGID
-	,DISPENSE_DATE -- using start_date from i2b2
+  ,DISPENSE_DATE -- using start_date from i2b2
   ,NDC --using pcornet_med pcori_ndc - new column!
   ,DISPENSE_SUP ---- modifier nval_num
   ,DISPENSE_AMT  -- modifier nval_num
@@ -1758,22 +1759,22 @@ insert into dispensing (
 /* Below is the Cycle 2 fix for populating the DISPENSING table  */
 with disp_status as (
   select ibf.patient_num, ibf.encounter_num, ibf.concept_cd, ibf.instance_num, ibf.start_date, ibf.modifier_cd
-  from i2b2fact ibf
+  from i2b2medfact ibf
   join BLUEHERONMETADATA.pcornet_med pnm
     on ibf.modifier_cd=pnm.c_basecode
   where pnm.c_fullname like '\PCORI_MOD\RX_BASIS\DI\%'
-    and length(substr(ibf.concept_cd, 5)) < 12
+    and length(substr(ibf.concept_cd, 5)) < 12 -- TODO: Generalize this for other sites.
 )
 , disp_quantity as (
   select ibf.patient_num, ibf.encounter_num, ibf.concept_cd, ibf.instance_num, ibf.start_date, ibf.modifier_cd, ibf.nval_num
-  from i2b2fact ibf
+  from i2b2medfact ibf
   join BLUEHERONMETADATA.pcornet_med pnm
     on ibf.modifier_cd=pnm.c_basecode
   where pnm.c_fullname like '\PCORI_MOD\PCORI_MOD\RX_QUANTITY\%'
 )
 , disp_supply as (
   select ibf.patient_num, ibf.encounter_num, ibf.concept_cd, ibf.instance_num, ibf.start_date, ibf.modifier_cd, ibf.nval_num
-  from i2b2fact ibf
+  from i2b2medfact ibf
   join BLUEHERONMETADATA.pcornet_med pnm
     on ibf.modifier_cd=pnm.c_basecode
   where pnm.c_fullname like '\PCORI_MOD\PCORI_MOD\RX_DAYS_SUPPLY\%'
@@ -1782,8 +1783,8 @@ select
   st.patient_num patid,
   null prescribingid,
   st.start_date dispense_date,
-  substr(st.concept_cd, 5) ndc,
-  qt.nval_num dispense_sup,
+  substr(st.concept_cd, 5) ndc, -- TODO: Generalize this for other sites.
+  ds.nval_num dispense_sup,
   qt.nval_num dispense_amt
 from disp_status st
 left outer join disp_quantity qt
@@ -1800,8 +1801,9 @@ left outer join disp_supply ds
   and st.start_date=ds.start_date
 ;
 
-/* NOTE: Once DISPENSING related encounters have made it into the CDM (via the visit
-   dimension) then the original SCILHS code below should work.
+/* NOTE: The original SCILHS transformation is below.
+
+-- insert data with outer joins to ensure all records are included even if some data elements are missing
 
 select  m.patient_num, null,m.start_date, NVL(mo.pcori_ndc,'NA')
     ,max(supply.nval_num) sup, max(amount.nval_num) amt 
