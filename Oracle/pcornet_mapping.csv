@@ -1,7 +1,7 @@
 pcori_path,local_path
 \PCORI_MOD\RX_BASIS\DI\,\Medication\Surescripts\Status\
-\PCORI_MOD\PCORI_MOD\RX_QUANTITY\,\Medication\Surescripts\Amount\
-\PCORI_MOD\PCORI_MOD\RX_DAYS_SUPPLY\,\Medication\Surescripts\Days Supply\
+\PCORI_MOD\RX_QUANTITY\,\Medication\Surescripts\Amount\
+\PCORI_MOD\RX_DAYS_SUPPLY\,\Medication\Surescripts\Days Supply\
 \PCORI_MOD\RX_BASIS\PR\02\,\Medication\Inpatient\
 \PCORI_MOD\RX_BASIS\PR\OT\,\Medication\Other Orders\
 \PCORI_MOD\RX_BASIS\PR\01\,\Medication\Outpatient\
