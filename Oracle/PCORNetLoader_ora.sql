@@ -1770,14 +1770,14 @@ with disp_status as (
   from i2b2fact ibf
   join BLUEHERONMETADATA.pcornet_med pnm
     on ibf.modifier_cd=pnm.c_basecode
-  where pnm.c_fullname like '\PCORI_MOD\PCORI_MOD\RX_QUANTITY\%'
+  where pnm.c_fullname like '\PCORI_MOD\RX_QUANTITY\%'
 )
 , disp_supply as (
   select ibf.patient_num, ibf.encounter_num, ibf.concept_cd, ibf.instance_num, ibf.start_date, ibf.modifier_cd, ibf.nval_num
   from i2b2fact ibf
   join BLUEHERONMETADATA.pcornet_med pnm
     on ibf.modifier_cd=pnm.c_basecode
-  where pnm.c_fullname like '\PCORI_MOD\PCORI_MOD\RX_DAYS_SUPPLY\%'
+  where pnm.c_fullname like '\PCORI_MOD\RX_DAYS_SUPPLY\%'
 )
 select
   st.patient_num patid,
