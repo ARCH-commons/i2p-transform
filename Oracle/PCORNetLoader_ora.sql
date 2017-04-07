@@ -1763,10 +1763,9 @@ with disp_status as (
   join "&&i2b2_meta_schema".pcornet_med pnm
     on ibf.modifier_cd=pnm.c_basecode
   where pnm.c_fullname like '\PCORI_MOD\RX_BASIS\DI\%'
-    /* TODO: Generalize for other sites.  The substr() strips 'NDC:' from the 
-             front the concept_cd and the '< 12' makes sure only 11 digit codes
-             are included. */
-    and length(substr(ibf.concept_cd, 5)) < 12
+    /* TODO: Generalize for other sites.  The '< 12' makes sure only 11 digit 
+             codes are included. */
+    and length(replace(concept_cd, 'NDC:', '')) < 12
 )
 , disp_quantity as (
   select ibf.patient_num, ibf.encounter_num, ibf.concept_cd, ibf.instance_num, ibf.start_date, ibf.modifier_cd, ibf.nval_num
@@ -1786,7 +1785,7 @@ select
   st.patient_num patid,
   null prescribingid,
   st.start_date dispense_date,
-  substr(st.concept_cd, 5) ndc, -- TODO: Generalize this for other sites.
+  replace(concept_cd, 'NDC:', '') ndc, -- TODO: Generalize this for other sites.
   ds.nval_num dispense_sup,
   qt.nval_num dispense_amt
 from disp_status st
