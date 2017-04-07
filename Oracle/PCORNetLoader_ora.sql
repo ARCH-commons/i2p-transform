@@ -1760,22 +1760,25 @@ insert into dispensing (
 with disp_status as (
   select ibf.patient_num, ibf.encounter_num, ibf.concept_cd, ibf.instance_num, ibf.start_date, ibf.modifier_cd
   from i2b2fact ibf
-  join BLUEHERONMETADATA.pcornet_med pnm
+  join "&&i2b2_meta_schema".pcornet_med pnm
     on ibf.modifier_cd=pnm.c_basecode
   where pnm.c_fullname like '\PCORI_MOD\RX_BASIS\DI\%'
-    and length(substr(ibf.concept_cd, 5)) < 12 -- TODO: Generalize this for other sites.
+    /* TODO: Generalize for other sites.  The substr() strips 'NDC:' from the 
+             front the concept_cd and the '< 12' makes sure only 11 digit codes
+             are included. */
+    and length(substr(ibf.concept_cd, 5)) < 12
 )
 , disp_quantity as (
   select ibf.patient_num, ibf.encounter_num, ibf.concept_cd, ibf.instance_num, ibf.start_date, ibf.modifier_cd, ibf.nval_num
   from i2b2fact ibf
-  join BLUEHERONMETADATA.pcornet_med pnm
+  join "&&i2b2_meta_schema".pcornet_med pnm
     on ibf.modifier_cd=pnm.c_basecode
   where pnm.c_fullname like '\PCORI_MOD\RX_QUANTITY\%'
 )
 , disp_supply as (
   select ibf.patient_num, ibf.encounter_num, ibf.concept_cd, ibf.instance_num, ibf.start_date, ibf.modifier_cd, ibf.nval_num
   from i2b2fact ibf
-  join BLUEHERONMETADATA.pcornet_med pnm
+  join "&&i2b2_meta_schema".pcornet_med pnm
     on ibf.modifier_cd=pnm.c_basecode
   where pnm.c_fullname like '\PCORI_MOD\RX_DAYS_SUPPLY\%'
 )
