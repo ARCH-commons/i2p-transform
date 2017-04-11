@@ -601,7 +601,7 @@ select
   case
     when llm.lab_name is not null then 'LAB_NAME:'|| llm.lab_name
     else lc.c_basecode
-  end c_basecose,
+  end c_basecode,
   lc.C_METADATAXML,
   lc.C_FACTTABLECOLUMN,
   lc.C_TABLENAME,

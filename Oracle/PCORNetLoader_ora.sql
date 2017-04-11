@@ -1397,7 +1397,7 @@ INSERT INTO lab_result_cm
 
 SELECT DISTINCT  M.patient_num patid,
 M.encounter_num encounterid,
-CASE WHEN ont_parent.C_BASECODE LIKE 'LAB_NAME%' then SUBSTR (ont_parent.c_basecode,10, 10) ELSE 'NI' END LAB_NAME,
+CASE WHEN ont_parent.C_BASECODE LIKE 'LAB_NAME%' then SUBSTR (ont_parent.c_basecode,10, 10) ELSE null END LAB_NAME,
 CASE WHEN lab.pcori_specimen_source like '%or SR_PLS' THEN 'SR_PLS' WHEN lab.pcori_specimen_source is null then 'NI' ELSE lab.pcori_specimen_source END specimen_source, -- (Better way would be to fix the column in the ontology but this will work)
 NVL(lab.pcori_basecode, 'NI') LAB_LOINC,
 NVL(p.PRIORITY,'NI') PRIORITY,
