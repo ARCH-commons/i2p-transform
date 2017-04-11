@@ -1414,7 +1414,12 @@ to_char(m.end_date,'HH:MI') RESULT_TIME,
 CASE WHEN m.ValType_Cd='N' THEN m.NVAL_NUM ELSE null END RESULT_NUM,
 CASE WHEN m.ValType_Cd='N' THEN (CASE NVL(nullif(m.TVal_Char,''),'NI') WHEN 'E' THEN 'EQ' WHEN 'NE' THEN 'OT' WHEN 'L' THEN 'LT' WHEN 'LE' THEN 'LE' WHEN 'G' THEN 'GT' WHEN 'GE' THEN 'GE' ELSE 'NI' END)  ELSE 'TX' END RESULT_MODIFIER,
 --NVL(m.Units_CD,'NI') RESULT_UNIT, -- TODO: Should be standardized units
-CASE WHEN INSTR(m.Units_CD, '%') > 0 THEN 'PERCENT' WHEN m.Units_CD IS NULL THEN NVL(m.Units_CD,'NI') ELSE TRIM(REPLACE(UPPER(m.Units_CD), '(CALC)', '')) end RESULT_UNIT, -- Local fix for KUMC
+CASE 
+  WHEN INSTR(m.Units_CD, '%') > 0 THEN 'PERCENT' 
+  WHEN m.Units_CD IS NULL THEN NVL(m.Units_CD,'NI')
+  when length(m.Units_CD) > 11 then substr(m.Units_CD, 1, 11)
+  ELSE TRIM(REPLACE(UPPER(m.Units_CD), '(CALC)', '')) 
+end RESULT_UNIT, -- Local fix for KUMC
 nullif(norm.NORM_RANGE_LOW,'') NORM_RANGE_LOW
 ,norm.NORM_MODIFIER_LOW,
 nullif(norm.NORM_RANGE_HIGH,'') NORM_RANGE_HIGH
