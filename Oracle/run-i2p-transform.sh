@@ -25,6 +25,7 @@ set -e
 
 python load_csv.py harvest_local harvest_local.csv harvest_local.ctl pcornet_cdm_user pcornet_cdm
 python load_csv.py PMN_LabNormal pmn_labnormal.csv pmn_labnormal.ctl pcornet_cdm_user pcornet_cdm
+python load_csv.py lab_loinc_mapping lab_loinc_mapping.csv lab_loinc_mapping.ctl pcornet_cdm_user pcornet_cdm
 . ./load_pcornet_mapping.sh
 
 # Run some tests

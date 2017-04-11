@@ -1434,7 +1434,7 @@ inner join encounter enc on enc.patid = m.patient_num and enc.encounterid = m.en
 
 inner join pcornet_lab lab on lab.c_basecode  = M.concept_cd and lab.c_fullname like '\PCORI\LAB_RESULT_CM\%'
 inner JOIN pcornet_lab ont_parent on lab.c_path=ont_parent.c_fullname
-inner join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
+left outer join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
 
 LEFT OUTER JOIN priority p
  
@@ -1453,7 +1453,7 @@ and M.concept_cd=l.concept_Cd
 and M.start_date=l.start_Date
  
 WHERE m.ValType_Cd in ('N','T')
-and ont_parent.C_BASECODE LIKE 'LAB_NAME%' -- Exclude non-pcori labs
+--and ont_parent.C_BASECODE LIKE 'LAB_NAME%' -- Exclude non-pcori labs
 and m.MODIFIER_CD='@';
 
 execute immediate 'create index lab_result_cm_patid on lab_result_cm (PATID)';
