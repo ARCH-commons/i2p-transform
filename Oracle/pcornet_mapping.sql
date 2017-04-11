@@ -680,7 +680,7 @@ from children_loinc_codes clc
 join "&&i2b2_meta_schema"."&&terms_table" ccc
   on ccc.c_fullname like (clc.c_fullname || '%')
   and ccc.c_basecode like 'KUH|COMPONENT_ID:%' -- TODO: Generalize for other sites.
-left outer join mprittie.lab_loinc_mapping llm
+left outer join lab_loinc_mapping llm
   on clc.c_basecode = ('LOINC:' || llm.loinc_code)
 ;
 
