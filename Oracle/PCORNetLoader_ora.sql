@@ -1781,7 +1781,7 @@ with disp_status as (
     on ibf.modifier_cd=pnm.c_basecode
   where pnm.c_fullname like '\PCORI_MOD\RX_DAYS_SUPPLY\%'
 )
-select
+select distinct
   st.patient_num patid,
   null prescribingid,
   st.start_date dispense_date,
