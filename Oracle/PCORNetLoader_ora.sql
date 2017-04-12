@@ -1765,7 +1765,7 @@ with disp_status as (
   where pnm.c_fullname like '\PCORI_MOD\RX_BASIS\DI\%'
     /* TODO: Generalize for other sites.  The '< 12' makes sure only 11 digit 
              codes are included. */
-    and length(replace(concept_cd, 'NDC:', '')) < 12
+    and length(replace(ibf.concept_cd, 'NDC:', '')) < 12
 )
 , disp_quantity as (
   select ibf.patient_num, ibf.encounter_num, ibf.concept_cd, ibf.instance_num, ibf.start_date, ibf.modifier_cd, ibf.nval_num
@@ -1785,7 +1785,7 @@ select distinct
   st.patient_num patid,
   null prescribingid,
   st.start_date dispense_date,
-  replace(concept_cd, 'NDC:', '') ndc, -- TODO: Generalize this for other sites.
+  replace(st.concept_cd, 'NDC:', '') ndc, -- TODO: Generalize this for other sites.
   ds.nval_num dispense_sup,
   qt.nval_num dispense_amt
 from disp_status st
