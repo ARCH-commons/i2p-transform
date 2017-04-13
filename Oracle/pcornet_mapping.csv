@@ -36,6 +36,7 @@ pcori_path,local_path
 \PCORI\ENCOUNTER\ENC_TYPE\OA\,\i2b2\Visit Details\ENC_TYPE\OA\
 \PCORI\ENCOUNTER\ENC_TYPE\OT\,\i2b2\Visit Details\ENC_TYPE\OT\
 \PCORI\ENCOUNTER\ENC_TYPE\UN\,\i2b2\Visit Details\ENC_TYPE\UN\
+\PCORI\ENCOUNTER\ENC_TYPE\IP\,\i2b2\UHC\Visit Details\Length of Stay\Hospital\
 \PCORI\DEMOGRAPHIC\SEX\F\,\i2b2\Demographics\Gender\Female\
 \PCORI\DEMOGRAPHIC\SEX\M\,\i2b2\Demographics\Gender\Male\
 \PCORI\DEMOGRAPHIC\SEX\NI\,\i2b2\Demographics\Gender\Unknown\Unknown-@\
@@ -193,7 +194,7 @@ pcori_path,local_path
 "\PCORI\ENCOUNTER\ENC_TYPE\OA\","\i2b2\Visit Details\Place of Service (IDX)\03\"
 "\PCORI\ENCOUNTER\ENC_TYPE\AV\","\i2b2\Visit Details\Place of Service (IDX)\26\"
 "\PCORI\ENCOUNTER\ENC_TYPE\AV\","\i2b2\Visit Details\Place of Service (IDX)\11\"
-"\PCORI\ENCOUNTER\ENC_TYPE\IP\","\i2b2\Visit Details\Place of Service (IDX)\21\"
+"\PCORI\ENCOUNTER\ENC_TYPE\OA\","\i2b2\Visit Details\Place of Service (IDX)\21\"
 "\PCORI\ENCOUNTER\ENC_TYPE\ED\","\i2b2\Visit Details\Place of Service (IDX)\23\"
 "\PCORI\ENCOUNTER\ENC_TYPE\IS\","\i2b2\Visit Details\Place of Service (IDX)\13\"
 "\PCORI\ENCOUNTER\ENC_TYPE\IS\","\i2b2\Visit Details\Place of Service (IDX)\65\"
