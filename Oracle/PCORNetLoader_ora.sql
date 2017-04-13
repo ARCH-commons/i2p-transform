@@ -1432,7 +1432,7 @@ NULL RAW_PANEL,
 CASE WHEN m.ValType_Cd='T' THEN substr(m.TVal_Char, 1, 50) ELSE to_char(m.NVal_Num) END RAW_RESULT, -- Local fix for KUMC
 NULL RAW_UNIT,
 NULL RAW_ORDER_DEPT,
-NULL m.concept_cd RAW_FACILITY_CODE
+m.concept_cd RAW_FACILITY_CODE
 
 FROM i2b2fact M
 inner join encounter enc on enc.patid = m.patient_num and enc.encounterid = m.encounter_Num -- Constraint to selected encounters
