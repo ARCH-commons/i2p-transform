@@ -591,7 +591,7 @@ truncate table "&&i2b2_meta_schema".pcornet_lab;
 /* Insert LOINC codes from local hierarchy, setting c_basecode to appropriate
    LAB_NAME for common PCORNet labs. */
 insert into "&&i2b2_meta_schema".pcornet_lab
-select
+select distinct
   lc.C_HLEVEL,
   replace(lc.C_FULLNAME, '\i2b2\Laboratory Tests\', '\PCORI\LAB_RESULT_CM\') c_fullname,
   lc.C_NAME,
@@ -648,7 +648,7 @@ with parent_loinc_codes as ( -- LOINC codes with children LOINC codes
       select c_basecode from parent_loinc_codes
   )
 )
-select
+select distinct
   ccc.C_HLEVEL,
   replace(ccc.C_FULLNAME, '\i2b2\Laboratory Tests\', '\PCORI\LAB_RESULT_CM\') c_fullname,
   ccc.C_NAME,
