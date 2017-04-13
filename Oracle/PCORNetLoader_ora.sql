@@ -1397,7 +1397,7 @@ INSERT INTO lab_result_cm
 
 SELECT DISTINCT  M.patient_num patid,
 M.encounter_num encounterid,
-CASE WHEN ont_parent.C_BASECODE LIKE 'LAB_NAME%' then SUBSTR (ont_parent.c_basecode,10, 10) ELSE 'NI' END LAB_NAME,
+CASE WHEN ont_parent.C_BASECODE LIKE 'LAB_NAME%' then SUBSTR (ont_parent.c_basecode,10, 10) ELSE null END LAB_NAME,
 CASE WHEN lab.pcori_specimen_source like '%or SR_PLS' THEN 'SR_PLS' WHEN lab.pcori_specimen_source is null then 'NI' ELSE lab.pcori_specimen_source END specimen_source, -- (Better way would be to fix the column in the ontology but this will work)
 NVL(lab.pcori_basecode, 'NI') LAB_LOINC,
 NVL(p.PRIORITY,'NI') PRIORITY,
@@ -1414,7 +1414,12 @@ to_char(m.end_date,'HH:MI') RESULT_TIME,
 CASE WHEN m.ValType_Cd='N' THEN m.NVAL_NUM ELSE null END RESULT_NUM,
 CASE WHEN m.ValType_Cd='N' THEN (CASE NVL(nullif(m.TVal_Char,''),'NI') WHEN 'E' THEN 'EQ' WHEN 'NE' THEN 'OT' WHEN 'L' THEN 'LT' WHEN 'LE' THEN 'LE' WHEN 'G' THEN 'GT' WHEN 'GE' THEN 'GE' ELSE 'NI' END)  ELSE 'TX' END RESULT_MODIFIER,
 --NVL(m.Units_CD,'NI') RESULT_UNIT, -- TODO: Should be standardized units
-CASE WHEN INSTR(m.Units_CD, '%') > 0 THEN 'PERCENT' WHEN m.Units_CD IS NULL THEN NVL(m.Units_CD,'NI') ELSE TRIM(REPLACE(UPPER(m.Units_CD), '(CALC)', '')) end RESULT_UNIT, -- Local fix for KUMC
+CASE 
+  WHEN INSTR(m.Units_CD, '%') > 0 THEN 'PERCENT' 
+  WHEN m.Units_CD IS NULL THEN NVL(m.Units_CD,'NI')
+  when length(m.Units_CD) > 11 then substr(m.Units_CD, 1, 11)
+  ELSE TRIM(REPLACE(UPPER(m.Units_CD), '(CALC)', '')) 
+end RESULT_UNIT, -- Local fix for KUMC
 nullif(norm.NORM_RANGE_LOW,'') NORM_RANGE_LOW
 ,norm.NORM_MODIFIER_LOW,
 nullif(norm.NORM_RANGE_HIGH,'') NORM_RANGE_HIGH
@@ -1427,14 +1432,14 @@ NULL RAW_PANEL,
 CASE WHEN m.ValType_Cd='T' THEN substr(m.TVal_Char, 1, 50) ELSE to_char(m.NVal_Num) END RAW_RESULT, -- Local fix for KUMC
 NULL RAW_UNIT,
 NULL RAW_ORDER_DEPT,
-NULL RAW_FACILITY_CODE
+NULL m.concept_cd RAW_FACILITY_CODE
 
 FROM i2b2fact M
 inner join encounter enc on enc.patid = m.patient_num and enc.encounterid = m.encounter_Num -- Constraint to selected encounters
 
 inner join pcornet_lab lab on lab.c_basecode  = M.concept_cd and lab.c_fullname like '\PCORI\LAB_RESULT_CM\%'
 inner JOIN pcornet_lab ont_parent on lab.c_path=ont_parent.c_fullname
-inner join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
+left outer join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
 
 LEFT OUTER JOIN priority p
  
@@ -1453,7 +1458,6 @@ and M.concept_cd=l.concept_Cd
 and M.start_date=l.start_Date
  
 WHERE m.ValType_Cd in ('N','T')
-and ont_parent.C_BASECODE LIKE 'LAB_NAME%' -- Exclude non-pcori labs
 and m.MODIFIER_CD='@';
 
 execute immediate 'create index lab_result_cm_patid on lab_result_cm (PATID)';
