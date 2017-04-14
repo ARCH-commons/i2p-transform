@@ -414,8 +414,8 @@ with pcornet_spec as (
 
   union all
 
-  select clarity_medication_id, rxcui, '4) Manual Curation' --, con.tty, va_name, sdf_name
-  from heron_etl_1.med_map_manual_curation mmmc
+  select to_number(clarity_medication_id), rxcui, '4) Manual Curation' --, con.tty, va_name, sdf_name
+  from "&&i2b2_etl_schema".med_map_manual_curation mmmc
   join rxnorm.rxnconso@id con on con.rxaui = mmmc.sdf_rxaui
 )
 , med_map_pref as ( -- HERON clarity_med_id_to_rxcui joined with spec order
