@@ -1051,7 +1051,7 @@ select distinct factline.patient_num, factline.encounter_num encounterid,	enc_ty
                                                       else '09'
        end dxtype,
 	CASE WHEN enc_type='AV' THEN 'FI' ELSE nvl(SUBSTR(dxsource,INSTR(dxsource,':')+1,2) ,'NI') END dx_source,
-	CASE WHEN enc_type in ('IP', 'IS')  -- PDX is "relevant only on IP and IS encounters"
+	CASE WHEN enc_type in ('EI', 'IP', 'IS')  -- PDX is "relevant only on IP and IS encounters"
              THEN nvl(SUBSTR(pdxsource,INSTR(pdxsource, ':')+1,2),'NI')
              ELSE 'X' END PDX
 from i2b2fact factline
