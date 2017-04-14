@@ -591,53 +591,107 @@ join "&&i2b2_meta_schema".pcornet_med on med_mod_mapping.PCORI_PATH = pcornet_me
 
 commit;
 
-/* Add relevent nodes from local i2b2 lab hierarchy to PCORNet Labs hierarchy.
+/* Replace SCILHS PCORNet Labs hierarchy with our local LOINC hierarchy with
+   adjustment to make it "SCILHS like".
 */
 
+/* Remove existing SCIHLS Labs hierarchy */
+truncate table "&&i2b2_meta_schema".pcornet_lab;
+
+/* Insert LOINC codes from local hierarchy, setting c_basecode to appropriate
+   LAB_NAME for common PCORNet labs. */
 insert into "&&i2b2_meta_schema".pcornet_lab
-with lab_map as (
-	select distinct lab.c_hlevel, lab.c_path, lab.pcori_specimen_source, trim(CHR(13) from lab.pcori_basecode) as pcori_basecode
-  from "&&i2b2_meta_schema".pcornet_lab lab 
-  inner JOIN "&&i2b2_meta_schema".pcornet_lab ont_parent on lab.c_path=ont_parent.c_fullname
-  inner join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
-  where lab.c_fullname like '\PCORI\LAB_RESULT_CM\%'
-),
-local_loinc_terms as (
-  select lm.C_HLEVEL, lt.C_FULLNAME, lm.C_PATH, lm.PCORI_BASECODE, lm.pcori_specimen_source
-  from "&&i2b2_meta_schema"."&&terms_table" lt, lab_map lm
-  where lm.pcori_basecode=replace(lt.c_basecode, 'LOINC:', '')
-    and lt.c_fullname like '\i2b2\Laboratory Tests\%' and lt.c_basecode like 'LOINC:%'
+select distinct
+  lc.C_HLEVEL,
+  replace(lc.C_FULLNAME, '\i2b2\Laboratory Tests\', '\PCORI\LAB_RESULT_CM\') c_fullname,
+  lc.C_NAME,
+  lc.C_SYNONYM_CD,
+  lc.C_VISUALATTRIBUTES,
+  lc.C_TOTALNUM,
+  case
+    when llm.lab_name is not null then 'LAB_NAME:'|| llm.lab_name
+    else lc.c_basecode
+  end c_basecode,
+  to_char(lc.C_METADATAXML),
+  lc.C_FACTTABLECOLUMN,
+  lc.C_TABLENAME,
+  lc.C_COLUMNNAME,
+  lc.C_COLUMNDATATYPE,
+  lc.C_OPERATOR,
+  lc.C_DIMCODE,
+  to_char(lc.C_COMMENT),
+  lc.C_TOOLTIP,
+  lc.M_APPLIED_PATH,
+  lc.UPDATE_DATE,
+  lc.DOWNLOAD_DATE,
+  lc.IMPORT_DATE,
+  lc.SOURCESYSTEM_CD,
+  lc.VALUETYPE_CD,
+  lc.M_EXCLUSION_CD,
+  lc.C_PATH,
+  lc.C_SYMBOL,
+  llm.pcori_specimen_source,
+  replace(lc.c_basecode, 'LOINC:', '') pcori_basecode
+from "&&i2b2_meta_schema"."&&terms_table" lc
+left outer join lab_loinc_mapping llm
+  on lc.c_basecode = ('LOINC:' || llm.loinc_code)
+where lc.c_basecode like 'LOINC:%'
+;
+
+/* Insert child KUH|COMPONENT_ID nodes, setting pcori_basecode, and c_path to
+   that of it's parent. */
+insert into "&&i2b2_meta_schema".pcornet_lab
+with parent_loinc_codes as ( -- LOINC codes with children LOINC codes
+  select p_loinc.*
+  from "&&i2b2_meta_schema"."&&terms_table" p_loinc
+  join "&&i2b2_meta_schema"."&&terms_table" c_loinc
+    on c_loinc.c_fullname like (p_loinc.c_fullname || '%')
+    and p_loinc.c_basecode like 'LOINC:%'
+    and c_loinc.c_basecode like 'LOINC:%'
+    and p_loinc.c_basecode!=c_loinc.c_basecode
 )
-select 
-  llt.C_HLEVEL,
-  concat(llt.c_path, substr(regexp_substr(lt.c_fullname, '\\[^\\]+\\$'), 2, length(regexp_substr(lt.c_fullname, '\\[^\\]+\\$')))) as c_fullname,
-  lt.C_NAME,
-  lt.C_SYNONYM_CD,
-  lt.C_VISUALATTRIBUTES,
-  lt.C_TOTALNUM,
-  lt.C_BASECODE,
-  lt.C_METADATAXML,
-  lt.C_FACTTABLECOLUMN,
-  lt.C_TABLENAME,
-  lt.C_COLUMNNAME,
-  lt.C_COLUMNDATATYPE,
-  lt.C_OPERATOR,
-  lt.C_DIMCODE,
-  lt.C_COMMENT,
-  lt.C_TOOLTIP,
-  lt.M_APPLIED_PATH,
-  lt.UPDATE_DATE,
-  lt.DOWNLOAD_DATE,
-  lt.IMPORT_DATE,
-  'MAPPING',
-  lt.VALUETYPE_CD,
-  lt.M_EXCLUSION_CD,
-  llt.C_PATH,
-  lt.C_SYMBOL,
-  llt.pcori_specimen_source,
-  llt.PCORI_BASECODE
-from "&&i2b2_meta_schema"."&&terms_table" lt, local_loinc_terms llt
-where lt.c_fullname like llt.c_fullname||'%\'
+, children_loinc_codes as ( -- LOINC codes without children LOINC codes
+  select clc.*
+  from "&&i2b2_meta_schema"."&&terms_table" clc
+  where clc.c_basecode like 'LOINC:%'
+    and clc.c_basecode not in (
+      select c_basecode from parent_loinc_codes
+  )
+)
+select distinct
+  ccc.C_HLEVEL,
+  replace(ccc.C_FULLNAME, '\i2b2\Laboratory Tests\', '\PCORI\LAB_RESULT_CM\') c_fullname,
+  ccc.C_NAME,
+  ccc.C_SYNONYM_CD,
+  ccc.C_VISUALATTRIBUTES,
+  ccc.C_TOTALNUM,
+  ccc.C_BASECODE,
+  to_char(ccc.C_METADATAXML),
+  ccc.C_FACTTABLECOLUMN,
+  ccc.C_TABLENAME,
+  ccc.C_COLUMNNAME,
+  ccc.C_COLUMNDATATYPE,
+  ccc.C_OPERATOR,
+  ccc.C_DIMCODE,
+  to_char(ccc.C_COMMENT),
+  ccc.C_TOOLTIP,
+  ccc.M_APPLIED_PATH,
+  ccc.UPDATE_DATE,
+  ccc.DOWNLOAD_DATE,
+  ccc.IMPORT_DATE,
+  ccc.SOURCESYSTEM_CD,
+  ccc.VALUETYPE_CD,
+  ccc.M_EXCLUSION_CD,
+  replace(clc.C_FULLNAME, '\i2b2\Laboratory Tests\', '\PCORI\LAB_RESULT_CM\') c_path,
+  ccc.C_SYMBOL,
+  llm.pcori_specimen_source,
+  replace(clc.c_basecode, 'LOINC:', '') pcori_basecode
+from children_loinc_codes clc
+join "&&i2b2_meta_schema"."&&terms_table" ccc
+  on ccc.c_fullname like (clc.c_fullname || '%')
+  and ccc.c_basecode like 'KUH|COMPONENT_ID:%' -- TODO: Generalize for other sites.
+left outer join lab_loinc_mapping llm
+  on clc.c_basecode = ('LOINC:' || llm.loinc_code)
 ;
 
 commit;

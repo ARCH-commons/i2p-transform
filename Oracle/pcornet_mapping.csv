@@ -1,10 +1,13 @@
 pcori_path,local_path
-\PCORI_MOD\RX_BASIS\DI\,\Medication\Surescripts\
+\PCORI_MOD\RX_BASIS\DI\,\Medication\Surescripts\Status\
+\PCORI_MOD\RX_QUANTITY\,\Medication\Surescripts\Amount\
+\PCORI_MOD\RX_DAYS_SUPPLY\,\Medication\Surescripts\Days Supply\
 \PCORI_MOD\RX_BASIS\PR\02\,\Medication\Inpatient\
 \PCORI_MOD\RX_BASIS\PR\OT\,\Medication\Other Orders\
 \PCORI_MOD\RX_BASIS\PR\01\,\Medication\Outpatient\
 \PCORI_MOD\RX_BASIS\PR\02\,\Medication\PRN Inpatient Order\
 \PCORI_MOD\PDX\P\,\Diagnosis\\modifier_dx\billing_diagnosis\discharge\discharge_primary\
+\PCORI_MOD\PDX\P\,\Diagnosis\Billing\Primary\
 \PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\DI\,\Diagnosis\\modifier_dx\billing_diagnosis\discharge\
 \PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\AD\,\Diagnosis\\modifier_dx\billing_diagnosis\admit\
 "\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\UN\","\Diagnosis\Billing\UHC_DIAGNOSIS\"
@@ -26,10 +29,15 @@ pcori_path,local_path
 \PCORI\DEMOGRAPHIC\HISPANIC\Y\,\i2b2\Demographics\Ethnicity\Hispanic or Latino\
 \PCORI\DEMOGRAPHIC\HISPANIC\Y\,"\i2b2\Demographics\Ethnicity\Hispanic, Latino or Spanish Origin\"
 \PCORI\ENCOUNTER\ENC_TYPE\AV\,\i2b2\Visit Details\ENC_TYPE\AV\
-\PCORI\ENCOUNTER\ENC_TYPE\AV\,\i2b2\Visit Details\ENC_TYPE\AV\
 \PCORI\ENCOUNTER\ENC_TYPE\ED\,\i2b2\Visit Details\ENC_TYPE\ED\
+\PCORI\ENCOUNTER\ENC_TYPE\EI\,\i2b2\Visit Details\ENC_TYPE\EI\
 \PCORI\ENCOUNTER\ENC_TYPE\IP\,\i2b2\Visit Details\ENC_TYPE\IP\
+\PCORI\ENCOUNTER\ENC_TYPE\IS\,\i2b2\Visit Details\ENC_TYPE\IS\
+\PCORI\ENCOUNTER\ENC_TYPE\NI\,\i2b2\Visit Details\ENC_TYPE\NI\
+\PCORI\ENCOUNTER\ENC_TYPE\OA\,\i2b2\Visit Details\ENC_TYPE\OA\
 \PCORI\ENCOUNTER\ENC_TYPE\OT\,\i2b2\Visit Details\ENC_TYPE\OT\
+\PCORI\ENCOUNTER\ENC_TYPE\UN\,\i2b2\Visit Details\ENC_TYPE\UN\
+\PCORI\ENCOUNTER\ENC_TYPE\IP\,\i2b2\UHC\Visit Details\Length of Stay\Hospital\
 \PCORI\DEMOGRAPHIC\SEX\F\,\i2b2\Demographics\Gender\Female\
 \PCORI\DEMOGRAPHIC\SEX\M\,\i2b2\Demographics\Gender\Male\
 \PCORI\DEMOGRAPHIC\SEX\NI\,\i2b2\Demographics\Gender\Unknown\Unknown-@\
@@ -187,7 +195,7 @@ pcori_path,local_path
 "\PCORI\ENCOUNTER\ENC_TYPE\OA\","\i2b2\Visit Details\Place of Service (IDX)\03\"
 "\PCORI\ENCOUNTER\ENC_TYPE\AV\","\i2b2\Visit Details\Place of Service (IDX)\26\"
 "\PCORI\ENCOUNTER\ENC_TYPE\AV\","\i2b2\Visit Details\Place of Service (IDX)\11\"
-"\PCORI\ENCOUNTER\ENC_TYPE\IP\","\i2b2\Visit Details\Place of Service (IDX)\21\"
+"\PCORI\ENCOUNTER\ENC_TYPE\OA\","\i2b2\Visit Details\Place of Service (IDX)\21\"
 "\PCORI\ENCOUNTER\ENC_TYPE\ED\","\i2b2\Visit Details\Place of Service (IDX)\23\"
 "\PCORI\ENCOUNTER\ENC_TYPE\IS\","\i2b2\Visit Details\Place of Service (IDX)\13\"
 "\PCORI\ENCOUNTER\ENC_TYPE\IS\","\i2b2\Visit Details\Place of Service (IDX)\65\"

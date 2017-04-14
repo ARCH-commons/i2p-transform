@@ -1051,7 +1051,7 @@ select distinct factline.patient_num, factline.encounter_num encounterid,	enc_ty
                                                       else '09'
        end dxtype,
 	CASE WHEN enc_type='AV' THEN 'FI' ELSE nvl(SUBSTR(dxsource,INSTR(dxsource,':')+1,2) ,'NI') END dx_source,
-	CASE WHEN enc_type in ('IP', 'IS')  -- PDX is "relevant only on IP and IS encounters"
+	CASE WHEN enc_type in ('EI', 'IP', 'IS')  -- PDX is "relevant only on IP and IS encounters"
              THEN nvl(SUBSTR(pdxsource,INSTR(pdxsource, ':')+1,2),'NI')
              ELSE 'X' END PDX
 from i2b2fact factline
@@ -1397,7 +1397,7 @@ INSERT INTO lab_result_cm
 
 SELECT DISTINCT  M.patient_num patid,
 M.encounter_num encounterid,
-CASE WHEN ont_parent.C_BASECODE LIKE 'LAB_NAME%' then SUBSTR (ont_parent.c_basecode,10, 10) ELSE 'NI' END LAB_NAME,
+CASE WHEN ont_parent.C_BASECODE LIKE 'LAB_NAME%' then SUBSTR (ont_parent.c_basecode,10, 10) ELSE null END LAB_NAME,
 CASE WHEN lab.pcori_specimen_source like '%or SR_PLS' THEN 'SR_PLS' WHEN lab.pcori_specimen_source is null then 'NI' ELSE lab.pcori_specimen_source END specimen_source, -- (Better way would be to fix the column in the ontology but this will work)
 NVL(lab.pcori_basecode, 'NI') LAB_LOINC,
 NVL(p.PRIORITY,'NI') PRIORITY,
@@ -1414,7 +1414,12 @@ to_char(m.end_date,'HH:MI') RESULT_TIME,
 CASE WHEN m.ValType_Cd='N' THEN m.NVAL_NUM ELSE null END RESULT_NUM,
 CASE WHEN m.ValType_Cd='N' THEN (CASE NVL(nullif(m.TVal_Char,''),'NI') WHEN 'E' THEN 'EQ' WHEN 'NE' THEN 'OT' WHEN 'L' THEN 'LT' WHEN 'LE' THEN 'LE' WHEN 'G' THEN 'GT' WHEN 'GE' THEN 'GE' ELSE 'NI' END)  ELSE 'TX' END RESULT_MODIFIER,
 --NVL(m.Units_CD,'NI') RESULT_UNIT, -- TODO: Should be standardized units
-CASE WHEN INSTR(m.Units_CD, '%') > 0 THEN 'PERCENT' WHEN m.Units_CD IS NULL THEN NVL(m.Units_CD,'NI') ELSE TRIM(REPLACE(UPPER(m.Units_CD), '(CALC)', '')) end RESULT_UNIT, -- Local fix for KUMC
+CASE 
+  WHEN INSTR(m.Units_CD, '%') > 0 THEN 'PERCENT' 
+  WHEN m.Units_CD IS NULL THEN NVL(m.Units_CD,'NI')
+  when length(m.Units_CD) > 11 then substr(m.Units_CD, 1, 11)
+  ELSE TRIM(REPLACE(UPPER(m.Units_CD), '(CALC)', '')) 
+end RESULT_UNIT, -- Local fix for KUMC
 nullif(norm.NORM_RANGE_LOW,'') NORM_RANGE_LOW
 ,norm.NORM_MODIFIER_LOW,
 nullif(norm.NORM_RANGE_HIGH,'') NORM_RANGE_HIGH
@@ -1427,14 +1432,14 @@ NULL RAW_PANEL,
 CASE WHEN m.ValType_Cd='T' THEN substr(m.TVal_Char, 1, 50) ELSE to_char(m.NVal_Num) END RAW_RESULT, -- Local fix for KUMC
 NULL RAW_UNIT,
 NULL RAW_ORDER_DEPT,
-NULL RAW_FACILITY_CODE
+m.concept_cd RAW_FACILITY_CODE
 
 FROM i2b2fact M
 inner join encounter enc on enc.patid = m.patient_num and enc.encounterid = m.encounter_Num -- Constraint to selected encounters
 
 inner join pcornet_lab lab on lab.c_basecode  = M.concept_cd and lab.c_fullname like '\PCORI\LAB_RESULT_CM\%'
 inner JOIN pcornet_lab ont_parent on lab.c_path=ont_parent.c_fullname
-inner join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
+left outer join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
 
 LEFT OUTER JOIN priority p
  
@@ -1453,7 +1458,6 @@ and M.concept_cd=l.concept_Cd
 and M.start_date=l.start_Date
  
 WHERE m.ValType_Cd in ('N','T')
-and ont_parent.C_BASECODE LIKE 'LAB_NAME%' -- Exclude non-pcori labs
 and m.MODIFIER_CD='@';
 
 execute immediate 'create index lab_result_cm_patid on lab_result_cm (PATID)';
@@ -1723,7 +1727,7 @@ whenever sqlerror exit;
 create or replace procedure PCORNetDispensing as
 sqltext varchar2(4000);
 begin
-
+/*
 PMN_DROPSQL('drop index dispensing_patid');
 
 PMN_DROPSQL('DROP TABLE supply');
@@ -1743,35 +1747,69 @@ sqltext := 'create table amount as '||
 '        on amount.modifier_cd = amountcode.c_basecode '||
 '        and amountcode.c_fullname like ''\PCORI_MOD\RX_QUANTITY\'') ';
 PMN_EXECUATESQL(sqltext);
-        
--- insert data with outer joins to ensure all records are included even if some data elements are missing
+*/
+    
+/* NOTE: New transformation developed by KUMC */
 
 insert into dispensing (
 	PATID
-    ,PRESCRIBINGID
-	,DISPENSE_DATE -- using start_date from i2b2
-    ,NDC --using pcornet_med pcori_ndc - new column!
-    ,DISPENSE_SUP ---- modifier nval_num
-    ,DISPENSE_AMT  -- modifier nval_num
+  ,PRESCRIBINGID
+  ,DISPENSE_DATE -- using start_date from i2b2
+  ,NDC --using pcornet_med pcori_ndc - new column!
+  ,DISPENSE_SUP ---- modifier nval_num
+  ,DISPENSE_AMT  -- modifier nval_num
 --    ,RAW_NDC
 )
 /* Below is the Cycle 2 fix for populating the DISPENSING table  */
+with disp_status as (
+  select ibf.patient_num, ibf.encounter_num, ibf.concept_cd, ibf.instance_num, ibf.start_date, ibf.modifier_cd
+  from i2b2fact ibf
+  join "&&i2b2_meta_schema".pcornet_med pnm
+    on ibf.modifier_cd=pnm.c_basecode
+  where pnm.c_fullname like '\PCORI_MOD\RX_BASIS\DI\%'
+    /* TODO: Generalize for other sites.  The '< 12' makes sure only 11 digit 
+             codes are included. */
+    and length(replace(ibf.concept_cd, 'NDC:', '')) < 12
+)
+, disp_quantity as (
+  select ibf.patient_num, ibf.encounter_num, ibf.concept_cd, ibf.instance_num, ibf.start_date, ibf.modifier_cd, ibf.nval_num
+  from i2b2fact ibf
+  join "&&i2b2_meta_schema".pcornet_med pnm
+    on ibf.modifier_cd=pnm.c_basecode
+  where pnm.c_fullname like '\PCORI_MOD\RX_QUANTITY\%'
+)
+, disp_supply as (
+  select ibf.patient_num, ibf.encounter_num, ibf.concept_cd, ibf.instance_num, ibf.start_date, ibf.modifier_cd, ibf.nval_num
+  from i2b2fact ibf
+  join "&&i2b2_meta_schema".pcornet_med pnm
+    on ibf.modifier_cd=pnm.c_basecode
+  where pnm.c_fullname like '\PCORI_MOD\RX_DAYS_SUPPLY\%'
+)
 select distinct
-  ibf.patient_num patid,
+  st.patient_num patid,
   null prescribingid,
-  ibf.start_date dispense_date,
-  substr(ibf.concept_cd, 5) ndc,
-  null dispense_sup,
-  null dispense_amt
-from i2b2fact ibf
-join BLUEHERONMETADATA.pcornet_med pnm
-  on ibf.modifier_cd=pnm.c_basecode
-where pnm.c_fullname like '\PCORI_MOD\RX_BASIS\DI\%'
-  and length(substr(ibf.concept_cd, 5)) < 12
-; 
+  st.start_date dispense_date,
+  replace(st.concept_cd, 'NDC:', '') ndc, -- TODO: Generalize this for other sites.
+  ds.nval_num dispense_sup,
+  qt.nval_num dispense_amt
+from disp_status st
+left outer join disp_quantity qt
+  on st.patient_num=qt.patient_num
+  and st.encounter_num=qt.encounter_num
+  and st.concept_cd=qt.concept_cd
+  and st.instance_num=qt.instance_num
+  and st.start_date=qt.start_date
+left outer join disp_supply ds
+  on st.patient_num=ds.patient_num
+  and st.encounter_num=ds.encounter_num
+  and st.concept_cd=ds.concept_cd
+  and st.instance_num=ds.instance_num
+  and st.start_date=ds.start_date
+;
 
-/* NOTE: Once DISPENSING related encounters have made it into the CDM (via the visit
-   dimension) then the original SCILHS code below should work.
+/* NOTE: The original SCILHS transformation is below.
+
+-- insert data with outer joins to ensure all records are included even if some data elements are missing
 
 select  m.patient_num, null,m.start_date, NVL(mo.pcori_ndc,'NA')
     ,max(supply.nval_num) sup, max(amount.nval_num) amt 
