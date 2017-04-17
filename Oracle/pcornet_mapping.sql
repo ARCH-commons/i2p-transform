@@ -662,7 +662,7 @@ select distinct
   ccc.C_VISUALATTRIBUTES,
   ccc.C_TOTALNUM,
   ccc.C_BASECODE,
---  to_char(ccc.C_METADATAXML),
+  null C_METADATAXML, --  to_char(ccc.C_METADATAXML),
   ccc.C_FACTTABLECOLUMN,
   ccc.C_TABLENAME,
   ccc.C_COLUMNNAME,
