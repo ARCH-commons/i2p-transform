@@ -24,3 +24,14 @@ when matched then update set p.rx_providerid = e.providerid;
 The CDM wants height in inches and weight in pounds. */
 update vital v set v.ht = v.ht / 2.54;
 update vital v set v.wt = v.wt / 16;
+
+/* Remove rows from the PRESCRIBING table where RX_* fields are null
+   TODO: Remove this when fixed in HERON
+ */
+delete
+from pcornet_cdm.prescribing
+where rx_basis is null
+  and rx_quantity is null
+  and rx_frequency is null
+  and rx_refills is null
+;
