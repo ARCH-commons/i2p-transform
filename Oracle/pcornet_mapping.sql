@@ -635,23 +635,21 @@ where lc.c_basecode like 'LOINC:%'
 /* Insert child KUH|COMPONENT_ID nodes, setting pcori_basecode, and c_path to
    that of it's parent. */
 insert into "&&i2b2_meta_schema".pcornet_lab
-with lab_terms as (
-  select c_fullname, c_hlevel, c_basecode
-  from "&&i2b2_meta_schema"."&&terms_table"
-  where c_fullname like '\i2b2\Laboratory Tests\%'
-)
-, loinc_terms as (
-  select *
-  from lab_terms
-  where c_basecode like 'LOINC:%'
+with parent_loinc_codes as ( -- LOINC codes with children LOINC codes
+  select p_loinc.*
+  from "&&i2b2_meta_schema"."&&terms_table" p_loinc
+  join "&&i2b2_meta_schema"."&&terms_table" c_loinc
+    on c_loinc.c_fullname like (p_loinc.c_fullname || '%')
+    and p_loinc.c_basecode like 'LOINC:%'
+    and c_loinc.c_basecode like 'LOINC:%'
+    and p_loinc.c_basecode!=c_loinc.c_basecode
 )
 , children_loinc_codes as ( -- LOINC codes without children LOINC codes
   select clc.*
-  from loinc_terms clc
-  where not exists (
-      select 1 from loinc_terms p
-      where p.c_hlevel < clc.c_hlevel
-      and clc.c_fullname like (p.c_fullname || '%')
+  from "&&i2b2_meta_schema"."&&terms_table" clc
+  where clc.c_basecode like 'LOINC:%'
+    and clc.c_basecode not in (
+      select c_basecode from parent_loinc_codes
   )
 )
 select distinct
@@ -662,7 +660,7 @@ select distinct
   ccc.C_VISUALATTRIBUTES,
   ccc.C_TOTALNUM,
   ccc.C_BASECODE,
-  null C_METADATAXML, --  to_char(ccc.C_METADATAXML),
+  to_char(ccc.C_METADATAXML),
   ccc.C_FACTTABLECOLUMN,
   ccc.C_TABLENAME,
   ccc.C_COLUMNNAME,
@@ -683,12 +681,9 @@ select distinct
   llm.pcori_specimen_source,
   replace(clc.c_basecode, 'LOINC:', '') pcori_basecode
 from children_loinc_codes clc
-join (select * from "&&i2b2_meta_schema"."&&terms_table"
-      where c_fullname like '\i2b2\Laboratory Tests\%'
-      and c_basecode like 'KUH|COMPONENT_ID:%' -- TODO: Generalize for other sites.
-     ) ccc
-  on ccc.c_hlevel > clc.c_hlevel
- and ccc.c_fullname like (clc.c_fullname || '%')
+join "&&i2b2_meta_schema"."&&terms_table" ccc
+  on ccc.c_fullname like (clc.c_fullname || '%')
+  and ccc.c_basecode like 'KUH|COMPONENT_ID:%' -- TODO: Generalize for other sites.
 left outer join lab_loinc_mapping llm
   on clc.c_basecode = ('LOINC:' || llm.loinc_code)
 ;
