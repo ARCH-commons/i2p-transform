@@ -131,9 +131,11 @@ CREATE OR REPLACE SYNONYM pcornet_enc FOR  i2b2metadata.pcornet_enc
 
 create or replace FUNCTION GETDATAMARTID RETURN VARCHAR2 IS 
 BEGIN 
-    RETURN 'WF';
+    RETURN 'C1WF';
 END;
 /
+-- Data mart name table "harvest reference table"
+-- https://github.com/SCILHS/scilhs-internal/blob/master/HARVEST%20Reference%20Table.pdf
 
 CREATE OR REPLACE FUNCTION GETDATAMARTNAME RETURN VARCHAR2 AS 
 BEGIN 
@@ -311,11 +313,11 @@ end;
 
 
 BEGIN
-PMN_DROPSQL('DROP TABLE pmnPROCEDURE');
+PMN_DROPSQL('DROP TABLE pmnPROCEDURES');
 END;
 /
 
-CREATE TABLE pmnPROCEDURE(
+CREATE TABLE pmnPROCEDURES( --Modified on 2/6/17 from procedure to procedures by Matthew Joss
 	PROCEDURESID NUMBER(19)  primary key,
 	PATID varchar(50) NOT NULL,
 	ENCOUNTERID varchar(50) NOT NULL,
@@ -332,18 +334,18 @@ CREATE TABLE pmnPROCEDURE(
 /
 
 BEGIN
-PMN_DROPSQL('DROP sequence  pmnPROCEDURE_seq');
+PMN_DROPSQL('DROP sequence  pmnPROCEDURES_seq');
 END;
 /
 
-create sequence  pmnPROCEDURE_seq
+create sequence  pmnPROCEDURES_seq
 /
 
-create or replace trigger pmnPROCEDURE_trg
-before insert on pmnPROCEDURE
+create or replace trigger pmnPROCEDURES_trg
+before insert on pmnPROCEDURES
 for each row
 begin
-  select pmnPROCEDURE_seq.nextval into :new.PROCEDURESID from dual;
+  select pmnPROCEDURES_seq.nextval into :new.PROCEDURESID from dual;
 end;
 /
 
@@ -390,11 +392,11 @@ end;
 
 
 BEGIN
-PMN_DROPSQL('DROP TABLE pmnlabresults_cm');
+PMN_DROPSQL('DROP TABLE pmnlab_result_cm');
 END;
 /
 
-CREATE TABLE pmnlabresults_cm(
+CREATE TABLE pmnlab_result_cm( --Modified on 2/6/17 from labresults_cm to lab_result_cm by Matthew Joss
 	LAB_RESULT_CM_ID NUMBER(19)  primary key,
 	PATID varchar(50) NOT NULL,
 	ENCOUNTERID varchar(50) NULL,
@@ -431,18 +433,18 @@ CREATE TABLE pmnlabresults_cm(
 
 
 BEGIN
-PMN_DROPSQL('DROP SEQUENCE pmnlabresults_cm_seq');
+PMN_DROPSQL('DROP SEQUENCE pmnlab_result_cm_seq');
 END;
 /
 
-create sequence  pmnlabresults_cm_seq
+create sequence  pmnlab_result_cm_seq
 /
 
-create or replace trigger pmnlabresults_cm_trg
-before insert on pmnlabresults_cm
+create or replace trigger pmnlab_result_cm_trg
+before insert on pmnlab_result_cm
 for each row
 begin
-  select pmnlabresults_cm_seq.nextval into :new.LAB_RESULT_CM_ID from dual;
+  select pmnlab_result_cm_seq.nextval into :new.LAB_RESULT_CM_ID from dual;
 end;
 /
 
@@ -521,10 +523,10 @@ CREATE TABLE pmndeath(
 /
 
 BEGIN
-PMN_DROPSQL('DROP TABLE pmndeath_cause');
+PMN_DROPSQL('DROP TABLE pmndeath_condition');
 END;
 /
-CREATE TABLE pmndeath_cause(
+CREATE TABLE pmndeath_condition( --Modified on 2/6/17 from death_cause to death_condition by Matthew Joss
 	PATID varchar(50) NOT NULL,
 	DEATH_CAUSE varchar(8) NOT NULL,
 	DEATH_CAUSE_CODE varchar(2) NOT NULL,
@@ -833,7 +835,7 @@ CREATE OR REPLACE SYNONYM CONDITION FOR  PMNCONDITION
 CREATE OR REPLACE SYNONYM DEATH FOR  PMNDEATH
 /
 
-CREATE OR REPLACE SYNONYM DEATH_CAUSE FOR  PMNDEATH_CAUSE
+CREATE OR REPLACE SYNONYM DEATH_CAUSE FOR  PMNDEATH_CONDITION
 /
 
 CREATE OR REPLACE SYNONYM DEMOGRAPHIC FOR  PMNDEMOGRAPHIC
@@ -854,7 +856,7 @@ CREATE OR REPLACE SYNONYM ENROLLMENT FOR  PMNENROLLMENT
 CREATE OR REPLACE SYNONYM HARVEST FOR  PMNHARVEST
 /
 
-CREATE OR REPLACE SYNONYM LAB_RESULT_CM FOR  PMNLABRESULTS_CM
+CREATE OR REPLACE SYNONYM LAB_RESULT_CM FOR  PMNLAB_RESULT_CM
 /
 
 CREATE OR REPLACE SYNONYM PCORNET_TRIAL FOR  PMNPCORNET_TRIAL
@@ -866,7 +868,7 @@ CREATE OR REPLACE SYNONYM PRESCRIBING FOR  PMNPRESCRIBING
 CREATE OR REPLACE SYNONYM PRO_CM FOR  PMNPRO_CM
 /
 
-CREATE OR REPLACE SYNONYM PROCEDURES FOR  PMNPROCEDURE
+CREATE OR REPLACE SYNONYM PROCEDURES FOR  PMNPROCEDURES
 /
 
 CREATE OR REPLACE SYNONYM VITAL FOR  PMNVITAL
@@ -1207,9 +1209,9 @@ sqltext := 'insert into pmndiagnosis (patid,			encounterid,	enc_type, admit_date
 -- Skip ICD-9 V codes in 10 ontology, ICD-9 E codes in 10 ontology, ICD-10 numeric codes in 10 ontology
 -- Note: makes the assumption that ICD-9 Ecodes are not ICD-10 Ecodes; same with ICD-9 V codes. On inspection seems to be true.
 'where (diag.c_fullname not like ''\PCORI\DIAGNOSIS\10\%'' or ' ||
-'( not ( diag.pcori_basecode like ''[V]%'' and diag.c_fullname not like ''\PCORI\DIAGNOSIS\10\([V]%\([V]%\([V]%'' ) '||
-'and not ( diag.pcori_basecode like ''[E]%'' and diag.c_fullname not like ''\PCORI\DIAGNOSIS\10\([E]%\([E]%\([E]%'' ) '|| 
-'and not (diag.c_fullname like ''\PCORI\DIAGNOSIS\10\%'' and diag.pcori_basecode like ''[0-9]%'') )) '||
+'( not (  REGEXP_LIKE (diag.pcori_basecode, ''[V].*'', ''i'')  and not REGEXP_LIKE(diag.c_fullname, ''\\PCORI\\DIAGNOSIS\\10\\\([V].*\\\([V].*\\\([V].*'', ''i'' ) ) '||
+'and not ( REGEXP_LIKE(diag.pcori_basecode, ''[E].*'', ''i'')  and not REGEXP_LIKE(diag.c_fullname, ''\\PCORI\\DIAGNOSIS\\10\\\([E].*\\\([E].*\\\([E].*'', ''i'') ) '|| 
+'and not (diag.c_fullname like ''\PCORI\DIAGNOSIS\10\%'' and REGEXP_LIKE(diag.pcori_basecode, ''[0-9].*'', ''i'' )) )) '||
 'and (sourcefact.c_fullname like ''\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\%'' or sourcefact.c_fullname is null) ';
 
 PMN_EXECUATESQL(sqltext);
@@ -1303,7 +1305,7 @@ end PCORNetCondition;
 create or replace procedure PCORNetProcedure as
 begin
 
-insert into pmnprocedure( 
+insert into pmnprocedures( 
 				patid,			encounterid,	enc_type, admit_date, providerid, px, px_type, px_source,px_date) 
 select  distinct fact.patient_num, enc.encounterid,	enc.enc_type, enc.admit_date, 
 		enc.providerid, SUBSTR(pr.pcori_basecode,INSTR(pr.pcori_basecode, ':')+1,11) px, SUBSTR(pr.c_fullname,18,2) pxtype, 'NI' px_source, fact.start_date
@@ -1532,7 +1534,7 @@ sqltext := 'insert into location '||
 PMN_EXECUATESQL(sqltext);
 
 
-INSERT INTO pmnlabresults_cm
+INSERT INTO pmnlab_result_cm
       (PATID
       ,ENCOUNTERID
       ,LAB_NAME
@@ -1647,7 +1649,7 @@ create or replace procedure PCORNetHarvest as
 begin
 
 INSERT INTO pmnharvest(NETWORKID, NETWORK_NAME, DATAMARTID, DATAMART_NAME, DATAMART_PLATFORM, CDM_VERSION, DATAMART_CLAIMS, DATAMART_EHR, BIRTH_DATE_MGMT, ENR_START_DATE_MGMT, ENR_END_DATE_MGMT, ADMIT_DATE_MGMT, DISCHARGE_DATE_MGMT, PX_DATE_MGMT, RX_ORDER_DATE_MGMT, RX_START_DATE_MGMT, RX_END_DATE_MGMT, DISPENSE_DATE_MGMT, LAB_ORDER_DATE_MGMT, SPECIMEN_DATE_MGMT, RESULT_DATE_MGMT, MEASURE_DATE_MGMT, ONSET_DATE_MGMT, REPORT_DATE_MGMT, RESOLVE_DATE_MGMT, PRO_DATE_MGMT, REFRESH_DEMOGRAPHIC_DATE, REFRESH_ENROLLMENT_DATE, REFRESH_ENCOUNTER_DATE, REFRESH_DIAGNOSIS_DATE, REFRESH_PROCEDURES_DATE, REFRESH_VITAL_DATE, REFRESH_DISPENSING_DATE, REFRESH_LAB_RESULT_CM_DATE, REFRESH_CONDITION_DATE, REFRESH_PRO_CM_DATE, REFRESH_PRESCRIBING_DATE, REFRESH_PCORNET_TRIAL_DATE, REFRESH_DEATH_DATE, REFRESH_DEATH_CAUSE_DATE) 
-	VALUES('SCILHS', 'SCILHS', getDataMartID(), getDataMartName(), getDataMartPlatform(), 3, '01', '02', '01','01','02','01','02','01','02','01','02','01','01','02','02','01','01','01','02','01',current_date,current_date,current_date,current_date,current_date,current_date,current_date,current_date,current_date,null,current_date,null,null,null);
+	VALUES('C1', 'SCILHS', getDataMartID(), getDataMartName(), getDataMartPlatform(), 3, '01', '02', '01','01','02','01','02','01','02','01','02','01','01','02','02','01','01','01','02','01',current_date,current_date,current_date,current_date,current_date,current_date,current_date,current_date,current_date,null,current_date,null,null,null);
 
 Commit;
 
@@ -1828,12 +1830,12 @@ insert into pmnprescribing (
     ,RX_DAYS_SUPPLY -- modifier nval_num
     ,RX_FREQUENCY --modifier with basecode lookup
     ,RX_BASIS --modifier with basecode lookup
---    ,RAW_RX_MED_NAME, --not filling these right now
+    ,RAW_RX_MED_NAME --not filling these right now
 --    ,RAW_RX_FREQUENCY,
 --    ,RAW_RXNORM_CUI
 )
 select distinct  m.patient_num, m.Encounter_Num,m.provider_id,  m.start_date order_date,  to_char(m.start_date,'HH24:MI'), m.start_date start_date, m.end_date, mo.pcori_cui -- Changed HH to HH24, Matthew Joss 8/25/16
-    ,quantity.nval_num quantity, refills.nval_num refills, supply.nval_num supply, substr(freq.pcori_basecode, instr(freq.pcori_basecode, ':') + 1, 2) frequency, substr(basis.pcori_basecode, instr(freq.pcori_basecode, ':') + 1, 2) basis
+    ,quantity.nval_num quantity, refills.nval_num refills, supply.nval_num supply, substr(freq.pcori_basecode, instr(freq.pcori_basecode, ':') + 1, 2) frequency, substr(basis.pcori_basecode, instr(freq.pcori_basecode, ':') + 1, 2) basis, substr(mo.c_name, 0, 50)
  from i2b2fact m inner join pcornet_med mo on m.concept_cd = mo.c_basecode 
 inner join pmnENCOUNTER enc on enc.encounterid = m.encounter_Num       
 -- TODO: This join adds several minutes to the load - must be debugged
@@ -1975,7 +1977,7 @@ inner join pmnENCOUNTER enc on enc.encounterid = m.encounter_Num
     left join  amount
     on m.encounter_num = amount.encounter_num
     and m.concept_cd = amount.concept_Cd
-
+where mo.pcori_ndc is not null
 group by m.encounter_num ,m.patient_num, m.start_date,  mo.pcori_ndc;
 
 Commit;
@@ -2067,12 +2069,12 @@ select count(*) into i2b2Encounters   from i2b2visit i inner join pmndemographic
 select count(*) into pmnPats   from pmndemographic;
 select count(*) into pmnencounters   from pmnencounter e ;
 select count(*) into pmndx   from pmndiagnosis;
-select count(*) into pmnprocs  from pmnprocedure;
+select count(*) into pmnprocs  from pmnprocedures;
 
 select count(*) into pmncond from pmncondition;
 select count(*) into pmnenroll  from pmnenrollment;
 select count(*) into pmnvital  from pmnvital;
-select count(*) into pmnlabs from pmnlabresults_cm;
+select count(*) into pmnlabs from pmnlab_result_cm;
 select count(*) into pmnprescribings from pmnprescribing;
 select count(*) into pmndispensings from pmndispensing;
 
@@ -2080,11 +2082,11 @@ select count(*) into pmndispensings from pmndispensing;
 -- Distinct patients in PMN tables
 select count(distinct patid) into pmnencountersd   from pmnencounter e;
 select count(distinct patid) into pmndxd   from pmndiagnosis;
-select count(distinct patid) into pmnprocsd   from pmnprocedure; 
+select count(distinct patid) into pmnprocsd   from pmnprocedures; 
 select count(distinct patid) into pmncondd   from pmncondition; 
 select count(distinct patid) into pmnenrolld   from pmnenrollment; 
 select count(distinct patid) into pmnvitald   from pmnvital; 
-select count(distinct patid) into pmnlabsd   from pmnlabresults_cm; 
+select count(distinct patid) into pmnlabsd   from pmnlab_result_cm; 
 select count(distinct patid) into pmnprescribingsd   from pmnprescribing; 
 select count(distinct patid) into pmndispensingsd   from pmndispensing; 
 
@@ -2147,12 +2149,12 @@ begin
 
 DELETE FROM pmndispensing;
 DELETE FROM pmnprescribing;
-DELETE FROM pmnprocedure;
+DELETE FROM pmnprocedures;
 DELETE FROM pmndiagnosis;
 DELETE FROM pmncondition;
 DELETE FROM pmnvital;
 DELETE FROM pmnenrollment;
-DELETE FROM pmnlabresults_cm;
+DELETE FROM pmnlab_result_cm;
 DELETE FROM pmndeath;
 DELETE FROM pmnencounter;
 DELETE FROM pmndemographic;
