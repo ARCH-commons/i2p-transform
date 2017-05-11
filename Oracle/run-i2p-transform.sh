@@ -26,7 +26,6 @@ set -e
 python load_csv.py harvest_local harvest_local.csv harvest_local.ctl pcornet_cdm_user pcornet_cdm
 python load_csv.py PMN_LabNormal pmn_labnormal.csv pmn_labnormal.ctl pcornet_cdm_user pcornet_cdm
 python load_csv.py lab_loinc_mapping lab_loinc_mapping.csv lab_loinc_mapping.ctl pcornet_cdm_user pcornet_cdm
-. ./load_pcornet_mapping.sh
 
 # Run some tests
 sqlplus /nolog <<EOF
@@ -72,26 +71,6 @@ set timing on;
 set linesize 3000;
 set pagesize 5000;
 
-WHENEVER SQLERROR CONTINUE;
-
-drop table DEMOGRAPHIC;
-drop table ENROLLMENT;
-drop table ENCOUNTER;
-drop table DIAGNOSIS;
-drop table PROCEDURES;
-drop table VITAL;
-drop table DISPENSING;
-drop table LAB_RESULT_CM;
-drop table CONDITION;
-drop table PRO_CM;
-drop table PRESCRIBING;
-drop table PCORNET_TRIAL;
-drop table DEATH;
-drop table DEATH_CAUSE;
-drop table HARVEST;
-
-WHENEVER SQLERROR EXIT SQL.SQLCODE;
-
 define i2b2_data_schema=${i2b2_data_schema}
 define i2b2_meta_schema=${i2b2_meta_schema}
 define i2b2_etl_schema=${i2b2_etl_schema}
@@ -104,12 +83,6 @@ define min_pat_list_date_dd_mon_rrrr=${min_pat_list_date_dd_mon_rrrr}
 define min_visit_date_dd_mon_rrrr=${min_visit_date_dd_mon_rrrr}
 define enrollment_months_back=${enrollment_months_back}
 define pcornet_cdm_user=${pcornet_cdm_user}
-
--- Local terminology mapping
-start pcornet_mapping.sql
-
--- Prepare for transform
-start gather_table_stats.sql
 
 -- SCILHS transform
 start PCORNetLoader_ora.sql
