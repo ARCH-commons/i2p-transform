@@ -40,7 +40,7 @@ EOF
 
 
 ########### Initialize Schema ###########
-if [ ${initialize_schema} == 'true']
+if [ ${initialize_schema} == 'true' ]
 then
 
 sqlplus /nolog <<EOF

@@ -1297,14 +1297,3 @@ begin
   end if;
 end PCORNetLoader;
 /
-
-
-BEGIN
-pcornetloader; --- you may want to run sql statements one by one in the pcornetloader procedure :)
-END;
-/
-
-select concept "Data Type",sourceval "From i2b2",destval "In PopMedNet", diff "Difference" from i2preport where RUNID = (select max(RUNID) from I2PREPORT);
-
-
-
