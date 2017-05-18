@@ -1210,44 +1210,92 @@ end pcornetReport;
 
 
 
-create or replace procedure pcornetloader as
+create or replace PROCEDURE PCORNetLoader(start_with VARCHAR2) AS
 begin
----pcornetclear;
-PCORNetDemographic;
-PCORNetEncounter;
-PCORNetDiagnosis;
-PCORNetCondition;
-PCORNetProcedure; 
-PCORNetVital;
-PCORNetEnroll;
-PCORNetLabResultCM;
-PCORNetPrescribing;
-
-/* ORA-04068: existing state of packages has been discarded
-ORA-04065: not executed, altered or dropped stored procedure "PCORNETDISPENSING"
-ORA-06508: PL/SQL: could not find program unit being called: "PCORNETDISPENSING"
-ORA-06512: at "PCORNETLOADER", line 14
-ORA-06512: at line 2
-04068. 00000 -  "existing state of packages%s%s%s has been discarded"
-*Cause:    One of errors 4060 - 4067 when attempt to execute a stored
-           procedure.
-*Action:   Try again after proper re-initialization of any application's
-           state.
-
-The above error only happens when we call PCORNetDispensing _and_ PCORNetPrescribing
-from within pcornetloader.  When running either individually, the error does not
-happen.
-
-Skipping dispensing as per gpc-dev notes:
-http://listserv.kumc.edu/pipermail/gpc-dev/attachments/20160223/8d79fa70/attachment-0001.pdf
-> LV: the dispensing side [?] is not mandatory? we just did Rx, since that
-> what we have in our i2b2
-*/
-PCORNetDispensing;
-PCORNetDeath;
-PCORNetHarvest;
-
-end pcornetloader;
+  if start_with in ('PCORNetDemographic') then
+    PCORNetDemographic;
+  end if;
+  
+  if start_with in ('PCORNetDemographic', 'PCORNetEncounter') then
+    PCORNetEncounter;
+  end if;
+  
+  if start_with in (
+    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis'
+  ) then 
+    PCORNetDiagnosis;
+  end if;
+  
+  if start_with in (
+    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
+    'PCORNetCondition'
+    ) then
+      PCORNetCondition;
+  end if;
+  
+  if start_with in (
+    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
+    'PCORNetCondition', 'PCORNetProcedure'
+    ) then
+      PCORNetProcedure;
+  end if;
+  
+  if start_with in (
+    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
+    'PCORNetCondition', 'PCORNetProcedure', 'PCORNetVital'
+    ) then
+      PCORNetVital;
+  end if;
+  
+  if start_with in (
+    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
+    'PCORNetCondition', 'PCORNetProcedure', 'PCORNetVital', 'PCORNetEnroll'
+    ) then
+      PCORNetEnroll;
+  end if;
+  
+  if start_with in (
+    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
+    'PCORNetCondition', 'PCORNetProcedure', 'PCORNetVital', 'PCORNetEnroll',
+    'PCORNetLabResultCM'
+    ) then
+      PCORNetLabResultCM;
+  end if;
+  
+  if start_with in (
+    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
+    'PCORNetCondition', 'PCORNetProcedure', 'PCORNetVital', 'PCORNetEnroll',
+    'PCORNetLabResultCM', 'PCORNetPrescribing'
+    ) then
+      PCORNetPrescribing;
+  end if;
+  
+  if start_with in (
+    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
+    'PCORNetCondition', 'PCORNetProcedure', 'PCORNetVital', 'PCORNetEnroll',
+    'PCORNetLabResultCM', 'PCORNetPrescribing', 'PCORNetDispensing'
+    ) then
+      PCORNetDispensing;
+  end if;
+  
+  if start_with in (
+    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
+    'PCORNetCondition', 'PCORNetProcedure', 'PCORNetVital', 'PCORNetEnroll',
+    'PCORNetLabResultCM', 'PCORNetPrescribing', 'PCORNetDispensing',
+    'PCORNetDeath'
+    ) then
+      PCORNetDeath;
+  end if;
+  
+  if start_with in (
+    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
+    'PCORNetCondition', 'PCORNetProcedure', 'PCORNetVital', 'PCORNetEnroll',
+    'PCORNetLabResultCM', 'PCORNetPrescribing', 'PCORNetDispensing',
+    'PCORNetDeath', 'PCORNetHarvest'
+    ) then
+      PCORNetHarvest;
+  end if;
+end PCORNetLoader;
 /
 
 
