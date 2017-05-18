@@ -249,7 +249,7 @@ END;
 /
 
 CREATE TABLE enrollment (
-	PATID number(38,0) NOT NULL,
+	PATID varchar(50) NOT NULL,
 	ENR_START_DATE date NOT NULL,
 	ENR_END_DATE date NULL,
 	CHART varchar(1) NULL,
@@ -268,8 +268,8 @@ END;
 
 CREATE TABLE vital (
 	VITALID varchar(19)  primary key,
-	PATID number(38,0) NULL,
-	ENCOUNTERID number(38,0) NULL,
+	PATID varchar(50) NULL,
+	ENCOUNTERID varchar(50) NULL,
 	MEASURE_DATE date NULL,
 	MEASURE_TIME varchar(5) NULL,
 	VITAL_SOURCE varchar(2) NULL,
@@ -318,8 +318,8 @@ END;
 
 CREATE TABLE procedures(
 	PROCEDURESID varchar(19)  primary key,
-	PATID number(38,0) NOT NULL,
-	ENCOUNTERID number(38,0) NOT NULL,
+	PATID varchar(50) NOT NULL,
+	ENCOUNTERID varchar(50) NOT NULL,
 	ENC_TYPE varchar(2) NULL,
 	ADMIT_DATE date NULL,
 	PROVIDERID varchar(50) NULL,
@@ -355,8 +355,8 @@ END;
 
 CREATE TABLE diagnosis(
 	DIAGNOSISID varchar(19)  primary key,
-	PATID number(38,0) NOT NULL,
-	ENCOUNTERID number(38,0) NOT NULL,
+	PATID varchar(50) NOT NULL,
+	ENCOUNTERID varchar(50) NOT NULL,
 	ENC_TYPE varchar(2) NULL,
 	ADMIT_DATE date NULL,
 	PROVIDERID varchar(50) NULL,
@@ -397,8 +397,8 @@ END;
 
 CREATE TABLE lab_result_cm(
 	LAB_RESULT_CM_ID varchar(19)  primary key,
-	PATID number(38,0) NOT NULL,
-	ENCOUNTERID number(38,0) NULL,
+	PATID varchar(50) NOT NULL,
+	ENCOUNTERID varchar(50) NULL,
 	LAB_NAME varchar(10) NULL,
 	SPECIMEN_SOURCE varchar(10) NULL,
 	LAB_LOINC varchar(10) NULL,
@@ -453,7 +453,7 @@ PMN_DROPSQL('DROP TABLE death');
 END;
 /
 CREATE TABLE death(
-	PATID number(38,0) NOT NULL,
+	PATID varchar(50) NOT NULL,
 	DEATH_DATE date NOT NULL,
 	DEATH_DATE_IMPUTE varchar(2) NULL,
 	DEATH_SOURCE varchar(2) NOT NULL,
@@ -466,7 +466,7 @@ PMN_DROPSQL('DROP TABLE death_cause');
 END;
 /
 CREATE TABLE death_cause(
-	PATID number(38,0) NOT NULL,
+	PATID varchar(50) NOT NULL,
 	DEATH_CAUSE varchar(8) NOT NULL,
 	DEATH_CAUSE_CODE varchar(2) NOT NULL,
 	DEATH_CAUSE_TYPE varchar(2) NOT NULL,
@@ -481,7 +481,7 @@ END;
 /
 CREATE TABLE dispensing(
 	DISPENSINGID varchar(19)  primary key,
-	PATID number(38,0) NOT NULL,
+	PATID varchar(50) NOT NULL,
 	PRESCRIBINGID varchar(19)  NULL,
 	DISPENSE_DATE date NOT NULL,
 	NDC varchar (11) NOT NULL,
@@ -522,8 +522,8 @@ END;
 /
 CREATE TABLE prescribing(
 	PRESCRIBINGID varchar(19)  primary key,
-	PATID number(38,0) NOT NULL,
-	ENCOUNTERID number(38,0) NULL,
+	PATID varchar(50) NOT NULL,
+	ENCOUNTERID  varchar(50) NULL,
 	RX_PROVIDERID varchar(50) NULL, -- NOTE: The spec has a _ before the ID, but this is inconsistent.
 	RX_ORDER_DATE date NULL,
 	RX_ORDER_TIME varchar (5) NULL,
@@ -562,7 +562,7 @@ PMN_DROPSQL('DROP TABLE pcornet_trial');
 END;
 /
 CREATE TABLE pcornet_trial(
-	PATID number(38,0) NOT NULL,
+	PATID varchar(50) NOT NULL,
 	TRIALID varchar(20) NOT NULL,
 	PARTICIPANTID varchar(50) NOT NULL,
 	TRIAL_SITEID varchar(50) NULL,
@@ -579,8 +579,8 @@ END;
 /
 CREATE TABLE condition(
 	CONDITIONID varchar(19)  primary key,
-	PATID number(38,0) NOT NULL,
-	ENCOUNTERID number(38,0) NULL,
+	PATID varchar(50) NOT NULL,
+	ENCOUNTERID  varchar(50) NULL,
 	REPORT_DATE  date NULL,
 	RESOLVE_DATE  date NULL,
 	ONSET_DATE  date NULL,
@@ -618,8 +618,8 @@ END;
 /
 CREATE TABLE pro_cm(
 	PRO_CM_ID varchar(19)  primary key,
-	PATID number(38,0) NOT NULL,
-	ENCOUNTERID number(38,0) NULL,
+	PATID varchar(50) NOT NULL,
+	ENCOUNTERID  varchar(50) NULL,
 	PRO_ITEM varchar (7) NOT NULL,
 	PRO_LOINC varchar (10) NULL,
 	PRO_DATE date NOT NULL,
@@ -703,8 +703,8 @@ PMN_DROPSQL('DROP TABLE encounter');
 END;
 /
 CREATE TABLE encounter(
-	PATID number(38,0) NOT NULL,
-	ENCOUNTERID number(38,0) NOT NULL,
+	PATID varchar(50) NOT NULL,
+	ENCOUNTERID varchar(50) NOT NULL,
 	ADMIT_DATE date NULL,
 	ADMIT_TIME varchar(5) NULL,
 	DISCHARGE_DATE date NULL,
@@ -732,7 +732,7 @@ PMN_DROPSQL('DROP TABLE demographic');
 END;
 /
 CREATE TABLE demographic(
-	PATID number(38,0) NOT NULL,
+	PATID varchar(50) NOT NULL,
 	BIRTH_DATE date NULL,
 	BIRTH_TIME varchar(5) NULL,
 	SEX varchar(2) NULL,
