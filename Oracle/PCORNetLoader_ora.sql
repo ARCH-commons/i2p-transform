@@ -24,6 +24,8 @@
 
 create or replace procedure PCORNetDemographic as 
 
+execute immediate 'truncate table demographic';
+
 sqltext varchar2(4000); 
 cursor getsql is 
 --1 --  S,R,NH
@@ -193,6 +195,8 @@ begin
 PMN_DROPSQL('drop index encounter_patid');
 PMN_DROPSQL('drop index encounter_encounterid');
 
+execute immediate 'truncate table encounter';
+
 insert into encounter(PATID,ENCOUNTERID,admit_date ,ADMIT_TIME , 
 		DISCHARGE_DATE ,DISCHARGE_TIME ,PROVIDERID ,FACILITY_LOCATION  
 		,ENC_TYPE ,FACILITYID ,DISCHARGE_DISPOSITION , 
@@ -243,6 +247,8 @@ begin
 
 PMN_DROPSQL('drop index diagnosis_patid');
 PMN_DROPSQL('drop index diagnosis_encounterid');
+
+execute immediate 'truncate table diagnosis';
 
 PMN_DROPSQL('DROP TABLE sourcefact'); -- associated indexes will be dropped as well
 
@@ -355,6 +361,8 @@ begin
 PMN_DROPSQL('drop index condition_patid');
 PMN_DROPSQL('drop index condition_encounterid');
 
+execute immediate 'truncate table condition';
+
 PMN_DROPSQL('DROP TABLE sourcefact2');
 
 sqltext := 'create table sourcefact2 as '||
@@ -407,6 +415,8 @@ begin
 PMN_DROPSQL('drop index procedures_patid');
 PMN_DROPSQL('drop index procedures_encounterid');
 
+execute immediate 'truncate table procedures';
+
 insert into procedures( 
 				patid,			encounterid,	enc_type, admit_date, px_date, providerid, px, px_type, px_source) 
 select  distinct fact.patient_num, enc.encounterid,	enc.enc_type, enc.admit_date, fact.start_date, 
@@ -436,6 +446,8 @@ begin
 
 PMN_DROPSQL('drop index vital_patid');
 PMN_DROPSQL('drop index vital_encounterid');
+
+execute immediate 'truncate table vital';
 
 -- jgk: I took out admit_date - it doesn't appear in the scheme. Now in SQLServer format - date, substring, name on inner select, no nested with. Added modifiers and now use only pathnames, not codes.
 insert into vital(patid, encounterid, measure_date, measure_time,vital_source,ht, wt, diastolic, systolic, original_bmi, bp_position,smoking,tobacco,tobacco_type)
@@ -527,6 +539,8 @@ begin
 
 PMN_DROPSQL('drop index enrollment_patid');
 
+execute immediate 'truncate table enrollment';
+
 INSERT INTO enrollment(PATID, ENR_START_DATE, ENR_END_DATE, CHART, ENR_BASIS) 
 with pats_delta as (
   -- If only one visit, visit_delta_days will be 0
@@ -597,6 +611,8 @@ begin
 
 PMN_DROPSQL('drop index lab_result_cm_patid');
 PMN_DROPSQL('drop index lab_result_cm_encounterid');
+
+execute immediate 'truncate table lab_result_cm'; 
 
 PMN_DROPSQL('DROP TABLE priority');
 
@@ -734,6 +750,8 @@ END PCORNetLabResultCM;
 create or replace procedure PCORNetHarvest as
 begin
 
+execute immediate 'truncate table harvest';
+
 INSERT INTO harvest(NETWORKID, NETWORK_NAME, DATAMARTID, DATAMART_NAME, DATAMART_PLATFORM, CDM_VERSION, DATAMART_CLAIMS, DATAMART_EHR, BIRTH_DATE_MGMT, ENR_START_DATE_MGMT, ENR_END_DATE_MGMT, ADMIT_DATE_MGMT, DISCHARGE_DATE_MGMT, PX_DATE_MGMT, RX_ORDER_DATE_MGMT, RX_START_DATE_MGMT, RX_END_DATE_MGMT, DISPENSE_DATE_MGMT, LAB_ORDER_DATE_MGMT, SPECIMEN_DATE_MGMT, RESULT_DATE_MGMT, MEASURE_DATE_MGMT, ONSET_DATE_MGMT, REPORT_DATE_MGMT, RESOLVE_DATE_MGMT, PRO_DATE_MGMT, REFRESH_DEMOGRAPHIC_DATE, REFRESH_ENROLLMENT_DATE, REFRESH_ENCOUNTER_DATE, REFRESH_DIAGNOSIS_DATE, REFRESH_PROCEDURES_DATE, REFRESH_VITAL_DATE, REFRESH_DISPENSING_DATE, REFRESH_LAB_RESULT_CM_DATE, REFRESH_CONDITION_DATE, REFRESH_PRO_CM_DATE, REFRESH_PRESCRIBING_DATE, REFRESH_PCORNET_TRIAL_DATE, REFRESH_DEATH_DATE, REFRESH_DEATH_CAUSE_DATE) 
 	select '&&network_id', '&&network_name', getDataMartID(), getDataMartName(), getDataMartPlatform(), 3, hl.DATAMART_CLAIMS, hl.DATAMART_EHR, hl.BIRTH_DATE_MGMT, hl.ENR_START_DATE_MGMT, hl.ENR_END_DATE_MGMT, hl.ADMIT_DATE_MGMT, hl.DISCHARGE_DATE_MGMT, hl.PX_DATE_MGMT, hl.RX_ORDER_DATE_MGMT, hl.RX_START_DATE_MGMT, hl.RX_END_DATE_MGMT, hl.DISPENSE_DATE_MGMT, hl.LAB_ORDER_DATE_MGMT, hl.SPECIMEN_DATE_MGMT, hl.RESULT_DATE_MGMT, hl.MEASURE_DATE_MGMT, hl.ONSET_DATE_MGMT, hl.REPORT_DATE_MGMT, hl.RESOLVE_DATE_MGMT, hl.PRO_DATE_MGMT,
   case when (select count(*) from demographic) > 0 then current_date else null end REFRESH_DEMOGRAPHIC_DATE,
@@ -830,6 +848,7 @@ begin
 PMN_DROPSQL('drop index prescribing_patid');
 PMN_DROPSQL('drop index prescribing_encounterid');
 
+execute immediate 'truncate table prescribing';
 
 PMN_DROPSQL('DROP TABLE basis');
 sqltext := 'create table basis as '||
@@ -989,9 +1008,11 @@ whenever sqlerror exit;
 create or replace procedure PCORNetDispensing as
 sqltext varchar2(4000);
 begin
-/*
+
 PMN_DROPSQL('drop index dispensing_patid');
 
+execute immediate 'truncate table dispensing';
+/*
 PMN_DROPSQL('DROP TABLE supply');
 sqltext := 'create table supply as '||
 '(select nval_num,encounter_num,concept_cd from i2b2fact supply '||
@@ -1118,6 +1139,8 @@ end PCORNetDispensing;
 create or replace procedure PCORNetDeath as
 
 begin
+  
+execute immediate 'truncate table death';
 
 insert into death( patid, death_date, death_date_impute, death_source, death_match_confidence) 
 select distinct pat.patient_num, pat.death_date,
