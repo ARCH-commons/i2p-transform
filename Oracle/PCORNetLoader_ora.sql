@@ -197,6 +197,19 @@ PMN_DROPSQL('drop index encounter_encounterid');
 
 execute immediate 'truncate table encounter';
 
+PMN_DROPSQL('DROP TABLE drg'); -- associated indexes will be dropped as well
+
+sqltext := 'create table drg as '||
+  'select * from' ||
+  'select patient_num,encounter_num,drg_type, drg,row_number() over (partition by  patient_num, encounter_num order by drg_type desc) AS rn from '||
+  '(select patient_num,encounter_num,drg_type,max(drg) drg  from '||
+  '(select distinct f.patient_num,encounter_num,SUBSTR(c_fullname,22,2) drg_type,SUBSTR(pcori_basecode,INSTR(pcori_basecode, ':')+1,3) drg from i2b2fact f  '||
+  'inner join demographic d on f.patient_num=d.patid '||
+  'inner join pcornet_enc enc on enc.c_basecode  = f.concept_cd '||
+  ' and enc.c_fullname like ''\PCORI\ENCOUNTER\DRG\%'') drg1 group by patient_num,encounter_num,drg_type) drg '||
+  'where rn=1';
+PMN_EXECUATESQL(sqltext);
+
 insert into encounter(PATID,ENCOUNTERID,admit_date ,ADMIT_TIME , 
 		DISCHARGE_DATE ,DISCHARGE_TIME ,PROVIDERID ,FACILITY_LOCATION  
 		,ENC_TYPE ,FACILITYID ,DISCHARGE_DISPOSITION , 
@@ -215,15 +228,7 @@ select distinct v.patient_num, v.encounter_num,
   drg.drg, drg_type, 
   CASE WHEN admitting_source IS NULL THEN 'NI' ELSE admitting_source END admitting_source
 from i2b2visit v inner join demographic d on v.patient_num=d.patid
-left outer join 
-   (select * from
-   (select patient_num,encounter_num,drg_type, drg,row_number() over (partition by  patient_num, encounter_num order by drg_type desc) AS rn from 
-   (select patient_num,encounter_num,drg_type,max(drg) drg  from
-    (select distinct f.patient_num,encounter_num,SUBSTR(c_fullname,22,2) drg_type,SUBSTR(pcori_basecode,INSTR(pcori_basecode, ':')+1,3) drg from i2b2fact f 
-     inner join demographic d on f.patient_num=d.patid
-     inner join pcornet_enc enc on enc.c_basecode  = f.concept_cd   
-      and enc.c_fullname like '\PCORI\ENCOUNTER\DRG\%') drg1 group by patient_num,encounter_num,drg_type) drg) drg
-     where rn=1) drg -- This section is bugfixed to only include 1 drg if multiple DRG types exist in a single encounter...
+left outer join drg -- This section is bugfixed to only include 1 drg if multiple DRG types exist in a single encounter...
   on drg.patient_num=v.patient_num and drg.encounter_num=v.encounter_num
 left outer join 
 -- Encounter type. Note that this requires a full table scan on the ontology table, so it is not particularly efficient.
