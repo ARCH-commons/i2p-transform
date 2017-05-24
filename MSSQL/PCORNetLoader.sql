@@ -1781,6 +1781,93 @@ where (basis.c_fullname is null or basis.c_fullname like '\PCORI_MOD\RX_BASIS\PR
 
 end
 GO
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------
+-- 9x. Prescribing alternative implementation 
+-- by Aaron Abend and Jeff Klann, PhD with optimizations by Griffin Weber, MD, PhD and Dan Vianello
+----------------------------------------------------------------------------------------------------------------------------------------
+-- You must have run the meds_schemachange proc to create the PCORI_NDC and PCORI_CUI columns
+-- TODO: The first encounter inner join seems to slow things down
+
+    DROP VIEW vw_pmnprescribing_loader
+    GO
+
+    CREATE VIEW vw_pmnprescribing_loader AS 
+     SELECT fact.patient_num,
+        fact.encounter_num,
+        fact.provider_id,
+        fact.start_date,
+        fact.end_date,
+        mo.pcori_cui,
+        fact.concept_cd,
+        fact.instance_num, 
+        max(case when mo.c_name is null then null else mo.c_name end) as c_name,
+        max(case when basis.c_basecode is null then null else basis.pcori_basecode end) as basis_basecode,
+        max(case when freq.c_basecode is null then null else freq.pcori_basecode end) as frequency_basecode,
+        max(case when quantity.c_basecode is null then null else fact.nval_num end) as quantity_nval,
+        max(case when refills.c_basecode is null then null else fact.nval_num end) as refills_nval,
+        max(case when supply.c_basecode is null then null else fact.nval_num end) as supply_nval
+       FROM pcornet_med mo
+         JOIN i2b2fact fact ON fact.concept_cd = mo.c_basecode
+         LEFT JOIN pcornet_med basis ON fact.modifier_cd = basis.c_basecode AND basis.c_fullname LIKE '\PCORI_MOD\RX_BASIS\PR%'
+         LEFT JOIN pcornet_med freq ON fact.modifier_cd = freq.c_basecode AND freq.c_fullname LIKE '\PCORI_MOD\RX_FREQUENCY%'
+         LEFT JOIN pcornet_med quantity ON fact.modifier_cd = quantity.c_basecode AND quantity.c_fullname LIKE '\PCORI_MOD\RX_QUANTITY%'
+         LEFT JOIN pcornet_med refills ON fact.modifier_cd = refills.c_basecode AND refills.c_fullname LIKE '\PCORI_MOD\RX_REFILLS%'
+         LEFT JOIN pcornet_med supply ON fact.modifier_cd = supply.c_basecode AND supply.c_fullname LIKE '\PCORI_MOD\RX_DAYS_SUPPLY%'
+       group by fact.patient_num,
+        fact.encounter_num,
+        fact.provider_id,
+        fact.start_date,
+        fact.end_date,
+        mo.pcori_cui,
+        fact.concept_cd,
+        fact.instance_num
+     GO
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'PCORNetPrescribingAlt') AND type in (N'P', N'PC')) DROP PROCEDURE PCORNetPrescribingAlt;
+GO
+create procedure PCORNetPrescribingAlt as
+begin
+     insert into pmnprescribing  
+       (PATID  
+       ,encounterid  
+       ,RX_PROVIDERID  
+       ,RX_ORDER_DATE
+       ,RX_ORDER_TIME
+       ,RX_START_DATE  
+       ,RX_END_DATE   
+       ,RXNORM_CUI
+       ,RX_QUANTITY
+       ,RX_REFILLS
+       ,RX_DAYS_SUPPLY
+       ,RX_FREQUENCY
+       ,RX_BASIS   
+       ,RAW_RX_MED_NAME
+     )  
+     SELECT distinct fact.patient_num as PATID 
+          , fact.encounter_num as encounterid 
+          , fact.provider_id as RX_PROVIDERID 
+          , fact.start_date as RX_ORDER_DATE 
+          , substring(convert(varchar,fact.start_date,8),1,5) as RX_ORDER_TIME 
+          , fact.start_date as RX_start_date 
+          , fact.end_date as RX_END_DATE 
+          , fact.pcori_cui as RXNORM_CUI 
+          , fact.quantity_nval as RX_QUANTITY 
+          , fact.refills_nval as RX_REFILLS  
+          , fact.supply_nval as RX_DAYS_SUPPLY  
+          , substring(frequency_basecode,charindex(':',frequency_basecode)+1,2) RX_FREQUENCY
+          , substring(basis_basecode,charindex(':',basis_basecode)+1,2) RX_BASIS
+          , substring(c_name,0,50) RAW_RX_MED_NAME
+       from pmnencounter enc  
+      inner join vw_pmnprescribing_loader fact 
+         on enc.patid = fact.patient_num  
+        and enc.encounterid= fact.encounter_Num
+
+end
+GO
+
 ----------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------------
 -- 9a. Dispensing - by Aaron Abend and Jeff Klann, PhD 
