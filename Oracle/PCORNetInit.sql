@@ -736,3 +736,131 @@ insert into i2preport (runid) values (0);
 pcornet_popcodelist;
 END;
 /
+
+
+/* TODO: When compiling PCORNetLabResultCM I got Error(106,17): 
+  PL/SQL: ORA-00942: table or view does not exist 
+apparently due to tables that the procedure references but also drops/recreates
+before reference.  Creating them outside the function solves the issue.  SQL
+copied from the function.
+
+In the same function, I got 
+  Error(63,123): PL/SQL: ORA-00904: "LAB"."PCORI_SPECIMEN_SOURCE": invalid identifier
+So, I just altered the table to have the referenced column.
+
+*/
+whenever sqlerror continue;
+drop table priority;
+drop table location;
+
+create table priority (
+  patient_num number(38,0),
+	encounter_num number(38,0),
+	provider_id varchar2(50 byte),
+	concept_cd varchar2(50 byte),
+	start_date date,
+	priority varchar2(50 byte)
+  );
+   
+create table location (	
+  patient_num number(38,0), 
+	encounter_num number(38,0), 
+	provider_id varchar2(50 byte), 
+	concept_cd varchar2(50 byte), 
+	start_date date, 
+	result_loc varchar2(50 byte)
+  );
+
+alter table "&&i2b2_meta_schema".pcornet_lab add (
+  pcori_specimen_source varchar2(1000) -- arbitrary
+  );
+whenever sqlerror exit;
+
+
+/* TODO: When compiling PCORNetPrescribing, I got Error(93,15): 
+  PL/SQL: ORA-00942: table or view does not exist
+At compile time, it's complaining about the fact tables don't exist that are 
+created in the function itself.  I created them ahead of time - SQL taken from
+the procedure.
+*/
+whenever sqlerror continue;
+drop table basis;
+drop table freq;
+drop table quantity;
+drop table refills;
+drop table supply;
+
+create table basis (
+  pcori_basecode varchar2(50 byte), 
+  c_fullname varchar2(700 byte), 
+  encounter_num number(38,0), 
+  concept_cd varchar2(50 byte),
+  instance_num number(18,0),
+  start_date date,
+  provider_id varchar2(50 byte),
+  modifier_cd varchar2(100 byte)
+  ) ;
+  
+create table freq (
+  pcori_basecode varchar2(50 byte), 
+  encounter_num number(38,0), 
+  concept_cd varchar2(50 byte),
+  instance_num number(18,0),
+  start_date date,
+  provider_id varchar2(50 byte),
+  modifier_cd varchar2(100 byte)
+  );
+
+create table quantity(
+  nval_num number(18,5), 
+  encounter_num number(38,0), 
+  concept_cd varchar2(50 byte),
+  instance_num number(18,0),
+  start_date date,
+  provider_id varchar2(50 byte),
+  modifier_cd varchar2(100 byte)
+  );
+  
+create table refills(
+  nval_num number(18,5), 
+  encounter_num number(38,0), 
+  concept_cd varchar2(50 byte),
+  instance_num number(18,0),
+  start_date date,
+  provider_id varchar2(50 byte),
+  modifier_cd varchar2(100 byte)
+  );
+
+create table supply(
+  nval_num number(18,5), 
+  encounter_num number(38,0), 
+  concept_cd varchar2(50 byte),
+  instance_num number(18,0),
+  start_date date,
+  provider_id varchar2(50 byte),
+  modifier_cd varchar2(100 byte)
+  );
+
+whenever sqlerror exit;
+
+
+/* TODO: When compiling PCORNetDispensing:
+
+Error(53,16): PL/SQL: ORA-00942: table or view does not exist (amount)
+ - supply, also used, is created above in the prescribing function
+
+Also, Error(57,57): PL/SQL: ORA-00904: "MO"."PCORI_NDC": invalid identifier
+*/
+whenever sqlerror continue;
+drop table amount;
+
+create table amount(
+  nval_num number(18,5), 
+	encounter_num number(38,0), 
+	concept_cd varchar2(50 byte)
+  ); 
+
+alter table "&&i2b2_meta_schema".pcornet_med add (
+  pcori_ndc varchar2(1000) -- arbitrary
+  );
+whenever sqlerror exit;
