@@ -24,8 +24,6 @@
 
 create or replace procedure PCORNetDemographic as 
 
-execute immediate 'truncate table demographic';
-
 sqltext varchar2(4000); 
 cursor getsql is 
 --1 --  S,R,NH
@@ -162,6 +160,8 @@ pcornet_popcodelist;
 
 PMN_DROPSQL('drop index demographic_patid');
 
+execute immediate 'truncate table demographic';
+
 OPEN getsql;
 LOOP
 FETCH getsql INTO sqltext;
@@ -203,7 +203,7 @@ sqltext := 'create table drg as '||
   'select * from' ||
   'select patient_num,encounter_num,drg_type, drg,row_number() over (partition by  patient_num, encounter_num order by drg_type desc) AS rn from '||
   '(select patient_num,encounter_num,drg_type,max(drg) drg  from '||
-  '(select distinct f.patient_num,encounter_num,SUBSTR(c_fullname,22,2) drg_type,SUBSTR(pcori_basecode,INSTR(pcori_basecode, ':')+1,3) drg from i2b2fact f  '||
+  '(select distinct f.patient_num,encounter_num,SUBSTR(c_fullname,22,2) drg_type,SUBSTR(pcori_basecode,INSTR(pcori_basecode, '':'')+1,3) drg from i2b2fact f  '||
   'inner join demographic d on f.patient_num=d.patid '||
   'inner join pcornet_enc enc on enc.c_basecode  = f.concept_cd '||
   ' and enc.c_fullname like ''\PCORI\ENCOUNTER\DRG\%'') drg1 group by patient_num,encounter_num,drg_type) drg '||
