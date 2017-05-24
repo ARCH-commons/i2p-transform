@@ -12,6 +12,19 @@
 
 *12/16/14* - release of "version 5" for SQL Server, which transforms all sections of CDM v1.5 except for unit conversions and code translation on visit_dimension columns.  
 
+- Version 5 by Jeff Klann, PhD; derived from version 4.1 and with contributions from Dan Connolly and Nathan Graham for vitals transformation
+- Version 4.1 by Aaron Abend, aaronabend@gmail.com, 978-621-7745
+- TODO: Code translation on encounter columns, unit conversion on vitals
+- 5.0 Now transforms vitals, enrollment (encounter basis), encounters (new columns and DRGs), speed improvements in diagnosis, bugfixes in procedures
+- 4.0 Splits HIB/HIW/etc codes into race and hispanic 
+- 3.8 Removed Duplicates due to invalid codes introduced by use of isnull
+- 3.6 Properly handle hispanic in the race_cd column
+- 3.5 Properly handle null sex and null race 
+- 3.4 fixed date formats in diagnosis, fixed extra/missing rows in diagnosis, removed unchecked drop statements
+- 3.3 fixes diagnoses to not miss unmapped PDX code
+- 3.2 fixes demographics - does not miss patients with unmapped sex or unmapped race
+- 3.1. puts admit diagnosis modifier in dx_source of pmn
+
 *3/19/15* - release of loyalty cohort transform script
 
 ## Version 5.1 for MSSQL (8/20/15)
@@ -50,6 +63,7 @@
 - MSSQL and Oracle versions are once again equivalent. 
 - Versioning schema changed from 6.x to 0.6.x
 - Migrated to GitHub
+- bugfix in tobbaco_type logic in vitals, 12/17/15
 
 # Version 0.6.2 for Oracle (1/6/15)
 
@@ -65,4 +79,7 @@
 - Wrong data type found in pmnprescribing (RX_FREQUENCY)
 - tobbaco_type logic in vitals was faulty
 
+# Version 0.6.5 for MSSQL
 
+- Version 0.6.5, Harvest leading zero was still a bug!; wrong column referenced in pcornetprocedure; added simple (non-ontology) death transform; duplicate code in i2preport
+- Version 0.6.4, Harvest leading zero bug, px_type default
