@@ -1,8 +1,7 @@
 # Change Log
 
-## [Unreleased](https://github.com/SCILHS/i2p-transform/tree/HEAD)
-
-[Full Changelog](https://github.com/SCILHS/i2p-transform/compare/v0.6.1-beta...HEAD)
+## [2.1](https://github.com/SCILHS/i2p-transform/tree/2.1) (2017-05-24)
+[Full Changelog](https://github.com/SCILHS/i2p-transform/compare/v0.6.1-beta...2.1)
 
 **Implemented enhancements:**
 
