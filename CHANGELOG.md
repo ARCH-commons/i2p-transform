@@ -1,5 +1,14 @@
 # Change Log
 
+## [Unreleased](https://github.com/SCILHS/i2p-transform/tree/HEAD)
+
+[Full Changelog](https://github.com/SCILHS/i2p-transform/compare/2.1...HEAD)
+
+**Implemented enhancements:**
+
+- Make loyalty cohort optional [\#56](https://github.com/SCILHS/i2p-transform/issues/56)
+- Integrate run script into PCORnetLoader [\#54](https://github.com/SCILHS/i2p-transform/issues/54)
+
 ## [2.1](https://github.com/SCILHS/i2p-transform/tree/2.1) (2017-05-24)
 [Full Changelog](https://github.com/SCILHS/i2p-transform/compare/v0.6.1-beta...2.1)
 
