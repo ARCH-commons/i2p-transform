@@ -1116,48 +1116,64 @@ end pcornetReport;
 
 
 
-create or replace PROCEDURE PCORNetLoader(start_with VARCHAR2) AS
+create or replace PROCEDURE PCORNetLoader(start_with VARCHAR2, 
+  release_name VARCHAR2, build_num NUMBER, data_source VARCHAR2
+) AS
 begin
   if start_with in ('PCORNetDemographic') then
+    LogTaskStart(release_name, 'PCORNetDemographic', build_num, data_source);
     PCORNetDemographic;
+    LogTaskComplete(release_name, 'PCORNetDemographic', build_num, 'DEMOGRAPHIC');
   end if;
   
   if start_with in ('PCORNetDemographic', 'PCORNetEncounter') then
+    LogTaskStart(release_name, 'PCORNetEncounter', build_num, data_source);
     PCORNetEncounter;
+    LogTaskComplete(release_name, 'PCORNetEncounter', build_num, data_source);
   end if;
   
   if start_with in (
     'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis'
   ) then 
+    LogTaskStart(release_name, 'PCORNetDiagnosis', build_num, data_source);
     PCORNetDiagnosis;
+    LogTaskComplete(release_name, 'PCORNetDiagnosis', build_num, data_source);
   end if;
   
   if start_with in (
     'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
     'PCORNetCondition'
     ) then
+      LogTaskStart(release_name, 'PCORNetCondition', build_num, data_source);
       PCORNetCondition;
+      LogTaskComplete(release_name, 'PCORNetCondition', build_num, data_source);
   end if;
   
   if start_with in (
     'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
     'PCORNetCondition', 'PCORNetProcedure'
     ) then
+      LogTaskStart(release_name, 'PCORNetProcedure', build_num, data_source);
       PCORNetProcedure;
+      LogTaskComplete(release_name, 'PCORNetProcedure', build_num, data_source);
   end if;
   
   if start_with in (
     'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
     'PCORNetCondition', 'PCORNetProcedure', 'PCORNetVital'
     ) then
+      LogTaskStart(release_name, 'PCORNetVital', build_num, data_source);
       PCORNetVital;
+      LogTaskComplete(release_name, 'PCORNetVital', build_num, data_source);
   end if;
   
   if start_with in (
     'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
     'PCORNetCondition', 'PCORNetProcedure', 'PCORNetVital', 'PCORNetEnroll'
     ) then
+      LogTaskStart(release_name, 'PCORNetEnroll', build_num, data_source);
       PCORNetEnroll;
+      LogTaskComplete(release_name, 'PCORNetEnroll', build_num, data_source);
   end if;
   
   if start_with in (
@@ -1165,7 +1181,9 @@ begin
     'PCORNetCondition', 'PCORNetProcedure', 'PCORNetVital', 'PCORNetEnroll',
     'PCORNetLabResultCM'
     ) then
+      LogTaskStart(release_name, 'PCORNetLabResultCM', build_num, data_source);
       PCORNetLabResultCM;
+      LogTaskComplete(release_name, 'PCORNetLabResultCM', build_num, data_source);
   end if;
   
   if start_with in (
@@ -1173,7 +1191,9 @@ begin
     'PCORNetCondition', 'PCORNetProcedure', 'PCORNetVital', 'PCORNetEnroll',
     'PCORNetLabResultCM', 'PCORNetPrescribing'
     ) then
+      LogTaskStart(release_name, 'PCORNetPrescribing', build_num, data_source);
       PCORNetPrescribing;
+      LogTaskComplete(release_name, 'PCORNetPrescribing', build_num, data_source);
   end if;
   
   if start_with in (
@@ -1181,7 +1201,9 @@ begin
     'PCORNetCondition', 'PCORNetProcedure', 'PCORNetVital', 'PCORNetEnroll',
     'PCORNetLabResultCM', 'PCORNetPrescribing', 'PCORNetDispensing'
     ) then
+      LogTaskStart(release_name, 'PCORNetDispensing', build_num, data_source);
       PCORNetDispensing;
+      LogTaskComplete(release_name, 'PCORNetDispensing', build_num, data_source);
   end if;
   
   if start_with in (
@@ -1190,7 +1212,9 @@ begin
     'PCORNetLabResultCM', 'PCORNetPrescribing', 'PCORNetDispensing',
     'PCORNetDeath'
     ) then
+      LogTaskStart(release_name, 'PCORNetDeath', build_num, data_source);
       PCORNetDeath;
+      LogTaskComplete(release_name, 'PCORNetDeath', build_num, data_source);
   end if;
   
   if start_with in (
@@ -1199,7 +1223,9 @@ begin
     'PCORNetLabResultCM', 'PCORNetPrescribing', 'PCORNetDispensing',
     'PCORNetDeath', 'PCORNetHarvest'
     ) then
+      LogTaskStart(release_name, 'PCORNetHarvest', build_num, data_source);
       PCORNetHarvest;
+      LogTaskComplete(release_name, 'PCORNetHarvest', build_num, data_source);
   end if;
 end PCORNetLoader;
 /
