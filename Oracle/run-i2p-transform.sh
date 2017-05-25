@@ -117,7 +117,7 @@ set linesize 3000;
 set pagesize 5000;
 
 -- Run transform
-execute PCORNetLoader('${start_with}', '${release_name}', '${build_num}', $'{data_source}');
+execute PCORNetLoader('${start_with}', '${release_name}', '${BUILD_NUMBER}', $'{data_source}');
 EOF
 
 fi

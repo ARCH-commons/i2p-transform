@@ -1,8 +1,8 @@
 --------------------------------------------------------------------------------
 -- PCORNetLogging Script
 --
--- This file contains the Oracle SQL needed to create the logging table and 
--- associated sequence.
+-- This file contains the Oracle SQL needed to create the logging table, the  
+-- associated sequence, and procedures for manipulating the log table.
 --------------------------------------------------------------------------------
 
 
@@ -12,7 +12,7 @@ whenever sqlerror exit;
 
 create table i2p_task_log (
   task_num number(8) not null,
-  cdm_release varchar(48) not null,
+  release_name varchar(48) not null,
   task_name varchar(48) not null,
   build_num number(8) not null,
   started date not null,
@@ -39,6 +39,7 @@ begin
   insert into i2p_task_log (task_num, release_name, task_name, build_num, started, data_source)
   values (i2p_task_seq.nextval, r_name, t_name, b_num, sysdate, d_source);
 end LogTaskStart;
+/
 
 
 create or replace procedure LogTaskComplete(r_name varchar2, t_name varchar2, b_num number, target_table varchar2) as
@@ -52,3 +53,4 @@ begin
   '  and build_num=''' || b_num || ''''
   ;
 end LogTaskComplete;
+/
