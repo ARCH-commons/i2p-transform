@@ -203,11 +203,11 @@ CREATE TABLE [dbo].[pmnVITAL](
 	[MEASURE_DATE] [datetime] NULL,
 	[MEASURE_TIME] [varchar](5) NULL,
 	[VITAL_SOURCE] [varchar](2) NULL,
-    [HT] [numeric](18, 0) NULL, -- 8,0
-	[WT] [numeric](18, 0) NULL, -- 8,0
-	[DIASTOLIC] [numeric](18, 0) NULL, --  4,0
-	[SYSTOLIC] [numeric](18, 0) NULL, -- 4,0
-    [ORIGINAL_BMI] [numeric](18,0) NULL, -- 8,0
+    [HT] [numeric](15, 8) NULL, -- 8,0
+	[WT] [numeric](15, 8) NULL, -- 8,0
+	[DIASTOLIC] [numeric](15, 8) NULL, --  4,0
+	[SYSTOLIC] [numeric](15, 8) NULL, -- 4,0
+    [ORIGINAL_BMI] [numeric](15,8) NULL, -- 8,0
 	[BP_POSITION] [varchar](2) NULL,
 	[SMOKING] [varchar] (2),
 	[TOBACCO] [varchar] (2),
@@ -279,6 +279,7 @@ CREATE TABLE [dbo].[pmndiagnosis](
 	[DX] [varchar](18) NOT NULL,
 	[DX_TYPE] [varchar](2) NOT NULL,
 	[DX_SOURCE] [varchar](2) NOT NULL,
+    [DX_ORIGIN] [varchar] (2) NULL,
 	[PDX] [varchar](2) NULL,
 	[RAW_DX] [varchar](50) NULL,
 	[RAW_DX_TYPE] [varchar](50) NULL,
@@ -324,7 +325,7 @@ CREATE TABLE [dbo].[pmnlab_result_cm]( --Modified on 2/6/17 from labresults_cm t
 	[RESULT_DATE] [datetime] NOT NULL,
 	[RESULT_TIME] [varchar](5) NULL,
 	[RESULT_QUAL] [varchar](12) NULL,
-	[RESULT_NUM] [decimal] (18,5) NULL,
+	[RESULT_NUM] [decimal] (15,8) NULL,
 	[RESULT_MODIFIER] [varchar](2) NULL,
 	[RESULT_UNIT] [varchar](11) NULL,
 	[NORM_RANGE_LOW] [varchar](10) NULL,
@@ -451,8 +452,8 @@ CREATE TABLE [dbo].[pmndispensing](
 	[PRESCRIBINGID] [bigint] NULL, -- jgk fix 9/24
 	[DISPENSE_DATE] [datetime] NOT NULL,
 	[NDC] [varchar] (11) NOT NULL,
-	[DISPENSE_SUP] [int], 
-	[DISPENSE_AMT] [int], 
+	[DISPENSE_SUP] [numeric] (15, 8), 
+	[DISPENSE_AMT] [numeric] (15, 8), 
 	[RAW_NDC] [varchar] (50),
 	
 PRIMARY KEY NONCLUSTERED 
@@ -480,15 +481,18 @@ CREATE TABLE [dbo].[pmnprescribing](
 	[RX_ORDER_TIME] [varchar] (5) NULL,
 	[RX_START_DATE] [datetime] NULL,
 	[RX_END_DATE] [datetime] NULL,
-	[RX_QUANTITY] [int] NULL,
-	[RX_REFILLS] [int] NULL,
-	[RX_DAYS_SUPPLY] [int] NULL,
+	[RX_QUANTITY] [numeric] (15, 8) NULL,
+    [RX_QUANTITY_UNIT] [varchar] (2) NULL,
+	[RX_REFILLS] [numeric] (15, 8) NULL,
+	[RX_DAYS_SUPPLY] [numeric] (15, 8) NULL,
 	[RX_FREQUENCY] [varchar] (2) NULL, -- Data type error, fixed 1/11/16 jgk
 	[RX_BASIS] [varchar] (2) NULL,
-	[RXNORM_CUI] [int] NULL,
+	[RXNORM_CUI] [varchar] (8) NULL,
 	[RAW_RX_MED_NAME] [varchar] (50) NULL,
 	[RAW_RX_FREQUENCY] [varchar] (50) NULL,
 	[RAW_RXNORM_CUI] [varchar] (50) NULL,
+    [RAW_RX_QUANTITY] [varchar] (50) NULL,
+    [RAW_RX_NDC] [varchar] (50) NULL
 PRIMARY KEY NONCLUSTERED 
 (
 	[PRESCRIBINGID] ASC
@@ -563,11 +567,11 @@ CREATE TABLE [dbo].[pmnpro_cm](
 	[PRO_CM_ID] [bigint]  IDENTITY (1,1) NOT NULL,
 	[PATID] [varchar](50) NOT NULL,
 	[ENCOUNTERID]  [varchar](50) NULL,
-	[PRO_ITEM] [varchar] (7) NOT NULL,
+	[PRO_ITEM] [varchar] (20) NOT NULL,
 	[PRO_LOINC] [varchar] (10) NULL,
 	[PRO_DATE] [datetime] NOT NULL,
 	[PRO_TIME] [varchar] (5) NULL,
-	[PRO_RESPONSE] [int] NOT NULL,
+	[PRO_RESPONSE] [numeric] (15, 8) NOT NULL,
 	[PRO_METHOD] [varchar] (2) NULL,
 	[PRO_MODE] [varchar] (2) NULL,
 	[PRO_CAT] [varchar] (2) NULL,
@@ -589,7 +593,7 @@ CREATE TABLE [dbo].[pmnharvest](
 	[DATAMARTID] [varchar](10) NOT NULL,
 	[DATAMART_NAME] [varchar](20) NULL,
 	[DATAMART_PLATFORM] [varchar](2) NULL,
-	[CDM_VERSION] [numeric](8, 2) NULL,
+	[CDM_VERSION] [numeric](15, 8) NULL,
 	[DATAMART_CLAIMS] [varchar](2) NULL,
 	[DATAMART_EHR] [varchar](2) NULL,
 	[BIRTH_DATE_MGMT] [varchar](2) NULL,
@@ -686,12 +690,16 @@ CREATE TABLE [dbo].[pmndemographic](
 	[BIRTH_DATE] [datetime] NULL,
 	[BIRTH_TIME] [varchar](5) NULL,
 	[SEX] [varchar](2) NULL,
+    [SEXUAL_ORIENTATION] [varchar] (2) NULL,
+    [GENDER_IDENTITY] [varchar] (2) NULL,
 	[HISPANIC] [varchar](2) NULL,
     [BIOBANK_FLAG] [varchar](1),
 	[RACE] [varchar](2) NULL,
 	[RAW_SEX] [varchar](50) NULL,
 	[RAW_HISPANIC] [varchar](50) NULL,
 	[RAW_RACE] [varchar](50) NULL,
+    [EAW_SEXUAL_ORIENTATION] [varchar] (50) NULL,
+    [RAW_GENDER_IDENTITY] [varchar] (50) NULL
 PRIMARY KEY NONCLUSTERED 
 (
 	[PATID] ASC
@@ -1583,7 +1591,7 @@ INSERT INTO dbo.[pmnlabresults_cm]
 
 SELECT DISTINCT  M.patient_num patid,
 M.encounter_num encounterid,
-CASE WHEN ont_parent.C_BASECODE LIKE 'LAB_NAME%' then SUBSTRING (ont_parent.c_basecode,10, 10) ELSE 'NI' END LAB_NAME,
+CASE WHEN ont_parent.C_BASECODE LIKE 'LAB_NAME%' then SUBSTRING (ont_parent.c_basecode,10, 10) ELSE 'UN' END LAB_NAME,
 CASE WHEN lab.pcori_specimen_source like '%or SR_PLS' THEN 'SR_PLS' WHEN lab.pcori_specimen_source is null then 'NI' ELSE lab.pcori_specimen_source END specimen_source, -- (Better way would be to fix the column in the ontology but this will work)
 isnull(lab.pcori_basecode, 'NI') LAB_LOINC,
 isnull(p.PRIORITY,'NI') PRIORITY,
@@ -1600,9 +1608,9 @@ CASE WHEN m.ValType_Cd='N' THEN m.NVAL_NUM ELSE null END RESULT_NUM,
 CASE WHEN m.ValType_Cd='N' THEN (CASE isnull(nullif(m.TVal_Char,''),'NI') WHEN 'E' THEN 'EQ' WHEN 'NE' THEN 'OT' WHEN 'L' THEN 'LT' WHEN 'LE' THEN 'LE' WHEN 'G' THEN 'GT' WHEN 'GE' THEN 'GE' ELSE 'NI' END)  ELSE 'TX' END RESULT_MODIFIER,
 isnull(m.Units_CD,'NI') RESULT_UNIT, -- TODO: Should be standardized units
 nullif(norm.NORM_RANGE_LOW,'') NORM_RANGE_LOW
-,norm.NORM_MODIFIER_LOW,
+,isnull(norm.NORM_MODIFIER_LOW, 'UN') NORM_MODIFIER_LOW,
 nullif(norm.NORM_RANGE_HIGH,'') NORM_RANGE_HIGH
-,norm.NORM_MODIFIER_HIGH,
+,isnull(norm.NORM_MODIFIER_HIGH, 'UN') NORM_MODIFIER_HIGH,
 CASE isnull(nullif(m.VALUEFLAG_CD,''),'NI') WHEN 'H' THEN 'AH' WHEN 'L' THEN 'AL' WHEN 'A' THEN 'AB' ELSE 'NI' END ABN_IND,
 NULL [RAW_LAB_NAME],
 NULL [RAW_LAB_CODE],
@@ -1618,7 +1626,7 @@ inner join pmnENCOUNTER enc on enc.patid = m.patient_num and enc.encounterid = m
 inner join pcornet_lab lab on lab.c_basecode  = M.concept_cd and lab.c_fullname like '\PCORI\LAB_RESULT_CM\%'
 inner join pcornet_lab ont_loinc on lab.pcori_basecode=ont_loinc.pcori_basecode and ont_loinc.c_basecode like 'LOINC:%' --NOTE: You will need to change 'LOINC:' to our local term.
 inner JOIN pcornet_lab ont_parent on ont_loinc.c_path=ont_parent.c_fullname
-inner join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
+left outer join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
 
 
 LEFT OUTER JOIN

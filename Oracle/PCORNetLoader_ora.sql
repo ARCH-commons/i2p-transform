@@ -274,11 +274,11 @@ CREATE TABLE pmnVITAL (
 	MEASURE_DATE date NULL,
 	MEASURE_TIME varchar(5) NULL,
 	VITAL_SOURCE varchar(2) NULL,
-	HT number(18, 0) NULL, --8, 0
-	WT number(18, 0) NULL, --8, 0
-	DIASTOLIC number(18, 0) NULL,--4, 0
-	SYSTOLIC number(18, 0) NULL, --4, 0
-	ORIGINAL_BMI number(18,0) NULL,--8, 0
+	HT number(15, 8) NULL, --8, 0
+	WT number(15, 8) NULL, --8, 0
+	DIASTOLIC number(15, 8) NULL,--4, 0
+	SYSTOLIC number(15, 8) NULL, --4, 0
+	ORIGINAL_BMI number(15,8) NULL,--8, 0
 	BP_POSITION varchar(2) NULL,
 	SMOKING varchar (2),
 	TOBACCO varchar (2),
@@ -364,6 +364,7 @@ CREATE TABLE pmndiagnosis(
 	DX varchar(18) NOT NULL,
 	DX_TYPE varchar(2) NOT NULL,
 	DX_SOURCE varchar(2) NOT NULL,
+    DX_ORIGIN varchar (2) NULL,
 	PDX varchar(2) NULL,
 	RAW_DX varchar(50) NULL,
 	RAW_DX_TYPE varchar(50) NULL,
@@ -413,7 +414,7 @@ CREATE TABLE pmnlab_result_cm( --Modified on 2/6/17 from labresults_cm to lab_re
 	RESULT_DATE date NOT NULL,
 	RESULT_TIME varchar(5) NULL,
 	RESULT_QUAL varchar(12) NULL,
-	RESULT_NUM number (18,5) NULL,
+	RESULT_NUM number (15,8) NULL,
 	RESULT_MODIFIER varchar(2) NULL,
 	RESULT_UNIT varchar(11) NULL,
 	NORM_RANGE_LOW varchar(10) NULL,
@@ -546,8 +547,8 @@ CREATE TABLE pmndispensing(
 	PRESCRIBINGID NUMBER(19)  NULL, -- jgk fix 9/24
 	DISPENSE_DATE date NOT NULL,
 	NDC varchar (11) NOT NULL,
-	DISPENSE_SUP int, 
-	DISPENSE_AMT int, 
+	DISPENSE_SUP numeric (15,8), 
+	DISPENSE_AMT numeric (15,8), 
 	RAW_NDC varchar (50)
 )
 /
@@ -584,15 +585,18 @@ CREATE TABLE pmnprescribing(
 	RX_ORDER_TIME varchar (5) NULL,
 	RX_START_DATE date NULL,
 	RX_END_DATE date NULL,
-	RX_QUANTITY int NULL,
-	RX_REFILLS int NULL,
-	RX_DAYS_SUPPLY int NULL,
+	RX_QUANTITY numeric (15,8) NULL,
+    RX_QUANTITY_UNIT varchar (2) NULL,
+	RX_REFILLS numeric (15,8) NULL,
+	RX_DAYS_SUPPLY numeric (15,8) NULL,
 	RX_FREQUENCY varchar (2) NULL, -- Data type error, fixed 1/11/16 jgk
 	RX_BASIS varchar (2) NULL,
-	RXNORM_CUI int NULL,
+	RXNORM_CUI varchar (8) NULL,
 	RAW_RX_MED_NAME varchar (50) NULL,
 	RAW_RX_FREQUENCY varchar (50) NULL,
-	RAW_RXNORM_CUI varchar (50) NULL
+	RAW_RXNORM_CUI varchar (50) NULL,
+    RAW_RX_QUANTITY varchar (50) NULL,
+    RAW_RX_NDC varchar (50) NULL
 )
 /
 
@@ -675,11 +679,11 @@ CREATE TABLE pmnpro_cm(
 	PRO_CM_ID NUMBER(19)  primary key,
 	PATID varchar(50) NOT NULL,
 	ENCOUNTERID  varchar(50) NULL,
-	PRO_ITEM varchar (7) NOT NULL,
+	PRO_ITEM varchar (20) NOT NULL,
 	PRO_LOINC varchar (10) NULL,
 	PRO_DATE date NOT NULL,
 	PRO_TIME varchar (5) NULL,
-	PRO_RESPONSE int NOT NULL,
+	PRO_RESPONSE numeric (15, 8) NOT NULL,
 	PRO_METHOD varchar (2) NULL,
 	PRO_MODE varchar (2) NULL,
 	PRO_CAT varchar (2) NULL,
@@ -713,7 +717,7 @@ CREATE TABLE pmnharvest(
 	DATAMARTID varchar(10) NOT NULL,
 	DATAMART_NAME varchar(20) NULL,
 	DATAMART_PLATFORM varchar(2) NULL,
-	CDM_VERSION numeric(8, 2) NULL,
+	CDM_VERSION numeric(15, 8) NULL,
 	DATAMART_CLAIMS varchar(2) NULL,
 	DATAMART_EHR varchar(2) NULL,
 	BIRTH_DATE_MGMT varchar(2) NULL,
@@ -797,12 +801,16 @@ CREATE TABLE pmndemographic(
 	BIRTH_DATE date NULL,
 	BIRTH_TIME varchar(5) NULL,
 	SEX varchar(2) NULL,
+    SEXUAL_ORIENTATION varchar(2) NULL,
+    GENDER_IDENTITY varchar(2) NULL,
 	HISPANIC varchar(2) NULL,
 	BIOBANK_FLAG varchar(1) DEFAULT 'N',
 	RACE varchar(2) NULL,
 	RAW_SEX varchar(50) NULL,
 	RAW_HISPANIC varchar(50) NULL,
-	RAW_RACE varchar(50) NULL
+	RAW_RACE varchar(50) NULL,
+    RAW_SEXUAL_ORIENTATION varchar(50) NULL,
+    RAW_GENDER_IDENTITY varchar(50) NULL
 )
 /
 
