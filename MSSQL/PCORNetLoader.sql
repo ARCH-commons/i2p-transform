@@ -701,7 +701,7 @@ CREATE TABLE [dbo].[pmndemographic](
 	[RAW_SEX] [varchar](50) NULL,
 	[RAW_HISPANIC] [varchar](50) NULL,
 	[RAW_RACE] [varchar](50) NULL,
-    [EAW_SEXUAL_ORIENTATION] [varchar] (50) NULL,
+    [RAW_SEXUAL_ORIENTATION] [varchar] (50) NULL,
     [RAW_GENDER_IDENTITY] [varchar] (50) NULL
 PRIMARY KEY NONCLUSTERED 
 (
