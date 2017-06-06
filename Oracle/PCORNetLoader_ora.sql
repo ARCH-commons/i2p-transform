@@ -570,7 +570,7 @@ select distinct patient_num, encounter_num, provider_id, concept_cd, start_date,
 from i2b2fact
 inner join encounter enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num
 inner join pcornet_lab lsource on i2b2fact.modifier_cd =lsource.c_basecode
-where c_fullname LIKE '\PCORI_MOD\PRIORITY\%');
+where c_fullname LIKE '\PCORI_MOD\PRIORITY\%';
 
 execute immediate 'create index priority_idx on priority (patient_num, encounter_num, provider_id, concept_cd, start_date)';
 GATHER_TABLE_STATS('PRIORITY');
