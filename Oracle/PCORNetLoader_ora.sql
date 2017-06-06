@@ -203,7 +203,7 @@ select * from
 (select distinct f.patient_num,encounter_num,SUBSTR(c_fullname,22,2) drg_type,SUBSTR(pcori_basecode,INSTR(pcori_basecode, ':')+1,3) drg from i2b2fact f
 inner join demographic d on f.patient_num=d.patid
 inner join pcornet_enc enc on enc.c_basecode  = f.concept_cd
-and enc.c_fullname like ''\PCORI\ENCOUNTER\DRG\%'') drg1 group by patient_num,encounter_num,drg_type) drg) drg
+and enc.c_fullname like '\PCORI\ENCOUNTER\DRG\%') drg1 group by patient_num,encounter_num,drg_type) drg) drg
 where rn=1;
 
 execute immediate 'create index drg_idx on drg (patient_num, encounter_num)';
@@ -232,7 +232,7 @@ left outer join drg -- This section is bugfixed to only include 1 drg if multipl
 left outer join 
 -- Encounter type. Note that this requires a full table scan on the ontology table, so it is not particularly efficient.
 (select patient_num, encounter_num, inout_cd,SUBSTR(pcori_basecode,INSTR(pcori_basecode, ':')+1,2) pcori_enctype from i2b2visit v
- inner join pcornet_enc e on c_dimcode like '%'''||inout_cd||'''%' and e.c_fullname like '\PCORI\ENCOUNTER\ENC_TYPE\%') enctype
+ inner join pcornet_enc e on c_dimcode like '%'||inout_cd||'%' and e.c_fullname like '\PCORI\ENCOUNTER\ENC_TYPE\%') enctype
   on enctype.patient_num=v.patient_num and enctype.encounter_num=v.encounter_num;
 
 execute immediate 'create index encounter_idx on encounter (PATID, ENCOUNTERID)';
@@ -254,7 +254,7 @@ execute immediate 'truncate table diagnosis';
 execute immediate 'truncate table sourcefact';
 execute immediate 'truncate table pdxfact';
 
-insert into table sourcefact
+insert into sourcefact
 	select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode dxsource, dxsource.c_fullname
 	from i2b2fact factline
     inner join encounter enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num
@@ -264,7 +264,7 @@ insert into table sourcefact
 execute immediate 'create index sourcefact_idx on sourcefact (patient_num, encounter_num, provider_id, concept_cd, start_date)';
 GATHER_TABLE_STATS('SOURCEFACT');
 
-insert into table pdxfact
+insert into pdxfact
 	select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode pdxsource,dxsource.c_fullname
 	from i2b2fact factline
     inner join encounter enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num
@@ -737,7 +737,7 @@ execute immediate 'truncate table quantity';
 execute immediate 'truncate table refills';
 execute immediate 'truncate table supply';
 
-insert into table basis
+insert into basis
 select pcori_basecode,c_fullname,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd from i2b2medfact basis
         inner join encounter enc on enc.patid = basis.patient_num and enc.encounterid = basis.encounter_Num
      join pcornet_med basiscode
@@ -747,7 +747,7 @@ select pcori_basecode,c_fullname,instance_num,start_date,provider_id,concept_cd,
 execute immediate 'create unique index basis_idx on basis (instance_num, start_date, provider_id, concept_cd, encounter_num, modifier_cd)';
 GATHER_TABLE_STATS('BASIS');
 
-insert into table freq
+insert into freq
 select pcori_basecode,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd from i2b2medfact freq
         inner join encounter enc on enc.patid = freq.patient_num and enc.encounterid = freq.encounter_Num
      join pcornet_med freqcode
@@ -757,7 +757,7 @@ select pcori_basecode,instance_num,start_date,provider_id,concept_cd,encounter_n
 execute immediate 'create unique index freq_idx on freq (instance_num, start_date, provider_id, concept_cd, encounter_num, modifier_cd)';
 GATHER_TABLE_STATS('FREQ');
 
-insert into table quantity
+insert into quantity
 select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd from i2b2medfact quantity
         inner join encounter enc on enc.patid = quantity.patient_num and enc.encounterid = quantity.encounter_Num
      join pcornet_med quantitycode
@@ -767,7 +767,7 @@ select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,mod
 execute immediate 'create unique index quantity_idx on quantity (instance_num, start_date, provider_id, concept_cd, encounter_num, modifier_cd)';
 GATHER_TABLE_STATS('QUANTITY');
         
-insert into table refills
+insert into refills
 select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd from i2b2medfact refills
         inner join encounter enc on enc.patid = refills.patient_num and enc.encounterid = refills.encounter_Num
      join pcornet_med refillscode
@@ -777,7 +777,7 @@ select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,mod
 execute immediate 'create unique index refills_idx on refills (instance_num, start_date, provider_id, concept_cd, encounter_num, modifier_cd)';
 GATHER_TABLE_STATS('REFILLS');
         
-insert into table supply
+insert into supply
 select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd from i2b2medfact supply
         inner join encounter enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num
      join pcornet_med supplycode
