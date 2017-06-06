@@ -1129,7 +1129,7 @@ begin
   if start_with in ('PCORNetDemographic', 'PCORNetEncounter') then
     LogTaskStart(release_name, 'PCORNetEncounter', build_num, data_source);
     PCORNetEncounter;
-    LogTaskComplete(release_name, 'PCORNetEncounter', build_num, data_source);
+    LogTaskComplete(release_name, 'PCORNetEncounter', build_num, 'ENCOUNTER');
   end if;
   
   if start_with in (
@@ -1137,7 +1137,7 @@ begin
   ) then 
     LogTaskStart(release_name, 'PCORNetDiagnosis', build_num, data_source);
     PCORNetDiagnosis;
-    LogTaskComplete(release_name, 'PCORNetDiagnosis', build_num, data_source);
+    LogTaskComplete(release_name, 'PCORNetDiagnosis', build_num, 'DIAGNOSIS');
   end if;
   
   if start_with in (
@@ -1146,7 +1146,7 @@ begin
     ) then
       LogTaskStart(release_name, 'PCORNetCondition', build_num, data_source);
       PCORNetCondition;
-      LogTaskComplete(release_name, 'PCORNetCondition', build_num, data_source);
+      LogTaskComplete(release_name, 'PCORNetCondition', build_num, 'CONDITION');
   end if;
   
   if start_with in (
@@ -1155,7 +1155,7 @@ begin
     ) then
       LogTaskStart(release_name, 'PCORNetProcedure', build_num, data_source);
       PCORNetProcedure;
-      LogTaskComplete(release_name, 'PCORNetProcedure', build_num, data_source);
+      LogTaskComplete(release_name, 'PCORNetProcedure', build_num, 'PROCEDURE');
   end if;
   
   if start_with in (
@@ -1164,7 +1164,7 @@ begin
     ) then
       LogTaskStart(release_name, 'PCORNetVital', build_num, data_source);
       PCORNetVital;
-      LogTaskComplete(release_name, 'PCORNetVital', build_num, data_source);
+      LogTaskComplete(release_name, 'PCORNetVital', build_num, 'VITAL');
   end if;
   
   if start_with in (
@@ -1173,7 +1173,7 @@ begin
     ) then
       LogTaskStart(release_name, 'PCORNetEnroll', build_num, data_source);
       PCORNetEnroll;
-      LogTaskComplete(release_name, 'PCORNetEnroll', build_num, data_source);
+      LogTaskComplete(release_name, 'PCORNetEnroll', build_num, 'ENROLLMENT');
   end if;
   
   if start_with in (
@@ -1183,7 +1183,7 @@ begin
     ) then
       LogTaskStart(release_name, 'PCORNetLabResultCM', build_num, data_source);
       PCORNetLabResultCM;
-      LogTaskComplete(release_name, 'PCORNetLabResultCM', build_num, data_source);
+      LogTaskComplete(release_name, 'PCORNetLabResultCM', build_num, 'LAB_RESULT_CM');
   end if;
   
   if start_with in (
@@ -1193,7 +1193,7 @@ begin
     ) then
       LogTaskStart(release_name, 'PCORNetPrescribing', build_num, data_source);
       PCORNetPrescribing;
-      LogTaskComplete(release_name, 'PCORNetPrescribing', build_num, data_source);
+      LogTaskComplete(release_name, 'PCORNetPrescribing', build_num, 'PRESCRIBING');
   end if;
   
   if start_with in (
@@ -1203,7 +1203,7 @@ begin
     ) then
       LogTaskStart(release_name, 'PCORNetDispensing', build_num, data_source);
       PCORNetDispensing;
-      LogTaskComplete(release_name, 'PCORNetDispensing', build_num, data_source);
+      LogTaskComplete(release_name, 'PCORNetDispensing', build_num, 'DISPENSING');
   end if;
   
   if start_with in (
@@ -1214,7 +1214,7 @@ begin
     ) then
       LogTaskStart(release_name, 'PCORNetDeath', build_num, data_source);
       PCORNetDeath;
-      LogTaskComplete(release_name, 'PCORNetDeath', build_num, data_source);
+      LogTaskComplete(release_name, 'PCORNetDeath', build_num, 'DEATH');
   end if;
   
   if start_with in (
@@ -1225,7 +1225,7 @@ begin
     ) then
       LogTaskStart(release_name, 'PCORNetHarvest', build_num, data_source);
       PCORNetHarvest;
-      LogTaskComplete(release_name, 'PCORNetHarvest', build_num, data_source);
+      LogTaskComplete(release_name, 'PCORNetHarvest', build_num, 'HARVEST');
   end if;
 end PCORNetLoader;
 /
