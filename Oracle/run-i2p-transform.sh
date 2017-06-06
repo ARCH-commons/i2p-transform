@@ -123,7 +123,7 @@ EOF
 fi
 
 
-########### Run Post Proc Cleanup / Stats / Tests ###########
+########### Run Stats / Tests ###########
 sqlplus /nolog <<EOF
 connect ${pcornet_cdm_user}/${pcornet_cdm}
 
@@ -134,9 +134,6 @@ set pagesize 5000;
 
 define pcornet_cdm_user=${pcornet_cdm_user}
 define i2b2_data_schema=${i2b2_data_schema}
-
--- Post-process steps
-start cdm_postproc.sql
 
 -- Report stats
 start cdm_stats.sql

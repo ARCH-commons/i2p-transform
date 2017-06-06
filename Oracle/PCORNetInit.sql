@@ -1,3 +1,8 @@
+
+--------------------------------------------------------------------------------
+-- HELPER FUNCTIONS AND PROCEDURES
+--------------------------------------------------------------------------------
+
 create or replace PROCEDURE GATHER_TABLE_STATS(table_name VARCHAR2) AS 
   BEGIN
   DBMS_STATS.GATHER_TABLE_STATS (
@@ -10,6 +15,7 @@ create or replace PROCEDURE GATHER_TABLE_STATS(table_name VARCHAR2) AS
 END GATHER_TABLE_STATS;
 /
 
+
 create or replace PROCEDURE PMN_DROPSQL(sqlstring VARCHAR2) AS 
   BEGIN
       EXECUTE IMMEDIATE sqlstring;
@@ -17,6 +23,7 @@ create or replace PROCEDURE PMN_DROPSQL(sqlstring VARCHAR2) AS
       WHEN OTHERS THEN NULL;
 END PMN_DROPSQL;
 /
+
 
 create or replace FUNCTION PMN_IFEXISTS(objnamestr VARCHAR2, objtypestr VARCHAR2) RETURN BOOLEAN AS 
 cnt NUMBER;
@@ -47,6 +54,7 @@ BEGIN
 END PMN_ExecuateSQL;
 /
 
+
 --ACK: http://dba.stackexchange.com/questions/9441/how-to-catch-and-handle-only-specific-oracle-exceptions
 create or replace procedure create_error_table(table_name varchar2) as
 sqltext varchar2(4000); 
@@ -67,8 +75,30 @@ end;
 /
 
 
+create or replace FUNCTION GETDATAMARTID RETURN VARCHAR2 IS 
+BEGIN 
+    RETURN '&&datamart_id';
+END;
+/
 
 
+CREATE OR REPLACE FUNCTION GETDATAMARTNAME RETURN VARCHAR2 AS 
+BEGIN 
+    RETURN '&&datamart_name';
+END;
+/
+
+
+CREATE OR REPLACE FUNCTION GETDATAMARTPLATFORM RETURN VARCHAR2 AS 
+BEGIN 
+    RETURN '02'; -- 01 is MSSQL, 02 is Oracle
+END;
+/
+
+
+--------------------------------------------------------------------------------
+-- I2B2 SYNONYMS, VIEWS, AND INTERMEDIARY TABLES
+--------------------------------------------------------------------------------
 
 
 CREATE OR REPLACE SYNONYM I2B2FACT FOR "&&i2b2_data_schema".OBSERVATION_FACT
@@ -95,7 +125,6 @@ create or replace VIEW i2b2patient as select * from "&&i2b2_data_schema".PATIENT
 create or replace view i2b2visit as select * from "&&i2b2_data_schema".VISIT_DIMENSION where START_DATE >= to_date('&&min_visit_date_dd_mon_rrrr','dd-mon-rrrr') and (END_DATE is NULL or END_DATE < CURRENT_DATE) and (START_DATE <CURRENT_DATE)
 /
 
-
 CREATE OR REPLACE SYNONYM pcornet_med FOR  "&&i2b2_meta_schema".pcornet_med
 /
 
@@ -117,23 +146,10 @@ CREATE OR REPLACE SYNONYM pcornet_vital FOR  "&&i2b2_meta_schema".pcornet_vital
 CREATE OR REPLACE SYNONYM pcornet_enc FOR  "&&i2b2_meta_schema".pcornet_enc
 /
 
-create or replace FUNCTION GETDATAMARTID RETURN VARCHAR2 IS 
-BEGIN 
-    RETURN '&&datamart_id';
-END;
-/
 
-CREATE OR REPLACE FUNCTION GETDATAMARTNAME RETURN VARCHAR2 AS 
-BEGIN 
-    RETURN '&&datamart_name';
-END;
-/
-
-CREATE OR REPLACE FUNCTION GETDATAMARTPLATFORM RETURN VARCHAR2 AS 
-BEGIN 
-    RETURN '02'; -- 01 is MSSQL, 02 is Oracle
-END;
-/
+--------------------------------------------------------------------------------
+-- I2P REPORT
+--------------------------------------------------------------------------------
 
 /* TODO: Consider building the loyalty cohort as designed: 
 https://github.com/njgraham/SCILHS-utils/blob/master/LoyaltyCohort/LoyaltyCohort-ora.sql
@@ -148,9 +164,10 @@ BEGIN
 PMN_DROPSQL('DROP TABLE pcornet_codelist');
 END;
 /
-
 create table pcornet_codelist(codetype varchar2(20), code varchar2(50))
 /
+
+
 create or replace procedure pcornet_parsecode (codetype in varchar, codestring in varchar) as
 
 tex varchar(2000);
@@ -191,7 +208,6 @@ end pcornet_parsecode;
 /
 
 
-
 create or replace procedure pcornet_popcodelist as
 
 codedata varchar(2000);
@@ -205,7 +221,6 @@ select 'SEX',c_dimcode from pcornet_demo where c_fullname like '\PCORI\DEMOGRAPH
 union
 select 'HISPANIC',c_dimcode from pcornet_demo where c_fullname like '\PCORI\DEMOGRAPHIC\HISPANIC%';
 
-
 begin
 open getcodesql;
 LOOP 
@@ -218,14 +233,51 @@ close getcodesql ;
 end pcornet_popcodelist;
 /
 
+BEGIN
+PMN_DROPSQL('DROP TABLE i2pReport');
+END;
+/
+create table i2pReport (runid number, rundate date, concept varchar(20), sourceval number, destval number, diff number)
+/
+
+BEGIN
+insert into i2preport (runid) values (0);
+pcornet_popcodelist;
+END;
+/
 
 
+--------------------------------------------------------------------------------
+-- DEMOGRAPHIC
+--------------------------------------------------------------------------------
+
+BEGIN
+PMN_DROPSQL('DROP TABLE demographic');
+END;
+/
+CREATE TABLE demographic(
+	PATID varchar(50) NOT NULL,
+	BIRTH_DATE date NULL,
+	BIRTH_TIME varchar(5) NULL,
+	SEX varchar(2) NULL,
+	HISPANIC varchar(2) NULL,
+	BIOBANK_FLAG varchar(1) DEFAULT 'N',
+	RACE varchar(2) NULL,
+	RAW_SEX varchar(50) NULL,
+	RAW_HISPANIC varchar(50) NULL,
+	RAW_RACE varchar(50) NULL
+)
+/
+
+
+--------------------------------------------------------------------------------
+-- ENROLLMENT
+--------------------------------------------------------------------------------
 
 BEGIN
 PMN_DROPSQL('DROP TABLE enrollment');
 END;
 /
-
 CREATE TABLE enrollment (
 	PATID varchar(50) NOT NULL,
 	ENR_START_DATE date NOT NULL,
@@ -238,99 +290,61 @@ CREATE TABLE enrollment (
 /
 
 
+--------------------------------------------------------------------------------
+-- ENCOUNTER
+--------------------------------------------------------------------------------
 
 BEGIN
-PMN_DROPSQL('DROP TABLE vital');
+PMN_DROPSQL('DROP TABLE encounter');
 END;
 /
-
-CREATE TABLE vital (
-	VITALID varchar(19)  primary key,
-	PATID varchar(50) NULL,
-	ENCOUNTERID varchar(50) NULL,
-	MEASURE_DATE date NULL,
-	MEASURE_TIME varchar(5) NULL,
-	VITAL_SOURCE varchar(2) NULL,
-	HT number(18, 0) NULL, --8, 0
-	WT number(18, 0) NULL, --8, 0
-	DIASTOLIC number(18, 0) NULL,--4, 0
-	SYSTOLIC number(18, 0) NULL, --4, 0
-	ORIGINAL_BMI number(18,0) NULL,--8, 0
-	BP_POSITION varchar(2) NULL,
-	SMOKING varchar (2),
-	TOBACCO varchar (2),
-	TOBACCO_TYPE varchar (2),
-	RAW_VITAL_SOURCE varchar(50) NULL,
-	RAW_HT varchar(50) NULL,
-	RAW_WT varchar(50) NULL,
-	RAW_DIASTOLIC varchar(50) NULL,
-	RAW_SYSTOLIC varchar(50) NULL,
-	RAW_BP_POSITION varchar(50) NULL,
-	RAW_SMOKING varchar (50),
-	Raw_TOBACCO varchar (50),
-	Raw_TOBACCO_TYPE varchar (50)
-)
-/
-
-BEGIN
-PMN_DROPSQL('DROP SEQUENCE vital_seq');
-END;
-/
-
-create sequence  vital_seq
-/
-
-create or replace trigger vital_trg
-before insert on vital
-for each row
-begin
-  select vital_seq.nextval into :new.VITALID from dual;
-end;
-/
-
-
-BEGIN
-PMN_DROPSQL('DROP TABLE procedures');
-END;
-/
-
-CREATE TABLE procedures(
-	PROCEDURESID varchar(19)  primary key,
+CREATE TABLE encounter(
 	PATID varchar(50) NOT NULL,
 	ENCOUNTERID varchar(50) NOT NULL,
-	ENC_TYPE varchar(2) NULL,
 	ADMIT_DATE date NULL,
+	ADMIT_TIME varchar(5) NULL,
+	DISCHARGE_DATE date NULL,
+	DISCHARGE_TIME varchar(5) NULL,
 	PROVIDERID varchar(50) NULL,
-	PX_DATE date NULL,
-	PX varchar(11) NOT NULL,
-	PX_TYPE varchar(2) NOT NULL,
-	PX_SOURCE varchar(2) NULL,
-	RAW_PX varchar(50) NULL,
-	RAW_PX_TYPE varchar(50) NULL
+	FACILITY_LOCATION varchar(3) NULL,
+	ENC_TYPE varchar(2) NOT NULL,
+	FACILITYID varchar(50) NULL,
+	DISCHARGE_DISPOSITION varchar(2) NULL,
+	DISCHARGE_STATUS varchar(2) NULL,
+	DRG varchar(3) NULL,
+	DRG_TYPE varchar(2) NULL,
+	ADMITTING_SOURCE varchar(2) NULL,
+	RAW_SITEID varchar (50) NULL,
+	RAW_ENC_TYPE varchar(50) NULL,
+	RAW_DISCHARGE_DISPOSITION varchar(50) NULL,
+	RAW_DISCHARGE_STATUS varchar(50) NULL,
+	RAW_DRG_TYPE varchar(50) NULL,
+	RAW_ADMITTING_SOURCE varchar(50) NULL
 )
 /
 
 BEGIN
-PMN_DROPSQL('DROP sequence  procedures_seq');
+PMN_DROPSQL('DROP TABLE drg');
 END;
 /
-
-create sequence  procedures_seq
+CREATE TABLE drg (
+  PATIENT_NUM NUMBER(38) NOT NULL, 
+  ENCOUNTER_NUM NUMBER(38) NOT NULL, 
+  DRG_TYPE VARCHAR2(2), 
+  DRG VARCHAR2(3), 
+  RN NUMBER
+)
 /
 
-create or replace trigger procedures_trg
-before insert on procedures
-for each row
-begin
-  select procedures_seq.nextval into :new.PROCEDURESID from dual;
-end;
-/
+
+--------------------------------------------------------------------------------
+-- DIAGNOSIS
+--------------------------------------------------------------------------------
 
 BEGIN
 PMN_DROPSQL('DROP TABLE diagnosis');
 END;
 /
-
 CREATE TABLE diagnosis(
 	DIAGNOSISID varchar(19)  primary key,
 	PATID varchar(50) NOT NULL,
@@ -365,14 +379,138 @@ begin
 end;
 /
 
+BEGIN
+PMN_DROPSQL('DROP TABLE sourcefact');
+END;
+/
+
+CREATE TABLE SOURCEFACT  ( 
+	PATIENT_NUM  	NUMBER(38) NOT NULL,
+	ENCOUNTER_NUM	NUMBER(38) NOT NULL,
+	PROVIDER_ID  	VARCHAR2(50) NOT NULL,
+	CONCEPT_CD   	VARCHAR2(50) NOT NULL,
+	START_DATE   	DATE NOT NULL,
+	DXSOURCE     	VARCHAR2(50) NULL,
+	C_FULLNAME   	VARCHAR2(700) NOT NULL 
+	)
+/
+
+BEGIN
+PMN_DROPSQL('DROP TABLE pdxfact');
+END;
+/
+
+CREATE TABLE PDXFACT  ( 
+	PATIENT_NUM  	NUMBER(38) NOT NULL,
+	ENCOUNTER_NUM	NUMBER(38) NOT NULL,
+	PROVIDER_ID  	VARCHAR2(50) NOT NULL,
+	CONCEPT_CD   	VARCHAR2(50) NOT NULL,
+	START_DATE   	DATE NOT NULL,
+	PDXSOURCE    	VARCHAR2(50) NULL,
+	C_FULLNAME   	VARCHAR2(700) NOT NULL 
+	)
+/
+
+--------------------------------------------------------------------------------
+-- PROCEDURES
+--------------------------------------------------------------------------------
+
+BEGIN
+PMN_DROPSQL('DROP TABLE procedures');
+END;
+/
+CREATE TABLE procedures(
+	PROCEDURESID varchar(19)  primary key,
+	PATID varchar(50) NOT NULL,
+	ENCOUNTERID varchar(50) NOT NULL,
+	ENC_TYPE varchar(2) NULL,
+	ADMIT_DATE date NULL,
+	PROVIDERID varchar(50) NULL,
+	PX_DATE date NULL,
+	PX varchar(11) NOT NULL,
+	PX_TYPE varchar(2) NOT NULL,
+	PX_SOURCE varchar(2) NULL,
+	RAW_PX varchar(50) NULL,
+	RAW_PX_TYPE varchar(50) NULL
+)
+/
+
+BEGIN
+PMN_DROPSQL('DROP sequence  procedures_seq');
+END;
+/
+create sequence  procedures_seq
+/
+
+create or replace trigger procedures_trg
+before insert on procedures
+for each row
+begin
+  select procedures_seq.nextval into :new.PROCEDURESID from dual;
+end;
+/
 
 
+--------------------------------------------------------------------------------
+-- VITAL
+--------------------------------------------------------------------------------
+
+BEGIN
+PMN_DROPSQL('DROP TABLE vital');
+END;
+/
+CREATE TABLE vital (
+	VITALID varchar(19)  primary key,
+	PATID varchar(50) NULL,
+	ENCOUNTERID varchar(50) NULL,
+	MEASURE_DATE date NULL,
+	MEASURE_TIME varchar(5) NULL,
+	VITAL_SOURCE varchar(2) NULL,
+	HT number(18, 0) NULL, --8, 0
+	WT number(18, 0) NULL, --8, 0
+	DIASTOLIC number(18, 0) NULL,--4, 0
+	SYSTOLIC number(18, 0) NULL, --4, 0
+	ORIGINAL_BMI number(18,0) NULL,--8, 0
+	BP_POSITION varchar(2) NULL,
+	SMOKING varchar (2),
+	TOBACCO varchar (2),
+	TOBACCO_TYPE varchar (2),
+	RAW_VITAL_SOURCE varchar(50) NULL,
+	RAW_HT varchar(50) NULL,
+	RAW_WT varchar(50) NULL,
+	RAW_DIASTOLIC varchar(50) NULL,
+	RAW_SYSTOLIC varchar(50) NULL,
+	RAW_BP_POSITION varchar(50) NULL,
+	RAW_SMOKING varchar (50),
+	Raw_TOBACCO varchar (50),
+	Raw_TOBACCO_TYPE varchar (50)
+)
+/
+
+BEGIN
+PMN_DROPSQL('DROP SEQUENCE vital_seq');
+END;
+/
+create sequence  vital_seq
+/
+
+create or replace trigger vital_trg
+before insert on vital
+for each row
+begin
+  select vital_seq.nextval into :new.VITALID from dual;
+end;
+/
+
+
+--------------------------------------------------------------------------------
+-- LAB_RESULT_CM
+--------------------------------------------------------------------------------
 
 BEGIN
 PMN_DROPSQL('DROP TABLE lab_result_cm');
 END;
 /
-
 CREATE TABLE lab_result_cm(
 	LAB_RESULT_CM_ID varchar(19)  primary key,
 	PATID varchar(50) NOT NULL,
@@ -408,12 +546,10 @@ CREATE TABLE lab_result_cm(
 )
 /
 
-
 BEGIN
 PMN_DROPSQL('DROP SEQUENCE lab_result_cm_seq');
 END;
 /
-
 create sequence  lab_result_cm_seq
 /
 
@@ -425,131 +561,45 @@ begin
 end;
 /
 
-
 BEGIN
-PMN_DROPSQL('DROP TABLE death');
+PMN_DROPSQL('DROP TABLE priority');
 END;
 /
-CREATE TABLE death(
-	PATID varchar(50) NOT NULL,
-	DEATH_DATE date NOT NULL,
-	DEATH_DATE_IMPUTE varchar(2) NULL,
-	DEATH_SOURCE varchar(2) NOT NULL,
-	DEATH_MATCH_CONFIDENCE varchar(2) NULL
-)
-/
 
-BEGIN
-PMN_DROPSQL('DROP TABLE death_cause');
-END;
-/
-CREATE TABLE death_cause(
-	PATID varchar(50) NOT NULL,
-	DEATH_CAUSE varchar(8) NOT NULL,
-	DEATH_CAUSE_CODE varchar(2) NOT NULL,
-	DEATH_CAUSE_TYPE varchar(2) NOT NULL,
-	DEATH_CAUSE_SOURCE varchar(2) NOT NULL,
-	DEATH_CAUSE_CONFIDENCE varchar(2) NULL
-)
+CREATE TABLE PRIORITY  ( 
+	PATIENT_NUM  	NUMBER(38) NOT NULL,
+	ENCOUNTER_NUM	NUMBER(38) NOT NULL,
+	PROVIDER_ID  	VARCHAR2(50) NOT NULL,
+	CONCEPT_CD   	VARCHAR2(50) NOT NULL,
+	START_DATE   	DATE NOT NULL,
+	PRIORITY     	VARCHAR2(50) NULL 
+	)
 /
 
 BEGIN
-PMN_DROPSQL('DROP TABLE dispensing');
+PMN_DROPSQL('DROP TABLE location');
 END;
 /
-CREATE TABLE dispensing(
-	DISPENSINGID varchar(19)  primary key,
-	PATID varchar(50) NOT NULL,
-	PRESCRIBINGID varchar(19)  NULL,
-	DISPENSE_DATE date NOT NULL,
-	NDC varchar (11) NOT NULL,
-	DISPENSE_SUP int, 
-	DISPENSE_AMT int, 
-	RAW_NDC varchar (50)
-)
+
+CREATE TABLE LOCATION  ( 
+	PATIENT_NUM  	NUMBER(38) NOT NULL,
+	ENCOUNTER_NUM	NUMBER(38) NOT NULL,
+	PROVIDER_ID  	VARCHAR2(50) NOT NULL,
+	CONCEPT_CD   	VARCHAR2(50) NOT NULL,
+	START_DATE   	DATE NOT NULL,
+	RESULT_LOC   	VARCHAR2(50) NULL 
+	)
 /
 
-
-BEGIN
-PMN_DROPSQL('DROP sequence  dispensing_seq');
-END;
-/
-create sequence  dispensing_seq
-/
-
-create or replace trigger dispensing_trg
-before insert on dispensing
-for each row
-begin
-  select dispensing_seq.nextval into :new.DISPENSINGID from dual;
-end;
-/
+-- TODO: This seems to belong in h2p-mapping
+alter table "&&i2b2_meta_schema".pcornet_lab add (
+  pcori_specimen_source varchar2(1000) -- arbitrary
+  );
 
 
-
-
-
-
-
-
-
-
-BEGIN
-PMN_DROPSQL('DROP TABLE prescribing');
-END;
-/
-CREATE TABLE prescribing(
-	PRESCRIBINGID varchar(19)  primary key,
-	PATID varchar(50) NOT NULL,
-	ENCOUNTERID  varchar(50) NULL,
-	RX_PROVIDERID varchar(50) NULL, -- NOTE: The spec has a _ before the ID, but this is inconsistent.
-	RX_ORDER_DATE date NULL,
-	RX_ORDER_TIME varchar (5) NULL,
-	RX_START_DATE date NULL,
-	RX_END_DATE date NULL,
-	RX_QUANTITY int NULL,
-	RX_REFILLS int NULL,
-	RX_DAYS_SUPPLY int NULL,
-	RX_FREQUENCY varchar(2) NULL,
-	RX_BASIS varchar (2) NULL,
-	RXNORM_CUI int NULL,
-	RAW_RX_MED_NAME varchar (50) NULL,
-	RAW_RX_FREQUENCY varchar (50) NULL,
-	RAW_RXNORM_CUI varchar (50) NULL
-)
-/
-
-
-BEGIN
-PMN_DROPSQL('DROP sequence  prescribing_seq');
-END;
-/
-create sequence  prescribing_seq
-/
-
-create or replace trigger prescribing_trg
-before insert on prescribing
-for each row
-begin
-  select prescribing_seq.nextval into :new.PRESCRIBINGID from dual;
-end;
-/
-
-BEGIN
-PMN_DROPSQL('DROP TABLE pcornet_trial');
-END;
-/
-CREATE TABLE pcornet_trial(
-	PATID varchar(50) NOT NULL,
-	TRIALID varchar(20) NOT NULL,
-	PARTICIPANTID varchar(50) NOT NULL,
-	TRIAL_SITEID varchar(50) NULL,
-	TRIAL_ENROLL_DATE date NULL,
-	TRIAL_END_DATE date NULL,
-	TRIAL_WITHDRAW_DATE date NULL,
-	TRIAL_INVITE_CODE varchar(20) NULL
-)
-/
+--------------------------------------------------------------------------------
+-- CONDITION
+--------------------------------------------------------------------------------
 
 BEGIN
 PMN_DROPSQL('DROP TABLE condition');
@@ -588,7 +638,26 @@ begin
 end;
 /
 
+BEGIN
+PMN_DROPSQL('DROP TABLE sourcefact2');
+END;
+/
 
+CREATE TABLE SOURCEFACT2  ( 
+	PATIENT_NUM  	NUMBER(38) NOT NULL,
+	ENCOUNTER_NUM	NUMBER(38) NOT NULL,
+	PROVIDER_ID  	VARCHAR2(50) NOT NULL,
+	CONCEPT_CD   	VARCHAR2(50) NOT NULL,
+	START_DATE   	DATE NOT NULL,
+	DXSOURCE     	VARCHAR2(50) NULL,
+	C_FULLNAME   	VARCHAR2(700) NOT NULL 
+	)
+/
+
+
+--------------------------------------------------------------------------------
+-- PRO_CM
+--------------------------------------------------------------------------------
 
 BEGIN
 PMN_DROPSQL('DROP TABLE pro_cm');
@@ -625,6 +694,260 @@ begin
   select pro_cm_seq.nextval into :new.PRO_CM_ID from dual;
 end;
 /
+
+
+--------------------------------------------------------------------------------
+-- PRESCRIBING
+--------------------------------------------------------------------------------
+
+BEGIN
+PMN_DROPSQL('DROP TABLE prescribing');
+END;
+/
+CREATE TABLE prescribing(
+	PRESCRIBINGID varchar(19)  primary key,
+	PATID varchar(50) NOT NULL,
+	ENCOUNTERID  varchar(50) NULL,
+	RX_PROVIDERID varchar(50) NULL, -- NOTE: The spec has a _ before the ID, but this is inconsistent.
+	RX_ORDER_DATE date NULL,
+	RX_ORDER_TIME varchar (5) NULL,
+	RX_START_DATE date NULL,
+	RX_END_DATE date NULL,
+	RX_QUANTITY int NULL,
+	RX_REFILLS int NULL,
+	RX_DAYS_SUPPLY int NULL,
+	RX_FREQUENCY varchar(2) NULL,
+	RX_BASIS varchar (2) NULL,
+	RXNORM_CUI int NULL,
+	RAW_RX_MED_NAME varchar (50) NULL,
+	RAW_RX_FREQUENCY varchar (50) NULL,
+	RAW_RXNORM_CUI varchar (50) NULL
+)
+/
+
+BEGIN
+PMN_DROPSQL('DROP sequence  prescribing_seq');
+END;
+/
+create sequence  prescribing_seq
+/
+
+create or replace trigger prescribing_trg
+before insert on prescribing
+for each row
+begin
+  select prescribing_seq.nextval into :new.PRESCRIBINGID from dual;
+end;
+/
+
+BEGIN
+PMN_DROPSQL('DROP TABLE basis');
+END;
+/
+
+CREATE TABLE BASIS  ( 
+	PCORI_BASECODE	VARCHAR2(50) NULL,
+	C_FULLNAME    	VARCHAR2(700) NOT NULL,
+	INSTANCE_NUM  	NUMBER(18) NOT NULL,
+	START_DATE    	DATE NOT NULL,
+	PROVIDER_ID   	VARCHAR2(50) NOT NULL,
+	CONCEPT_CD    	VARCHAR2(50) NOT NULL,
+	ENCOUNTER_NUM 	NUMBER(38) NOT NULL,
+	MODIFIER_CD   	VARCHAR2(100) NOT NULL 
+	)
+/
+
+BEGIN
+PMN_DROPSQL('DROP TABLE freq');
+END;
+/
+
+CREATE TABLE FREQ  ( 
+	PCORI_BASECODE	VARCHAR2(50) NULL,
+	INSTANCE_NUM  	NUMBER(18) NOT NULL,
+	START_DATE    	DATE NOT NULL,
+	PROVIDER_ID   	VARCHAR2(50) NOT NULL,
+	CONCEPT_CD    	VARCHAR2(50) NOT NULL,
+	ENCOUNTER_NUM 	NUMBER(38) NOT NULL,
+	MODIFIER_CD   	VARCHAR2(100) NOT NULL 
+	)
+/
+
+BEGIN
+PMN_DROPSQL('DROP TABLE quantity');
+END;
+/
+
+CREATE TABLE QUANTITY  ( 
+	NVAL_NUM     	NUMBER(18,5) NULL,
+	INSTANCE_NUM 	NUMBER(18) NOT NULL,
+	START_DATE   	DATE NOT NULL,
+	PROVIDER_ID  	VARCHAR2(50) NOT NULL,
+	CONCEPT_CD   	VARCHAR2(50) NOT NULL,
+	ENCOUNTER_NUM	NUMBER(38) NOT NULL,
+	MODIFIER_CD  	VARCHAR2(100) NOT NULL 
+	)
+/
+
+BEGIN
+PMN_DROPSQL('DROP TABLE refills');
+END;
+/
+
+CREATE TABLE REFILLS  ( 
+	NVAL_NUM     	NUMBER(18,5) NULL,
+	INSTANCE_NUM 	NUMBER(18) NOT NULL,
+	START_DATE   	DATE NOT NULL,
+	PROVIDER_ID  	VARCHAR2(50) NOT NULL,
+	CONCEPT_CD   	VARCHAR2(50) NOT NULL,
+	ENCOUNTER_NUM	NUMBER(38) NOT NULL,
+	MODIFIER_CD  	VARCHAR2(100) NOT NULL 
+	)
+/
+
+BEGIN
+PMN_DROPSQL('DROP TABLE supply');
+END;
+/
+
+CREATE TABLE SUPPLY  ( 
+	NVAL_NUM     	NUMBER(18,5) NULL,
+	INSTANCE_NUM 	NUMBER(18) NOT NULL,
+	START_DATE   	DATE NOT NULL,
+	PROVIDER_ID  	VARCHAR2(50) NOT NULL,
+	CONCEPT_CD   	VARCHAR2(50) NOT NULL,
+	ENCOUNTER_NUM	NUMBER(38) NOT NULL,
+	MODIFIER_CD  	VARCHAR2(100) NOT NULL 
+	)
+/
+
+
+--------------------------------------------------------------------------------
+-- DISPENSING
+--------------------------------------------------------------------------------
+
+BEGIN
+PMN_DROPSQL('DROP TABLE dispensing');
+END;
+/
+CREATE TABLE dispensing(
+	DISPENSINGID varchar(19)  primary key,
+	PATID varchar(50) NOT NULL,
+	PRESCRIBINGID varchar(19)  NULL,
+	DISPENSE_DATE date NOT NULL,
+	NDC varchar (11) NOT NULL,
+	DISPENSE_SUP int, 
+	DISPENSE_AMT int, 
+	RAW_NDC varchar (50)
+)
+/
+
+BEGIN
+PMN_DROPSQL('DROP sequence  dispensing_seq');
+END;
+/
+create sequence  dispensing_seq
+/
+
+create or replace trigger dispensing_trg
+before insert on dispensing
+for each row
+begin
+  select dispensing_seq.nextval into :new.DISPENSINGID from dual;
+end;
+/
+
+BEGIN
+PMN_DROPSQL('DROP TABLE DISP_SUPPLY');  --Changed the table 'supply' to the name 'disp_supply' to avoid conflicts with the prescribing procedure, Matthew Joss 8/16/16
+END;
+/
+
+CREATE TABLE DISP_SUPPLY  ( 
+	NVAL_NUM     	NUMBER(18,5) NULL,
+	ENCOUNTER_NUM	NUMBER(38) NOT NULL,
+	CONCEPT_CD   	VARCHAR2(50) NOT NULL 
+	)
+/
+
+BEGIN
+PMN_DROPSQL('DROP TABLE amount');
+END;
+/
+
+CREATE TABLE AMOUNT  ( 
+	NVAL_NUM     	NUMBER(18,5) NULL,
+	ENCOUNTER_NUM	NUMBER(38) NOT NULL,
+	CONCEPT_CD   	VARCHAR2(50) NOT NULL 
+	)
+/
+
+-- TODO: This seems to belong in h2p-mapping
+alter table "&&i2b2_meta_schema".pcornet_med add (
+  pcori_ndc varchar2(1000) -- arbitrary
+  );
+
+
+--------------------------------------------------------------------------------
+-- PCORNET_TRIAL
+--------------------------------------------------------------------------------
+
+BEGIN
+PMN_DROPSQL('DROP TABLE pcornet_trial');
+END;
+/
+CREATE TABLE pcornet_trial(
+	PATID varchar(50) NOT NULL,
+	TRIALID varchar(20) NOT NULL,
+	PARTICIPANTID varchar(50) NOT NULL,
+	TRIAL_SITEID varchar(50) NULL,
+	TRIAL_ENROLL_DATE date NULL,
+	TRIAL_END_DATE date NULL,
+	TRIAL_WITHDRAW_DATE date NULL,
+	TRIAL_INVITE_CODE varchar(20) NULL
+)
+/
+
+
+--------------------------------------------------------------------------------
+-- DEATH
+--------------------------------------------------------------------------------
+
+BEGIN
+PMN_DROPSQL('DROP TABLE death');
+END;
+/
+CREATE TABLE death(
+	PATID varchar(50) NOT NULL,
+	DEATH_DATE date NOT NULL,
+	DEATH_DATE_IMPUTE varchar(2) NULL,
+	DEATH_SOURCE varchar(2) NOT NULL,
+	DEATH_MATCH_CONFIDENCE varchar(2) NULL
+)
+/
+
+
+--------------------------------------------------------------------------------
+-- DEATH_CAUSE
+--------------------------------------------------------------------------------
+
+BEGIN
+PMN_DROPSQL('DROP TABLE death_cause');
+END;
+/
+CREATE TABLE death_cause(
+	PATID varchar(50) NOT NULL,
+	DEATH_CAUSE varchar(8) NOT NULL,
+	DEATH_CAUSE_CODE varchar(2) NOT NULL,
+	DEATH_CAUSE_TYPE varchar(2) NOT NULL,
+	DEATH_CAUSE_SOURCE varchar(2) NOT NULL,
+	DEATH_CAUSE_CONFIDENCE varchar(2) NULL
+)
+/
+
+
+--------------------------------------------------------------------------------
+-- HARVEST
+--------------------------------------------------------------------------------
 
 BEGIN
 PMN_DROPSQL('DROP TABLE harvest');
@@ -675,192 +998,3 @@ CREATE TABLE harvest(
 /
 
 
-
-BEGIN
-PMN_DROPSQL('DROP TABLE encounter');
-END;
-/
-CREATE TABLE encounter(
-	PATID varchar(50) NOT NULL,
-	ENCOUNTERID varchar(50) NOT NULL,
-	ADMIT_DATE date NULL,
-	ADMIT_TIME varchar(5) NULL,
-	DISCHARGE_DATE date NULL,
-	DISCHARGE_TIME varchar(5) NULL,
-	PROVIDERID varchar(50) NULL,
-	FACILITY_LOCATION varchar(3) NULL,
-	ENC_TYPE varchar(2) NOT NULL,
-	FACILITYID varchar(50) NULL,
-	DISCHARGE_DISPOSITION varchar(2) NULL,
-	DISCHARGE_STATUS varchar(2) NULL,
-	DRG varchar(3) NULL,
-	DRG_TYPE varchar(2) NULL,
-	ADMITTING_SOURCE varchar(2) NULL,
-	RAW_SITEID varchar (50) NULL,
-	RAW_ENC_TYPE varchar(50) NULL,
-	RAW_DISCHARGE_DISPOSITION varchar(50) NULL,
-	RAW_DISCHARGE_STATUS varchar(50) NULL,
-	RAW_DRG_TYPE varchar(50) NULL,
-	RAW_ADMITTING_SOURCE varchar(50) NULL
-)
-/
-
-BEGIN
-PMN_DROPSQL('DROP TABLE demographic');
-END;
-/
-CREATE TABLE demographic(
-	PATID varchar(50) NOT NULL,
-	BIRTH_DATE date NULL,
-	BIRTH_TIME varchar(5) NULL,
-	SEX varchar(2) NULL,
-	HISPANIC varchar(2) NULL,
-	BIOBANK_FLAG varchar(1) DEFAULT 'N',
-	RACE varchar(2) NULL,
-	RAW_SEX varchar(50) NULL,
-	RAW_HISPANIC varchar(50) NULL,
-	RAW_RACE varchar(50) NULL
-)
-/
-
-BEGIN
-PMN_DROPSQL('DROP TABLE i2pReport');
-END;
-/
-
-create table i2pReport (runid number, rundate date, concept varchar(20), sourceval number, destval number, diff number)
-/
-
-BEGIN
-insert into i2preport (runid) values (0);
-pcornet_popcodelist;
-END;
-/
-
-
-/* TODO: When compiling PCORNetLabResultCM I got Error(106,17): 
-  PL/SQL: ORA-00942: table or view does not exist 
-apparently due to tables that the procedure references but also drops/recreates
-before reference.  Creating them outside the function solves the issue.  SQL
-copied from the function.
-
-In the same function, I got 
-  Error(63,123): PL/SQL: ORA-00904: "LAB"."PCORI_SPECIMEN_SOURCE": invalid identifier
-So, I just altered the table to have the referenced column.
-
-*/
-whenever sqlerror continue;
-drop table priority;
-drop table location;
-
-create table priority (
-  patient_num number(38,0),
-	encounter_num number(38,0),
-	provider_id varchar2(50 byte),
-	concept_cd varchar2(50 byte),
-	start_date date,
-	priority varchar2(50 byte)
-  );
-   
-create table location (	
-  patient_num number(38,0), 
-	encounter_num number(38,0), 
-	provider_id varchar2(50 byte), 
-	concept_cd varchar2(50 byte), 
-	start_date date, 
-	result_loc varchar2(50 byte)
-  );
-
-alter table "&&i2b2_meta_schema".pcornet_lab add (
-  pcori_specimen_source varchar2(1000) -- arbitrary
-  );
-whenever sqlerror exit;
-
-
-/* TODO: When compiling PCORNetPrescribing, I got Error(93,15): 
-  PL/SQL: ORA-00942: table or view does not exist
-At compile time, it's complaining about the fact tables don't exist that are 
-created in the function itself.  I created them ahead of time - SQL taken from
-the procedure.
-*/
-whenever sqlerror continue;
-drop table basis;
-drop table freq;
-drop table quantity;
-drop table refills;
-drop table supply;
-
-create table basis (
-  pcori_basecode varchar2(50 byte), 
-  c_fullname varchar2(700 byte), 
-  encounter_num number(38,0), 
-  concept_cd varchar2(50 byte),
-  instance_num number(18,0),
-  start_date date,
-  provider_id varchar2(50 byte),
-  modifier_cd varchar2(100 byte)
-  ) ;
-  
-create table freq (
-  pcori_basecode varchar2(50 byte), 
-  encounter_num number(38,0), 
-  concept_cd varchar2(50 byte),
-  instance_num number(18,0),
-  start_date date,
-  provider_id varchar2(50 byte),
-  modifier_cd varchar2(100 byte)
-  );
-
-create table quantity(
-  nval_num number(18,5), 
-  encounter_num number(38,0), 
-  concept_cd varchar2(50 byte),
-  instance_num number(18,0),
-  start_date date,
-  provider_id varchar2(50 byte),
-  modifier_cd varchar2(100 byte)
-  );
-  
-create table refills(
-  nval_num number(18,5), 
-  encounter_num number(38,0), 
-  concept_cd varchar2(50 byte),
-  instance_num number(18,0),
-  start_date date,
-  provider_id varchar2(50 byte),
-  modifier_cd varchar2(100 byte)
-  );
-
-create table supply(
-  nval_num number(18,5), 
-  encounter_num number(38,0), 
-  concept_cd varchar2(50 byte),
-  instance_num number(18,0),
-  start_date date,
-  provider_id varchar2(50 byte),
-  modifier_cd varchar2(100 byte)
-  );
-
-whenever sqlerror exit;
-
-
-/* TODO: When compiling PCORNetDispensing:
-
-Error(53,16): PL/SQL: ORA-00942: table or view does not exist (amount)
- - supply, also used, is created above in the prescribing function
-
-Also, Error(57,57): PL/SQL: ORA-00904: "MO"."PCORI_NDC": invalid identifier
-*/
-whenever sqlerror continue;
-drop table amount;
-
-create table amount(
-  nval_num number(18,5), 
-	encounter_num number(38,0), 
-	concept_cd varchar2(50 byte)
-  ); 
-
-alter table "&&i2b2_meta_schema".pcornet_med add (
-  pcori_ndc varchar2(1000) -- arbitrary
-  );
-whenever sqlerror exit;
