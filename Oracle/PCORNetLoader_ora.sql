@@ -364,7 +364,7 @@ insert into sourcefact2
     inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode
 	where dxsource.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\%';
 
-execute immediate 'create index sourcefact2_idx on sourcefact (patient_num, encounter_num, provider_id, concept_cd, start_date)';
+execute immediate 'create index sourcefact2_idx on sourcefact2 (patient_num, encounter_num, provider_id, concept_cd, start_date)';
 GATHER_TABLE_STATS('SOURCEFACT2');
 
 create_error_table('CONDITION');
