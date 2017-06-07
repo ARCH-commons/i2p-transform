@@ -1082,9 +1082,9 @@ declare getsql cursor local for
 	'	and	lower(p.race_cd) in ('+lower(race.c_dimcode)+') '+
 	'   and lower(isnull(p.race_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'') '
 	from pcornet_demo race, pcornet_demo sex
-	where race.c_fullname like '\PCORI\DEMOGRAPHIC\RACE%'
+	where race.c_fullname like '\PCORI\DEMOGRAPHIC\RACE\%'
 	and race.c_visualattributes like 'L%'
-	and sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX%'
+	and sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX\%'
 	and sex.c_visualattributes like 'L%'
 union -- A - S,R,H
 select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
@@ -1100,11 +1100,11 @@ select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HI
 	'	and	lower(isnull(p.race_cd,''xx'')) in (select lower(code) from pcornet_codelist where codetype=''RACE'') '+
 	'   and lower(isnull(p.race_cd,''xx'')) in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'') '
 	from pcornet_demo race, pcornet_demo hisp, pcornet_demo sex
-	where race.c_fullname like '\PCORI\DEMOGRAPHIC\RACE%'
+	where race.c_fullname like '\PCORI\DEMOGRAPHIC\RACE\%'
 	and race.c_visualattributes like 'L%'
 	and hisp.c_fullname like '\PCORI\DEMOGRAPHIC\HISPANIC\Y%'
 	and hisp.c_visualattributes like 'L%'
-	and sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX%'
+	and sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX\%'
 	and sex.c_visualattributes like 'L%'
 union --2 S, nR, nH
 	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
@@ -1119,7 +1119,7 @@ union --2 S, nR, nH
 	'	and	lower(isnull(p.race_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''RACE'') '+
 	'   and lower(isnull(p.race_cd,''ni'')) not in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'') '
 	from pcornet_demo sex
-	where sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX%'
+	where sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX\%'
 	and sex.c_visualattributes like 'L%'
 union --3 -- nS,R, NH
 	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
@@ -1134,7 +1134,7 @@ union --3 -- nS,R, NH
 	'	and	lower(p.race_cd) in ('+lower(race.c_dimcode)+') '+
 	'   and lower(isnull(p.race_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'')'
 	from pcornet_demo race
-	where race.c_fullname like '\PCORI\DEMOGRAPHIC\RACE%'
+	where race.c_fullname like '\PCORI\DEMOGRAPHIC\RACE\%'
 	and race.c_visualattributes like 'L%'
 union --B -- nS,R, H
 	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
@@ -1150,7 +1150,7 @@ union --B -- nS,R, H
 	'	and	lower(isnull(p.race_cd,''xx'')) in (select lower(code) from pcornet_codelist where codetype=''RACE'') '+
 	'   and lower(isnull(p.race_cd,''xx'')) in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'')'
 	from pcornet_demo race,pcornet_demo hisp
-	where race.c_fullname like '\PCORI\DEMOGRAPHIC\RACE%'
+	where race.c_fullname like '\PCORI\DEMOGRAPHIC\RACE\%'
 	and race.c_visualattributes like 'L%'
 	and hisp.c_fullname like '\PCORI\DEMOGRAPHIC\HISPANIC\Y%'
 	and hisp.c_visualattributes like 'L%'
@@ -1167,7 +1167,7 @@ union --4 -- S, NR, H
 	'	and lower(isnull(p.race_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''RACE'') '+
 	'	and lower(isnull(p.race_cd,''xx'')) in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'') '
 	from pcornet_demo sex
-	where sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX%'
+	where sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX\%'
 	and sex.c_visualattributes like 'L%'
 union --5 -- NS, NR, H
 	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
@@ -1226,12 +1226,12 @@ WHERE P.C_FULLNAME LIKE '\PCORI\DEMOGRAPHIC\BIOBANK_FLAG\Y\%')
 UPDATE D SET gender_identity = P.pcori_basecode
 from pmndemographic D inner join i2b2fact i on D.patid=i.patient_num
 INNER JOIN pcornet_demo P ON i.CONCEPT_CD = P.C_BASECODE 
-P.C_FULLNAME LIKE '\PCORI\DEMOGRAPHIC\GENDER_IDENTITY\%'
+WHERE P.C_FULLNAME LIKE '\PCORI\DEMOGRAPHIC\GENDER_IDENTITY\%'
 
 UPDATE D SET sexual_orientation = P.pcori_basecode
 from pmndemographic D inner join i2b2fact i on D.patid=i.patient_num
 INNER JOIN pcornet_demo P ON i.CONCEPT_CD = P.C_BASECODE 
-P.C_FULLNAME LIKE '\PCORI\DEMOGRAPHIC\SEXUAL_ORIENTATION\%'
+WHERE P.C_FULLNAME LIKE '\PCORI\DEMOGRAPHIC\SEXUAL_ORIENTATION\%'
 
 end
 
