@@ -1222,6 +1222,11 @@ INNER JOIN pcornet_demo P
 ON OBS.CONCEPT_CD = P.C_BASECODE 
 WHERE P.C_FULLNAME LIKE '\PCORI\DEMOGRAPHIC\BIOBANK_FLAG\Y\%')
 
+-- CDM 3.1 updates
+UPDATE D SET gender_identity = P.pcori_basecode
+from pmndemographic D inner join i2b2fact i on D.patid=i.patient_num
+INNER JOIN pcornet_demo P ON i.CONCEPT_CD = P.C_BASECODE 
+P.C_FULLNAME LIKE '\PCORI\DEMOGRAPHIC\GENDER_IDENTITY\%'
 end
 
 go
