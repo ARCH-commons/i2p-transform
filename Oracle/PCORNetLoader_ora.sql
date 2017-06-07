@@ -1171,7 +1171,7 @@ begin
     ) then
       LogTaskStart(release_name, 'PCORNetProcedure', build_num, data_source);
       PCORNetProcedure;
-      LogTaskComplete(release_name, 'PCORNetProcedure', build_num, 'PROCEDURE');
+      LogTaskComplete(release_name, 'PCORNetProcedure', build_num, 'PROCEDURES');
   end if;
   
   if start_with in (
