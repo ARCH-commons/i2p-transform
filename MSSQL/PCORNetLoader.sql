@@ -1227,6 +1227,12 @@ UPDATE D SET gender_identity = P.pcori_basecode
 from pmndemographic D inner join i2b2fact i on D.patid=i.patient_num
 INNER JOIN pcornet_demo P ON i.CONCEPT_CD = P.C_BASECODE 
 P.C_FULLNAME LIKE '\PCORI\DEMOGRAPHIC\GENDER_IDENTITY\%'
+
+UPDATE D SET sexual_orientation = P.pcori_basecode
+from pmndemographic D inner join i2b2fact i on D.patid=i.patient_num
+INNER JOIN pcornet_demo P ON i.CONCEPT_CD = P.C_BASECODE 
+P.C_FULLNAME LIKE '\PCORI\DEMOGRAPHIC\SEXUAL_ORIENTATION\%'
+
 end
 
 go
@@ -1301,12 +1307,19 @@ inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounte
 inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode  
 and dxsource.c_fullname like '\PCORI_MOD\PDX\%'
 
-insert into pmndiagnosis (patid,			encounterid,	enc_type, admit_date, providerid, dx, dx_type, dx_source, pdx)
+select  patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode originsource,dxsource.c_fullname 
+into #originfact from i2b2fact factline 
+inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num 
+inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode  
+and dxsource.c_fullname like '\PCORI_MOD\DX_ORIGIN\%'
+
+insert into pmndiagnosis (patid,			encounterid,	enc_type, admit_date, providerid, dx, dx_type, dx_source, pdx, dx_origin)
 select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, enc.admit_date, enc.providerid, --bug fix MJ 10/7/16
 substring(diag.pcori_basecode,charindex(':',diag.pcori_basecode)+1,10), -- jgk bugfix 10/3 
 substring(diag.c_fullname,18,2) dxtype,  
 	CASE WHEN enc_type='AV' THEN 'FI' ELSE isnull(substring(dxsource,charindex(':',dxsource)+1,2) ,'NI') END,
-	isnull(substring(pdxsource,charindex(':',pdxsource)+1,2),'NI') -- jgk bugfix 9/28/15 
+	isnull(substring(pdxsource,charindex(':',pdxsource)+1,2),'NI'), -- jgk bugfix 9/28/15 
+originsource
 from i2b2fact factline
 inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num
  left outer join #sourcefact sf
@@ -1321,6 +1334,12 @@ and factline.encounter_num=pf.encounter_num
 and factline.provider_id=pf.provider_id --bug fix MJ 10/7/16, JK 12/7/16
 and factline.concept_cd=pf.concept_cd
 and factline.start_date=pf.start_Date --bug fix MJ 10/7/16, JK 12/7/16
+left outer join #originfact orf
+on	factline.patient_num=orf.patient_num
+and factline.encounter_num=orf.encounter_num
+and factline.provider_id=orf.provider_id 
+and factline.concept_cd=orf.concept_cd
+and factline.start_date=orf.start_Date 
 inner join pcornet_diag diag on diag.c_basecode  = factline.concept_cd
 -- Skip ICD-9 V codes in 10 ontology, ICD-9 E codes in 10 ontology, ICD-10 numeric codes in 10 ontology
 -- Note: makes the assumption that ICD-9 Ecodes are not ICD-10 Ecodes; same with ICD-9 V codes. On inspection seems to be true.
@@ -1715,6 +1734,14 @@ begin
 		 join pcornet_med supplycode 
 			on supply.modifier_cd = supplycode.c_basecode
 			and supplycode.c_fullname like '\PCORI_MOD\RX_DAYS_SUPPLY\'
+--CDM 3.1--
+    select pcori_basecode,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd 
+		into #unit
+		from i2b2fact unit
+			inner join pmnENCOUNTER enc on enc.patid = unit.patient_num and enc.encounterid = unit.encounter_Num
+		 join pcornet_med unitcode 
+			on unit.modifier_cd = unitcode.c_basecode
+			and unitcode.c_fullname like '\PCORI_MOD\RX_QUANTITY_UNIT\'
 
 -- insert data with outer joins to ensure all records are included even if some data elements are missing
 insert into pmnprescribing (
@@ -1731,12 +1758,13 @@ insert into pmnprescribing (
     ,RX_DAYS_SUPPLY -- modifier nval_num
     ,RX_FREQUENCY --modifier with basecode lookup
     ,RX_BASIS --modifier with basecode lookup
-    ,RAW_RX_MED_NAME 
+    ,RAW_RX_MED_NAME
+    ,RX_QUANTITY_UNIT
 --    ,RAW_RX_FREQUENCY, --not filling these right now
 --    ,RAW_RXNORM_CUI
 )
 select distinct  m.patient_num, m.Encounter_Num,m.provider_id,  m.start_date order_date,  substring(convert(varchar,m.start_date,8),1,5), m.start_date start_date, m.end_date, mo.pcori_cui
-    ,quantity.nval_num quantity, refills.nval_num refills, supply.nval_num supply, substring(freq.pcori_basecode,charindex(':',freq.pcori_basecode)+1,2) frequency, substring(basis.pcori_basecode,charindex(':',basis.pcori_basecode)+1,2) basis, substring(mo.c_name,0,50)
+    ,quantity.nval_num quantity, refills.nval_num refills, supply.nval_num supply, substring(freq.pcori_basecode,charindex(':',freq.pcori_basecode)+1,2) frequency, substring(basis.pcori_basecode,charindex(':',basis.pcori_basecode)+1,2) basis, substring(mo.c_name,0,50), unit.pcori_basecode
  from i2b2fact m inner join pcornet_med mo on m.concept_cd = mo.c_basecode 
 inner join pmnENCOUNTER enc on enc.encounterid = m.encounter_Num
 -- TODO: This join adds several minutes to the load - must be debugged
@@ -1775,6 +1803,13 @@ inner join pmnENCOUNTER enc on enc.encounterid = m.encounter_Num
     and m.start_date = supply.start_date
     and m.provider_id = supply.provider_id
     and m.instance_num = supply.instance_num
+--CDM 3.1--
+    left join #unit unit
+    on m.encounter_num = unit.encounter_num
+    and m.concept_cd = unit.concept_Cd
+    and m.start_date = unit.start_date
+    and m.provider_id = unit.provider_id
+    and m.instance_num = unit.instance_num
 
 where (basis.c_fullname is null or basis.c_fullname like '\PCORI_MOD\RX_BASIS\PR\%') -- jgk 11/2 bugfix: filter for PR, not DI
 
