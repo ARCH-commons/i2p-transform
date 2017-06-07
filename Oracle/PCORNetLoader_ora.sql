@@ -357,8 +357,6 @@ PMN_DROPSQL('drop index sourcefact2_idx');
 execute immediate 'truncate table condition';
 execute immediate 'truncate table sourcefact2';
 
-PMN_DROPSQL('DROP TABLE sourcefact2');
-
 insert into sourcefact2
 	select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode dxsource, dxsource.c_fullname
 	from i2b2fact factline
