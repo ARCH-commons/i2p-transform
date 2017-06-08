@@ -1741,7 +1741,7 @@ begin
 			inner join pmnENCOUNTER enc on enc.patid = unit.patient_num and enc.encounterid = unit.encounter_Num
 		 join pcornet_med unitcode 
 			on unit.modifier_cd = unitcode.c_basecode
-			and unitcode.c_fullname like '\PCORI_MOD\RX_QUANTITY_UNIT\'
+			and unitcode.c_fullname like '\PCORI_MOD\RX_QUANTITY_UNIT\%'
 
 -- insert data with outer joins to ensure all records are included even if some data elements are missing
 insert into pmnprescribing (
