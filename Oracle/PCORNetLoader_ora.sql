@@ -158,7 +158,7 @@ union --6 -- NS, NR, nH
 begin    
 pcornet_popcodelist;
 
-PMN_DROPSQL('drop index demographic_idx');
+PMN_DROPSQL('drop index demographic_pk');
 
 execute immediate 'truncate table demographic';
 
@@ -172,7 +172,7 @@ FETCH getsql INTO sqltext;
 END LOOP;
 CLOSE getsql;
 
-execute immediate 'create index demographic_idx on demographic (PATID)';
+execute immediate 'create unique index demographic_pk on demographic (PATID)';
 GATHER_TABLE_STATS('DEMOGRAPHIC');
 
 end PCORNetDemographic; 
@@ -190,7 +190,8 @@ ORA-00904: "LOCATION_ZIP": invalid identifier
 create or replace procedure PCORNetEncounter as
 begin
 
-PMN_DROPSQL('drop index encounter_idx');
+PMN_DROPSQL('drop index encounter_pk');
+PMN_DROPSQL('drop index encounter_idx')
 PMN_DROPSQL('drop index drg_idx');
 
 execute immediate 'truncate table encounter';
@@ -232,9 +233,10 @@ left outer join drg -- This section is bugfixed to only include 1 drg if multipl
 left outer join 
 -- Encounter type. Note that this requires a full table scan on the ontology table, so it is not particularly efficient.
 (select patient_num, encounter_num, inout_cd,SUBSTR(pcori_basecode,INSTR(pcori_basecode, ':')+1,2) pcori_enctype from i2b2visit v
- inner join pcornet_enc e on c_dimcode like '%'||inout_cd||'%' and e.c_fullname like '\PCORI\ENCOUNTER\ENC_TYPE\%') enctype
+ inner join pcornet_enc e on c_dimcode like '%'''||inout_cd||'''%' and e.c_fullname like '\PCORI\ENCOUNTER\ENC_TYPE\%') enctype
   on enctype.patient_num=v.patient_num and enctype.encounter_num=v.encounter_num;
 
+execute immediate 'create unique index encounter_pk on encounter (ENCOUNTERID)';
 execute immediate 'create index encounter_idx on encounter (PATID, ENCOUNTERID)';
 GATHER_TABLE_STATS('ENCOUNTER');
 
