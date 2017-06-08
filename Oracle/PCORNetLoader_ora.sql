@@ -27,11 +27,13 @@ create or replace procedure PCORNetDemographic as
 sqltext varchar2(4000); 
 cursor getsql is 
 --1 --  S,R,NH
-	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
+	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, SEXUAL_ORIENTATION, GENDER_IDENTITY, HISPANIC, RACE) '||
 	'	select ''1'',patient_num, '||
 	'	birth_date, '||
 	'	to_char(birth_date,''HH:MI''), '||
 	''''||sex.pcori_basecode||''','||
+  '''NI'','||
+  '''NI'','||
 	'''NI'','||
 	''''||race.pcori_basecode||''''||
 	' from i2b2patient p '||
@@ -44,11 +46,13 @@ cursor getsql is
 	and sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX%'
 	and sex.c_visualattributes like 'L%'
 union -- A - S,R,H
-select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
+select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, SEXUAL_ORIENTATION, GENDER_IDENTITY, HISPANIC, RACE) '||
 	'	select ''A'',patient_num, '||
 	'	birth_date, '||
 	'	to_char(birth_date,''HH:MI''), '||
 	''''||sex.pcori_basecode||''','||
+  '''NI'','||
+  '''NI'','||
 	''''||hisp.pcori_basecode||''','||
 	''''||race.pcori_basecode||''''||
 	' from i2b2patient p '||
@@ -63,11 +67,13 @@ select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPA
 	and sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX%'
 	and sex.c_visualattributes like 'L%'
 union --2 S, nR, nH
-	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
+	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, SEXUAL_ORIENTATION, GENDER_IDENTITY, HISPANIC, RACE) '||
 	'	select ''2'',patient_num, '||
 	'	birth_date, '||
 	'	to_char(birth_date,''HH:MI''), '||
 	''''||sex.pcori_basecode||''','||
+  '''NI'','||
+  '''NI'','||
 	'''NI'','||
 	'''NI'''||
 	' from i2b2patient p '||
@@ -78,11 +84,13 @@ union --2 S, nR, nH
 	where sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX%'
 	and sex.c_visualattributes like 'L%'
 union --3 -- nS,R, NH
-	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
+	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, SEXUAL_ORIENTATION, GENDER_IDENTITY, HISPANIC, RACE) '||
 	'	select ''3'',patient_num, '||
 	'	birth_date, '||
 	'	to_char(birth_date,''HH:MI''), '||
 	'''NI'','||
+  '''NI'','||
+  '''NI'','||
 	'''NI'','||
 	''''||race.pcori_basecode||''''||
 	' from i2b2patient p '||
@@ -93,11 +101,13 @@ union --3 -- nS,R, NH
 	where race.c_fullname like '\PCORI\DEMOGRAPHIC\RACE%'
 	and race.c_visualattributes like 'L%'
 union --B -- nS,R, H
-	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
+	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, SEXUAL_ORIENTATION, GENDER_IDENTITY, HISPANIC, RACE) '||
 	'	select ''B'',patient_num, '||
 	'	birth_date, '||
 	'	to_char(birth_date,''HH:MI''), '||
 	'''NI'','||
+  '''NI'','||
+  '''NI'','||
 	''''||hisp.pcori_basecode||''','||
 	''''||race.pcori_basecode||''''||
 	' from i2b2patient p '||
@@ -110,11 +120,13 @@ union --B -- nS,R, H
 	and hisp.c_fullname like '\PCORI\DEMOGRAPHIC\HISPANIC%'
 	and hisp.c_visualattributes like 'L%'
 union --4 -- S, NR, H
-	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
+	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, SEXUAL_ORIENTATION, GENDER_IDENTITY, HISPANIC, RACE) '||
 	'	select ''4'',patient_num, '||
 	'	birth_date, '||
 	'	to_char(birth_date,''HH:MI''), '||
 	''''||sex.pcori_basecode||''','||
+  '''NI'','||
+  '''NI'','||
 	''''||hisp.pcori_basecode||''','||
 	'''NI'''||
 	' from i2b2patient p '||
@@ -127,11 +139,13 @@ union --4 -- S, NR, H
 	and hisp.c_fullname like '\PCORI\DEMOGRAPHIC\HISPANIC%'
 	and hisp.c_visualattributes like 'L%'
 union --5 -- NS, NR, H
-	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
+	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, SEXUAL_ORIENTATION, GENDER_IDENTITY, HISPANIC, RACE) '||
 	'	select ''5'',patient_num, '||
 	'	birth_date, '||
 	'	to_char(birth_date,''HH:MI''), '||
 	'''NI'','||
+  '''NI'','||
+  '''NI'','||
 	''''||hisp.pcori_basecode||''','||
 	'''NI'''||
 	' from i2b2patient p '||
@@ -142,11 +156,13 @@ union --5 -- NS, NR, H
 	where hisp.c_fullname like '\PCORI\DEMOGRAPHIC\HISPANIC%'
 	and hisp.c_visualattributes like 'L%'
 union --6 -- NS, NR, nH
-	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
+	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, SEXUAL_ORIENTATION, GENDER_IDENTITY, HISPANIC, RACE) '||
 	'	select ''6'',patient_num, '||
 	'	birth_date, '||
 	'	to_char(birth_date,''HH:MI''), '||
 	'''NI'','||
+  '''NI'','||
+  '''NI'','||
 	'''NI'','||
 	'''NI'''||
 	' from i2b2patient p '||
@@ -274,7 +290,7 @@ insert into pdxfact
 execute immediate 'create index pdxfact_idx on pdxfact (patient_num, encounter_num, provider_id, concept_cd, start_date)';
 GATHER_TABLE_STATS('PDXFACT');
 
-insert into diagnosis (patid,	encounterid, enc_type, admit_date, providerid, dx, dx_type, dx_source, pdx)
+insert into diagnosis (patid,	encounterid, enc_type, admit_date, providerid, dx, dx_type, dx_source, dx_origin, pdx)
 /* KUMC started billing with ICD10 on Oct 1, 2015. */
 with icd10_transition as (
   select date '2015-10-01' as cutoff from dual
@@ -317,6 +333,7 @@ select distinct factline.patient_num, factline.encounter_num encounterid,	enc_ty
                                                       else '09'
        end dxtype,
 	CASE WHEN enc_type='AV' THEN 'FI' ELSE nvl(SUBSTR(dxsource,INSTR(dxsource,':')+1,2) ,'NI') END dx_source,
+  'BI' dx_origin,
 	CASE WHEN enc_type in ('EI', 'IP', 'IS')  -- PDX is "relevant only on IP and IS encounters"
              THEN nvl(SUBSTR(pdxsource,INSTR(pdxsource, ':')+1,2),'NI')
              ELSE 'X' END PDX
@@ -617,7 +634,7 @@ INSERT INTO lab_result_cm
 
 SELECT DISTINCT  M.patient_num patid,
 M.encounter_num encounterid,
-CASE WHEN ont_parent.C_BASECODE LIKE 'LAB_NAME%' then SUBSTR (ont_parent.c_basecode,10, 10) ELSE null END LAB_NAME,
+CASE WHEN ont_parent.C_BASECODE LIKE 'LAB_NAME%' then SUBSTR (ont_parent.c_basecode,10, 10) ELSE 'UN' END LAB_NAME,
 CASE WHEN lab.pcori_specimen_source like '%or SR_PLS' THEN 'SR_PLS' WHEN lab.pcori_specimen_source is null then 'NI' ELSE lab.pcori_specimen_source END specimen_source, -- (Better way would be to fix the column in the ontology but this will work)
 NVL(lab.pcori_basecode, 'NI') LAB_LOINC,
 NVL(p.PRIORITY,'NI') PRIORITY,
@@ -796,6 +813,7 @@ insert into prescribing (
 	,RX_END_DATE 
     ,RXNORM_CUI --using pcornet_med pcori_cui - new column!
     ,RX_QUANTITY ---- modifier nval_num
+    ,RX_QUANTITY_UNIT
     ,RX_REFILLS  -- modifier nval_num
     ,RX_DAYS_SUPPLY -- modifier nval_num
     ,RX_FREQUENCY --modifier with basecode lookup
@@ -805,7 +823,7 @@ insert into prescribing (
     ,RAW_RXNORM_CUI
 )
 select distinct  m.patient_num, m.Encounter_Num,m.provider_id,  m.start_date order_date,  to_char(m.start_date,'HH:MI'), m.start_date start_date, m.end_date, mo.pcori_cui
-    ,quantity.nval_num quantity, refills.nval_num refills, supply.nval_num supply, substr(freq.pcori_basecode, instr(freq.pcori_basecode, ':') + 1, 2) frequency, 
+    ,quantity.nval_num quantity, 'NI' rx_quantity_unit, refills.nval_num refills, supply.nval_num supply, substr(freq.pcori_basecode, instr(freq.pcori_basecode, ':') + 1, 2) frequency, 
     substr(basis.pcori_basecode, instr(basis.pcori_basecode, ':') + 1, 2) basis
     , substr(mo.c_name, 1, 50) raw_rx_med_name, substr(mo.c_basecode, 1, 50) raw_rxnorm_cui
  from i2b2medfact m inner join pcornet_med mo on m.concept_cd = mo.c_basecode 

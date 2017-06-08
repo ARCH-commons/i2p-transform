@@ -260,10 +260,14 @@ CREATE TABLE demographic(
 	BIRTH_DATE date NULL,
 	BIRTH_TIME varchar(5) NULL,
 	SEX varchar(2) NULL,
+  SEXUAL_ORIENTATION varchar(2) NULL,
+  GENDER_IDENTITY varchar(2) NULL,
 	HISPANIC varchar(2) NULL,
 	BIOBANK_FLAG varchar(1) DEFAULT 'N',
 	RACE varchar(2) NULL,
 	RAW_SEX varchar(50) NULL,
+  RAW_SEXUAL_ORIENTATION varchar(50) NULL,
+  RAW_GENDER_IDENTITY varchar(50) NULL,
 	RAW_HISPANIC varchar(50) NULL,
 	RAW_RACE varchar(50) NULL
 )
@@ -355,6 +359,7 @@ CREATE TABLE diagnosis(
 	DX varchar(18) NOT NULL,
 	DX_TYPE varchar(2) NOT NULL,
 	DX_SOURCE varchar(2) NOT NULL,
+  DX_ORIGIN varchar(2) NULL,
 	PDX varchar(2) NULL,
 	RAW_DX varchar(50) NULL,
 	RAW_DX_TYPE varchar(50) NULL,
@@ -713,14 +718,17 @@ CREATE TABLE prescribing(
 	RX_ORDER_TIME varchar (5) NULL,
 	RX_START_DATE date NULL,
 	RX_END_DATE date NULL,
-	RX_QUANTITY int NULL,
-	RX_REFILLS int NULL,
-	RX_DAYS_SUPPLY int NULL,
+	RX_QUANTITY number(18,5) NULL,
+  RX_QUANTITY_UNIT varchar(2) NULL,
+	RX_REFILLS number(18,5) NULL,
+	RX_DAYS_SUPPLY number (18,5) NULL,
 	RX_FREQUENCY varchar(2) NULL,
 	RX_BASIS varchar (2) NULL,
-	RXNORM_CUI int NULL,
+	RXNORM_CUI varchar(8) NULL,
 	RAW_RX_MED_NAME varchar (50) NULL,
 	RAW_RX_FREQUENCY varchar (50) NULL,
+  RAW_RX_QUANTITY varchar(50) NULL,
+  RAW_RX_NDC varchar(50) NULL,
 	RAW_RXNORM_CUI varchar (50) NULL
 )
 /
@@ -836,9 +844,9 @@ CREATE TABLE dispensing(
 	PRESCRIBINGID varchar(19)  NULL,
 	DISPENSE_DATE date NOT NULL,
 	NDC varchar (11) NOT NULL,
-	DISPENSE_SUP int, 
-	DISPENSE_AMT int, 
-	RAW_NDC varchar (50)
+	DISPENSE_SUP number(18) NULL, 
+	DISPENSE_AMT number(18) NULL, 
+	RAW_NDC varchar (50) NULL
 )
 /
 
