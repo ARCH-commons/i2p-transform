@@ -191,7 +191,7 @@ create or replace procedure PCORNetEncounter as
 begin
 
 PMN_DROPSQL('drop index encounter_pk');
-PMN_DROPSQL('drop index encounter_idx')
+PMN_DROPSQL('drop index encounter_idx');
 PMN_DROPSQL('drop index drg_idx');
 
 execute immediate 'truncate table encounter';
