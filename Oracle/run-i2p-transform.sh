@@ -104,9 +104,6 @@ fi
 
 
 ########### Exectute Transform ########### 
-if [ ${start_with} != 'PCORNetPostProc' ]
-then 
-
 sqlplus /nolog <<EOF
 connect ${pcornet_cdm_user}/${pcornet_cdm}
 
@@ -116,10 +113,8 @@ set linesize 3000;
 set pagesize 5000;
 
 -- Run transform
-execute PCORNetLoader('${start_with_step}');
+execute PCORNetLoader('${start_with}');
 EOF
-
-fi
 
 
 ########### Run Stats / Tests ###########

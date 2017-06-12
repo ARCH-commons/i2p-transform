@@ -1100,7 +1100,28 @@ end PCORNetPostProc;
 --
 --------------------------------------------------------------------------------
 create or replace PROCEDURE PCORNetLoader(start_with_step VARCHAR2) AS
+start_with_step int;
 begin
+  
+  select step into start_with_step from (
+    select 1 step, 'PCORNetDemographic' proc from dual union
+    select 2 step, 'PCORNetEncounter' proc from dual union
+    select 3 step, 'PCORNetDiagnosis' proc from dual union
+    select 4 step, 'PCORNetCondition' proc from dual union
+    select 5 step, 'PCORNetProcedure' proc from dual union
+    select 6 step, 'PCORNetVital' proc from dual union
+    select 7 step, 'PCORNetEnroll' proc from dual union
+    select 8 step, 'PCORNetLabResultCM' proc from dual union
+    select 9 step, 'PCORNetPrescribing' proc from dual union
+    select 10 step, 'PCORNetDispensing' proc from dual union
+    select 11 step, 'PCORNetDeath' proc from dual union
+    select 12 step, 'PCORNetHarvest' proc from dual union
+    select 13 step, 'PCORNetPostProc' proc from dual
+  ) where proc=start_with;
+
+  insert into output
+  select start_with_step from dual;
+  
   if start_with_step = 1 then
     PCORNetDemographic;
   end if;
