@@ -1119,9 +1119,6 @@ begin
     select 13 step, 'PCORNetPostProc' proc from dual
   ) where proc=start_with;
 
-  insert into output
-  select start_with_step from dual;
-  
   if start_with_step = 1 then
     PCORNetDemographic;
   end if;
