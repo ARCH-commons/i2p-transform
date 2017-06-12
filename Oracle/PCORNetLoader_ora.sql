@@ -1134,89 +1134,78 @@ end PCORNetPostProc;
 /
 
 
-create or replace PROCEDURE PCORNetLoader(start_with VARCHAR2) AS
+--------------------------------------------------------------------------------
+-- PCORNetLoader procedure
+--
+-- This procedure orchestrates the execution of the procedures defined above, 
+-- and consists of 13 steps.  Using the start_with_step parameter a step number
+-- can be provided to start at any point in the sequence.  This is helpful when
+-- an issue is encountered during execution and restart from the beginning is 
+-- undesirable.
+--
+-- Steps:
+-- 1 - PCORNetDemographic
+-- 2 - PCORNetEncounter
+-- 3 - PCORNetDiagnosis
+-- 4 - PCORNetCondition
+-- 5 - PCORNetProcedure
+-- 6 - PCORNetVital
+-- 7 - PCORNetEnroll
+-- 8 - PCORNetLabResultCM
+-- 9 - PCORNetPrescribing
+-- 10 - PCORNetDispensing
+-- 11 - PCORNetDeath
+-- 12 - PCORNetHarvest
+-- 13 - PCORNetPostProc
+--
+--------------------------------------------------------------------------------
+create or replace PROCEDURE PCORNetLoader(start_with_step VARCHAR2) AS
 begin
-  if start_with in ('PCORNetDemographic') then
+  if start_with_step = 1 then
     PCORNetDemographic;
   end if;
   
-  if start_with in ('PCORNetDemographic', 'PCORNetEncounter') then
+  if start_with_step >= 2 then
     PCORNetEncounter;
   end if;
   
-  if start_with in (
-    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis'
-  ) then 
+  if start_with_step >= 3 then 
     PCORNetDiagnosis;
   end if;
   
-  if start_with in (
-    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
-    'PCORNetCondition'
-    ) then
+  if start_with_step >= 4 then
       PCORNetCondition;
   end if;
   
-  if start_with in (
-    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
-    'PCORNetCondition', 'PCORNetProcedure'
-    ) then
+  if start_with_step >= 5 then
       PCORNetProcedure;
   end if;
   
-  if start_with in (
-    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
-    'PCORNetCondition', 'PCORNetProcedure', 'PCORNetVital'
-    ) then
+  if start_with_step >= 6 then
       PCORNetVital;
   end if;
   
-  if start_with in (
-    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
-    'PCORNetCondition', 'PCORNetProcedure', 'PCORNetVital', 'PCORNetEnroll'
-    ) then
+  if start_with_step >= 7 then
       PCORNetEnroll;
   end if;
   
-  if start_with in (
-    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
-    'PCORNetCondition', 'PCORNetProcedure', 'PCORNetVital', 'PCORNetEnroll',
-    'PCORNetLabResultCM'
-    ) then
+  if start_with _step >= 8 then
       PCORNetLabResultCM;
   end if;
   
-  if start_with in (
-    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
-    'PCORNetCondition', 'PCORNetProcedure', 'PCORNetVital', 'PCORNetEnroll',
-    'PCORNetLabResultCM', 'PCORNetPrescribing'
-    ) then
+  if start_with_step >= 9 then
       PCORNetPrescribing;
   end if;
   
-  if start_with in (
-    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
-    'PCORNetCondition', 'PCORNetProcedure', 'PCORNetVital', 'PCORNetEnroll',
-    'PCORNetLabResultCM', 'PCORNetPrescribing', 'PCORNetDispensing'
-    ) then
+  if start_with_step >= 10 then
       PCORNetDispensing;
   end if;
   
-  if start_with in (
-    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
-    'PCORNetCondition', 'PCORNetProcedure', 'PCORNetVital', 'PCORNetEnroll',
-    'PCORNetLabResultCM', 'PCORNetPrescribing', 'PCORNetDispensing',
-    'PCORNetDeath'
-    ) then
+  if start_with_step >= 11 then
       PCORNetDeath;
   end if;
   
-  if start_with in (
-    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
-    'PCORNetCondition', 'PCORNetProcedure', 'PCORNetVital', 'PCORNetEnroll',
-    'PCORNetLabResultCM', 'PCORNetPrescribing', 'PCORNetDispensing',
-    'PCORNetDeath', 'PCORNetHarvest'
-    ) then
+  if start_with_step >= 12 then
       PCORNetHarvest;
   end if;
   
