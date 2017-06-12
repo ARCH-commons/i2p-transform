@@ -1,3 +1,18 @@
+-------------------------------------------------------------------------------------------
+-- PCORNetInit Script
+-- 
+-- This script prepares target load and intermidiary transform tables, helper
+-- functions and procedure, and synonyms and views of the source i2b2 source
+-- tables.
+-- 
+-- This script should be run as the initial step of running the i2p-transform,
+-- but has been seperated out from PCORNetLoader_ora.sql so that the former can
+-- be run without dropping all tables.
+--
+-- Created by: Michael Prittie (mprittie@kumc.edu)
+-- Adapted from original PCORNetLoader_ora.sql
+--------------------------------------------------------------------------------
+
 
 --------------------------------------------------------------------------------
 -- HELPER FUNCTIONS AND PROCEDURES
@@ -96,6 +111,78 @@ END;
 /
 
 
+BEGIN
+PMN_DROPSQL('DROP TABLE pcornet_codelist');
+END;
+/
+create table pcornet_codelist(codetype varchar2(20), code varchar2(50))
+/
+
+create or replace procedure pcornet_parsecode (codetype in varchar, codestring in varchar) as
+
+tex varchar(2000);
+pos number(9);
+readstate char(1) ;
+nextchar char(1) ;
+val varchar(50);
+
+begin
+
+val:='';
+readstate:='F';
+pos:=0;
+tex := codestring;
+FOR pos IN 1..length(tex)
+LOOP
+--	dbms_output.put_line(val);
+    	nextchar:=substr(tex,pos,1);
+	if nextchar!=',' then
+		if nextchar='''' then
+			if readstate='F' then
+				val:='';
+				readstate:='T';
+			else
+				insert into pcornet_codelist values (codetype,val);
+				val:='';
+				readstate:='F'  ;
+			end if;
+		else
+			if readstate='T' then
+				val:= val || nextchar;
+			end if;
+		end if;
+	end if;
+END LOOP;
+
+end pcornet_parsecode;
+/
+
+create or replace procedure pcornet_popcodelist as
+
+codedata varchar(2000);
+onecode varchar(20);
+codetype varchar(20);
+
+cursor getcodesql is
+select 'RACE',c_dimcode from pcornet_demo where c_fullname like '\PCORI\DEMOGRAPHIC\RACE%'
+union
+select 'SEX',c_dimcode from pcornet_demo where c_fullname like '\PCORI\DEMOGRAPHIC\SEX%'
+union
+select 'HISPANIC',c_dimcode from pcornet_demo where c_fullname like '\PCORI\DEMOGRAPHIC\HISPANIC%';
+
+begin
+open getcodesql;
+LOOP 
+	fetch getcodesql into codetype,codedata;
+	EXIT WHEN getcodesql%NOTFOUND ;
+ 	pcornet_parsecode (codetype,codedata );
+end loop;
+
+close getcodesql ;
+end pcornet_popcodelist;
+/
+
+
 --------------------------------------------------------------------------------
 -- I2B2 SYNONYMS, VIEWS, AND INTERMEDIARY TABLES
 --------------------------------------------------------------------------------
@@ -144,106 +231,6 @@ CREATE OR REPLACE SYNONYM pcornet_vital FOR  "&&i2b2_meta_schema".pcornet_vital
 /
 
 CREATE OR REPLACE SYNONYM pcornet_enc FOR  "&&i2b2_meta_schema".pcornet_enc
-/
-
-
---------------------------------------------------------------------------------
--- I2P REPORT
---------------------------------------------------------------------------------
-
-/* TODO: Consider building the loyalty cohort as designed: 
-https://github.com/njgraham/SCILHS-utils/blob/master/LoyaltyCohort/LoyaltyCohort-ora.sql
-
-For now, let's count all patients for testing with the KUMC test patients.
-*/
-
---create or replace view i2b2loyalty_patients as (select patient_num,to_date('01-Jul-2010','dd-mon-rrrr') period_start,to_date('01-Jul-2014','dd-mon-rrrr') period_end from "&&i2b2_data_schema".loyalty_cohort_patient_summary where BITAND(filter_set, 61511) = 61511 and patient_num in (select patient_num from i2b2patient))
---/
-
-BEGIN
-PMN_DROPSQL('DROP TABLE pcornet_codelist');
-END;
-/
-create table pcornet_codelist(codetype varchar2(20), code varchar2(50))
-/
-
-
-create or replace procedure pcornet_parsecode (codetype in varchar, codestring in varchar) as
-
-tex varchar(2000);
-pos number(9);
-readstate char(1) ;
-nextchar char(1) ;
-val varchar(50);
-
-begin
-
-val:='';
-readstate:='F';
-pos:=0;
-tex := codestring;
-FOR pos IN 1..length(tex)
-LOOP
---	dbms_output.put_line(val);
-    	nextchar:=substr(tex,pos,1);
-	if nextchar!=',' then
-		if nextchar='''' then
-			if readstate='F' then
-				val:='';
-				readstate:='T';
-			else
-				insert into pcornet_codelist values (codetype,val);
-				val:='';
-				readstate:='F'  ;
-			end if;
-		else
-			if readstate='T' then
-				val:= val || nextchar;
-			end if;
-		end if;
-	end if;
-END LOOP;
-
-end pcornet_parsecode;
-/
-
-
-create or replace procedure pcornet_popcodelist as
-
-codedata varchar(2000);
-onecode varchar(20);
-codetype varchar(20);
-
-cursor getcodesql is
-select 'RACE',c_dimcode from pcornet_demo where c_fullname like '\PCORI\DEMOGRAPHIC\RACE%'
-union
-select 'SEX',c_dimcode from pcornet_demo where c_fullname like '\PCORI\DEMOGRAPHIC\SEX%'
-union
-select 'HISPANIC',c_dimcode from pcornet_demo where c_fullname like '\PCORI\DEMOGRAPHIC\HISPANIC%';
-
-begin
-open getcodesql;
-LOOP 
-	fetch getcodesql into codetype,codedata;
-	EXIT WHEN getcodesql%NOTFOUND ;
- 	pcornet_parsecode (codetype,codedata );
-end loop;
-
-close getcodesql ;
-end pcornet_popcodelist;
-/
-
-BEGIN
-PMN_DROPSQL('DROP TABLE i2pReport');
-END;
-/
-create table i2pReport (runid number, rundate date, concept varchar(20), sourceval number, destval number, diff number)
-/
-
-BEGIN
-insert into i2preport (runid) values (0);
-pcornet_popcodelist;
-END;
 /
 
 

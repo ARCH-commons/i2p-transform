@@ -1042,66 +1042,6 @@ end;
 /
 
 
-create or replace PROCEDURE pcornetReport
-as
-i2b2pats  number;
-i2b2Encounters  number;
-i2b2facts number;
-i2b2dxs number;
-i2b2procs number;
-i2b2lcs number;
-
-pmnpats  number;
-encounters number;
-pmndx number;
-pmnprocs number;
-pmnfacts number;
-pmnenroll number;
-vital number;
-
-
-
-pmnlabs number;
-prescribings number;
-dispensings number;
-pmncond number;
-
-
-v_runid number;
-begin
-select count(*) into i2b2Pats   from i2b2patient;
-select count(*) into i2b2Encounters   from i2b2visit i inner join demographic d on i.patient_num=d.patid;
-
-
-select count(*) into pmnPats   from demographic;
-select count(*) into encounters   from encounter e ;
-select count(*) into pmndx   from diagnosis;
-select count(*) into pmnprocs  from procedures;
-
-select count(*) into pmncond from condition;
-select count(*) into pmnenroll  from enrollment;
-select count(*) into vital  from vital;
-select count(*) into pmnlabs from lab_result_cm;
-select count(*) into prescribings from prescribing;
-select count(*) into dispensings from dispensing;
-
-select max(runid) into v_runid from i2pReport;
-v_runid := v_runid + 1;
-insert into i2pReport values( v_runid, SYSDATE, 'Pats', i2b2pats, pmnpats, i2b2pats-pmnpats);
-insert into i2pReport values( v_runid, SYSDATE, 'Enrollment', i2b2pats, pmnenroll, i2b2pats-pmnpats);
-
-insert into i2pReport values(v_runid, SYSDATE, 'Encounters', i2b2Encounters, encounters, i2b2encounters-encounters);
-insert into i2pReport values(v_runid, SYSDATE, 'DX',		null,		pmndx,		null);
-insert into i2pReport values(v_runid, SYSDATE, 'PX',		null,		pmnprocs,	null);
-insert into i2pReport values(v_runid, SYSDATE, 'Condition',	null,		pmncond,	null);
-insert into i2pReport values(v_runid, SYSDATE, 'Vital',		null,		vital,	null);
-insert into i2pReport values(v_runid, SYSDATE, 'Labs',		null,		pmnlabs,	null);
-insert into i2pReport values(v_runid, SYSDATE, 'Prescribing',	null,		prescribings,null);
-insert into i2pReport values(v_runid, SYSDATE, 'Dispensing',	null,		dispensings,	null);
-
-end pcornetReport;
-/
-
 --------------------------------------------------------------------------------
 -- PCORNetPostProc procedure
 --
@@ -1152,116 +1092,121 @@ end PCORNetPostProc;
 /
 
 
-create or replace PROCEDURE PCORNetLoader(start_with VARCHAR2, 
-  release_name VARCHAR2, build_num NUMBER, data_source VARCHAR2
-) AS
+--------------------------------------------------------------------------------
+-- PCORNetLoader procedure
+--
+-- This procedure orchestrates the execution of the procedures defined above, 
+-- and consists of 13 steps.  Using the start_with_step parameter a step number
+-- can be provided to start at any point in the sequence.  This is helpful when
+-- an issue is encountered during execution and restart from the beginning is 
+-- undesirable.
+--
+-- Steps:
+-- 1 - PCORNetDemographic
+-- 2 - PCORNetEncounter
+-- 3 - PCORNetDiagnosis
+-- 4 - PCORNetCondition
+-- 5 - PCORNetProcedure
+-- 6 - PCORNetVital
+-- 7 - PCORNetEnroll
+-- 8 - PCORNetLabResultCM
+-- 9 - PCORNetPrescribing
+-- 10 - PCORNetDispensing
+-- 11 - PCORNetDeath
+-- 12 - PCORNetHarvest
+-- 13 - PCORNetPostProc
+--
+--------------------------------------------------------------------------------
+create or replace PROCEDURE PCORNetLoader(start_with_step VARCHAR2) AS
+start_with_step int;
 begin
-  if start_with in ('PCORNetDemographic') then
+  
+  select step into start_with_step from (
+    select 1 step, 'PCORNetDemographic' proc from dual union
+    select 2 step, 'PCORNetEncounter' proc from dual union
+    select 3 step, 'PCORNetDiagnosis' proc from dual union
+    select 4 step, 'PCORNetCondition' proc from dual union
+    select 5 step, 'PCORNetProcedure' proc from dual union
+    select 6 step, 'PCORNetVital' proc from dual union
+    select 7 step, 'PCORNetEnroll' proc from dual union
+    select 8 step, 'PCORNetLabResultCM' proc from dual union
+    select 9 step, 'PCORNetPrescribing' proc from dual union
+    select 10 step, 'PCORNetDispensing' proc from dual union
+    select 11 step, 'PCORNetDeath' proc from dual union
+    select 12 step, 'PCORNetHarvest' proc from dual union
+    select 13 step, 'PCORNetPostProc' proc from dual
+  ) where proc=start_with;
+
+  if start_with_step = 1 then
     LogTaskStart(release_name, 'PCORNetDemographic', build_num, data_source);
     PCORNetDemographic;
     LogTaskComplete(release_name, 'PCORNetDemographic', build_num, 'DEMOGRAPHIC');
   end if;
   
-  if start_with in ('PCORNetDemographic', 'PCORNetEncounter') then
+  if start_with_step >= 2 then
     LogTaskStart(release_name, 'PCORNetEncounter', build_num, data_source);
     PCORNetEncounter;
     LogTaskComplete(release_name, 'PCORNetEncounter', build_num, 'ENCOUNTER');
   end if;
   
-  if start_with in (
-    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis'
-  ) then 
+  if start_with_step >= 3 then 
     LogTaskStart(release_name, 'PCORNetDiagnosis', build_num, data_source);
     PCORNetDiagnosis;
     LogTaskComplete(release_name, 'PCORNetDiagnosis', build_num, 'DIAGNOSIS');
   end if;
   
-  if start_with in (
-    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
-    'PCORNetCondition'
-    ) then
-      LogTaskStart(release_name, 'PCORNetCondition', build_num, data_source);
-      PCORNetCondition;
-      LogTaskComplete(release_name, 'PCORNetCondition', build_num, 'CONDITION');
+  if start_with_step >= 4 then
+    LogTaskStart(release_name, 'PCORNetCondition', build_num, data_source);
+    PCORNetCondition;
+    LogTaskComplete(release_name, 'PCORNetCondition', build_num, 'CONDITION');
   end if;
   
-  if start_with in (
-    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
-    'PCORNetCondition', 'PCORNetProcedure'
-    ) then
-      LogTaskStart(release_name, 'PCORNetProcedure', build_num, data_source);
-      PCORNetProcedure;
-      LogTaskComplete(release_name, 'PCORNetProcedure', build_num, 'PROCEDURES');
+  if start_with_step >= 5 then
+    LogTaskStart(release_name, 'PCORNetProcedure', build_num, data_source);
+    PCORNetProcedure;
+    LogTaskComplete(release_name, 'PCORNetProcedure', build_num, 'PROCEDURES');
   end if;
   
-  if start_with in (
-    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
-    'PCORNetCondition', 'PCORNetProcedure', 'PCORNetVital'
-    ) then
-      LogTaskStart(release_name, 'PCORNetVital', build_num, data_source);
-      PCORNetVital;
-      LogTaskComplete(release_name, 'PCORNetVital', build_num, 'VITAL');
+  if start_with_step >= 6 then
+    LogTaskStart(release_name, 'PCORNetVital', build_num, data_source);
+    PCORNetVital;
+    LogTaskComplete(release_name, 'PCORNetVital', build_num, 'VITAL');
   end if;
   
-  if start_with in (
-    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
-    'PCORNetCondition', 'PCORNetProcedure', 'PCORNetVital', 'PCORNetEnroll'
-    ) then
-      LogTaskStart(release_name, 'PCORNetEnroll', build_num, data_source);
-      PCORNetEnroll;
-      LogTaskComplete(release_name, 'PCORNetEnroll', build_num, 'ENROLLMENT');
+  if start_with_step >= 7 then
+    LogTaskStart(release_name, 'PCORNetEnroll', build_num, data_source);
+    PCORNetEnroll;
+    LogTaskComplete(release_name, 'PCORNetEnroll', build_num, 'ENROLLMENT');
   end if;
   
-  if start_with in (
-    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
-    'PCORNetCondition', 'PCORNetProcedure', 'PCORNetVital', 'PCORNetEnroll',
-    'PCORNetLabResultCM'
-    ) then
-      LogTaskStart(release_name, 'PCORNetLabResultCM', build_num, data_source);
-      PCORNetLabResultCM;
-      LogTaskComplete(release_name, 'PCORNetLabResultCM', build_num, 'LAB_RESULT_CM');
+  if start_with _step >= 8 then
+    LogTaskStart(release_name, 'PCORNetLabResultCM', build_num, data_source);
+    PCORNetLabResultCM;
+    LogTaskComplete(release_name, 'PCORNetLabResultCM', build_num, 'LAB_RESULT_CM');
   end if;
   
-  if start_with in (
-    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
-    'PCORNetCondition', 'PCORNetProcedure', 'PCORNetVital', 'PCORNetEnroll',
-    'PCORNetLabResultCM', 'PCORNetPrescribing'
-    ) then
-      LogTaskStart(release_name, 'PCORNetPrescribing', build_num, data_source);
-      PCORNetPrescribing;
-      LogTaskComplete(release_name, 'PCORNetPrescribing', build_num, 'PRESCRIBING');
+  if start_with_step >= 9 then
+    LogTaskStart(release_name, 'PCORNetPrescribing', build_num, data_source);
+    PCORNetPrescribing;
+    LogTaskComplete(release_name, 'PCORNetPrescribing', build_num, 'PRESCRIBING');
   end if;
   
-  if start_with in (
-    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
-    'PCORNetCondition', 'PCORNetProcedure', 'PCORNetVital', 'PCORNetEnroll',
-    'PCORNetLabResultCM', 'PCORNetPrescribing', 'PCORNetDispensing'
-    ) then
-      LogTaskStart(release_name, 'PCORNetDispensing', build_num, data_source);
-      PCORNetDispensing;
-      LogTaskComplete(release_name, 'PCORNetDispensing', build_num, 'DISPENSING');
+  if start_with_step >= 10 then
+    LogTaskStart(release_name, 'PCORNetDispensing', build_num, data_source);
+    PCORNetDispensing;
+    LogTaskComplete(release_name, 'PCORNetDispensing', build_num, 'DISPENSING');
   end if;
   
-  if start_with in (
-    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
-    'PCORNetCondition', 'PCORNetProcedure', 'PCORNetVital', 'PCORNetEnroll',
-    'PCORNetLabResultCM', 'PCORNetPrescribing', 'PCORNetDispensing',
-    'PCORNetDeath'
-    ) then
-      LogTaskStart(release_name, 'PCORNetDeath', build_num, data_source);
-      PCORNetDeath;
-      LogTaskComplete(release_name, 'PCORNetDeath', build_num, 'DEATH');
+  if start_with_step >= 11 then
+    LogTaskStart(release_name, 'PCORNetDeath', build_num, data_source);
+    PCORNetDeath;
+    LogTaskComplete(release_name, 'PCORNetDeath', build_num, 'DEATH');
   end if;
   
-  if start_with in (
-    'PCORNetDemographic', 'PCORNetEncounter', 'PCORNetDiagnosis',
-    'PCORNetCondition', 'PCORNetProcedure', 'PCORNetVital', 'PCORNetEnroll',
-    'PCORNetLabResultCM', 'PCORNetPrescribing', 'PCORNetDispensing',
-    'PCORNetDeath', 'PCORNetHarvest'
-    ) then
-      LogTaskStart(release_name, 'PCORNetHarvest', build_num, data_source);
-      PCORNetHarvest;
-      LogTaskComplete(release_name, 'PCORNetHarvest', build_num, 'HARVEST');
+  if start_with_step >= 12 then
+    LogTaskStart(release_name, 'PCORNetHarvest', build_num, data_source);
+    PCORNetHarvest;
+    LogTaskComplete(release_name, 'PCORNetHarvest', build_num, 'HARVEST');
   end if;
   
   PCORNetPostProc;

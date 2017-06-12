@@ -62,7 +62,6 @@ define min_pat_list_date_dd_mon_rrrr=${min_pat_list_date_dd_mon_rrrr}
 define min_visit_date_dd_mon_rrrr=${min_visit_date_dd_mon_rrrr}
 define enrollment_months_back=${enrollment_months_back}
 define pcornet_cdm_user=${pcornet_cdm_user}
-define start_with=${start_with}
 
 -- Prepare for transform
 start PCORNetInit.sql
@@ -104,9 +103,6 @@ fi
 
 
 ########### Exectute Transform ########### 
-if [ ${start_with} != 'PCORNetPostProc' ]
-then 
-
 sqlplus /nolog <<EOF
 connect ${pcornet_cdm_user}/${pcornet_cdm}
 
@@ -118,8 +114,6 @@ set pagesize 5000;
 -- Run transform
 execute PCORNetLoader('${start_with}', '${release_name}', '${BUILD_NUMBER}', '${data_source}');
 EOF
-
-fi
 
 
 ########### Run Stats / Tests ###########
