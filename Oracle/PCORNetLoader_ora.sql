@@ -1145,67 +1145,67 @@ begin
     LogTaskComplete(release_name, 'PCORNetDemographic', build_num, 'DEMOGRAPHIC');
   end if;
   
-  if start_with_step >= 2 then
+  if start_with_step <= 2 then
     LogTaskStart(release_name, 'PCORNetEncounter', build_num, data_source);
     PCORNetEncounter;
     LogTaskComplete(release_name, 'PCORNetEncounter', build_num, 'ENCOUNTER');
   end if;
   
-  if start_with_step >= 3 then 
+  if start_with_step <= 3 then 
     LogTaskStart(release_name, 'PCORNetDiagnosis', build_num, data_source);
     PCORNetDiagnosis;
     LogTaskComplete(release_name, 'PCORNetDiagnosis', build_num, 'DIAGNOSIS');
   end if;
   
-  if start_with_step >= 4 then
+  if start_with_step <= 4 then
     LogTaskStart(release_name, 'PCORNetCondition', build_num, data_source);
     PCORNetCondition;
     LogTaskComplete(release_name, 'PCORNetCondition', build_num, 'CONDITION');
   end if;
   
-  if start_with_step >= 5 then
+  if start_with_step <= 5 then
     LogTaskStart(release_name, 'PCORNetProcedure', build_num, data_source);
     PCORNetProcedure;
     LogTaskComplete(release_name, 'PCORNetProcedure', build_num, 'PROCEDURES');
   end if;
   
-  if start_with_step >= 6 then
+  if start_with_step <= 6 then
     LogTaskStart(release_name, 'PCORNetVital', build_num, data_source);
     PCORNetVital;
     LogTaskComplete(release_name, 'PCORNetVital', build_num, 'VITAL');
   end if;
   
-  if start_with_step >= 7 then
+  if start_with_step <= 7 then
     LogTaskStart(release_name, 'PCORNetEnroll', build_num, data_source);
     PCORNetEnroll;
     LogTaskComplete(release_name, 'PCORNetEnroll', build_num, 'ENROLLMENT');
   end if;
   
-  if start_with_step >= 8 then
+  if start_with_step <= 8 then
     LogTaskStart(release_name, 'PCORNetLabResultCM', build_num, data_source);
     PCORNetLabResultCM;
     LogTaskComplete(release_name, 'PCORNetLabResultCM', build_num, 'LAB_RESULT_CM');
   end if;
   
-  if start_with_step >= 9 then
+  if start_with_step <= 9 then
     LogTaskStart(release_name, 'PCORNetPrescribing', build_num, data_source);
     PCORNetPrescribing;
     LogTaskComplete(release_name, 'PCORNetPrescribing', build_num, 'PRESCRIBING');
   end if;
   
-  if start_with_step >= 10 then
+  if start_with_step <= 10 then
     LogTaskStart(release_name, 'PCORNetDispensing', build_num, data_source);
     PCORNetDispensing;
     LogTaskComplete(release_name, 'PCORNetDispensing', build_num, 'DISPENSING');
   end if;
   
-  if start_with_step >= 11 then
+  if start_with_step <= 11 then
     LogTaskStart(release_name, 'PCORNetDeath', build_num, data_source);
     PCORNetDeath;
     LogTaskComplete(release_name, 'PCORNetDeath', build_num, 'DEATH');
   end if;
   
-  if start_with_step >= 12 then
+  if start_with_step <= 12 then
     LogTaskStart(release_name, 'PCORNetHarvest', build_num, data_source);
     PCORNetHarvest;
     LogTaskComplete(release_name, 'PCORNetHarvest', build_num, 'HARVEST');
