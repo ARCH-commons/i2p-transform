@@ -1,3 +1,18 @@
+-------------------------------------------------------------------------------------------
+-- PCORNetInit Script
+-- 
+-- This script prepares target load and intermidiary transform tables, helper
+-- functions and procedure, and synonyms and views of the source i2b2 source
+-- tables.
+-- 
+-- This script should be run as the initial step of running the i2p-transform,
+-- but has been seperated out from PCORNetLoader_ora.sql so that the former can
+-- be run without dropping all tables.
+--
+-- Created by: Michael Prittie (mprittie@kumc.edu)
+-- Adapted from original PCORNetLoader_ora.sql
+--------------------------------------------------------------------------------
+
 
 --------------------------------------------------------------------------------
 -- HELPER FUNCTIONS AND PROCEDURES
