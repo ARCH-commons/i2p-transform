@@ -1179,7 +1179,7 @@ begin
     LogTaskComplete(release_name, 'PCORNetEnroll', build_num, 'ENROLLMENT');
   end if;
   
-  if start_with _step >= 8 then
+  if start_with_step >= 8 then
     LogTaskStart(release_name, 'PCORNetLabResultCM', build_num, data_source);
     PCORNetLabResultCM;
     LogTaskComplete(release_name, 'PCORNetLabResultCM', build_num, 'LAB_RESULT_CM');
