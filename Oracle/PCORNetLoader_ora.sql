@@ -417,7 +417,7 @@ from i2b2fact fact
  inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
 where pr.c_fullname like '\PCORI\PROCEDURE\%';
 
-execute immediate 'create index procedures_patid on procedures (PATID, ENCOUNTERID)';
+execute immediate 'create index procedures_idx on procedures (PATID, ENCOUNTERID)';
 GATHER_TABLE_STATS('PROCEDURES');
 
 end PCORNetProcedure;
