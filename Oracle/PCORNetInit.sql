@@ -403,6 +403,22 @@ CREATE TABLE PDXFACT  (
 	)
 /
 
+BEGIN
+PMN_DROPSQL('DROP TABLE originfact');
+END;
+/
+
+CREATE TABLE ORIGINFACT  ( 
+	PATIENT_NUM  	NUMBER(38) NOT NULL,
+	ENCOUNTER_NUM	NUMBER(38) NOT NULL,
+	PROVIDER_ID  	VARCHAR2(50) NOT NULL,
+	CONCEPT_CD   	VARCHAR2(50) NOT NULL,
+	START_DATE   	DATE NOT NULL,
+	ORIGINSOURCE    VARCHAR2(50) NULL,
+	C_FULLNAME   	VARCHAR2(700) NOT NULL 
+	)
+/
+
 --------------------------------------------------------------------------------
 -- PROCEDURES
 --------------------------------------------------------------------------------
