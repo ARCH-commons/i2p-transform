@@ -267,10 +267,12 @@ begin
 PMN_DROPSQL('drop index diagnosis_idx');
 PMN_DROPSQL('drop index sourcefact_idx');
 PMN_DROPSQL('drop index pdxfact_idx');
+PMN_DROPSQL('drop index originfact_idx');
 
 execute immediate 'truncate table diagnosis';
 execute immediate 'truncate table sourcefact';
 execute immediate 'truncate table pdxfact';
+execute immediate 'truncate table originfact';
 
 insert into sourcefact
 	select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode dxsource, dxsource.c_fullname
@@ -291,6 +293,16 @@ insert into pdxfact
 
 execute immediate 'create index pdxfact_idx on pdxfact (patient_num, encounter_num, provider_id, concept_cd, start_date)';
 GATHER_TABLE_STATS('PDXFACT');
+
+insert into originfact --CDM 3.1 addition
+	select patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode originsource, dxsource.c_fullname  
+	from i2b2fact factline 
+    inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num 
+    inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode 
+	and dxsource.c_fullname like '\PCORI_MOD\DX_ORIGIN\%';
+
+execute immediate 'create index originfact_idx on originfact (patient_num, encounter_num, provider_id, concept_cd, start_date)';
+GATHER_TABLE_STATS('ORIGINFACT');
 
 insert into diagnosis (patid,	encounterid, enc_type, admit_date, providerid, dx, dx_type, dx_source, dx_origin, pdx)
 /* KUMC started billing with ICD10 on Oct 1, 2015. */
@@ -353,6 +365,12 @@ and factline.encounter_num=pdxfact.encounter_num
 and factline.provider_id=pdxfact.provider_id
 and factline.concept_cd=pdxfact.concept_cd
 and factline.start_date=pdxfact.start_Date
+left outer join originfact --CDM 3.1 addition
+on	factline.patient_num=originfact.patient_num 
+and factline.encounter_num=originfact.encounter_num
+and factline.provider_id=originfact.provider_id 
+and factline.concept_cd=originfact.concept_cd
+and factline.start_date=originfact.start_Date
 inner join diag on diag.c_basecode  = factline.concept_cd
 cross join icd10_transition
 where (sourcefact.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\%' or sourcefact.c_fullname is null)
