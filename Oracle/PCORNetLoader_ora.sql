@@ -297,7 +297,7 @@ GATHER_TABLE_STATS('PDXFACT');
 insert into originfact --CDM 3.1 addition
 	select patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode originsource, dxsource.c_fullname  
 	from i2b2fact factline 
-    inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num 
+    inner join ENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num 
     inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode 
 	and dxsource.c_fullname like '\PCORI_MOD\DX_ORIGIN\%';
 
