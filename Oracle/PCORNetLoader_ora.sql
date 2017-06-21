@@ -448,8 +448,8 @@ select  distinct fact.patient_num, enc.encounterid,	enc.enc_type, enc.admit_date
     -- All are billing for now - see https://informatics.gpcnetwork.org/trac/Project/ticket/491
     'BI' px_source
 from i2b2fact fact
+ inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd
  inner join encounter enc on enc.patid = fact.patient_num and enc.encounterid = fact.encounter_Num
- inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
 where pr.c_fullname like '\PCORI\PROCEDURE\%';
 
 execute immediate 'create index procedures_idx on procedures (PATID, ENCOUNTERID)';
