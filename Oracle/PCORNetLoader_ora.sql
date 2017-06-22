@@ -27,11 +27,13 @@ create or replace procedure PCORNetDemographic as
 sqltext varchar2(4000); 
 cursor getsql is 
 --1 --  S,R,NH
-	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
+	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, SEXUAL_ORIENTATION, GENDER_IDENTITY, HISPANIC, RACE) '||
 	'	select ''1'',patient_num, '||
 	'	birth_date, '||
 	'	to_char(birth_date,''HH:MI''), '||
 	''''||sex.pcori_basecode||''','||
+  '''NI'','||
+  '''NI'','||
 	'''NI'','||
 	''''||race.pcori_basecode||''''||
 	' from i2b2patient p '||
@@ -44,11 +46,13 @@ cursor getsql is
 	and sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX%'
 	and sex.c_visualattributes like 'L%'
 union -- A - S,R,H
-select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
+select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, SEXUAL_ORIENTATION, GENDER_IDENTITY, HISPANIC, RACE) '||
 	'	select ''A'',patient_num, '||
 	'	birth_date, '||
 	'	to_char(birth_date,''HH:MI''), '||
 	''''||sex.pcori_basecode||''','||
+  '''NI'','||
+  '''NI'','||
 	''''||hisp.pcori_basecode||''','||
 	''''||race.pcori_basecode||''''||
 	' from i2b2patient p '||
@@ -63,11 +67,13 @@ select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPA
 	and sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX%'
 	and sex.c_visualattributes like 'L%'
 union --2 S, nR, nH
-	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
+	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, SEXUAL_ORIENTATION, GENDER_IDENTITY, HISPANIC, RACE) '||
 	'	select ''2'',patient_num, '||
 	'	birth_date, '||
 	'	to_char(birth_date,''HH:MI''), '||
 	''''||sex.pcori_basecode||''','||
+  '''NI'','||
+  '''NI'','||
 	'''NI'','||
 	'''NI'''||
 	' from i2b2patient p '||
@@ -78,11 +84,13 @@ union --2 S, nR, nH
 	where sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX%'
 	and sex.c_visualattributes like 'L%'
 union --3 -- nS,R, NH
-	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
+	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, SEXUAL_ORIENTATION, GENDER_IDENTITY, HISPANIC, RACE) '||
 	'	select ''3'',patient_num, '||
 	'	birth_date, '||
 	'	to_char(birth_date,''HH:MI''), '||
 	'''NI'','||
+  '''NI'','||
+  '''NI'','||
 	'''NI'','||
 	''''||race.pcori_basecode||''''||
 	' from i2b2patient p '||
@@ -93,11 +101,13 @@ union --3 -- nS,R, NH
 	where race.c_fullname like '\PCORI\DEMOGRAPHIC\RACE%'
 	and race.c_visualattributes like 'L%'
 union --B -- nS,R, H
-	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
+	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, SEXUAL_ORIENTATION, GENDER_IDENTITY, HISPANIC, RACE) '||
 	'	select ''B'',patient_num, '||
 	'	birth_date, '||
 	'	to_char(birth_date,''HH:MI''), '||
 	'''NI'','||
+  '''NI'','||
+  '''NI'','||
 	''''||hisp.pcori_basecode||''','||
 	''''||race.pcori_basecode||''''||
 	' from i2b2patient p '||
@@ -110,11 +120,13 @@ union --B -- nS,R, H
 	and hisp.c_fullname like '\PCORI\DEMOGRAPHIC\HISPANIC%'
 	and hisp.c_visualattributes like 'L%'
 union --4 -- S, NR, H
-	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
+	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, SEXUAL_ORIENTATION, GENDER_IDENTITY, HISPANIC, RACE) '||
 	'	select ''4'',patient_num, '||
 	'	birth_date, '||
 	'	to_char(birth_date,''HH:MI''), '||
 	''''||sex.pcori_basecode||''','||
+  '''NI'','||
+  '''NI'','||
 	''''||hisp.pcori_basecode||''','||
 	'''NI'''||
 	' from i2b2patient p '||
@@ -127,11 +139,13 @@ union --4 -- S, NR, H
 	and hisp.c_fullname like '\PCORI\DEMOGRAPHIC\HISPANIC%'
 	and hisp.c_visualattributes like 'L%'
 union --5 -- NS, NR, H
-	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
+	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, SEXUAL_ORIENTATION, GENDER_IDENTITY, HISPANIC, RACE) '||
 	'	select ''5'',patient_num, '||
 	'	birth_date, '||
 	'	to_char(birth_date,''HH:MI''), '||
 	'''NI'','||
+  '''NI'','||
+  '''NI'','||
 	''''||hisp.pcori_basecode||''','||
 	'''NI'''||
 	' from i2b2patient p '||
@@ -142,11 +156,13 @@ union --5 -- NS, NR, H
 	where hisp.c_fullname like '\PCORI\DEMOGRAPHIC\HISPANIC%'
 	and hisp.c_visualattributes like 'L%'
 union --6 -- NS, NR, nH
-	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '||
+	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, SEXUAL_ORIENTATION, GENDER_IDENTITY, HISPANIC, RACE) '||
 	'	select ''6'',patient_num, '||
 	'	birth_date, '||
 	'	to_char(birth_date,''HH:MI''), '||
 	'''NI'','||
+  '''NI'','||
+  '''NI'','||
 	'''NI'','||
 	'''NI'''||
 	' from i2b2patient p '||
@@ -251,10 +267,12 @@ begin
 PMN_DROPSQL('drop index diagnosis_idx');
 PMN_DROPSQL('drop index sourcefact_idx');
 PMN_DROPSQL('drop index pdxfact_idx');
+PMN_DROPSQL('drop index originfact_idx');
 
 execute immediate 'truncate table diagnosis';
 execute immediate 'truncate table sourcefact';
 execute immediate 'truncate table pdxfact';
+execute immediate 'truncate table originfact';
 
 insert into sourcefact
 	select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode dxsource, dxsource.c_fullname
@@ -276,7 +294,17 @@ insert into pdxfact
 execute immediate 'create index pdxfact_idx on pdxfact (patient_num, encounter_num, provider_id, concept_cd, start_date)';
 GATHER_TABLE_STATS('PDXFACT');
 
-insert into diagnosis (patid,	encounterid, enc_type, admit_date, providerid, dx, dx_type, dx_source, pdx)
+insert into originfact --CDM 3.1 addition
+	select patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode originsource, dxsource.c_fullname  
+	from i2b2fact factline 
+    inner join ENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num 
+    inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode 
+	and dxsource.c_fullname like '\PCORI_MOD\DX_ORIGIN\%';
+
+execute immediate 'create index originfact_idx on originfact (patient_num, encounter_num, provider_id, concept_cd, start_date)';
+GATHER_TABLE_STATS('ORIGINFACT');
+
+insert into diagnosis (patid,	encounterid, enc_type, admit_date, providerid, dx, dx_type, dx_source, dx_origin, pdx)
 /* KUMC started billing with ICD10 on Oct 1, 2015. */
 with icd10_transition as (
   select date '2015-10-01' as cutoff from dual
@@ -319,6 +347,7 @@ select distinct factline.patient_num, factline.encounter_num encounterid,	enc_ty
                                                       else '09'
        end dxtype,
 	CASE WHEN enc_type='AV' THEN 'FI' ELSE nvl(SUBSTR(dxsource,INSTR(dxsource,':')+1,2) ,'NI') END dx_source,
+  'BI' dx_origin,
 	CASE WHEN enc_type in ('EI', 'IP', 'IS')  -- PDX is "relevant only on IP and IS encounters"
              THEN nvl(SUBSTR(pdxsource,INSTR(pdxsource, ':')+1,2),'NI')
              ELSE 'X' END PDX
@@ -336,6 +365,12 @@ and factline.encounter_num=pdxfact.encounter_num
 and factline.provider_id=pdxfact.provider_id
 and factline.concept_cd=pdxfact.concept_cd
 and factline.start_date=pdxfact.start_Date
+left outer join originfact --CDM 3.1 addition
+on	factline.patient_num=originfact.patient_num 
+and factline.encounter_num=originfact.encounter_num
+and factline.provider_id=originfact.provider_id 
+and factline.concept_cd=originfact.concept_cd
+and factline.start_date=originfact.start_Date
 inner join diag on diag.c_basecode  = factline.concept_cd
 cross join icd10_transition
 where (sourcefact.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\%' or sourcefact.c_fullname is null)
@@ -413,8 +448,8 @@ select  distinct fact.patient_num, enc.encounterid,	enc.enc_type, enc.admit_date
     -- All are billing for now - see https://informatics.gpcnetwork.org/trac/Project/ticket/491
     'BI' px_source
 from i2b2fact fact
+ inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd
  inner join encounter enc on enc.patid = fact.patient_num and enc.encounterid = fact.encounter_Num
- inner join	pcornet_proc pr on pr.c_basecode  = fact.concept_cd   
 where pr.c_fullname like '\PCORI\PROCEDURE\%';
 
 execute immediate 'create index procedures_idx on procedures (PATID, ENCOUNTERID)';
@@ -619,7 +654,7 @@ INSERT INTO lab_result_cm
 
 SELECT DISTINCT  M.patient_num patid,
 M.encounter_num encounterid,
-CASE WHEN ont_parent.C_BASECODE LIKE 'LAB_NAME%' then SUBSTR (ont_parent.c_basecode,10, 10) ELSE null END LAB_NAME,
+CASE WHEN ont_parent.C_BASECODE LIKE 'LAB_NAME%' then SUBSTR (ont_parent.c_basecode,10, 10) ELSE 'UN' END LAB_NAME,
 CASE WHEN lab.pcori_specimen_source like '%or SR_PLS' THEN 'SR_PLS' WHEN lab.pcori_specimen_source is null then 'NI' ELSE lab.pcori_specimen_source END specimen_source, -- (Better way would be to fix the column in the ontology but this will work)
 NVL(lab.pcori_basecode, 'NI') LAB_LOINC,
 NVL(p.PRIORITY,'NI') PRIORITY,
@@ -798,6 +833,7 @@ insert into prescribing (
 	,RX_END_DATE 
     ,RXNORM_CUI --using pcornet_med pcori_cui - new column!
     ,RX_QUANTITY ---- modifier nval_num
+    ,RX_QUANTITY_UNIT
     ,RX_REFILLS  -- modifier nval_num
     ,RX_DAYS_SUPPLY -- modifier nval_num
     ,RX_FREQUENCY --modifier with basecode lookup
@@ -807,7 +843,7 @@ insert into prescribing (
     ,RAW_RXNORM_CUI
 )
 select distinct  m.patient_num, m.Encounter_Num,m.provider_id,  m.start_date order_date,  to_char(m.start_date,'HH:MI'), m.start_date start_date, m.end_date, mo.pcori_cui
-    ,quantity.nval_num quantity, refills.nval_num refills, supply.nval_num supply, substr(freq.pcori_basecode, instr(freq.pcori_basecode, ':') + 1, 2) frequency, 
+    ,quantity.nval_num quantity, 'NI' rx_quantity_unit, refills.nval_num refills, supply.nval_num supply, substr(freq.pcori_basecode, instr(freq.pcori_basecode, ':') + 1, 2) frequency, 
     substr(basis.pcori_basecode, instr(basis.pcori_basecode, ':') + 1, 2) basis
     , substr(mo.c_name, 1, 50) raw_rx_med_name, substr(mo.c_basecode, 1, 50) raw_rxnorm_cui
  from i2b2medfact m inner join pcornet_med mo on m.concept_cd = mo.c_basecode 
@@ -1099,7 +1135,9 @@ end PCORNetPostProc;
 -- 13 - PCORNetPostProc
 --
 --------------------------------------------------------------------------------
-create or replace PROCEDURE PCORNetLoader(start_with_step VARCHAR2) AS
+create or replace PROCEDURE PCORNetLoader(start_with VARCHAR2, 
+  release_name VARCHAR2, build_num NUMBER, data_source VARCHAR2
+) AS
 start_with_step int;
 begin
   
@@ -1125,67 +1163,67 @@ begin
     LogTaskComplete(release_name, 'PCORNetDemographic', build_num, 'DEMOGRAPHIC');
   end if;
   
-  if start_with_step >= 2 then
+  if start_with_step <= 2 then
     LogTaskStart(release_name, 'PCORNetEncounter', build_num, data_source);
     PCORNetEncounter;
     LogTaskComplete(release_name, 'PCORNetEncounter', build_num, 'ENCOUNTER');
   end if;
   
-  if start_with_step >= 3 then 
+  if start_with_step <= 3 then 
     LogTaskStart(release_name, 'PCORNetDiagnosis', build_num, data_source);
     PCORNetDiagnosis;
     LogTaskComplete(release_name, 'PCORNetDiagnosis', build_num, 'DIAGNOSIS');
   end if;
   
-  if start_with_step >= 4 then
+  if start_with_step <= 4 then
     LogTaskStart(release_name, 'PCORNetCondition', build_num, data_source);
     PCORNetCondition;
     LogTaskComplete(release_name, 'PCORNetCondition', build_num, 'CONDITION');
   end if;
   
-  if start_with_step >= 5 then
+  if start_with_step <= 5 then
     LogTaskStart(release_name, 'PCORNetProcedure', build_num, data_source);
     PCORNetProcedure;
     LogTaskComplete(release_name, 'PCORNetProcedure', build_num, 'PROCEDURES');
   end if;
   
-  if start_with_step >= 6 then
+  if start_with_step <= 6 then
     LogTaskStart(release_name, 'PCORNetVital', build_num, data_source);
     PCORNetVital;
     LogTaskComplete(release_name, 'PCORNetVital', build_num, 'VITAL');
   end if;
   
-  if start_with_step >= 7 then
+  if start_with_step <= 7 then
     LogTaskStart(release_name, 'PCORNetEnroll', build_num, data_source);
     PCORNetEnroll;
     LogTaskComplete(release_name, 'PCORNetEnroll', build_num, 'ENROLLMENT');
   end if;
   
-  if start_with _step >= 8 then
+  if start_with_step <= 8 then
     LogTaskStart(release_name, 'PCORNetLabResultCM', build_num, data_source);
     PCORNetLabResultCM;
     LogTaskComplete(release_name, 'PCORNetLabResultCM', build_num, 'LAB_RESULT_CM');
   end if;
   
-  if start_with_step >= 9 then
+  if start_with_step <= 9 then
     LogTaskStart(release_name, 'PCORNetPrescribing', build_num, data_source);
     PCORNetPrescribing;
     LogTaskComplete(release_name, 'PCORNetPrescribing', build_num, 'PRESCRIBING');
   end if;
   
-  if start_with_step >= 10 then
+  if start_with_step <= 10 then
     LogTaskStart(release_name, 'PCORNetDispensing', build_num, data_source);
     PCORNetDispensing;
     LogTaskComplete(release_name, 'PCORNetDispensing', build_num, 'DISPENSING');
   end if;
   
-  if start_with_step >= 11 then
+  if start_with_step <= 11 then
     LogTaskStart(release_name, 'PCORNetDeath', build_num, data_source);
     PCORNetDeath;
     LogTaskComplete(release_name, 'PCORNetDeath', build_num, 'DEATH');
   end if;
   
-  if start_with_step >= 12 then
+  if start_with_step <= 12 then
     LogTaskStart(release_name, 'PCORNetHarvest', build_num, data_source);
     PCORNetHarvest;
     LogTaskComplete(release_name, 'PCORNetHarvest', build_num, 'HARVEST');
