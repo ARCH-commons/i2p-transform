@@ -349,20 +349,45 @@ with icd10_transition as (
   where diag.c_fullname like '\PCORI\DIAGNOSIS\%'
   and diag.pcori_basecode is not null
 )
+/* Convert i2b2 diagnosis facts to pcori diagnosis facts
+ * Note: The mapping of i2b2 diagnosis facts to pcori diagnosis facts 
+ * with respect to ICD9 and ICD10 is not 1-to-1 (there may exist an i2b2 
+ * diagnosis fact that could be represented as both ICD9 and ICD10 pcori fact)
+ *
+ * To prevent an increase in the number of post conversion facts, prioritize 
+ * filtering ICD10s prior to 1/1/2015 and ICD9s after 1/1/2015 if resulting 
+ * facts produce duplicates based on the i2b2 fact primary key.
+ */
+, diag_fact_merge as (
+ select factline.*, diag.*
+      , row_number() over (partition by factline.patient_num
+                                      , factline.encounter_num
+                                      , factline.concept_cd
+                                      , factline.start_date
+                                      , factline.modifier_cd
+                                      , factline.instance_num 
+                          order by (case when diag.dx_type = (select icd_9_cm from dx_type)  
+                                          and factline.start_date >= (select cutoff from icd10_transition) then 0
+                                         when diag.dx_type = (select icd_10_cm from dx_type)
+                                          and factline.start_date < (select cutoff from icd10_transition) then 0
+                                         else 1
+                                    end) asc) unique_row
+ from i2b2fact factline
+ join diag on diag.c_basecode = factline.concept_cd
+)
+, diag_fact_cutoff_filter as (
+ select * from diag_fact_merge where unique_row = 1
+)
 
 select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, enc.admit_date, enc.providerid
-     , case
-       when diag.pcori_basecode is not null           then diag.pcori_basecode
-       when enc.admit_date >= icd10_transition.cutoff then diag.icd10_code
-                                                      else diag.icd9_code
-       end dx
-     , diag.dx_type dxtype,
+     , factline.pcori_basecode dx
+     , factline.dx_type dxtype,
 	CASE WHEN enc_type='AV' THEN 'FI' ELSE nvl(SUBSTR(dxsource,INSTR(dxsource,':')+1,2) ,'NI') END dx_source,
   'BI' dx_origin,
 	CASE WHEN enc_type in ('EI', 'IP', 'IS')  -- PDX is "relevant only on IP and IS encounters"
              THEN nvl(SUBSTR(pdxsource,INSTR(pdxsource, ':')+1,2),'NI')
              ELSE 'X' END PDX
-from i2b2fact factline
+from diag_fact_cutoff_filter factline
 inner join encounter enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num
  left outer join sourcefact
 on	factline.patient_num=sourcefact.patient_num
@@ -382,8 +407,6 @@ and factline.encounter_num=originfact.encounter_num
 and factline.provider_id=originfact.provider_id 
 and factline.concept_cd=originfact.concept_cd
 and factline.start_date=originfact.start_Date
-inner join diag on diag.c_basecode  = factline.concept_cd
-cross join icd10_transition
 where (sourcefact.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\%' or sourcefact.c_fullname is null)
 -- order by enc.admit_date desc
 ;
