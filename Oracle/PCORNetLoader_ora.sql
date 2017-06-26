@@ -1448,7 +1448,7 @@ from (
             select '\PCORI\VITAL\TOBACCO\' concept_path FROM DUAL
             ) bp, pcornet_vital pm
           where pm.c_fullname like bp.concept_path || '%'
-          ) codes on (codes.concept_cd = obs.concept_cd)
+          ) codes on (codes.concept_cd = obs.concept_cd) where nval_num <= 10000000 --cdm 3.1 bug fix
         union all
             select obs.patient_num, obs.encounter_num, obs.start_Date, nval_num, pcori_basecode, codes.pcori_code
             from i2b2fact obs
