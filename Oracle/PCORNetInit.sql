@@ -536,7 +536,7 @@ CREATE TABLE lab_result_cm(
 	RESULT_DATE date NULL,
 	RESULT_TIME varchar(5) NULL,
 	RESULT_QUAL varchar(12) NULL,
-	RESULT_NUM number (18,5) NULL,
+	RESULT_NUM number (15,8) NULL,
 	RESULT_MODIFIER varchar(2) NULL,
 	RESULT_UNIT varchar(11) NULL,
 	NORM_RANGE_LOW varchar(10) NULL,
