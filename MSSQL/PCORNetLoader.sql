@@ -1434,7 +1434,7 @@ create procedure PCORNetVital as
 begin
 -- jgk: I took out admit_date - it doesn't appear in the scheme. Now in SQLServer format - date, substring, name on inner select, no nested with. Added modifiers and now use only pathnames, not codes.
 insert into pmnVITAL(patid, encounterid, measure_date, measure_time,vital_source,ht, wt, diastolic, systolic, original_bmi, bp_position,smoking,tobacco,tobacco_type)
-select patid, encounterid, measure_date, measure_time,vital_source, ht, wt, diastolic, systolic, original_bmi, bp_position,smoking,tobacco, --cdm 3.1 bugfix for nval_num
+select patid, encounterid, measure_date, measure_time,vital_source, ht, wt, diastolic, systolic, original_bmi, bp_position,smoking,tobacco, 
 case when tobacco in ('02','03','04') then -- no tobacco
     case when smoking in ('03','04') then '04' -- no smoking
         when smoking in ('01','02','07','08') then '01' -- smoking
@@ -1488,7 +1488,7 @@ from (
         select '\PCORI\VITAL\TOBACCO\' concept_path
         ) bp, pcornet_vital pm
       where pm.c_fullname like bp.concept_path + '%'
-      ) codes on (codes.concept_cd = obs.concept_cd) where nval_num <= 10000000
+      ) codes on (codes.concept_cd = obs.concept_cd) where nval_num <= 10000000 --cdm 3.1 bug fix
       UNION ALL
     select obs.patient_num, obs.encounter_num, obs.start_Date, nval_num, pcori_basecode, codes.pcori_code
     from i2b2fact obs
