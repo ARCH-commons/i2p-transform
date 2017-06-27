@@ -1106,6 +1106,12 @@ begin
     and rx_refills is null
   ;
   
+  /* Removed bad NDC code which make their way in from the source system
+     (i.e 00000000000 and 99999999999) */
+  delete from dispensing
+  where ndc in ('00000000000', '99999999999')
+  ;
+  
 end PCORNetPostProc;
 /
 
