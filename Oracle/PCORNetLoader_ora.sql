@@ -30,7 +30,7 @@ cursor getsql is
 	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, SEXUAL_ORIENTATION, GENDER_IDENTITY, HISPANIC, RACE) '||
 	'	select ''1'',patient_num, '||
 	'	birth_date, '||
-	'	to_char(birth_date,''HH:MI''), '||
+	'	to_char(birth_date,''HH24:MI''), '||
 	''''||sex.pcori_basecode||''','||
   '''NI'','||
   '''NI'','||
@@ -49,7 +49,7 @@ union -- A - S,R,H
 select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, SEXUAL_ORIENTATION, GENDER_IDENTITY, HISPANIC, RACE) '||
 	'	select ''A'',patient_num, '||
 	'	birth_date, '||
-	'	to_char(birth_date,''HH:MI''), '||
+	'	to_char(birth_date,''HH24:MI''), '||
 	''''||sex.pcori_basecode||''','||
   '''NI'','||
   '''NI'','||
@@ -70,7 +70,7 @@ union --2 S, nR, nH
 	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, SEXUAL_ORIENTATION, GENDER_IDENTITY, HISPANIC, RACE) '||
 	'	select ''2'',patient_num, '||
 	'	birth_date, '||
-	'	to_char(birth_date,''HH:MI''), '||
+	'	to_char(birth_date,''HH24:MI''), '||
 	''''||sex.pcori_basecode||''','||
   '''NI'','||
   '''NI'','||
@@ -87,7 +87,7 @@ union --3 -- nS,R, NH
 	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, SEXUAL_ORIENTATION, GENDER_IDENTITY, HISPANIC, RACE) '||
 	'	select ''3'',patient_num, '||
 	'	birth_date, '||
-	'	to_char(birth_date,''HH:MI''), '||
+	'	to_char(birth_date,''HH24:MI''), '||
 	'''NI'','||
   '''NI'','||
   '''NI'','||
@@ -104,7 +104,7 @@ union --B -- nS,R, H
 	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, SEXUAL_ORIENTATION, GENDER_IDENTITY, HISPANIC, RACE) '||
 	'	select ''B'',patient_num, '||
 	'	birth_date, '||
-	'	to_char(birth_date,''HH:MI''), '||
+	'	to_char(birth_date,''HH24:MI''), '||
 	'''NI'','||
   '''NI'','||
   '''NI'','||
@@ -123,7 +123,7 @@ union --4 -- S, NR, H
 	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, SEXUAL_ORIENTATION, GENDER_IDENTITY, HISPANIC, RACE) '||
 	'	select ''4'',patient_num, '||
 	'	birth_date, '||
-	'	to_char(birth_date,''HH:MI''), '||
+	'	to_char(birth_date,''HH24:MI''), '||
 	''''||sex.pcori_basecode||''','||
   '''NI'','||
   '''NI'','||
@@ -142,7 +142,7 @@ union --5 -- NS, NR, H
 	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, SEXUAL_ORIENTATION, GENDER_IDENTITY, HISPANIC, RACE) '||
 	'	select ''5'',patient_num, '||
 	'	birth_date, '||
-	'	to_char(birth_date,''HH:MI''), '||
+	'	to_char(birth_date,''HH24:MI''), '||
 	'''NI'','||
   '''NI'','||
   '''NI'','||
@@ -159,7 +159,7 @@ union --6 -- NS, NR, nH
 	select 'insert into demographic(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, SEXUAL_ORIENTATION, GENDER_IDENTITY, HISPANIC, RACE) '||
 	'	select ''6'',patient_num, '||
 	'	birth_date, '||
-	'	to_char(birth_date,''HH:MI''), '||
+	'	to_char(birth_date,''HH24:MI''), '||
 	'''NI'','||
   '''NI'','||
   '''NI'','||
@@ -232,9 +232,9 @@ insert into encounter(PATID,ENCOUNTERID,admit_date ,ADMIT_TIME ,
 		DISCHARGE_STATUS ,DRG ,DRG_TYPE ,ADMITTING_SOURCE) 
 select distinct v.patient_num, v.encounter_num,  
 	start_Date, 
-	to_char(start_Date,'HH:MI'), 
+	to_char(start_Date,'HH24:MI'), 
 	end_Date, 
-	to_char(end_Date,'HH:MI'), 
+	to_char(end_Date,'HH24:MI'), 
 	providerid,
   'NI' location_zip, /* See TODO above */
 (case when pcori_enctype is not null then pcori_enctype else 'UN' end) enc_type, 
@@ -507,7 +507,7 @@ from (
     select 
       obs.patient_num patid, obs.encounter_num encounterid, 
 	to_char(obs.start_Date,'YYYY-MM-DD') measure_date, 
-	to_char(obs.start_Date,'HH:MI') measure_time, 
+	to_char(obs.start_Date,'HH24:MI') measure_time, 
       nval_num, pcori_basecode, codes.pcori_code
     from i2b2fact obs
     inner join (select c_basecode concept_cd, c_fullname pcori_code, pcori_basecode
@@ -663,9 +663,9 @@ NVL(lab.pcori_basecode, 'NI') LAB_PX,
 'LC'  LAB_PX_TYPE,
 m.start_date LAB_ORDER_DATE, 
 m.start_date SPECIMEN_DATE,
-to_char(m.start_date,'HH:MI')  SPECIMEN_TIME,
+to_char(m.start_date,'HH24:MI')  SPECIMEN_TIME,
 m.end_date RESULT_DATE,
-to_char(m.end_date,'HH:MI') RESULT_TIME,
+to_char(m.end_date,'HH24:MI') RESULT_TIME,
 --CASE WHEN m.ValType_Cd='T' THEN NVL(nullif(m.TVal_Char,''),'NI') ELSE 'NI' END RESULT_QUAL, -- TODO: Should be a standardized value
 'NI' RESULT_QUAL, -- Local fix for KUMC (temp)
 CASE WHEN m.ValType_Cd='N' THEN m.NVAL_NUM ELSE null END RESULT_NUM,
@@ -842,7 +842,7 @@ insert into prescribing (
 --    ,RAW_RX_FREQUENCY,
     ,RAW_RXNORM_CUI
 )
-select distinct  m.patient_num, m.Encounter_Num,m.provider_id,  m.start_date order_date,  to_char(m.start_date,'HH:MI'), m.start_date start_date, m.end_date, mo.pcori_cui
+select distinct  m.patient_num, m.Encounter_Num,m.provider_id,  m.start_date order_date,  to_char(m.start_date,'HH24:MI'), m.start_date start_date, m.end_date, mo.pcori_cui
     ,quantity.nval_num quantity, 'NI' rx_quantity_unit, refills.nval_num refills, supply.nval_num supply, substr(freq.pcori_basecode, instr(freq.pcori_basecode, ':') + 1, 2) frequency, 
     substr(basis.pcori_basecode, instr(basis.pcori_basecode, ':') + 1, 2) basis
     , substr(mo.c_name, 1, 50) raw_rx_med_name, substr(mo.c_basecode, 1, 50) raw_rxnorm_cui
