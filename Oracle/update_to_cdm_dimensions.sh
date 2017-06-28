@@ -7,8 +7,6 @@ set -e
 # export i2b2_data_schema=
 # export i2b2_meta_schema=
 
-. ./load_pcornet_mapping.sh
-
 sqlplus /nolog <<EOF
 connect ${pcornet_cdm_user}/${pcornet_cdm}
 
