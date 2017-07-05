@@ -23,7 +23,7 @@ Instructions:
 
 libname sql_cdm odbc datasrc='PopMedNet'; 
 /* optionally add a password above: e.g., libname sql_cdm odbc datasrc='ORACLE_PMN' password=myPassWord; */
-libname cdm "C:\Users\jgk\Documents\My SAS Files\CDM";
+libname cdm "C:\Users\maj60\Documents\CDM_june_refresh";
 
 
 proc sql noprint; 
@@ -36,10 +36,14 @@ SELECT
 		/* Oracle might require something more like INPUT( ADMIT_DATE , e8601da.) AS ADMIT_DATE format date9., */
 	INPUT( BIRTH_TIME , time10.) AS BIRTH_TIME format hhmm.,
     SEX ,
+	SEXUAL_ORIENTATION,
+	GENDER_IDENTITY,
     HISPANIC ,
     RACE ,
     BIOBANK_FLAG ,
     RAW_SEX ,
+	RAW_SEXUAL_ORIENTATION,
+	RAW_GENDER_IDENTITY,
     RAW_HISPANIC ,
     RAW_RACE 
 FROM SQL_CDM.PMNDEMOGRAPHIC
@@ -89,6 +93,7 @@ SELECT PUT(DIAGNOSISID,32.) AS DIAGNOSISID ,
        DX ,
        DX_TYPE ,
        DX_SOURCE ,
+	   DX_ORIGIN ,
        PDX ,
        RAW_DX ,
        RAW_DX_TYPE ,
@@ -150,6 +155,7 @@ SELECT PUT(PRESCRIBINGID,32.) AS PRESCRIBINGID,
 	   DATEPART( RX_START_DATE ) AS RX_START_DATE format date9.,
 	   DATEPART( RX_END_DATE ) AS RX_END_DATE format date9.,
        RX_QUANTITY ,
+	   RX_QUANTITY_UNIT,
        RX_REFILLS ,
        RX_DAYS_SUPPLY ,
        RX_FREQUENCY ,
@@ -201,7 +207,7 @@ SELECT PUT(VITALID,32.) AS VITALID ,
        RAW_DIASTOLIC ,
        RAW_SMOKING ,
        RAW_TOBACCO ,
-       RAW_TOBACCO_TYPE 
+       RAW_TOBACCO_TYPE
 FROM SQL_CDM.PMNVITAL
 ;
 
@@ -398,3 +404,4 @@ options nosource;
 %obsnvars(CDM.PRESCRIBING);
 %obsnvars(CDM.DISPENSING);
 options source;
+
