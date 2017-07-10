@@ -169,17 +169,17 @@ using (
    (
     max(pcori_code)
     for pcori_code in ('EI' as ei, 'IP' as ip, 'ED' as ed, 'IS' as e_is 
-                     , 'AV' as av, 'OA' as oa, 'OT' as ot
+                     , 'AV' as av, 'OA' as oa, 'OT' as ot, 'OS' as os
                      , 'NI' as ni, 'UN' as un)
    )
   )
   /* Single Encounter type to Encounter coercion:
      IP + ED = EI
-     EI > IP || ED > IS > AV > OA > OT > NI > UN
+     EI > IP || ED > OS > IS > AV > OA > OT > NI > UN
    */
   select encounter_num,
          case when ip is not null and ed is not null then 'EI'
-              else coalesce(ei, ip, ed, e_is, av, oa, ot, ni, un, 'UN')
+              else coalesce(ei, ip, ed, os, e_is, av, oa, ot, ni, un, 'UN')
          end as pcori_code
   from obs_enc_type_pivot) et 
 on ( vd.encounter_num = et.encounter_num )
