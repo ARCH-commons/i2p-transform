@@ -760,7 +760,9 @@ LEFT OUTER JOIN labnormal norm
   and (m.start_date - demo.birth_date) <= norm.age_upper
  
 WHERE m.ValType_Cd in ('N','T')
-and m.MODIFIER_CD='@';
+and m.MODIFIER_CD='@'
+and (m.nval_num is null or m.nval_num<=9999999) -- exclude lengths that exceed the spec
+;
 
 execute immediate 'create index lab_result_cm_idx on lab_result_cm (PATID, ENCOUNTERID)';
 GATHER_TABLE_STATS('LAB_RESULT_CM');
