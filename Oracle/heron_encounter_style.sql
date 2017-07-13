@@ -141,10 +141,12 @@ group by encounter_ide_source
 order by 1
 ;
 */
+whenever sqlerror continue;
+drop table enc_type_merge;
+whenever sqlerror exit;
 
-merge into "&&i2b2_data_schema".visit_dimension vd
-using (
-  with
+create table enc_type_merge as
+with
   enc_type_codes as (
     select pm.pcori_path
          , replace(substr(pm.pcori_path, instr(pm.pcori_path, '\', -2)), '\', '') pcori_code
@@ -181,7 +183,12 @@ using (
          case when ip is not null and ed is not null then 'EI'
               else coalesce(ei, ip, ed, os, e_is, av, oa, ot, ni, un, 'UN')
          end as pcori_code
-  from obs_enc_type_pivot) et 
+  from obs_enc_type_pivot;
+  
+--select pcori_code, count(*) from enc_type_merge group by pcori_code order by pcori_code;
+
+merge into "&&i2b2_data_schema".visit_dimension vd
+using enc_type_merge et 
 on ( vd.encounter_num = et.encounter_num )
 when matched then update
 set inout_cd = et.pcori_code;
