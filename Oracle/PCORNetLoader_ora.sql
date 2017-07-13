@@ -713,12 +713,12 @@ CASE
 end RESULT_UNIT, -- Local fix for KUMC
 norm.ref_lo NORM_RANGE_LOW,
 case 
-  when norm.ref_lo is not null then 'GE'
+  when norm.ref_lo is not null then 'EQ'
   else null 
 end NORM_MODIFIER_LOW,
 norm.ref_hi NORM_RANGE_HIGH,
 case
-  when norm.ref_hi is not null then 'LE'
+  when norm.ref_hi is not null then 'EQ'
   else null 
 end NORM_MODIFIER_HIGH,
 CASE NVL(nullif(m.VALUEFLAG_CD,''),'NI') WHEN 'H' THEN 'AH' WHEN 'L' THEN 'AL' WHEN 'A' THEN 'AB' ELSE 'NI' END ABN_IND,
