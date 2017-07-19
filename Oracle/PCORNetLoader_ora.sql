@@ -94,17 +94,25 @@ END PMN_ExecuateSQL;
 CREATE OR REPLACE SYNONYM I2B2FACT FOR I2B2DEMODATA.OBSERVATION_FACT
 /
 
+BEGIN
+PMN_DROPSQL('DROP TABLE i2b2patient_list');
+END;
+/
 
--- extracted i2b2patient_list create table statement and inserted into the new run script. MJ 10/10/16
-
-
+CREATE table i2b2patient_list as 
+select * from
+(
+select DISTINCT f.PATIENT_NUM from I2B2FACT f 
+inner join i2b2visit v on f.patient_num=v.patient_num
+where f.START_DATE >= to_date('01-Jan-2010','dd-mon-rrrr') and v.START_DATE >= to_date('01-Jan-2010','dd-mon-rrrr')
+) where ROWNUM<100000000
+/
 
 create or replace VIEW i2b2patient as select * from I2B2DEMODATA.PATIENT_DIMENSION where PATIENT_NUM in (select PATIENT_NUM from i2b2patient_list)
 /
 
 create or replace view i2b2visit as select * from I2B2DEMODATA.VISIT_DIMENSION where START_DATE >= to_date('01-Jan-2010','dd-mon-rrrr') and (END_DATE is NULL or END_DATE < CURRENT_DATE) and (START_DATE <CURRENT_DATE)
 /
-
 
 
 
@@ -131,7 +139,7 @@ CREATE OR REPLACE SYNONYM pcornet_enc FOR  i2b2metadata.pcornet_enc
 
 create or replace FUNCTION GETDATAMARTID RETURN VARCHAR2 IS 
 BEGIN 
-    RETURN 'C1WF';
+    RETURN 'C1PHS';
 END;
 /
 -- Data mart name table "harvest reference table"
@@ -139,7 +147,7 @@ END;
 
 CREATE OR REPLACE FUNCTION GETDATAMARTNAME RETURN VARCHAR2 AS 
 BEGIN 
-    RETURN 'WakeForest';
+    RETURN 'Partners';
 END;
 /
 
@@ -149,7 +157,23 @@ BEGIN
 END;
 /
 
-create or replace view i2b2loyalty_patients as (select patient_num,to_date('01-Jul-2010','dd-mon-rrrr') period_start,to_date('01-Jul-2014','dd-mon-rrrr') period_end from i2b2demodata.loyalty_cohort_patient_summary where BITAND(filter_set, 61511) = 61511 and patient_num in (select patient_num from i2b2patient))
+
+-- Loyalty Cohort is now optional, if you have not run the loyalty cohort it will create an empty view
+-- you will need to modify the objects below in order to point to the right location in your database. 
+
+
+
+declare 
+sqltext varchar2(4000) := 'create or replace view i2b2loyalty_patients as (select patient_num,to_date(''01-Jul-2010'',''dd-mon-rrrr'') period_start,to_date(''01-Jul-2014'',''dd-mon-rrrr'') period_end from i2b2demodata.loyalty_cohort_patient_summary where BITAND(filter_set, 61511) = 61511 and patient_num in (select patient_num from i2b2patient))';
+begin
+PMN_EXECUATESQL(sqltext);
+exception when others then 
+declare 
+sqltext varchar2(4000) := 'create or replace view i2b2loyalty_patients as (select patient_num,to_date(''01-Jan-2010'',''dd-mon-rrrr'') period_start,to_date(''01-Jan-2010'',''dd-mon-rrrr'') period_end from i2b2patient_list where rownum < 1)';
+begin
+PMN_EXECUATESQL(sqltext);
+end;
+end;
 /
 
 
@@ -1072,20 +1096,27 @@ PMN_EXECUATESQL(sqltext);
 
 --CDM 3.1--
 
-sqltext := 'UPDATE D '||
-	'SET gender_identity = P.pcori_basecode'||
-	'FROM pmndemographic D INNER JOIN i2b2fact i on D.patid=i.patient_num '||
-    'INNER JOIN pcornet_demo P on i.concept_cd=P.c_basecode'||
-    'WHERE P.C_FULLNAME LIKE ''\PCORI\DEMOGRAPHIC\GENDER_IDENTITY\%''';
+sqltext := 'MERGE INTO pmndemographic '||
+    'USING (SELECT PATID, P.pcori_basecode FROM pmndemographic D INNER JOIN i2b2fact i '||
+    'on D.patid=i.patient_num '||
+    'INNER JOIN pcornet_demo P '||
+    'on i.concept_cd=P.c_basecode '||
+    'WHERE P.C_FULLNAME LIKE ''\PCORI\DEMOGRAPHIC\GENDER_IDENTITY\%'') i ' ||
+    'ON (pmndemographic.patid = i.PATID) '||
+    'WHEN MATCHED THEN UPDATE ' ||
+    'SET gender_identity = i.pcori_basecode ';
 PMN_EXECUATESQL(sqltext);
 
-sqltext := 'UPDATE D '||
-	'SET sexual_orientation = P.pcori_basecode'||
-	'FROM pmndemographic D INNER JOIN i2b2fact i on D.patid=i.patient_num '||
-    'INNER JOIN pcornet_demo P on i.concept_cd=P.c_basecode'||
-    'WHERE P.C_FULLNAME LIKE ''\PCORI\DEMOGRAPHIC\SEXUAL_ORIENTATION\%''';
-PMN_EXECUATESQL(sqltext);
 
+sqltext := 'MERGE INTO pmndemographic '||
+	'USING (SELECT PATID, P.pcori_basecode FROM pmndemographic D INNER JOIN i2b2fact i '||
+    'on D.patid=i.patient_num '||
+    'INNER JOIN pcornet_demo P on i.concept_cd=P.c_basecode '||
+    'WHERE P.C_FULLNAME LIKE ''\PCORI\DEMOGRAPHIC\SEXUAL_ORIENTATION\%'') i '||
+    'ON (pmndemographic.patid = i.PATID) '||
+    'WHEN MATCHED THEN UPDATE ' ||
+    'SET sexual_orientation = i.pcori_basecode ';
+PMN_EXECUATESQL(sqltext);
 
 Commit;
 
@@ -1961,7 +1992,7 @@ inner join pmnENCOUNTER enc on enc.encounterid = m.encounter_Num
     and m.provider_id = supply.provider_id
     and m.instance_num = supply.instance_num
 
-+--CDM 3.1--
+--CDM 3.1--
     left join unit
     on m.encounter_num = unit.encounter_num
     and m.concept_cd = unit.concept_Cd
@@ -2257,11 +2288,9 @@ DELETE FROM pmnharvest;
 end;
 /
 
-
 ----------------------------------------------------------------------------------------------------------------------------------------
 -- 14. Load and Run Program
 ----------------------------------------------------------------------------------------------------------------------------------------
-
 
 create or replace procedure pcornetloader as
 begin
