@@ -97,7 +97,7 @@ GO
 
 
 CREATE FUNCTION dbo.getDataMartName() RETURNS varchar(20) AS BEGIN 
-    RETURN 'Partners' END
+    RETURN 'Partners Health' END
 GO
 CREATE FUNCTION dbo.getDataMartPlatform() RETURNS varchar(2) AS BEGIN 
     RETURN '01' END -- 01 is MSSQL, 02 is Oracle

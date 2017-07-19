@@ -1256,6 +1256,8 @@ PMN_EXECUATESQL(sqltext);
 
 --CDM 3.1--
 
+PMN_DROPSQL('DELETE FROM originfact');
+
 sqltext := 'insert into originfact '||
 	'select patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode originsource,dxsource.c_fullname  '||
 	'from i2b2fact factline '||
@@ -1270,7 +1272,7 @@ sqltext := 'insert into pmndiagnosis (patid,			encounterid,	enc_type, admit_date
 'SUBSTR(diag.c_fullname,18,2) dxtype,   '||
 '	CASE WHEN enc_type=''AV'' THEN ''FI'' ELSE nvl(SUBSTR(dxsource,INSTR(dxsource,'':'')+1,2) ,''NI'')END, '||
 '	nvl(SUBSTR(pdxsource,INSTR(pdxsource, '':'')+1,2),''NI''), '|| -- jgk bugfix 9/28/15 
-'originsource'||
+'originsource '||
 'from i2b2fact factline '||
 'inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num '||
 ' left outer join sourcefact '||
@@ -1285,7 +1287,7 @@ sqltext := 'insert into pmndiagnosis (patid,			encounterid,	enc_type, admit_date
 'and factline.provider_id=pdxfact.provider_id '|| --bug fix MJ 10/7/16 --another change based off of Jeff's fix. 12/8/16 MJ
 'and factline.concept_cd=pdxfact.concept_cd '||
 'and factline.start_date=pdxfact.start_Date '|| --bug fix MJ 10/7/16 --another change based off of Jeff's fix. 12/8/16 MJ
-'left outer join originfact' || --cdm 3.1
+'left outer join originfact ' || --cdm 3.1
 'on	factline.patient_num=originfact.patient_num '||
 'and factline.encounter_num=originfact.encounter_num '||
 'and factline.provider_id=originfact.provider_id '|| 
