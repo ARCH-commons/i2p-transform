@@ -16,15 +16,12 @@ Changes: ID translation, altered date/time translation, altered tablenames, repo
 Instructions:
 
 1. In Windows, open ODBC DataSources and create a SQL Server ODBC Data Source for the PopMedNet db. Call it "PopMedNet".
-2. Change the second libname line below to point to a place where you would like to store your SAS datamart.
-3. Run the script.
+2. Change the second libname line in CDM2sas_config.sas to point to a place where you would like to store your SAS datamart.
+3. Run this script.
 4. Verify the numbers printed at the completion match the destval numbers in the i2preport. (i.e. that everything copied without error)
 \--------------------------------------------------------------------------------------*/
 
-libname sql_cdm odbc datasrc='PopMedNet'; 
-/* optionally add a password above: e.g., libname sql_cdm odbc datasrc='ORACLE_PMN' password=myPassWord; */
-libname cdm "C:\Users\maj60\Documents\CDM_june_refresh";
-
+%include 'CDM2sas_config.sas';
 
 proc sql noprint; 
 
