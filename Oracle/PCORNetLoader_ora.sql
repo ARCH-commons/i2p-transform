@@ -1,4 +1,4 @@
--------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------
 -- PCORNetLoader Script
 -- Orignal MSSQL Verion Contributors: Jeff Klann, PhD; Aaron Abend; Arturo Torres
 -- Translate to Oracle version: by Kun Wei(Wake Forest)
@@ -713,13 +713,17 @@ CASE
 end RESULT_UNIT, -- Local fix for KUMC
 norm.ref_lo NORM_RANGE_LOW,
 case 
-  when norm.ref_lo is not null then 'EQ'
-  else null 
+  when norm.ref_lo is not null and norm.ref_hi is not null then 'EQ'
+  when norm.ref_lo is not null and norm.ref_hi is null then 'GE'
+  when norm.ref_lo is null and norm.ref_hi is not null then 'NO'
+else 'NI' 
 end NORM_MODIFIER_LOW,
 norm.ref_hi NORM_RANGE_HIGH,
 case
-  when norm.ref_hi is not null then 'EQ'
-  else null 
+  when norm.ref_lo is not null and norm.ref_hi is not null then 'EQ'
+  when norm.ref_lo is not null and norm.ref_hi is null then 'NO'
+  when norm.ref_lo is null and norm.ref_hi is not null then 'LE'
+  else 'NI' 
 end NORM_MODIFIER_HIGH,
 CASE NVL(nullif(m.VALUEFLAG_CD,''),'NI') WHEN 'H' THEN 'AH' WHEN 'L' THEN 'AL' WHEN 'A' THEN 'AB' ELSE 'NI' END ABN_IND,
 NULL RAW_LAB_NAME,
