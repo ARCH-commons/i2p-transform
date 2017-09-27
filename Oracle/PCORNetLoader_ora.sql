@@ -1,4 +1,4 @@
--------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------
 -- PCORNetLoader Script
 -- Orignal MSSQL Verion Contributors: Jeff Klann, PhD; Aaron Abend; Arturo Torres
 -- Translate to Oracle version: by Kun Wei(Wake Forest)
@@ -711,10 +711,20 @@ CASE
   when length(m.Units_CD) > 11 then substr(m.Units_CD, 1, 11)
   ELSE TRIM(REPLACE(UPPER(m.Units_CD), '(CALC)', '')) 
 end RESULT_UNIT, -- Local fix for KUMC
-nullif(norm.NORM_RANGE_LOW,'') NORM_RANGE_LOW
-,norm.NORM_MODIFIER_LOW,
-nullif(norm.NORM_RANGE_HIGH,'') NORM_RANGE_HIGH
-,norm.NORM_MODIFIER_HIGH,
+norm.ref_lo NORM_RANGE_LOW,
+case 
+  when norm.ref_lo is not null and norm.ref_hi is not null then 'EQ'
+  when norm.ref_lo is not null and norm.ref_hi is null then 'GE'
+  when norm.ref_lo is null and norm.ref_hi is not null then 'NO'
+else 'NI' 
+end NORM_MODIFIER_LOW,
+norm.ref_hi NORM_RANGE_HIGH,
+case
+  when norm.ref_lo is not null and norm.ref_hi is not null then 'EQ'
+  when norm.ref_lo is not null and norm.ref_hi is null then 'NO'
+  when norm.ref_lo is null and norm.ref_hi is not null then 'LE'
+  else 'NI' 
+end NORM_MODIFIER_HIGH,
 CASE NVL(nullif(m.VALUEFLAG_CD,''),'NI') WHEN 'H' THEN 'AH' WHEN 'L' THEN 'AL' WHEN 'A' THEN 'AB' ELSE 'NI' END ABN_IND,
 NULL RAW_LAB_NAME,
 NULL RAW_LAB_CODE,
@@ -727,10 +737,9 @@ m.concept_cd RAW_FACILITY_CODE
 
 FROM i2b2fact M
 inner join encounter enc on enc.patid = m.patient_num and enc.encounterid = m.encounter_Num -- Constraint to selected encounters
-
+inner join demographic demo on demo.patid=m.patient_num
 inner join pcornet_lab lab on lab.c_basecode  = M.concept_cd and lab.c_fullname like '\PCORI\LAB_RESULT_CM\%'
 inner JOIN pcornet_lab ont_parent on lab.c_path=ont_parent.c_fullname
-left outer join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
 
 LEFT OUTER JOIN priority p
  
@@ -747,6 +756,12 @@ and M.encounter_num=l.encounter_num
 and M.provider_id=l.provider_id
 and M.concept_cd=l.concept_Cd
 and M.start_date=l.start_Date
+
+LEFT OUTER JOIN labnormal norm
+  on m.concept_cd=norm.concept_cd
+  and demo.sex=norm.sex
+  and (m.start_date - demo.birth_date) > norm.age_lower
+  and (m.start_date - demo.birth_date) <= norm.age_upper
  
 WHERE m.ValType_Cd in ('N','T')
 and m.MODIFIER_CD='@'
