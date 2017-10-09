@@ -97,7 +97,7 @@ GO
 
 
 CREATE FUNCTION dbo.getDataMartName() RETURNS varchar(20) AS BEGIN 
-    RETURN 'Partners' END
+    RETURN 'Partners Health' END
 GO
 CREATE FUNCTION dbo.getDataMartPlatform() RETURNS varchar(2) AS BEGIN 
     RETURN '01' END -- 01 is MSSQL, 02 is Oracle
@@ -1082,9 +1082,9 @@ declare getsql cursor local for
 	'	and	lower(p.race_cd) in ('+lower(race.c_dimcode)+') '+
 	'   and lower(isnull(p.race_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'') '
 	from pcornet_demo race, pcornet_demo sex
-	where race.c_fullname like '\PCORI\DEMOGRAPHIC\RACE%'
+	where race.c_fullname like '\PCORI\DEMOGRAPHIC\RACE\%'
 	and race.c_visualattributes like 'L%'
-	and sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX%'
+	and sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX\%'
 	and sex.c_visualattributes like 'L%'
 union -- A - S,R,H
 select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
@@ -1100,11 +1100,11 @@ select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HI
 	'	and	lower(isnull(p.race_cd,''xx'')) in (select lower(code) from pcornet_codelist where codetype=''RACE'') '+
 	'   and lower(isnull(p.race_cd,''xx'')) in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'') '
 	from pcornet_demo race, pcornet_demo hisp, pcornet_demo sex
-	where race.c_fullname like '\PCORI\DEMOGRAPHIC\RACE%'
+	where race.c_fullname like '\PCORI\DEMOGRAPHIC\RACE\%'
 	and race.c_visualattributes like 'L%'
 	and hisp.c_fullname like '\PCORI\DEMOGRAPHIC\HISPANIC\Y%'
 	and hisp.c_visualattributes like 'L%'
-	and sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX%'
+	and sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX\%'
 	and sex.c_visualattributes like 'L%'
 union --2 S, nR, nH
 	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
@@ -1119,7 +1119,7 @@ union --2 S, nR, nH
 	'	and	lower(isnull(p.race_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''RACE'') '+
 	'   and lower(isnull(p.race_cd,''ni'')) not in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'') '
 	from pcornet_demo sex
-	where sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX%'
+	where sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX\%'
 	and sex.c_visualattributes like 'L%'
 union --3 -- nS,R, NH
 	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
@@ -1134,7 +1134,7 @@ union --3 -- nS,R, NH
 	'	and	lower(p.race_cd) in ('+lower(race.c_dimcode)+') '+
 	'   and lower(isnull(p.race_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'')'
 	from pcornet_demo race
-	where race.c_fullname like '\PCORI\DEMOGRAPHIC\RACE%'
+	where race.c_fullname like '\PCORI\DEMOGRAPHIC\RACE\%'
 	and race.c_visualattributes like 'L%'
 union --B -- nS,R, H
 	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
@@ -1150,7 +1150,7 @@ union --B -- nS,R, H
 	'	and	lower(isnull(p.race_cd,''xx'')) in (select lower(code) from pcornet_codelist where codetype=''RACE'') '+
 	'   and lower(isnull(p.race_cd,''xx'')) in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'')'
 	from pcornet_demo race,pcornet_demo hisp
-	where race.c_fullname like '\PCORI\DEMOGRAPHIC\RACE%'
+	where race.c_fullname like '\PCORI\DEMOGRAPHIC\RACE\%'
 	and race.c_visualattributes like 'L%'
 	and hisp.c_fullname like '\PCORI\DEMOGRAPHIC\HISPANIC\Y%'
 	and hisp.c_visualattributes like 'L%'
@@ -1167,7 +1167,7 @@ union --4 -- S, NR, H
 	'	and lower(isnull(p.race_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''RACE'') '+
 	'	and lower(isnull(p.race_cd,''xx'')) in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'') '
 	from pcornet_demo sex
-	where sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX%'
+	where sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX\%'
 	and sex.c_visualattributes like 'L%'
 union --5 -- NS, NR, H
 	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
@@ -1226,12 +1226,12 @@ WHERE P.C_FULLNAME LIKE '\PCORI\DEMOGRAPHIC\BIOBANK_FLAG\Y\%')
 UPDATE D SET gender_identity = P.pcori_basecode
 from pmndemographic D inner join i2b2fact i on D.patid=i.patient_num
 INNER JOIN pcornet_demo P ON i.CONCEPT_CD = P.C_BASECODE 
-P.C_FULLNAME LIKE '\PCORI\DEMOGRAPHIC\GENDER_IDENTITY\%'
+WHERE P.C_FULLNAME LIKE '\PCORI\DEMOGRAPHIC\GENDER_IDENTITY\%'
 
 UPDATE D SET sexual_orientation = P.pcori_basecode
 from pmndemographic D inner join i2b2fact i on D.patid=i.patient_num
 INNER JOIN pcornet_demo P ON i.CONCEPT_CD = P.C_BASECODE 
-P.C_FULLNAME LIKE '\PCORI\DEMOGRAPHIC\SEXUAL_ORIENTATION\%'
+WHERE P.C_FULLNAME LIKE '\PCORI\DEMOGRAPHIC\SEXUAL_ORIENTATION\%'
 
 end
 
@@ -1434,7 +1434,7 @@ create procedure PCORNetVital as
 begin
 -- jgk: I took out admit_date - it doesn't appear in the scheme. Now in SQLServer format - date, substring, name on inner select, no nested with. Added modifiers and now use only pathnames, not codes.
 insert into pmnVITAL(patid, encounterid, measure_date, measure_time,vital_source,ht, wt, diastolic, systolic, original_bmi, bp_position,smoking,tobacco,tobacco_type)
-select patid, encounterid, measure_date, measure_time,vital_source,ht, wt, diastolic, systolic, original_bmi, bp_position,smoking,tobacco,
+select patid, encounterid, measure_date, measure_time,vital_source, ht, wt, diastolic, systolic, original_bmi, bp_position,smoking,tobacco, 
 case when tobacco in ('02','03','04') then -- no tobacco
     case when smoking in ('03','04') then '04' -- no smoking
         when smoking in ('01','02','07','08') then '01' -- smoking
@@ -1470,7 +1470,7 @@ from (
       select patient_num patid, encounter_num encounterid, 
       	substring(convert(varchar,start_Date,20),1,10) measure_date, 
 	substring(convert(varchar,start_Date,20),12,5) measure_time, 
-      nval_num, pcori_basecode, pcori_code from
+    nval_num, pcori_basecode, pcori_code from 
     (select obs.patient_num, obs.encounter_num, obs.start_Date, nval_num, pcori_basecode, codes.pcori_code
     from i2b2fact obs
     inner join (select c_basecode concept_cd, c_fullname pcori_code, pcori_basecode
@@ -1488,7 +1488,7 @@ from (
         select '\PCORI\VITAL\TOBACCO\' concept_path
         ) bp, pcornet_vital pm
       where pm.c_fullname like bp.concept_path + '%'
-      ) codes on (codes.concept_cd = obs.concept_cd) 
+      ) codes on (codes.concept_cd = obs.concept_cd) where nval_num <= 10000000 --cdm 3.1 bug fix
       UNION ALL
     select obs.patient_num, obs.encounter_num, obs.start_Date, nval_num, pcori_basecode, codes.pcori_code
     from i2b2fact obs
@@ -1677,7 +1677,7 @@ create procedure PCORNetHarvest as
 begin
 
 INSERT INTO [dbo].[pmnharvest]([NETWORKID], [NETWORK_NAME], [DATAMARTID], [DATAMART_NAME], [DATAMART_PLATFORM], [CDM_VERSION], [DATAMART_CLAIMS], [DATAMART_EHR], [BIRTH_DATE_MGMT], [ENR_START_DATE_MGMT], [ENR_END_DATE_MGMT], [ADMIT_DATE_MGMT], [DISCHARGE_DATE_MGMT], [PX_DATE_MGMT], [RX_ORDER_DATE_MGMT], [RX_START_DATE_MGMT], [RX_END_DATE_MGMT], [DISPENSE_DATE_MGMT], [LAB_ORDER_DATE_MGMT], [SPECIMEN_DATE_MGMT], [RESULT_DATE_MGMT], [MEASURE_DATE_MGMT], [ONSET_DATE_MGMT], [REPORT_DATE_MGMT], [RESOLVE_DATE_MGMT], [PRO_DATE_MGMT], [REFRESH_DEMOGRAPHIC_DATE], [REFRESH_ENROLLMENT_DATE], [REFRESH_ENCOUNTER_DATE], [REFRESH_DIAGNOSIS_DATE], [REFRESH_PROCEDURES_DATE], [REFRESH_VITAL_DATE], [REFRESH_DISPENSING_DATE], [REFRESH_LAB_RESULT_CM_DATE], [REFRESH_CONDITION_DATE], [REFRESH_PRO_CM_DATE], [REFRESH_PRESCRIBING_DATE], [REFRESH_PCORNET_TRIAL_DATE], [REFRESH_DEATH_DATE], [REFRESH_DEATH_CAUSE_DATE]) 
-	VALUES('C1', 'SCILHS', dbo.getDataMartID(), dbo.getDataMartName(), dbo.getDataMartPlatform(), 3, '01', '02', '01','01','02','01','02','01','02','01','02','01','01','02','02','01','01','01','02','01',getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),null,getdate(),null,null,null)
+	VALUES('C1', 'SCILHS', dbo.getDataMartID(), dbo.getDataMartName(), dbo.getDataMartPlatform(), 3.1, '01', '02', '01','01','02','01','02','01','02','01','02','01','01','02','02','01','01','01','02','01',getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),null,getdate(),null,null,null)
 
 end
 GO
@@ -1741,7 +1741,7 @@ begin
 			inner join pmnENCOUNTER enc on enc.patid = unit.patient_num and enc.encounterid = unit.encounter_Num
 		 join pcornet_med unitcode 
 			on unit.modifier_cd = unitcode.c_basecode
-			and unitcode.c_fullname like '\PCORI_MOD\RX_QUANTITY_UNIT\'
+			and unitcode.c_fullname like '\PCORI_MOD\RX_QUANTITY_UNIT\%'
 
 -- insert data with outer joins to ensure all records are included even if some data elements are missing
 insert into pmnprescribing (
