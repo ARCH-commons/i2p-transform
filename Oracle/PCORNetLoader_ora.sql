@@ -1219,7 +1219,7 @@ sqltext := 'insert into pmndiagnosis (patid,			encounterid,	enc_type, admit_date
 'where (diag.c_fullname not like ''\PCORI\DIAGNOSIS\10\%'' or ' ||
 '( not (  REGEXP_LIKE (diag.pcori_basecode, ''[V].*'', ''i'')  and not REGEXP_LIKE(diag.c_fullname, ''\\PCORI\\DIAGNOSIS\\10\\\([V].*\\\([V].*\\\([V].*'', ''i'' ) ) '||
 'and not ( REGEXP_LIKE(diag.pcori_basecode, ''[E].*'', ''i'')  and not REGEXP_LIKE(diag.c_fullname, ''\\PCORI\\DIAGNOSIS\\10\\\([E].*\\\([E].*\\\([E].*'', ''i'') ) '|| 
-'and not (diag.c_fullname like ''\PCORI\DIAGNOSIS\10\%'' and REGEXP_LIKE(diag.pcori_basecode, ''[0-9].*'', ''i'' )) )) '||
+'and not (diag.c_fullname like ''\PCORI\DIAGNOSIS\10\%'' and REGEXP_LIKE(diag.pcori_basecode, ''^[0-9].*'', ''i'' )) )) '||
 'and (sourcefact.c_fullname like ''\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\%'' or sourcefact.c_fullname is null) ';
 
 PMN_EXECUATESQL(sqltext);
