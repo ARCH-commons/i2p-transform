@@ -1633,7 +1633,12 @@ NULL [RAW_UNIT],
 NULL [RAW_ORDER_DEPT],
 NULL [RAW_FACILITY_CODE]
 
-
+/* Assumes the following ontology structure:
+	    LAB_NAME:zzz <-- used to assign LAB_NAME, UN gets assigned if the parent doesn't look like this 
+	      LOINC:xxx  <-- from provided ontology, unchanged
+	        localcode1 <-- added locally
+	        localcode2
+*/
 FROM i2b2fact M   --JK bug fix 10/7/16
 inner join pmnENCOUNTER enc on enc.patid = m.patient_num and enc.encounterid = m.encounter_Num -- Constraint to selected encounters
 inner join pcornet_lab lab on lab.c_basecode  = M.concept_cd and lab.c_fullname like '\PCORI\LAB_RESULT_CM\%'
