@@ -25,12 +25,14 @@
 # failure-prone. Fortunately, the stockport/luigi-taskrunner Docker
 # image provides it:
 
-cx-Oracle==5.2.1
+#Changes from 5 to 6.0.3 have created a twophase incompatibility between
+#SQLAlchemy and cx-Oracle.
+cx-Oracle==6.0.3
 
 # Cython==0.25.1
 # docutils==0.12
 # lockfile==0.12.2
-luigi==2.4.0
+luigi==2.7.1
 # Mako==1.0.6
 # MarkupSafe==0.23
 # numpy==1.11.2

@@ -1,3 +1,6 @@
+# i2p-transform
+i2b2 to PCORnet Common Data Model Transformation - requires i2b2 PCORnet ontology
+
 # HERON ETL to i2b2
 
 We (*@@TODO aim to*) transform the data from a number of sources and
@@ -52,3 +55,4 @@ See [client.cfg](client.cfg).
 For design info and project coding style, see [CONTRIBUTING][].
 
 [CONTRIBUTING]: CONTRIBUTING.md
+

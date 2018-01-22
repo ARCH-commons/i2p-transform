@@ -10,6 +10,7 @@ Each script should have a title, taken from the first line::
     >>> text = Script.migrate_fact_upload.value
     >>> lines = text.split('\n')
     >>> print(lines[0])
+    ... #doctest: +NORMALIZE_WHITESPACE
     /** migrate_fact_upload - append data from a workspace table.
 
 We can separate the script into statements::
@@ -67,8 +68,11 @@ The completion test may depend on a digest of the script and its dependencies:
     >>> design_digest = Script.epic_flowsheets_transform.digest()
     >>> last = Script.epic_flowsheets_transform.statements(variables)[-1].strip()
     >>> print(last)
+    ... #doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
     select 1 up_to_date
-    from epic_flowsheets_txform_sql where design_digest = 1724122010
+    from epic_flowsheets_txform_sql where design_digest = ...
+
+ISSUE : Python hashes are senstive to the machine running the test?
 
 Some scripts use variables that are not known until a task is run; for
 example, `&&upload_id` is used in names of objects such as tables and
@@ -160,7 +164,7 @@ class SQLMixin(enum.Enum):
         line1 = self.sql.split('\n', 1)[0]
         if not (line1.startswith('/** ') and ' - ' in line1):
             raise ValueError('%s missing title block' % self)
-        return line1.split(' - ', 1)[1]
+        return line1.split(' - ', 1)[1].strip()
 
     def deps(self) -> List['SQLMixin']:
         return [child
@@ -233,8 +237,9 @@ class ScriptMixin(SQLMixin):
         return '.sql'
 
     def parse(self, text: SQL,
-              block_sep: str=';\n/\n') -> Iterable[StatementInContext]:
-        return (sql_syntax.iter_blocks(text) if block_sep in text
+              block_sep: str='/') -> Iterable[StatementInContext]:
+        lines = [l.strip() for l in text.split('\n')]
+        return (sql_syntax.iter_blocks(text) if block_sep in lines
                 else iter_statement(text))
 
     def created_objects(self) -> List[ObjectId]:
@@ -260,14 +265,16 @@ class Script(ScriptMixin, enum.Enum):
     '''
     [
         # Keep sorted
+        PCORNetInit,
         epic_facts_load,
         epic_flowsheets_transform,
         etl_tests_init,
         migrate_fact_upload,
     ] = [
         pkg.resource_string(__name__,
-                            'sql_scripts/' + fname).decode('utf-8')
+                            'Oracle/' + fname).decode('utf-8')
         for fname in [
+                'PCORNetInit.sql',
                 'epic_facts_load.sql',
                 'epic_flowsheets_transform.sql',
                 'etl_tests_init.sql',

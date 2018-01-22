@@ -156,6 +156,8 @@ class DBAccessTask(luigi.Task):
         if 'oracle' in account.lower():
             url.query['pool_recycle'] = self.max_idle
             # `twophase` interferes with direct path load somehow.
+            # To disable twophase, allow_twophase flag was commented out of opts dict in cx_Oracle.py
+            # This appears to be a change from cx_Oracle version 5 to 6.
             url.query['allow_twophase'] = False
         if self.passkey:
             from os import environ  # ISSUE: ambient

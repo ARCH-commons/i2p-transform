@@ -230,9 +230,9 @@ def insert_append_table(statement: SQL) -> Optional[Name]:
 
 
 def iter_blocks(module: SQL,
-                separator: str ='\n/\n') -> Iterable[StatementInContext]:
+                separator: str =r'\r?\n/\r?\n') -> Iterable[StatementInContext]:
     line = 1
-    for block in module.split(separator):
+    for block in re.split(separator, module):
         if block.strip():
             yield (line, '...no comment handling...', block)
         line += len((block + separator).split('\n')[:-1])

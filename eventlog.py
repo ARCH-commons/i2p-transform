@@ -64,7 +64,7 @@ class EventLogger(logging.LoggerAdapter):
     def __init__(self, logger: logging.Logger, event: JSONObject,
                  clock: Opt[Callable[[], datetime]]=None) -> None:
         logging.LoggerAdapter.__init__(self, logger, extra={})
-        self.name = logger.name
+#        self.name = logger.name
         if clock is None:
             clock = datetime.now  # ISSUE: ambient
         self.event = event
