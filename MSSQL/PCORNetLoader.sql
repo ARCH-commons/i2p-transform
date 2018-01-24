@@ -1046,7 +1046,7 @@ go
 -- create the reporting table - don't do this once you are running stuff and you want to track loads
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'i2pReport') AND type in (N'U')) DROP TABLE i2pReport
 GO
-create table i2pReport (runid numeric, rundate smalldatetime, concept varchar(20), sourceval numeric, sourcedistinct numeric, destval numeric, destdistinct numeric)
+create table i2pReport (runid numeric, rundate smalldatetime, concept varchar(20), sourceval numeric, sourcedistinct numeric, destval numeric, destdistinct numeric, maxdate datetime)
 go
 insert into i2preport (runid) select 0
 
@@ -2106,12 +2106,13 @@ go
 ----------------------------------------------------------------------------------------------------------------------------------------
 -- 12. Report Results - Version 5.1 by Aaron Abend and Jeff Klann
 -- This version is useful to check against i2b2, but consider running the more detailed annotated data dictionary tool also.
+-- Added max date listing - 1/24/18
 ----------------------------------------------------------------------------------------------------------------------------------------
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'pcornetReport') AND type in (N'P', N'PC')) DROP PROCEDURE pcornetReport
 go
 
 CREATE PROCEDURE [dbo].[pcornetReport] 
-as
+as 
 declare @i2b2vitald numeric
 declare @i2b2dxd numeric
 declare @i2b2cond numeric
@@ -2146,6 +2147,16 @@ declare @pmnprescribingsd numeric
 declare @pmndispensingsd numeric
 declare @pmncondd numeric
 
+declare @pmnencounterst datetime
+declare @pmndxt datetime
+declare @pmnprocst datetime
+declare @pmnfactst datetime
+declare @pmnenrollt datetime
+declare @pmnvitalt datetime
+declare @pmnlabst datetime
+declare @pmnprescribingst datetime
+declare @pmndispensingst datetime
+declare @pmncondt datetime
 
 declare @runid numeric
 begin
@@ -2176,6 +2187,17 @@ select @pmnvitald =count(distinct patid)  from pmnvital
 select @pmnlabsd =count(distinct patid)  from pmnlabresults_cm
 select @pmnprescribingsd =count(distinct patid)  from pmnprescribing
 select @pmndispensingsd =count(distinct patid)  from pmndispensing
+
+-- Max date (avg of top ten) in PMN tables
+select @pmnencounterst=CAST(AVG(CAST(admit_date AS INT)) AS DATETIME) from (select top 10 admit_date from pmnencounter where admit_date<getdate() order by admit_date desc) x
+select @pmndxt=CAST(AVG(CAST(admit_date AS INT)) AS DATETIME) from (select top 10 admit_date from pmndiagnosis where admit_date<getdate() order by admit_date desc) x
+select @pmnprocst=CAST(AVG(CAST(admit_date AS INT)) AS DATETIME) from (select top 10 px_date admit_date from pmnprocedure where px_date<getdate() order by px_date desc) x
+select @pmncondt=CAST(AVG(CAST(admit_date AS INT)) AS DATETIME) from (select top 10 report_date admit_date from pmncondition where report_date<getdate() order by report_date desc) x
+select @pmnenrollt=CAST(AVG(CAST(admit_date AS INT)) AS DATETIME) from (select top 10 enr_start_date admit_date from pmnenrollment where enr_start_date<getdate() order by enr_start_date desc) x
+select @pmnvitalt=CAST(AVG(CAST(admit_date AS INT)) AS DATETIME) from (select top 10 measure_date admit_date from pmnvital where measure_date<getdate() order by measure_date desc) x
+select @pmnlabst=CAST(AVG(CAST(admit_date AS INT)) AS DATETIME) from (select top 10 result_date admit_date from pmnlab_result_cm where result_date<getdate() order by result_date desc) x
+select @pmnprescribingst=CAST(AVG(CAST(admit_date AS INT)) AS DATETIME) from (select top 10 rx_order_date admit_date from pmnprescribing where rx_order_date<getdate() order by rx_order_date desc) x
+select @pmndispensingst=CAST(AVG(CAST(admit_date AS INT)) AS DATETIME) from (select top 10 dispense_date admit_date from pmndispensing where dispense_date<getdate() order by dispense_date desc) x
 
 -- Distinct patients in i2b2 (unfinished)
 select @i2b2pxd=count(distinct patient_num) from i2b2fact fact
@@ -2228,19 +2250,19 @@ select @i2b2encountersd=count(distinct patient_num) from i2b2visit
 
 select @runid = max(runid) from i2pReport
 set @runid = @runid + 1
-insert into i2pReport select @runid, getdate(), 'Pats',			@i2b2pats, @i2b2pats,		@pmnpats,			null
-insert into i2pReport select @runid, getdate(), 'Enrollment',	@i2b2pats, @i2b2pats,		@pmnenroll,			@pmnenrolld
+insert into i2pReport select @runid, getdate(), 'Pats',			@i2b2pats, @i2b2pats,		@pmnpats,			null,null
+insert into i2pReport select @runid, getdate(), 'Enrollment',	@i2b2pats, @i2b2pats,		@pmnenroll,			@pmnenrolld, @pmnenrollt
 
-insert into i2pReport select @runid, getdate(), 'Encounters',	@i2b2Encounters,null,@pmnEncounters,		@pmnEncountersd
-insert into i2pReport select @runid, getdate(), 'DX',		null,@i2b2dxd,@pmndx,	@pmndxd
-insert into i2pReport select @runid, getdate(), 'PX',		null,@i2b2pxd,@pmnprocs,	@pmnprocsd
-insert into i2pReport select @runid, getdate(), 'Condition',		null,@i2b2cond,		@pmncond,	@pmncondd
-insert into i2pReport select @runid, getdate(), 'Vital',		null,@i2b2vitald,		@pmnvital,	@pmnvitald
-insert into i2pReport select @runid, getdate(), 'Labs',		null,null,		@pmnlabs,	@pmnlabsd
-insert into i2pReport select @runid, getdate(), 'Prescribing',		null,null,	@pmnprescribings,	@pmnprescribingsd
-insert into i2pReport select @runid, getdate(), 'Dispensing',		null,null,	@pmndispensings,	@pmndispensingsd
+insert into i2pReport select @runid, getdate(), 'Encounters',	@i2b2Encounters,null,@pmnEncounters,@pmnEncountersd,@pmnEncounterst
+insert into i2pReport select @runid, getdate(), 'DX',		null,@i2b2dxd,@pmndx,@pmndxd,@pmndxt
+insert into i2pReport select @runid, getdate(), 'PX',		null,@i2b2pxd,@pmnprocs,@pmnprocsd,@pmnprocsd
+insert into i2pReport select @runid, getdate(), 'Condition',		null,@i2b2cond,		@pmncond,	@pmncondd, @pmncondt
+insert into i2pReport select @runid, getdate(), 'Vital',		null,@i2b2vitald,		@pmnvital,	@pmnvitald, @pmnvitalt
+insert into i2pReport select @runid, getdate(), 'Labs',		null,null,		@pmnlabs,	@pmnlabsd, @pmnlabst
+insert into i2pReport select @runid, getdate(), 'Prescribing',		null,null,	@pmnprescribings,	@pmnprescribingsd, @pmnprescribingst
+insert into i2pReport select @runid, getdate(), 'Dispensing',		null,null,	@pmndispensings,	@pmndispensingsd, @pmndispensingst
 
-select concept 'Data Type',sourceval 'From i2b2',sourcedistinct 'Patients in i2b2' ,  destval 'In PopMedNet', destdistinct 'Patients in PopMedNet' from i2preport where runid=@runid
+select concept 'Data Type',sourceval 'From i2b2',sourcedistinct 'Patients in i2b2' ,  destval 'In PopMedNet', destdistinct 'Patients in PopMedNet', maxdate 'Max Date in PopMedNet' from i2preport where runid=@runid
 
 end
 GO
