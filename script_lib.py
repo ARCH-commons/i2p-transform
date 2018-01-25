@@ -266,18 +266,22 @@ class Script(ScriptMixin, enum.Enum):
     [
         # Keep sorted
         PCORNetInit,
+        PCORNetLoader_ora,
         epic_facts_load,
         epic_flowsheets_transform,
         etl_tests_init,
+        med_admin,
         migrate_fact_upload,
     ] = [
         pkg.resource_string(__name__,
                             'Oracle/' + fname).decode('utf-8')
         for fname in [
                 'PCORNetInit.sql',
+                'PCORNetLoader_ora.sql',
                 'epic_facts_load.sql',
                 'epic_flowsheets_transform.sql',
                 'etl_tests_init.sql',
+                'med_admin.sql',
                 'migrate_fact_upload.sql',
         ]
     ]

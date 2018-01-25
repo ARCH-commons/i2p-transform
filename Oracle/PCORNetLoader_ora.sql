@@ -1289,3 +1289,5 @@ begin
   PCORNetPostProc;
 end PCORNetLoader;
 /
+
+SELECT 1 FROM HARVEST

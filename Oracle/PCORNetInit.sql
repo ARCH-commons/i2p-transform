@@ -1007,4 +1007,88 @@ CREATE TABLE harvest(
 	REFRESH_DEATH_CAUSE_DATE date NULL
 )
 /
+
+--------------------------------------------------------------------------------
+-- OBS_CLIN
+--------------------------------------------------------------------------------
+
+BEGIN
+PMN_DROPSQL('DROP TABLE obs_clin');
+END;
+/
+CREATE TABLE obs_clin(
+    OBSCLINID varchar(50) NOT NULL,
+    PATID varchar(50) NOT NULL,
+    ENCOUNTERID varchar(50) NULL,
+    OBSCLIN_PROVIDERID varchar(50) NULL,
+    OBSCLIN_DATE date NULL,
+    OBSCLIN_TIME varchar(5) NULL,
+    OBSCLIN_TYPE varchar(2) NULL,
+    OBSCLIN_CODE varchar(50) NULL,
+    OBSCLIN_RESULT_QUAL varchar(50) NULL,
+    OBSCLIN_RESULT_TEXT varchar(50) NULL,
+    OBSCLIN_RESULT_SNOMED varchar(50),
+    OBSCLIN_RESULT_NUM NUMBER(18, 0) NULL, -- (8,0)
+    OBSCLIN_RESULT_MODIFIER varchar(2) NULL,
+    OBSCLIN_RESULT_UNIT varchar(50) NULL,
+    RAW_OBSCLIN_NAME varchar(50) NULL,
+    RAW_OBSCLIN_CODE varchar(50) NULL,
+    RAW_OBSCLIN_TYPE varchar(50) NULL,
+    RAW_OBSCLIN_RESULT varchar(50) NULL,
+    RAW_OBSCLIN_MODIFIER varchar(50) NULL,
+    RAW_OBSCLIN_UNIT varchar(50) NULL
+)
+/
+
+--------------------------------------------------------------------------------
+-- OBS_GEN
+--------------------------------------------------------------------------------
+
+BEGIN
+PMN_DROPSQL('DROP TABLE obs_gen');
+END;
+/
+CREATE TABLE obs_gen(
+    OBSGENID varchar(50) NOT NULL,
+    PATID varchar(50) NOT NULL,
+    ENCOUNTERID varchar(50) NULL,
+    OBSGEN_PROVIDERID varchar(50) NULL,
+    OBSGEN_DATE date NULL,
+    OBSGEN_TIME varchar(5) NULL,
+    OBSGEN_TYPE varchar(30) NULL,
+    OBSGEN_CODE varchar(50) NULL,
+    OBSGEN_RESULT_QUAL varchar(50) NULL,
+    OBSGEN_RESULT_TEXT varchar(50) NULL,
+    OBSGEN_RESULT_NUM NUMBER(18, 0) NULL, -- (8,0)
+    OBSGEN_RESULT_MODIFIER varchar(2) NULL,
+    OBSGEN_RESULT_UNIT varchar(50) NULL,
+    OBSGEN_TABLE_MODIFIED varchar(3) NULL,
+    OBSGEN_ID_MODIFIED varchar(50) NULL,
+    RAW_OBSGEN_NAME varchar(50) NULL,
+    RAW_OBSGEN_CODE varchar(50) NULL,
+    RAW_OBSGEN_TYPE varchar(50) NULL,
+    RAW_OBSGEN_RESULT varchar(50) NULL,
+    RAW_OBSGEN_UNIT varchar(50) NULL
+)
+/
+
+--------------------------------------------------------------------------------
+-- PROVIDER
+--------------------------------------------------------------------------------
+
+BEGIN
+PMN_DROPSQL('DROP TABLE provider');
+END;
+/
+CREATE TABLE provider(
+    PROVIDERID varchar(50) NOT NULL,
+    PROVIDER_SEX varchar(2) NULL,
+    PROVIDER_SPECIALTY_PRIMARY varchar(50) NULL,
+    PROVIDER_NPI NUMBER(18, 0) NULL, -- (8,0)
+    PROVIDER_NPI_FLAG varchar(1) NULL,
+    RAW_PROVIDER_SPECIALTY_PRIMARY varchar(50) NULL
+)
+/
+
+
 SELECT 1 FROM HARVEST
