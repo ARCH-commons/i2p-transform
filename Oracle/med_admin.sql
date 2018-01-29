@@ -18,7 +18,7 @@ CREATE TABLE med_admin(
     MEDADMIN_STOP_TIME varchar(5) NULL,
     MEDADMIN_TYPE varchar(2) NULL,
     MEDADMIN_CODE varchar(50) NULL,
-    MEDADMIN_DOSE_ADMIN NUMBER(18, 0) NULL, -- (8,0)
+    MEDADMIN_DOSE_ADMIN NUMBER(18, 2) NULL, -- (8,0)
     MEDADMIN_DOSE_ADMIN_UNIT varchar(50) NULL,
     MEDADMIN_ROUTE varchar(50) NULL,
     MEDADMIN_SOURCE varchar(2) NULL,
@@ -50,13 +50,24 @@ PMN_DROPSQL('drop index med_admin_idx');
 execute immediate 'truncate table med_admin';
 
 insert into med_admin(patid, encounterid, medadmin_providerid, medadmin_start_date, medadmin_start_time, medadmin_stop_date,
-medadmin_stop_time, medadmin_type, medadmin_code, medadmin_source)
-select patient_num, encounter_num, provider_id, start_date, to_char(start_date, 'HH24:MI'), end_date, to_char(end_date, 'HH24:MI'),
-'RX' as medadmin_type, concept_cd, 'OD' as medadmin_source
-from pcornet_cdm.observation_fact_meds;
+medadmin_stop_time, medadmin_type, medadmin_code, medadmin_dose_admin, medadmin_dose_admin_unit, medadmin_source, raw_medadmin_code,
+raw_medadmin_dose_admin, raw_medadmin_dose_admin_unit)
 
-execute immediate 'create index med_admin_idx on prescribing (PATID, ENCOUNTERID)';
-GATHER_TABLE_STATS('MED_ADMIN');
+with med_start as (
+    select patient_num, encounter_num, provider_id, start_date, end_date, concept_cd, modifier_cd, instance_num
+    from pcornet_cdm.observation_fact_meds
+    where (modifier_cd like '%MAR%New Bag%' or (modifier_cd like '%MAR%Given%' and modifier_cd not like '%Not Given%'))
+)
+select med_start.patient_num, med_start.encounter_num, med_start.provider_id, med_start.start_date, to_char(med_start.start_date, 'HH24:MI'), med_start.end_date, to_char(med_start.end_date, 'HH24:MI'),
+'RX', med_start.concept_cd, med_dose.nval_num, med_dose.units_cd, 'OD', med_start.concept_cd, med_dose.nval_num, med_dose.units_cd
+from med_start
+left join pcornet_cdm.observation_fact_meds med_dose
+on med_dose.instance_num = med_start.instance_num
+and med_dose.modifier_cd like '%Dose%'
+;
+
+execute immediate 'create index med_admin_idx on med_admin (PATID, ENCOUNTERID)';
+--GATHER_TABLE_STATS('MED_ADMIN');
 
 end PCORNetMedAdmin;
 /

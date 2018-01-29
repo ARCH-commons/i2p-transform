@@ -600,9 +600,9 @@ CREATE TABLE LOCATION  (
 /
 
 -- TODO: This seems to belong in h2p-mapping
-alter table "&&i2b2_meta_schema".pcornet_lab add (
-  pcori_specimen_source varchar2(1000) -- arbitrary
-  );
+--alter table "&&i2b2_meta_schema".pcornet_lab add (
+--  pcori_specimen_source varchar2(1000) -- arbitrary
+--  );
 
 
 --------------------------------------------------------------------------------
@@ -893,9 +893,9 @@ CREATE TABLE AMOUNT  (
 /
 
 -- TODO: This seems to belong in h2p-mapping
-alter table "&&i2b2_meta_schema".pcornet_med add (
-  pcori_ndc varchar2(1000) -- arbitrary
-  );
+--alter table "&&i2b2_meta_schema".pcornet_med add (
+--  pcori_ndc varchar2(1000) -- arbitrary
+--  );
 
 
 --------------------------------------------------------------------------------
@@ -1091,4 +1091,4 @@ CREATE TABLE provider(
 /
 
 
-SELECT 1 FROM HARVEST
+SELECT * FROM dual where rownum < 2

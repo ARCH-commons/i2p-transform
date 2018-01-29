@@ -1290,4 +1290,4 @@ begin
 end PCORNetLoader;
 /
 
-SELECT 1 FROM HARVEST
+SELECT * FROM dual where rownum < 2
