@@ -50,20 +50,59 @@ PMN_DROPSQL('drop index med_admin_idx');
 execute immediate 'truncate table med_admin';
 
 insert into med_admin(patid, encounterid, medadmin_providerid, medadmin_start_date, medadmin_start_time, medadmin_stop_date,
-medadmin_stop_time, medadmin_type, medadmin_code, medadmin_dose_admin, medadmin_dose_admin_unit, medadmin_source, raw_medadmin_code,
-raw_medadmin_dose_admin, raw_medadmin_dose_admin_unit)
+medadmin_stop_time, medadmin_type, medadmin_code, medadmin_dose_admin, medadmin_dose_admin_unit, medadmin_source, raw_medadmin_med_name,
+raw_medadmin_code, raw_medadmin_dose_admin, raw_medadmin_dose_admin_unit, raw_medadmin_route)
 
 with med_start as (
     select patient_num, encounter_num, provider_id, start_date, end_date, concept_cd, modifier_cd, instance_num
     from pcornet_cdm.observation_fact_meds
-    where (modifier_cd like '%MAR%New Bag%' or (modifier_cd like '%MAR%Given%' and modifier_cd not like '%Not Given%'))
+    where modifier_cd = 'MedObs|MAR:New Bag'
+    or modifier_cd = 'MedObs|MAR:Downtime Given - New Bag'
+    or modifier_cd = 'MedObs|MAR:Given -  Without Order'
+    or modifier_cd = 'MedObs|MAR:Downtime Given'
+    or modifier_cd = 'MedObs|MAR:Given - Without Order'
+    or modifier_cd = 'MedObs|MAR:Given by another Provider'
+    or modifier_cd = 'MedObs|MAR:Given by Patient/Family'
+    or modifier_cd = 'MedObs|MAR:Given'
+    or modifier_cd = 'MedObs|MAR:Clinic Administered - Patient Supplied'
+    or modifier_cd = 'MedObs|MAR:Bolus'
+    or modifier_cd = 'MedObs|MAR:Per Protocol'
+    or modifier_cd = 'MedObs|MAR:Infusion Home with Patient'
+    or modifier_cd = 'MedObs|MAR:ED-Infusing Upon Admit'
+    or modifier_cd = 'MedObs|MAR:Push'
+    or modifier_cd = 'MedObs|MAR:Restarted'
+    or modifier_cd = 'MedObs|MAR:PCA Check/Change'
+    or modifier_cd = 'MedObs|MAR:NPO'
+    or modifier_cd = 'MedObs|MAR:See OR/Proc Flowsheet'
+    or modifier_cd = 'MedObs|MAR:Patch Applied'
+    or modifier_cd = 'MedObs|MAR:Bolus from Syringe'
+    or modifier_cd = 'MedObs|MAR:Bolus.'
 )
-select med_start.patient_num, med_start.encounter_num, med_start.provider_id, med_start.start_date, to_char(med_start.start_date, 'HH24:MI'), med_start.end_date, to_char(med_start.end_date, 'HH24:MI'),
-'RX', med_start.concept_cd, med_dose.nval_num, med_dose.units_cd, 'OD', med_start.concept_cd, med_dose.nval_num, med_dose.units_cd
+select med_start.patient_num, med_start.encounter_num, med_start.provider_id, med_start.start_date, to_char(med_start.start_date, 'HH24:MI'), med_start.end_date,
+to_char(med_start.end_date, 'HH24:MI'), 'RX', med_p.pcori_basecode, med_dose.nval_num, med_dose.units_cd, 'OD', med_p.c_name, med_start.concept_cd, med_dose.nval_num,
+med_dose.units_cd, med_start.modifier_cd
 from med_start
 left join pcornet_cdm.observation_fact_meds med_dose
 on med_dose.instance_num = med_start.instance_num
-and med_dose.modifier_cd like '%Dose%'
+and med_dose.start_date = med_start.start_date
+and (med_dose.modifier_cd = 'MedObs:MAR_Dose|puff'
+or med_dose.modifier_cd = 'MedObs:MAR_Dose|cap'
+or med_dose.modifier_cd = 'MedObs:MAR_Dose|drop'
+or med_dose.modifier_cd = 'MedObs:MAR_Dose|meq'
+or med_dose.modifier_cd = 'MedObs:MAR_Dose|tab'
+or med_dose.modifier_cd = 'MedObs:MAR_Dose|units'
+or med_dose.modifier_cd = 'MedObs:MAR_Dose|l'
+or med_dose.modifier_cd = 'MedObs:MAR_Dose|mg'
+or med_dose.modifier_cd = 'MedObs:Dose|puff'
+or med_dose.modifier_cd = 'MedObs:Dose|drop'
+or med_dose.modifier_cd = 'MedObs:Dose|cap'
+or med_dose.modifier_cd = 'MedObs:Dose|meq'
+or med_dose.modifier_cd = 'MedObs:Dose|units'
+or med_dose.modifier_cd = 'MedObs:Dose|l'
+or med_dose.modifier_cd = 'MedObs:Dose|tab'
+or  med_dose.modifier_cd = 'MedObs:Dose|mg')
+left join BLUEHERONMETADATA.pcornet_med med_p
+on med_p.c_basecode = med_start.concept_cd
 ;
 
 execute immediate 'create index med_admin_idx on med_admin (PATID, ENCOUNTERID)';
@@ -71,5 +110,8 @@ execute immediate 'create index med_admin_idx on med_admin (PATID, ENCOUNTERID)'
 
 end PCORNetMedAdmin;
 /
-
-SELECT 1 FROM HARVEST
+BEGIN
+PCORNetMedAdmin();
+END;
+/
+SELECT count(*) from med_admin
