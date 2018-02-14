@@ -78,7 +78,7 @@ raw_medadmin_code, raw_medadmin_dose_admin, raw_medadmin_dose_admin_unit, raw_me
 
 with med_start as (
     select patient_num, encounter_num, provider_id, start_date, end_date, concept_cd, modifier_cd, instance_num
-    from pcornet_cdm.observation_fact_meds
+    from pcornet_cdm.observation_fact
     where modifier_cd = 'MedObs|MAR:New Bag'
     or modifier_cd = 'MedObs|MAR:Downtime Given - New Bag'
     or modifier_cd = 'MedObs|MAR:Given -  Without Order'
