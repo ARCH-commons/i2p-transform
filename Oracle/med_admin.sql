@@ -78,7 +78,7 @@ raw_medadmin_code, raw_medadmin_dose_admin, raw_medadmin_dose_admin_unit, raw_me
 
 with med_start as (
     select patient_num, encounter_num, provider_id, start_date, end_date, concept_cd, modifier_cd, instance_num
-    from pcornet_cdm.observation_fact
+    from BLUEHERONDATA.observation_fact
     where modifier_cd = 'MedObs|MAR:New Bag'
     or modifier_cd = 'MedObs|MAR:Downtime Given - New Bag'
     or modifier_cd = 'MedObs|MAR:Given -  Without Order'
@@ -105,7 +105,7 @@ select med_start.patient_num, med_start.encounter_num, med_start.provider_id, me
 to_char(med_start.end_date, 'HH24:MI'), 'RX', med_p.pcori_basecode, med_dose.nval_num, med_dose.units_cd, 'OD', med_p.c_name, med_start.concept_cd, med_dose.nval_num,
 med_dose.units_cd, med_start.modifier_cd
 from med_start
-left join pcornet_cdm.observation_fact med_dose
+left join BLUEHERONDATA.observation_fact med_dose
 on med_dose.instance_num = med_start.instance_num
 and med_dose.start_date = med_start.start_date
 and (med_dose.modifier_cd = 'MedObs:MAR_Dose|puff'
