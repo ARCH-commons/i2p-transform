@@ -271,6 +271,7 @@ class Script(ScriptMixin, enum.Enum):
         epic_flowsheets_transform,
         etl_tests_init,
         med_admin,
+        med_admin_init,
         migrate_fact_upload,
     ] = [
         pkg.resource_string(__name__,
@@ -282,6 +283,7 @@ class Script(ScriptMixin, enum.Enum):
                 'epic_flowsheets_transform.sql',
                 'etl_tests_init.sql',
                 'med_admin.sql',
+                'med_admin_init.sql',
                 'migrate_fact_upload.sql',
         ]
     ]

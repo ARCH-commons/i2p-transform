@@ -31,3 +31,14 @@ class PCORNetMed_Admin(SqlScriptTask):
     @property
     def variables(self) -> Environment:
         return dict()
+
+    def requires(self) -> List[luigi.Task]:
+
+        return [PCORNetMed_Admin_Init()]
+
+class PCORNetMed_Admin_Init(SqlScriptTask):
+    script = Script.med_admin_init
+
+    @property
+    def variables(self) -> Environment:
+        return dict()
