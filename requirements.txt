@@ -27,7 +27,7 @@
 
 #Changes from 5 to 6.0.3 have created a twophase incompatibility between
 #SQLAlchemy and cx-Oracle.
-cx-Oracle==6.0.3
+cx_Oracle==6.0.3
 
 # Cython==0.25.1
 # docutils==0.12
@@ -46,7 +46,8 @@ pandas==0.19.1
 # pytz==2016.10
 # requests==2.12.3
 # six==1.10.0
-SQLAlchemy==1.1.4
+# SQLAlchemy==1.1.4 has a twophase conflict with cx_Oracle==6.0.3
+SQLAlchemy==1.2.1
 #tornado==4.4.2
 #XlsxWriter==0.9.4
 

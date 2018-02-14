@@ -1091,4 +1091,4 @@ CREATE TABLE provider(
 /
 
 
-SELECT * FROM dual where rownum < 2
+SELECT 0 FROM dual

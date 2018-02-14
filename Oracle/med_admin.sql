@@ -1,7 +1,30 @@
 --------------------------------------------------------------------------------
+-- HELPER FUNCTIONS AND PROCEDURES
+--------------------------------------------------------------------------------
+--These helper functions also exist in PCORNetInit.sql.  They are reproduced
+--here to make the med_admin script an independent luigi job.
+--TODO: consolidate helpers in a single, table independent job.
+create or replace PROCEDURE GATHER_TABLE_STATS(table_name VARCHAR2) AS
+  BEGIN
+  DBMS_STATS.GATHER_TABLE_STATS (
+          ownname => 'PCORNET_CDM', -- This doesn't work as a parameter for some reason.
+          tabname => table_name,
+          estimate_percent => 50, -- Percentage picked somewhat arbitrarily
+          cascade => TRUE,
+          degree => 16
+          );
+END GATHER_TABLE_STATS;
+/
+create or replace PROCEDURE PMN_DROPSQL(sqlstring VARCHAR2) AS
+  BEGIN
+      EXECUTE IMMEDIATE sqlstring;
+  EXCEPTION
+      WHEN OTHERS THEN NULL;
+END PMN_DROPSQL;
+/
+--------------------------------------------------------------------------------
 -- MED_ADMIN
 --------------------------------------------------------------------------------
-
 BEGIN
 PMN_DROPSQL('DROP TABLE med_admin');
 END;
@@ -82,7 +105,7 @@ select med_start.patient_num, med_start.encounter_num, med_start.provider_id, me
 to_char(med_start.end_date, 'HH24:MI'), 'RX', med_p.pcori_basecode, med_dose.nval_num, med_dose.units_cd, 'OD', med_p.c_name, med_start.concept_cd, med_dose.nval_num,
 med_dose.units_cd, med_start.modifier_cd
 from med_start
-left join pcornet_cdm.observation_fact_meds med_dose
+left join pcornet_cdm.observation_fact med_dose
 on med_dose.instance_num = med_start.instance_num
 and med_dose.start_date = med_start.start_date
 and (med_dose.modifier_cd = 'MedObs:MAR_Dose|puff'
@@ -114,4 +137,4 @@ BEGIN
 PCORNetMedAdmin();
 END;
 /
-SELECT count(*) from med_admin
+SELECT count(MEDADMINID) from med_admin where rownum = 1

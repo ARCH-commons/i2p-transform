@@ -20,14 +20,14 @@ class PCORNetLoader_ora(SqlScriptTask):
     def variables(self) -> Environment:
         return dict(i2b2_meta_schema='BLUEHERONMETADATA', network_id='todo1', network_name='todo2', enrollment_months_back='2')
 
+    def requires(self) -> List[luigi.Task]:
+        '''Wrap each of `self.script.deps()` in a SqlScriptTask.
+        '''
+        return [PCORNetInit()]
+
 class PCORNetMed_Admin(SqlScriptTask):
     script = Script.med_admin
 
     @property
     def variables(self) -> Environment:
-        return dict(i2b2_meta_schema='BLUEHERONMETADATA', network_id='todo1', network_name='todo2', enrollment_months_back='2')
-
-    def requires(self) -> List[luigi.Task]:
-        '''Wrap each of `self.script.deps()` in a SqlScriptTask.
-        '''
-        return [PCORNetInit(), PCORNetLoader_ora()]
+        return dict()
