@@ -202,7 +202,7 @@ class SqlScriptTask(DBAccessTask):
     >>> variables = dict(I2B2STAR='I2B2DEMODATA')
     >>> txform = SqlScriptTask(
     ...    account='sqlite:///', passkey=None,
-    ...    script=Script.migrate_fact_upload,
+    ...    script=Script.pcornet_loader,
     ...    param_vars=variables)
 
     ISSUE: doctest dependencies?
@@ -856,7 +856,7 @@ class MigrateUpload(SqlScriptTask, I2B2Task):
     parallel_degree = IntParam(default=24,
                                significant=False)
 
-    script = Script.migrate_fact_upload
+    script = Script.pcornet_loader
 
     @property
     def variables(self) -> Environment:

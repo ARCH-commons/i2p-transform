@@ -1,0 +1,40 @@
+BEGIN
+PMN_DROPSQL('DROP TABLE demographic');
+END;
+/
+BEGIN
+PMN_DROPSQL('DROP TABLE enrollment');
+END;
+/
+BEGIN
+PMN_DROPSQL('DROP TABLE encounter');
+END;
+/
+BEGIN
+PMN_DROPSQL('DROP TABLE drg');
+END;
+/
+BEGIN
+PMN_DROPSQL('DROP TABLE diagnosis');
+END;
+/
+BEGIN
+PMN_DROPSQL('DROP TABLE sourcefact');
+END;
+/
+BEGIN
+PMN_DROPSQL('DROP TABLE pdxfact');
+END;
+/
+BEGIN
+PMN_DROPSQL('DROP TABLE originfact');
+END;
+/
+BEGIN
+PMN_DROPSQL('DROP TABLE procedures');
+END;
+/
+BEGIN
+PMN_DROPSQL('DROP TABLE vital');
+END;
+/

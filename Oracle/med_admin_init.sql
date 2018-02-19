@@ -1,2 +1,2 @@
-/*Verify that there is useful data in the observation_fact table.  If not, check for failed Heron ETL.*/
+/*Verify that there is useful data in the observation_fact table.  If not, Heron ETL may have failed.*/
 SELECT count(patient_num) from BLUEHERONDATA.observation_fact where modifier_cd = 'MedObs|MAR:Given' and rownum = 1;
