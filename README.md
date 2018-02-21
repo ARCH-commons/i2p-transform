@@ -1,5 +1,19 @@
 # i2p-transform
-i2b2 to PCORnet Common Data Model Transformation - requires i2b2 PCORnet ontology
+
+The Greater Plains Collaborative ([GPC][]) and the Accessible Research
+Commons for Health ([ARCH][]) are PCORI CDRNs that i2b2 as a core
+technology. The [i2b2 PCORnet Common Data Model Ontology][ont] is a
+representation of the PCORnet Common Data Model ([CDM][]) which allows
+not only i2b2 style ad-hoc query of clinical data but also this
+i2p-transform of data from an [i2b2 datamart][CRC] into a PCORNet CDM
+datamart.
+
+[GPC]: http://pcornet.org/clinical-data-research-networks/cdrn4-university-of-kansas-medical-center-great-plains-collaborative/
+[ARCH]: http://pcornet.org/clinical-data-research-networks/cdrn1-harvard-university-scihls/
+[ont]: https://github.com/ARCH-commons/arch-ontology
+[CDM]: http://www.pcornet.org/pcornet-common-data-model/
+[CRC]: https://www.i2b2.org/software/files/PDF/current/CRC_Design.pdf
+
 
 ## Copyright and License
 
@@ -9,13 +23,6 @@ License:	MIT
 Portions copyright The Brigham and Women’s Hospital, Inc.
 License: i2b2 Software License
 
-# HERON ETL to i2b2
-
-We (*@@TODO aim to*) transform the data from a number of sources and
-load it into an i2b2 data repository, following the
-[i2b2 Data Repository (CRC) Cell Design Document][CRC].
-
-[CRC]: https://www.i2b2.org/software/files/PDF/current/CRC_Design.pdf
 
 ## Usage
 
