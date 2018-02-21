@@ -56,3 +56,10 @@ For design info and project coding style, see [CONTRIBUTING][].
 
 [CONTRIBUTING]: CONTRIBUTING.md
 
+## References
+
+ - Waitman, L.R., Aaronson, L.S., Nadkarni, P.M., Connolly, D.W. &
+   Campbell, J.R. [The Greater Plains Collaborative: a PCORnet Clinical
+   Research Data Network][1]. J Am Med Inform Assoc 21, 637-641 (2014).
+
+[1]: https://www.ncbi.nlm.nih.gov/pubmed/24778202
