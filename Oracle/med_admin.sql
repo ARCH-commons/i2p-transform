@@ -1,3 +1,8 @@
+/** med_admin - Build Medication Administration table.
+
+Copyright (c) 2018 University of Kansas Medical Center
+*/
+
 --------------------------------------------------------------------------------
 -- HELPER FUNCTIONS AND PROCEDURES
 --------------------------------------------------------------------------------

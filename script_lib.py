@@ -4,22 +4,23 @@ Scripts are pkg_resources, i.e. design-time constants.
 
 Each script should have a title, taken from the first line::
 
-    >>> Script.migrate_fact_upload.title
-    'append data from a workspace table.'
+    >>> Script.med_admin.title
+    'Build Medication Administration table.'
 
-    >>> text = Script.migrate_fact_upload.value
+    >>> text = Script.med_admin.value
     >>> lines = text.split('\n')
     >>> print(lines[0])
     ... #doctest: +NORMALIZE_WHITESPACE
-    /** migrate_fact_upload - append data from a workspace table.
+    /** med_admin - Build Medication Administration table.
 
 We can separate the script into statements::
 
-    >>> statements = Script.epic_flowsheets_transform.statements()
+    >>> statements = Script.med_admin.statements()
     >>> print(next(s for s in statements if 'insert' in s))
     ... #doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-    insert into etl_test_values (test_value, test_domain, test_name, result_id, result_date)
-    with test_key as ( ...
+    create or replace trigger med_admin_trg
+    before insert on med_admin
+    ...
 
 A bit of sqlplus syntax is supported for ignoring errors in just part
 of a script:
