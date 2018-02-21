@@ -1,6 +1,14 @@
 # i2p-transform
 i2b2 to PCORnet Common Data Model Transformation - requires i2b2 PCORnet ontology
 
+## Copyright and License
+
+Copyright (c) 2014-2017 Univeristy of Kansas Medical Center
+License:	MIT
+
+Portions copyright The Brigham and Women’s Hospital, Inc.
+License: i2b2 Software License
+
 # HERON ETL to i2b2
 
 We (*@@TODO aim to*) transform the data from a number of sources and
