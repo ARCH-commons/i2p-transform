@@ -1,7 +1,8 @@
---------------------------------------------------------------------------------
--- LAB_RESULT_CM
---------------------------------------------------------------------------------
+/** lab_result_cm - create and populate the lab_result_cm table.
+*/
 
+select encounterid from encounter where 'dep' = 'encounter.sql'
+/
 BEGIN
 PMN_DROPSQL('DROP TABLE lab_result_cm');
 END;
@@ -235,9 +236,10 @@ execute immediate 'create index lab_result_cm_idx on lab_result_cm (PATID, ENCOU
 
 END PCORNetLabResultCM;
 /
-BEGIN
-PCORNetLabResultCM();
-END;
+insert into cdm_status (status, last_update) values ('lab_result_cm', sysdate)
+--BEGIN
+--PCORNetLabResultCM();
+--END;
 /
-SELECT count(LAB_RESULT_CM_ID) from lab_result_cm where rownum = 1
---SELECT 1 FROM dual
+select 1 from cdm_status where status = 'lab_result_cm'
+--SELECT count(LAB_RESULT_CM_ID) from lab_result_cm where rownum = 1

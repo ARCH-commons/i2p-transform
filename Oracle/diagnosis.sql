@@ -1,7 +1,8 @@
---------------------------------------------------------------------------------
--- DIAGNOSIS
---------------------------------------------------------------------------------
+/** diagnosis - create and populate the diagnosis table.
+*/
 
+select encounterid from encounter where 'dep' = 'encounter.sql'
+/
 BEGIN
 PMN_DROPSQL('DROP TABLE diagnosis');
 END;
@@ -243,9 +244,10 @@ execute immediate 'create index diagnosis_idx on diagnosis (PATID, ENCOUNTERID)'
 
 end PCORNetDiagnosis;
 /
-BEGIN
-PCORNetDiagnosis();
-END;
+insert into cdm_status (status, last_update) values ('diagnosis', sysdate)
+--BEGIN
+--PCORNetDiagnosis();
+--END;
 /
-SELECT count(DIAGNOSISID) from diagnosis where rownum = 1
---SELECT 1 FROM dual
+select 1 from cdm_status where status = 'diagnosis'
+--SELECT count(DIAGNOSISID) from diagnosis where rownum = 1

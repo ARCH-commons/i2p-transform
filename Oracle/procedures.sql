@@ -1,7 +1,8 @@
---------------------------------------------------------------------------------
--- PROCEDURES
---------------------------------------------------------------------------------
+/** procedures - create and populate the procedures table.
+*/
 
+select encounterid from encounter where 'dep' = 'encounter.sql'
+/
 BEGIN
 PMN_DROPSQL('DROP TABLE procedures');
 END;
@@ -57,4 +58,10 @@ execute immediate 'create index procedures_idx on procedures (PATID, ENCOUNTERID
 
 end PCORNetProcedure;
 /
-SELECT count(PATID) from procedures where rownum = 1
+insert into cdm_status (status, last_update) values ('procedures', sysdate)
+--BEGIN
+--PCORNetProcedure();
+--END;
+/
+select 1 from cdm_status where status = 'procedures'
+--SELECT count(PATID) from procedures where rownum = 1

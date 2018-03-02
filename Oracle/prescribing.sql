@@ -1,7 +1,8 @@
---------------------------------------------------------------------------------
--- PRESCRIBING
---------------------------------------------------------------------------------
+/** prescribing - create and populate the prescribing table.
+*/
 
+select encounterid from encounter where 'dep' = 'encounter.sql'
+/
 BEGIN
 PMN_DROPSQL('DROP TABLE prescribing');
 END;
@@ -262,9 +263,10 @@ execute immediate 'create index prescribing_idx on prescribing (PATID, ENCOUNTER
 
 end PCORNetPrescribing;
 /
-BEGIN
-PCORNetPrescribing();
-END;
+insert into cdm_status (status, last_update) values ('prescribing', sysdate)
+--BEGIN
+--PCORNetPrescribing();
+--END;
 /
-SELECT count(PRESCRIBINGID) from prescribing where rownum = 1
---SELECT 1 FROM dual
+select 1 from cdm_status where status = 'prescribing'
+--SELECT count(PRESCRIBINGID) from prescribing where rownum = 1

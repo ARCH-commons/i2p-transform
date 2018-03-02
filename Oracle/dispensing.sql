@@ -1,6 +1,7 @@
---------------------------------------------------------------------------------
--- DISPENSING
---------------------------------------------------------------------------------
+/** dispensing - create and populate the dispensing table.
+*/
+
+--select encounterid from encounter where 'dep' = 'encounter.sql';
 
 BEGIN
 PMN_DROPSQL('DROP TABLE dispensing');
@@ -176,9 +177,10 @@ execute immediate 'create index dispensing_idx on dispensing (PATID)';
 
 end PCORNetDispensing;
 /
-BEGIN
-PCORNetDispensing();
-END;
+insert into cdm_status (status, last_update) values ('dispensing', sysdate)
+--BEGIN
+--PCORNetDispensing();
+--END;
 /
-SELECT count(DISPENSINGID) from dispensing where rownum = 1
---SELECT 1 FROM dual
+select 1 from cdm_status where status = 'dispensing'
+--SELECT count(DISPENSINGID) from dispensing where rownum = 1

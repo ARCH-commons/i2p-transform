@@ -1,148 +1,103 @@
+"""i2p_tasks -- Luigi CDM task support.
+"""
+
 from etl_tasks import SqlScriptTask
-import luigi
 from script_lib import Script
 from sql_syntax import Environment
-from typing import List
 
-class Condition(SqlScriptTask):
+class CDMScriptTask(SqlScriptTask):
+
+    @property
+    def variables(self) -> Environment:
+        return dict(datamart_id='C4UK', datamart_name='University of Kansas', i2b2_data_schema='BLUEHERONDATA',
+                    min_pat_list_date_dd_mon_rrrr='01-Jan-2010', min_visit_date_dd_mon_rrrr='01-Jan-2010',
+                    i2b2_meta_schema='BLUEHERONMETADATA', enrollment_months_back='2', network_id='C4',
+                    network_name='GPC')
+
+
+class condition(CDMScriptTask):
     script = Script.condition
 
-    def requires(self) -> List[luigi.Task]:
-        return [Encounter()]
 
-class Death(SqlScriptTask):
+class death(CDMScriptTask):
     script = Script.death
 
-    def requires(self) -> List[luigi.Task]:
-        return [Demographic()]
 
-class DeathCause(SqlScriptTask):
+class death_cause(CDMScriptTask):
     script = Script.death_cause
 
-class Demographic(SqlScriptTask):
+
+class demographic(CDMScriptTask):
     script = Script.demographic
 
-    def requires(self) -> List[luigi.Task]:
-        return [PcornetInit()]
 
-class Diagnosis(SqlScriptTask):
+class diagnosis(CDMScriptTask):
     script = Script.diagnosis
 
-    def requires(self) -> List[luigi.Task]:
-        return [Encounter()]
 
-    @property
-    def variables(self) -> Environment:
-        return dict(i2b2_meta_schema='BLUEHERONMETADATA')
-
-class Dispensing(SqlScriptTask):
+class dispensing(CDMScriptTask):
     script = Script.dispensing
 
-    def requires(self) -> List[luigi.Task]:
-        return [Encounter()]
 
-    @property
-    def variables(self) -> Environment:
-        return dict(i2b2_meta_schema='BLUEHERONMETADATA')
-
-
-class Encounter(SqlScriptTask):
+class encounter(CDMScriptTask):
     script = Script.encounter
 
-    def requires(self) -> List[luigi.Task]:
-        return [Demographic()]
 
-class Enrollment(SqlScriptTask):
+class enrollment(CDMScriptTask):
     script = Script.enrollment
 
-    @property
-    def variables(self) -> Environment:
-        return dict(enrollment_months_back='2')
 
-class Harvest(SqlScriptTask):
+class harvest(CDMScriptTask):
     script = Script.harvest
 
-    def requires(self) -> List[luigi.Task]:
-        return [Condition(), Death(), Diagnosis(), Dispensing(), LabResultCM(), Prescribing(), Procedures(), Vital()]
 
-    @property
-    def variables(self) -> Environment:
-        return dict(network_id='C4', network_name='GPC')
-
-class LabResultCM(SqlScriptTask):
+class lab_result_cm(CDMScriptTask):
     script = Script.lab_result_cm
 
-    def requires(self) -> List[luigi.Task]:
-        return [Encounter()]
 
-class MedAdmin(SqlScriptTask):
+class med_admin(CDMScriptTask):
     script = Script.med_admin
 
-    def requires(self) -> List[luigi.Task]:
-        return [MedAdminInit()]
 
-class MedAdminInit(SqlScriptTask):
+class med_admin_init(CDMScriptTask):
     script = Script.med_admin_init
 
-class ObsClin(SqlScriptTask):
+
+class obs_clin(CDMScriptTask):
     script = Script.obs_clin
 
-    def requires(self) -> List[luigi.Task]:
-        return []
 
-class ObsGen(SqlScriptTask):
+class obs_gen(CDMScriptTask):
     script = Script.obs_gen
 
-    def requires(self) -> List[luigi.Task]:
-        return []
 
-class PcornetInit(SqlScriptTask):
+class pcornet_init(CDMScriptTask):
     script = Script.pcornet_init
 
-    @property
-    def variables(self) -> Environment:
-        return dict(datamart_id='C4UK', datamart_name='University of Kansas', i2b2_data_schema='BLUEHERONDATA', min_pat_list_date_dd_mon_rrrr='01-Jan-2010', min_visit_date_dd_mon_rrrr='01-Jan-2010',
-                    i2b2_meta_schema='BLUEHERONMETADATA')
 
-class PcornetLoader(SqlScriptTask):
+class pcornet_loader(CDMScriptTask):
     script = Script.pcornet_loader
 
-    def requires(self) -> List[luigi.Task]:
-        #return [DeathCause(), Enrollment(), Harvest(), MedAdmin(), PcornetTrail(), ProCM()]
-        return [DeathCause(), Demographic(), MedAdmin()]
 
-class PcornetTrail(SqlScriptTask):
-    script = Script.pcornet_trail
+class pcornet_trial(CDMScriptTask):
+    script = Script.pcornet_trial
 
-    def requires(self) -> List[luigi.Task]:
-        return []
 
-class Prescribing(SqlScriptTask):
+class prescribing(CDMScriptTask):
     script = Script.prescribing
 
-    def requires(self) -> List[luigi.Task]:
-        return [Encounter()]
 
-class ProCM(SqlScriptTask):
+class pro_cm(CDMScriptTask):
     script = Script.pro_cm
 
-    def requires(self) -> List[luigi.Task]:
-        return []
 
-class Procedures(SqlScriptTask):
+class procedures(CDMScriptTask):
     script = Script.procedures
 
-    def requires(self) -> List[luigi.Task]:
-        return [Encounter()]
 
-class Provider(SqlScriptTask):
+class provider(CDMScriptTask):
     script = Script.provider
 
-    def requires(self) -> List[luigi.Task]:
-        return []
 
-class Vital(SqlScriptTask):
+class vital(CDMScriptTask):
     script = Script.vital
-
-    def requires(self) -> List[luigi.Task]:
-        return [Encounter()]

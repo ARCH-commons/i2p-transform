@@ -1,7 +1,8 @@
---------------------------------------------------------------------------------
--- HELPER FUNCTIONS AND PROCEDURES
---------------------------------------------------------------------------------
+/** pcornet_init - create helper functions and procedures
+*/
 
+alter session set current_schema = pcornet_cdm
+/
 create or replace PROCEDURE GATHER_TABLE_STATS(table_name VARCHAR2) AS
   BEGIN
   DBMS_STATS.GATHER_TABLE_STATS (
@@ -165,55 +166,6 @@ end loop;
 close getcodesql ;
 end pcornet_popcodelist;
 /
-
-
---------------------------------------------------------------------------------
--- I2B2 SYNONYMS, VIEWS, AND INTERMEDIARY TABLES
---------------------------------------------------------------------------------
-
-
-CREATE OR REPLACE SYNONYM I2B2FACT FOR "&&i2b2_data_schema".OBSERVATION_FACT
+insert into cdm_status (status, last_update) values ('pcornet_init', sysdate)
 /
-
-CREATE OR REPLACE SYNONYM I2B2MEDFACT FOR OBSERVATION_FACT_MEDS
-/
-
-BEGIN
-PMN_DROPSQL('DROP TABLE i2b2patient_list');
-END;
-/
-
-CREATE table i2b2patient_list as
-select * from
-(
-select DISTINCT PATIENT_NUM from I2B2FACT where START_DATE > to_date('&&min_pat_list_date_dd_mon_rrrr','dd-mon-rrrr')
-) where ROWNUM<100000000
-/
-
-create or replace VIEW i2b2patient as select * from "&&i2b2_data_schema".PATIENT_DIMENSION where PATIENT_NUM in (select PATIENT_NUM from i2b2patient_list)
-/
-
-create or replace view i2b2visit as select * from "&&i2b2_data_schema".VISIT_DIMENSION where START_DATE >= to_date('&&min_visit_date_dd_mon_rrrr','dd-mon-rrrr') and (END_DATE is NULL or END_DATE < CURRENT_DATE) and (START_DATE <CURRENT_DATE)
-/
-
-CREATE OR REPLACE SYNONYM pcornet_med FOR  "&&i2b2_meta_schema".pcornet_med
-/
-
-CREATE OR REPLACE SYNONYM pcornet_lab FOR  "&&i2b2_meta_schema".pcornet_lab
-/
-
-CREATE OR REPLACE SYNONYM pcornet_diag FOR  "&&i2b2_meta_schema".pcornet_diag
-/
-
-CREATE OR REPLACE SYNONYM pcornet_demo FOR  "&&i2b2_meta_schema".pcornet_demo
-/
-
-CREATE OR REPLACE SYNONYM pcornet_proc FOR  "&&i2b2_meta_schema".pcornet_proc
-/
-
-CREATE OR REPLACE SYNONYM pcornet_vital FOR  "&&i2b2_meta_schema".pcornet_vital
-/
-
-CREATE OR REPLACE SYNONYM pcornet_enc FOR  "&&i2b2_meta_schema".pcornet_enc
-/
-select 1 from dual
+select 1 from cdm_status where status = 'pcornet_init'

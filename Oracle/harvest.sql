@@ -1,7 +1,22 @@
---------------------------------------------------------------------------------
--- HARVEST
---------------------------------------------------------------------------------
+/** prescribing - create and populate the prescribing table.
+*/
 
+select conditionid from condition where 'dep' = 'condition.sql'
+/
+select patid from death where 'dep' = 'death.sql'
+/
+select diagnosisid from diagnosis where 'dep' = 'diagnosis.sql'
+/
+select dispensingid from dispensing where 'dep' = 'dispensing.sql'
+/
+select lab_result_cm_id from lab_result_cm where 'dep' = 'lab_result_cm.sql'
+/
+select prescribingid from prescribing where 'dep' = 'prescribing.sql'
+/
+select proceduresid from procedures where 'dep' = 'procedures.sql'
+/
+select vitalid from vital where 'dep' = 'vital.sql'
+/
 BEGIN
 PMN_DROPSQL('DROP TABLE harvest');
 END;
@@ -74,9 +89,10 @@ INSERT INTO harvest(NETWORKID, NETWORK_NAME, DATAMARTID, DATAMART_NAME, DATAMART
 
 end PCORNetHarvest;
 /
-BEGIN
-PCORNetHarvest();
-END;
+insert into cdm_status (status, last_update) values ('harvest', sysdate)
+--BEGIN
+--PCORNetHarvest();
+--END;
 /
-SELECT count(NETWORKID) from Harvest where rownum = 1
---SELECT 1 FROM dual
+select 1 from cdm_status where status = 'harvest'
+--SELECT count(NETWORKID) from Harvest where rownum = 1

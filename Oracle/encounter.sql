@@ -1,7 +1,8 @@
---------------------------------------------------------------------------------
--- ENCOUNTER
---------------------------------------------------------------------------------
+/** encounter - create and populate the encounter table.
+*/
 
+select patid from demographic where 'dep' = 'demographic.sql'
+/
 BEGIN
 PMN_DROPSQL('DROP TABLE encounter');
 END;
@@ -63,7 +64,7 @@ and enc.c_fullname like '\PCORI\ENCOUNTER\DRG\%') drg1 group by patient_num,enco
 where rn=1;
 
 execute immediate 'create index drg_idx on drg (patient_num, encounter_num)';
-GATHER_TABLE_STATS('drg');
+--GATHER_TABLE_STATS('drg');
 
 insert into encounter(PATID,ENCOUNTERID,admit_date ,ADMIT_TIME ,
 		DISCHARGE_DATE ,DISCHARGE_TIME ,PROVIDERID ,FACILITY_LOCATION
@@ -93,13 +94,11 @@ left outer join
 
 execute immediate 'create unique index encounter_pk on encounter (ENCOUNTERID)';
 execute immediate 'create index encounter_idx on encounter (PATID, ENCOUNTERID)';
-GATHER_TABLE_STATS('ENCOUNTER');
+--GATHER_TABLE_STATS('ENCOUNTER');
 
 end PCORNetEncounter;
 /
-BEGIN
-PCORNetEncounter();
-END;
+insert into cdm_status (status, last_update) values ('encounter', sysdate)
 /
+select 1 from cdm_status where status = 'encounter'
 --SELECT count(ENCOUNTERID) from encounter where rownum = 1
-SELECT 1 FROM dual

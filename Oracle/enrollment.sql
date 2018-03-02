@@ -1,7 +1,7 @@
---------------------------------------------------------------------------------
--- ENROLLMENT
---------------------------------------------------------------------------------
-
+/** enrollment - create and populate the enrollment table.
+*/
+select synonym_name from all_synonyms where 'dep' = 'pcornet_init.sql'
+/
 BEGIN
 PMN_DROPSQL('DROP TABLE enrollment');
 END;
@@ -44,13 +44,14 @@ join i2b2visit visit on enr.patient_num = visit.patient_num
 group by visit.patient_num;
 
 execute immediate 'create index enrollment_idx on enrollment (PATID)';
-GATHER_TABLE_STATS('ENROLLMENT');
+--GATHER_TABLE_STATS('ENROLLMENT');
 
 end PCORNetEnroll;
 /
-BEGIN
-PCORNetEnroll();
-END;
+insert into cdm_status (status, last_update) values ('enrollment', sysdate)
+--BEGIN
+--PCORNetEnroll();
+--END;
 /
+select 1 from cdm_status where status = 'enrollment'
 --SELECT count(PATID) from enrollment where rownum = 1
-SELECT 1 FROM dual

@@ -1,7 +1,8 @@
---------------------------------------------------------------------------------
--- VITAL
---------------------------------------------------------------------------------
+/** vital - create and populate the vital table.
+*/
 
+select encounterid from encounter where 'dep' = 'encounter.sql'
+/
 BEGIN
 PMN_DROPSQL('DROP TABLE vital');
 END;
@@ -133,8 +134,10 @@ execute immediate 'create index vital_idx on vital (PATID)';
 
 end PCORNetVital;
 /
-BEGIN
-PCORNetVital();
-END;
+insert into cdm_status (status, last_update) values ('vital', sysdate)
+--BEGIN
+--PCORNetVital();
+--END;
 /
-SELECT count(VITALID) from vital where rownum = 1
+select 1 from cdm_status where status = 'vital'
+--SELECT count(VITALID) from vital where rownum = 1

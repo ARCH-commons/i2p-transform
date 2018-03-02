@@ -1,7 +1,7 @@
---------------------------------------------------------------------------------
--- PRO_CM
---------------------------------------------------------------------------------
-
+/** pro_cm - create the pro_cm table.
+*/
+select synonym_name from all_synonyms where 'dep' = 'pcornet_init.sql'
+/
 BEGIN
 PMN_DROPSQL('DROP TABLE pro_cm');
 END;
@@ -37,4 +37,6 @@ begin
   select pro_cm_seq.nextval into :new.PRO_CM_ID from dual;
 end;
 /
-SELECT 1 FROM dual
+insert into cdm_status (status, last_update) values ('pro_cm', sysdate)
+/
+select 1 from cdm_status where status = 'pro_cm'
