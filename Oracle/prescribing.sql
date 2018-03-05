@@ -259,14 +259,15 @@ inner join encounter enc on enc.encounterid = m.encounter_Num
 where (basis.c_fullname is null or basis.c_fullname like '\PCORI_MOD\RX_BASIS\PR\%');
 
 execute immediate 'create index prescribing_idx on prescribing (PATID, ENCOUNTERID)';
---GATHER_TABLE_STATS('PRESCRIBING');
+GATHER_TABLE_STATS('PRESCRIBING');
 
 end PCORNetPrescribing;
 /
+BEGIN
+PCORNetPrescribing();
+END;
+/
 insert into cdm_status (status, last_update) values ('prescribing', sysdate)
---BEGIN
---PCORNetPrescribing();
---END;
 /
 select 1 from cdm_status where status = 'prescribing'
 --SELECT count(PRESCRIBINGID) from prescribing where rownum = 1

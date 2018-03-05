@@ -54,14 +54,15 @@ from i2b2fact fact
 where pr.c_fullname like '\PCORI\PROCEDURE\%';
 
 execute immediate 'create index procedures_idx on procedures (PATID, ENCOUNTERID)';
---GATHER_TABLE_STATS('PROCEDURES');
+GATHER_TABLE_STATS('PROCEDURES');
 
 end PCORNetProcedure;
 /
+BEGIN
+PCORNetProcedure();
+END;
+/
 insert into cdm_status (status, last_update) values ('procedures', sysdate)
---BEGIN
---PCORNetProcedure();
---END;
 /
 select 1 from cdm_status where status = 'procedures'
 --SELECT count(PATID) from procedures where rownum = 1

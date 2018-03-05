@@ -232,14 +232,15 @@ and (m.nval_num is null or m.nval_num<=9999999) -- exclude lengths that exceed t
 ;
 
 execute immediate 'create index lab_result_cm_idx on lab_result_cm (PATID, ENCOUNTERID)';
---GATHER_TABLE_STATS('LAB_RESULT_CM');
+GATHER_TABLE_STATS('LAB_RESULT_CM');
 
 END PCORNetLabResultCM;
 /
+BEGIN
+PCORNetLabResultCM();
+END;
+/
 insert into cdm_status (status, last_update) values ('lab_result_cm', sysdate)
---BEGIN
---PCORNetLabResultCM();
---END;
 /
 select 1 from cdm_status where status = 'lab_result_cm'
 --SELECT count(LAB_RESULT_CM_ID) from lab_result_cm where rownum = 1

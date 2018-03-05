@@ -94,9 +94,13 @@ left outer join
 
 execute immediate 'create unique index encounter_pk on encounter (ENCOUNTERID)';
 execute immediate 'create index encounter_idx on encounter (PATID, ENCOUNTERID)';
---GATHER_TABLE_STATS('ENCOUNTER');
+GATHER_TABLE_STATS('ENCOUNTER');
 
 end PCORNetEncounter;
+/
+BEGIN
+PCORNetEncounter();
+END;
 /
 insert into cdm_status (status, last_update) values ('encounter', sysdate)
 /

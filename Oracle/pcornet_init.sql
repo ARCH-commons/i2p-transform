@@ -1,8 +1,5 @@
 /** pcornet_init - create helper functions and procedures
 */
-
-alter session set current_schema = pcornet_cdm
-/
 create or replace PROCEDURE GATHER_TABLE_STATS(table_name VARCHAR2) AS
   BEGIN
   DBMS_STATS.GATHER_TABLE_STATS (

@@ -240,14 +240,15 @@ where (sourcefact.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\%' or so
 ;
 
 execute immediate 'create index diagnosis_idx on diagnosis (PATID, ENCOUNTERID)';
---GATHER_TABLE_STATS('DIAGNOSIS');
+GATHER_TABLE_STATS('DIAGNOSIS');
 
 end PCORNetDiagnosis;
 /
+BEGIN
+PCORNetDiagnosis();
+END;
+/
 insert into cdm_status (status, last_update) values ('diagnosis', sysdate)
---BEGIN
---PCORNetDiagnosis();
---END;
 /
 select 1 from cdm_status where status = 'diagnosis'
 --SELECT count(DIAGNOSISID) from diagnosis where rownum = 1

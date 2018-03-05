@@ -110,9 +110,10 @@ GATHER_TABLE_STATS('MED_ADMIN');
 
 end PCORNetMedAdmin;
 /
+BEGIN
+PCORNetMedAdmin();
+END;
+/
 insert into cdm_status (status, last_update) values ('med_admin', sysdate)
---BEGIN
---PCORNetMedAdmin();
---END;
 /
 select 1 from cdm_status where status = 'med_admin'

@@ -1,4 +1,4 @@
-/** prescribing - create and populate the prescribing table.
+/** harvest - create and populate the harvest table.
 */
 
 select conditionid from condition where 'dep' = 'condition.sql'
@@ -89,10 +89,11 @@ INSERT INTO harvest(NETWORKID, NETWORK_NAME, DATAMARTID, DATAMART_NAME, DATAMART
 
 end PCORNetHarvest;
 /
+BEGIN
+PCORNetHarvest();
+END;
+/
 insert into cdm_status (status, last_update) values ('harvest', sysdate)
---BEGIN
---PCORNetHarvest();
---END;
 /
 select 1 from cdm_status where status = 'harvest'
 --SELECT count(NETWORKID) from Harvest where rownum = 1

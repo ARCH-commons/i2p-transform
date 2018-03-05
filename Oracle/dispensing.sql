@@ -173,14 +173,15 @@ group by m.encounter_num ,m.patient_num, m.start_date,  mo.pcori_ndc;
 */
 
 execute immediate 'create index dispensing_idx on dispensing (PATID)';
---GATHER_TABLE_STATS('DISPENSING');
+GATHER_TABLE_STATS('DISPENSING');
 
 end PCORNetDispensing;
 /
+BEGIN
+PCORNetDispensing();
+END;
+/
 insert into cdm_status (status, last_update) values ('dispensing', sysdate)
---BEGIN
---PCORNetDispensing();
---END;
 /
 select 1 from cdm_status where status = 'dispensing'
 --SELECT count(DISPENSINGID) from dispensing where rownum = 1

@@ -46,6 +46,10 @@ where (pat.death_date is not null or vital_status_cd like 'Z%') and pat.patient_
 
 end;
 /
+BEGIN
+PCORNetDeath();
+END;
+/
 insert into cdm_status (status, last_update) values ('death', sysdate)
 /
 select 1 from cdm_status where status = 'death'
