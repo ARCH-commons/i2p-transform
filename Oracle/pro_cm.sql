@@ -37,6 +37,6 @@ begin
   select pro_cm_seq.nextval into :new.PRO_CM_ID from dual;
 end;
 /
-insert into cdm_status (status, last_update) values ('pro_cm', sysdate)
+insert into cdm_status (status, last_update, records) select 'pro_cm', sysdate, count(*) from pro_cm
 /
 select 1 from cdm_status where status = 'pro_cm'

@@ -52,7 +52,7 @@ BEGIN
 PCORNetEnroll();
 END;
 /
-insert into cdm_status (status, last_update) values ('enrollment', sysdate)
+insert into cdm_status (status, last_update, records) select 'enrollment', sysdate, count(*) from enrollment
 /
 select 1 from cdm_status where status = 'enrollment'
 --SELECT count(PATID) from enrollment where rownum = 1

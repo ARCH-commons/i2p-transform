@@ -17,6 +17,6 @@ CREATE TABLE pcornet_trial(
 	TRIAL_INVITE_CODE varchar(20) NULL
 )
 /
-insert into cdm_status (status, last_update) values ('pcornet_trial', sysdate)
+insert into cdm_status (status, last_update, records) select 'pcornet_trial', sysdate, count(*) from pcornet_trial
 /
 select 1 from cdm_status where status = 'pcornet_trial'

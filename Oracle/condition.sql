@@ -105,7 +105,6 @@ BEGIN
 PCORNetCondition();
 END;
 /
-insert into cdm_status (status, last_update) values ('condition', sysdate)
+insert into cdm_status (status, last_update, records) select 'condition', sysdate, count(*) from condition
 /
 select 1 from cdm_status where status = 'condition'
---SELECT count(CONDITIONID) from condition where rownum = 1

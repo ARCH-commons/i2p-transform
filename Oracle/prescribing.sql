@@ -150,7 +150,7 @@ select pcori_basecode,c_fullname,instance_num,start_date,provider_id,concept_cd,
         on basis.modifier_cd = basiscode.c_basecode
         and basiscode.c_fullname like '\PCORI_MOD\RX_BASIS\%';
 
-execute immediate 'create unique index basis_idx on basis (instance_num, start_date, provider_id, concept_cd, encounter_num, modifier_cd)';
+execute immediate 'create index basis_idx on basis (instance_num, start_date, provider_id, concept_cd, encounter_num, modifier_cd)';
 GATHER_TABLE_STATS('BASIS');
 
 insert into freq
@@ -160,7 +160,7 @@ select pcori_basecode,instance_num,start_date,provider_id,concept_cd,encounter_n
         on freq.modifier_cd = freqcode.c_basecode
         and freqcode.c_fullname like '\PCORI_MOD\RX_FREQUENCY\%';
 
-execute immediate 'create unique index freq_idx on freq (instance_num, start_date, provider_id, concept_cd, encounter_num, modifier_cd)';
+execute immediate 'create index freq_idx on freq (instance_num, start_date, provider_id, concept_cd, encounter_num, modifier_cd)';
 GATHER_TABLE_STATS('FREQ');
 
 insert into quantity
@@ -170,7 +170,7 @@ select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,mod
         on quantity.modifier_cd = quantitycode.c_basecode
         and quantitycode.c_fullname like '\PCORI_MOD\RX_QUANTITY\';
 
-execute immediate 'create unique index quantity_idx on quantity (instance_num, start_date, provider_id, concept_cd, encounter_num, modifier_cd)';
+execute immediate 'create index quantity_idx on quantity (instance_num, start_date, provider_id, concept_cd, encounter_num, modifier_cd)';
 GATHER_TABLE_STATS('QUANTITY');
 
 insert into refills
@@ -180,7 +180,7 @@ select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,mod
         on refills.modifier_cd = refillscode.c_basecode
         and refillscode.c_fullname like '\PCORI_MOD\RX_REFILLS\';
 
-execute immediate 'create unique index refills_idx on refills (instance_num, start_date, provider_id, concept_cd, encounter_num, modifier_cd)';
+execute immediate 'create index refills_idx on refills (instance_num, start_date, provider_id, concept_cd, encounter_num, modifier_cd)';
 GATHER_TABLE_STATS('REFILLS');
 
 insert into supply
@@ -190,7 +190,7 @@ select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,mod
         on supply.modifier_cd = supplycode.c_basecode
         and supplycode.c_fullname like '\PCORI_MOD\RX_DAYS_SUPPLY\';
 
-execute immediate 'create unique index supply_idx on supply (instance_num, start_date, provider_id, concept_cd, encounter_num, modifier_cd)';
+execute immediate 'create index supply_idx on supply (instance_num, start_date, provider_id, concept_cd, encounter_num, modifier_cd)';
 GATHER_TABLE_STATS('SUPPLY');
 
 -- insert data with outer joins to ensure all records are included even if some data elements are missing
@@ -267,7 +267,7 @@ BEGIN
 PCORNetPrescribing();
 END;
 /
-insert into cdm_status (status, last_update) values ('prescribing', sysdate)
+insert into cdm_status (status, last_update, records) select 'prescribing', sysdate, count(*) from prescribing
 /
 select 1 from cdm_status where status = 'prescribing'
 --SELECT count(PRESCRIBINGID) from prescribing where rownum = 1

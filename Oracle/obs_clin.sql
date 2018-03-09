@@ -1,6 +1,5 @@
---------------------------------------------------------------------------------
--- OBS_CLIN
---------------------------------------------------------------------------------
+/** obs_gen - create the obs_clin table.
+*/
 
 BEGIN
 PMN_DROPSQL('DROP TABLE obs_clin');
@@ -17,7 +16,7 @@ CREATE TABLE obs_clin(
     OBSCLIN_CODE varchar(50) NULL,
     OBSCLIN_RESULT_QUAL varchar(50) NULL,
     OBSCLIN_RESULT_TEXT varchar(50) NULL,
-    OBSCLIN_RESULT_SNOMED varchar(50),
+    OBSCLIN_RESULT_SNOMED varchar(50) NULL,
     OBSCLIN_RESULT_NUM NUMBER(18, 0) NULL, -- (8,0)
     OBSCLIN_RESULT_MODIFIER varchar(2) NULL,
     OBSCLIN_RESULT_UNIT varchar(50) NULL,
@@ -29,3 +28,6 @@ CREATE TABLE obs_clin(
     RAW_OBSCLIN_UNIT varchar(50) NULL
 )
 /
+insert into cdm_status (status, last_update, records) select 'obs_clin', sysdate, count(*) from obs_clin
+/
+select 1 from cdm_status where status = 'obs_clin'

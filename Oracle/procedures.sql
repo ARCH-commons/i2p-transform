@@ -62,7 +62,7 @@ BEGIN
 PCORNetProcedure();
 END;
 /
-insert into cdm_status (status, last_update) values ('procedures', sysdate)
+insert into cdm_status (status, last_update, records) select 'procedures', sysdate, count(*) from procedures
 /
 select 1 from cdm_status where status = 'procedures'
 --SELECT count(PATID) from procedures where rownum = 1

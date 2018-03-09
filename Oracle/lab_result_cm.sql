@@ -240,7 +240,7 @@ BEGIN
 PCORNetLabResultCM();
 END;
 /
-insert into cdm_status (status, last_update) values ('lab_result_cm', sysdate)
+insert into cdm_status (status, last_update, records) select 'lab_result_cm', sysdate, count(*) from lab_result_cm
 /
 select 1 from cdm_status where status = 'lab_result_cm'
 --SELECT count(LAB_RESULT_CM_ID) from lab_result_cm where rownum = 1

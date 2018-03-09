@@ -15,7 +15,7 @@ CREATE TABLE death_cause(
 	DEATH_CAUSE_CONFIDENCE varchar(2) NULL
 )
 /
-insert into cdm_status (status, last_update) values ('death_cause', sysdate)
+insert into cdm_status (status, last_update, records) select 'death_cause', sysdate, count(*) from death_cause
 /
 select 1 from cdm_status where status = 'death_cause'
 --SELECT count(PATID) from death_cause where rownum = 1

@@ -1,6 +1,5 @@
---------------------------------------------------------------------------------
--- OBS_GEN
---------------------------------------------------------------------------------
+/** obs_gen - create the obs_gen table.
+*/
 
 BEGIN
 PMN_DROPSQL('DROP TABLE obs_gen');
@@ -29,3 +28,6 @@ CREATE TABLE obs_gen(
     RAW_OBSGEN_UNIT varchar(50) NULL
 )
 /
+insert into cdm_status (status, last_update, records) select 'obs_gen', sysdate, count(*) from obs_gen
+/
+select 1 from cdm_status where status = 'obs_gen'
