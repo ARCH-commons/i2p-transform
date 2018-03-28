@@ -194,7 +194,7 @@ execute immediate 'create index supply_idx on supply (instance_num, start_date, 
 GATHER_TABLE_STATS('SUPPLY');
 
 -- insert data with outer joins to ensure all records are included even if some data elements are missing
-insert into prescribing (
+insert /*+ parallel(10) */ into prescribing (
 	PATID
     ,encounterid
     ,RX_PROVIDERID
