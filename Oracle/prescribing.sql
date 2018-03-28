@@ -150,6 +150,8 @@ select pcori_basecode,c_fullname,instance_num,start_date,provider_id,concept_cd,
         on basis.modifier_cd = basiscode.c_basecode
         and basiscode.c_fullname like '\PCORI_MOD\RX_BASIS\%';
 
+commit;
+
 execute immediate 'create index basis_idx on basis (instance_num, start_date, provider_id, concept_cd, encounter_num, modifier_cd)';
 GATHER_TABLE_STATS('BASIS');
 
@@ -159,6 +161,8 @@ select pcori_basecode,instance_num,start_date,provider_id,concept_cd,encounter_n
      join pcornet_med freqcode
         on freq.modifier_cd = freqcode.c_basecode
         and freqcode.c_fullname like '\PCORI_MOD\RX_FREQUENCY\%';
+
+commit;
 
 execute immediate 'create index freq_idx on freq (instance_num, start_date, provider_id, concept_cd, encounter_num, modifier_cd)';
 GATHER_TABLE_STATS('FREQ');
@@ -170,6 +174,8 @@ select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,mod
         on quantity.modifier_cd = quantitycode.c_basecode
         and quantitycode.c_fullname like '\PCORI_MOD\RX_QUANTITY\';
 
+commit;
+
 execute immediate 'create index quantity_idx on quantity (instance_num, start_date, provider_id, concept_cd, encounter_num, modifier_cd)';
 GATHER_TABLE_STATS('QUANTITY');
 
@@ -180,6 +186,8 @@ select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,mod
         on refills.modifier_cd = refillscode.c_basecode
         and refillscode.c_fullname like '\PCORI_MOD\RX_REFILLS\';
 
+commit;
+
 execute immediate 'create index refills_idx on refills (instance_num, start_date, provider_id, concept_cd, encounter_num, modifier_cd)';
 GATHER_TABLE_STATS('REFILLS');
 
@@ -189,6 +197,8 @@ select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,mod
      join pcornet_med supplycode
         on supply.modifier_cd = supplycode.c_basecode
         and supplycode.c_fullname like '\PCORI_MOD\RX_DAYS_SUPPLY\';
+
+commit;
 
 execute immediate 'create index supply_idx on supply (instance_num, start_date, provider_id, concept_cd, encounter_num, modifier_cd)';
 GATHER_TABLE_STATS('SUPPLY');
@@ -213,7 +223,7 @@ insert /*+ parallel(10) */ into prescribing (
 --    ,RAW_RX_FREQUENCY,
     ,RAW_RXNORM_CUI
 )
-select distinct  m.patient_num, m.Encounter_Num,m.provider_id,  m.start_date order_date,  to_char(m.start_date,'HH24:MI'), m.start_date start_date, m.end_date, mo.pcori_cui
+select /*+ parallel(10) */ distinct  m.patient_num, m.Encounter_Num,m.provider_id,  m.start_date order_date,  to_char(m.start_date,'HH24:MI'), m.start_date start_date, m.end_date, mo.pcori_cui
     ,quantity.nval_num quantity, 'NI' rx_quantity_unit, refills.nval_num refills, supply.nval_num supply, substr(freq.pcori_basecode, instr(freq.pcori_basecode, ':') + 1, 2) frequency,
     substr(basis.pcori_basecode, instr(basis.pcori_basecode, ':') + 1, 2) basis
     , substr(mo.c_name, 1, 50) raw_rx_med_name, substr(mo.c_basecode, 1, 50) raw_rxnorm_cui
