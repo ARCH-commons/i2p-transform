@@ -211,7 +211,7 @@ commit;
 execute immediate 'create index supply_idx on supply (instance_num, start_date, provider_id, concept_cd, encounter_num, modifier_cd)';
 GATHER_TABLE_STATS('SUPPLY');
 
-insert into prescribing_transfer (
+insert /*+ use_nl(freq quantity supply refills) parallel(10) */ into prescribing_transfer (
 	PATID, ENCOUNTERID, RX_PROVIDERID, RX_ORDER_DATE, RX_ORDER_TIME, RX_START_DATE, RX_END_DATE, RXNORM_CUI,
     RX_QUANTITY, RX_QUANTITY_UNIT, RX_REFILLS, RX_DAYS_SUPPLY, RX_FREQUENCY, RX_BASIS, RAW_RX_MED_NAME, RAW_RXNORM_CUI
 )
@@ -275,7 +275,7 @@ insert into prescribing_transfer (
 
 commit;
 
-insert into prescribing (
+insert /*+ parallel(10) */ into prescribing (
 	PATID, ENCOUNTERID, RX_PROVIDERID, RX_ORDER_DATE, RX_ORDER_TIME, RX_START_DATE, RX_END_DATE, RXNORM_CUI,
     RX_QUANTITY, RX_QUANTITY_UNIT, RX_REFILLS, RX_DAYS_SUPPLY, RX_FREQUENCY, RX_BASIS, RAW_RX_MED_NAME, RAW_RXNORM_CUI
 )
