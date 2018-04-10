@@ -1,7 +1,5 @@
 /** enrollment - create and populate the enrollment table.
 */
-select synonym_name from all_synonyms where 'dep' = 'pcornet_init.sql'
-/
 BEGIN
 PMN_DROPSQL('DROP TABLE enrollment');
 END;

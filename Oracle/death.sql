@@ -1,8 +1,5 @@
 /** death - create and populate the death table.
 */
-
-select patid from demographic where 'dep' = 'demographic.sql'
-/
 BEGIN
 PMN_DROPSQL('DROP TABLE death');
 END;

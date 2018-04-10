@@ -1,8 +1,5 @@
 /** lab_result_cm - create and populate the lab_result_cm table.
 */
-
-select encounterid from encounter where 'dep' = 'encounter.sql'
-/
 BEGIN
 PMN_DROPSQL('DROP TABLE lab_result_cm');
 END;

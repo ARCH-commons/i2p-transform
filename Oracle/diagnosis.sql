@@ -1,8 +1,5 @@
 /** diagnosis - create and populate the diagnosis table.
 */
-
-select encounterid from encounter where 'dep' = 'encounter.sql'
-/
 BEGIN
 PMN_DROPSQL('DROP TABLE diagnosis');
 END;

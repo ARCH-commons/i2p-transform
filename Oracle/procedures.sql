@@ -1,8 +1,5 @@
 /** procedures - create and populate the procedures table.
 */
-
-select encounterid from encounter where 'dep' = 'encounter.sql'
-/
 BEGIN
 PMN_DROPSQL('DROP TABLE procedures');
 END;

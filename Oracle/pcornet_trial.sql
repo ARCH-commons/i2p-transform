@@ -1,7 +1,5 @@
 /** pcornet_trial - create the pcornet_trial table.
 */
-select synonym_name from all_synonyms where 'dep' = 'pcornet_init.sql'
-/
 BEGIN
 PMN_DROPSQL('DROP TABLE pcornet_trial');
 END;

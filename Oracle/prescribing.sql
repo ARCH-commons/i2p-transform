@@ -1,8 +1,5 @@
 /** prescribing - create and populate the prescribing table.
 */
-
-select encounterid from encounter where 'dep' = 'encounter.sql'
-/
 BEGIN
 PMN_DROPSQL('DROP TABLE prescribing');
 END;

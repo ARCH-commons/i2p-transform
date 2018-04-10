@@ -1,8 +1,5 @@
 /** vital - create and populate the vital table.
 */
-
-select encounterid from encounter where 'dep' = 'encounter.sql'
-/
 BEGIN
 PMN_DROPSQL('DROP TABLE vital');
 END;

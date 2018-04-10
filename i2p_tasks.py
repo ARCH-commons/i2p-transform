@@ -1,6 +1,7 @@
 """i2p_tasks -- Luigi CDM task support.
 """
 
+from csv_load import LoadCSV
 from etl_tasks import SqlScriptTask
 from param_val import IntParam
 from script_lib import Script
@@ -16,55 +17,84 @@ class CDMScriptTask(SqlScriptTask):
         return dict(datamart_id='C4UK', datamart_name='University of Kansas', i2b2_data_schema='BLUEHERONDATA',
                     min_pat_list_date_dd_mon_rrrr='01-Jan-2010', min_visit_date_dd_mon_rrrr='01-Jan-2010',
                     i2b2_meta_schema='BLUEHERONMETADATA', enrollment_months_back='2', network_id='C4',
-                    network_name='GPC')
+                    network_name='GPC', i2b2_etl_schema='HERON_ETL_3')
 
 
 class condition(CDMScriptTask):
     script = Script.condition
 
+    def requires(self):
+        return [encounter()]
 
 class death(CDMScriptTask):
     script = Script.death
+
+    def requires(self):
+        return [demographic()]
 
 
 class death_cause(CDMScriptTask):
     script = Script.death_cause
 
+    def requires(self):
+        return [pcornet_init()]
+
 
 class demographic(CDMScriptTask):
     script = Script.demographic
+
+    def requires(self):
+        return [pcornet_init()]
 
 
 class diagnosis(CDMScriptTask):
     script = Script.diagnosis
 
+    def requires(self):
+        return [encounter()]
+
 
 class dispensing(CDMScriptTask):
     script = Script.dispensing
+
+    def requires(self):
+        return [encounter()]
 
 
 class encounter(CDMScriptTask):
     script = Script.encounter
 
+    def requires(self):
+        return [demographic()]
+
 
 class enrollment(CDMScriptTask):
     script = Script.enrollment
+
+    def requires(self):
+        return [pcornet_init()]
 
 
 class harvest(CDMScriptTask):
     script = Script.harvest
 
+    def requires(self):
+        return [condition(), death(), death_cause(), diagnosis(), dispensing(), enrollment(),
+                lab_result_cm(), med_admin(), obs_clin(), obs_gen(), pcornet_trial(),
+                prescribing(), pro_cm(), procedures(), provider(), vital()]
 
 class lab_result_cm(CDMScriptTask):
     script = Script.lab_result_cm
+
+    def requires(self):
+        return [encounter()]
 
 
 class med_admin(CDMScriptTask):
     script = Script.med_admin
 
-
-class med_admin_init(CDMScriptTask):
-    script = Script.med_admin_init
+    def requires(self):
+        return [pcornet_init()]
 
 
 class obs_clin(CDMScriptTask):
@@ -79,12 +109,6 @@ class patient_chunks_survey(SqlScriptTask):
     script = Script.patient_chunks_survey
     patient_chunks = IntParam(default=200)
     patient_chunk_max = IntParam(default=None)
-
-    #def variables(self) -> Environment:
-    #    return dict(chunk_qty=str(self.patient_chunks))
-
-    #def run(self) -> None:
-    #    SqlScriptTask.run_bound(self, script_params=dict(chunk_qty=str(self.patient_chunks))
 
     def results(self) -> List[RowProxy]:
         with self.connection(event='survey results') as lc:
@@ -110,25 +134,43 @@ class patient_chunks_survey(SqlScriptTask):
 class pcornet_init(CDMScriptTask):
     script = Script.pcornet_init
 
+    def requires(self):
+        return [loadLabNormal(), loadHarvestLocal()]
+
 
 class pcornet_loader(CDMScriptTask):
     script = Script.pcornet_loader
+
+    def requires(self):
+        return [harvest()]
 
 
 class pcornet_trial(CDMScriptTask):
     script = Script.pcornet_trial
 
+    def requires(self):
+        return [pcornet_init()]
+
 
 class prescribing(CDMScriptTask):
     script = Script.prescribing
+
+    def requires(self):
+        return [encounter()]
 
 
 class pro_cm(CDMScriptTask):
     script = Script.pro_cm
 
+    def requires(self):
+        return [pcornet_init()]
+
 
 class procedures(CDMScriptTask):
     script = Script.procedures
+
+    def requires(self):
+        return [encounter()]
 
 
 class provider(CDMScriptTask):
@@ -137,3 +179,16 @@ class provider(CDMScriptTask):
 
 class vital(CDMScriptTask):
     script = Script.vital
+
+    def requires(self):
+        return [encounter()]
+
+
+class loadLabNormal(LoadCSV):
+    tablename = 'LABNORMAL'
+    csvname = 'labnormal.csv'
+
+
+class loadHarvestLocal(LoadCSV):
+    tablename = 'HARVET_LOCAL'
+    csvname = 'harvest_local.csv'

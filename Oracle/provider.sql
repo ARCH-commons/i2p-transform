@@ -1,7 +1,5 @@
---------------------------------------------------------------------------------
--- PROVIDER
---------------------------------------------------------------------------------
-
+/** provider - create and populate the provider table.
+*/
 BEGIN
 PMN_DROPSQL('DROP TABLE provider');
 END;

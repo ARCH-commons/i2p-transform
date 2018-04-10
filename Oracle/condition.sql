@@ -1,8 +1,5 @@
 /** condition - create and populate the condition table.
 */
-
-select encounterid from encounter where 'dep' = 'encounter.sql'
-/
 BEGIN
 PMN_DROPSQL('DROP TABLE condition');
 END;

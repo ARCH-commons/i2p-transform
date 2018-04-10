@@ -1,8 +1,5 @@
 /** encounter - create and populate the encounter table.
 */
-
-select patid from demographic where 'dep' = 'demographic.sql'
-/
 BEGIN
 PMN_DROPSQL('DROP TABLE encounter');
 END;

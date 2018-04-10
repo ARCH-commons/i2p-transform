@@ -1,7 +1,5 @@
 /** med_admin - create and populate the med_admin table.
 */
-select synonym_name from all_synonyms where 'dep' = 'pcornet_init.sql'
-/
 BEGIN
 PMN_DROPSQL('DROP TABLE med_admin');
 END;

@@ -1,8 +1,5 @@
 /** dispensing - create and populate the dispensing table.
 */
-
---select encounterid from encounter where 'dep' = 'encounter.sql';
-
 BEGIN
 PMN_DROPSQL('DROP TABLE dispensing');
 END;

@@ -1,7 +1,5 @@
 /** pro_cm - create the pro_cm table.
 */
-select synonym_name from all_synonyms where 'dep' = 'pcornet_init.sql'
-/
 BEGIN
 PMN_DROPSQL('DROP TABLE pro_cm');
 END;
