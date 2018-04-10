@@ -186,9 +186,9 @@ class vital(CDMScriptTask):
 
 class loadLabNormal(LoadCSV):
     tablename = 'LABNORMAL'
-    csvname = 'labnormal.csv'
+    csvname = 'Oracle/labnormal.csv'
 
 
 class loadHarvestLocal(LoadCSV):
     tablename = 'HARVET_LOCAL'
-    csvname = 'harvest_local.csv'
+    csvname = 'Oracle/harvest_local.csv'
