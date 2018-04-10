@@ -190,5 +190,5 @@ class loadLabNormal(LoadCSV):
 
 
 class loadHarvestLocal(LoadCSV):
-    tablename = 'HARVET_LOCAL'
+    tablename = 'HARVEST_LOCAL'
     csvname = 'Oracle/harvest_local.csv'
