@@ -17,29 +17,25 @@ begin
 
 execute immediate 'truncate table death';
 
-insert into death( patid, death_date, death_date_impute, death_source, death_match_confidence)
-select distinct pat.patient_num, pat.death_date,
-case when vital_status_cd like 'X%' then 'B'
-  when vital_status_cd like 'M%' then 'D'
-  when vital_status_cd like 'Y%' then 'N'
-  else 'OT'
-  end death_date_impute,
-  'NI' death_source,
-  'NI' death_match_confidence
-from (
-	/* KUMC specific fix to address unknown death dates */
-  select
-    ibp.patient_num,
-    case when ibf.concept_cd is not null then DATE '2100-12-31' -- in accordance with the CDM v3 spec
-      else ibp.death_date end death_date,
-    case when ibf.concept_cd is not null then 'OT'
-      else upper(ibp.vital_status_cd) end vital_status_cd
-  from i2b2patient ibp
-  left join i2b2fact ibf
-    on ibp.patient_num=ibf.patient_num
-    and ibf.CONCEPT_CD='DEM|VITAL:yu'
-) pat
-where (pat.death_date is not null or vital_status_cd like 'Z%') and pat.patient_num in (select patid from demographic);
+insert into death(patid, death_date, death_date_impute, death_source, death_match_confidence)
+with death_source_map as (
+ select 'DEM|VITAL:y' concept_cd, 'L' death_source, null unknown from dual
+ union all
+ select 'DEM|VITAL:yu' concept_cd, 'L' death_source, 1 unknown from dual
+ union all
+ select 'DEM|VITAL|SSA:y' concept_cd, 'D' death_source, null unknown from dual
+ union all
+ select 'NAACCR|1760:0' concept_cd, 'T' death_source, null unknown from dual
+ union all
+ select 'NAACCR|1760:4' concept_cd, 'T' death_source, null unknown from dual
+)
+select /*+ parallel(0) */ obs.patient_num patid
+     , case when dmap.unknown = 1 then DATE '2100-12-31' else obs.start_date end death_date
+     , case when dmap.unknown = 1 then 'OT' else 'N' end death_date_impute
+     , dmap.death_source
+     , 'NI' death_match_confidence
+from pcornet_cdm.i2b2fact obs
+join death_source_map dmap on obs.concept_cd = dmap.concept_cd;
 
 end;
 /
