@@ -28,8 +28,10 @@ with death_source_map as (
  select 'NAACCR|1760:0' concept_cd, 'T' death_source, null unknown from dual
  union all
  select 'NAACCR|1760:4' concept_cd, 'T' death_source, null unknown from dual
+ -- Possible exception, NAACCR|1760:12 is not handled here as there are no examples in the data.
+ -- This is the case where date of death is flagged as unknown.
 )
-select /*+ parallel(0) */ obs.patient_num patid
+select distinct /*+ parallel(0) */ obs.patient_num patid
      , case when dmap.unknown = 1 then DATE '2100-12-31' else obs.start_date end death_date
      , case when dmap.unknown = 1 then 'OT' else 'N' end death_date_impute
      , dmap.death_source
