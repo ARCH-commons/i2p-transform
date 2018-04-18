@@ -16,7 +16,7 @@ class CDMScriptTask(SqlScriptTask):
     def variables(self) -> Environment:
         return dict(datamart_id='C4UK', datamart_name='University of Kansas', i2b2_data_schema='BLUEHERONDATA',
                     min_pat_list_date_dd_mon_rrrr='01-Jan-2010', min_visit_date_dd_mon_rrrr='01-Jan-2010',
-                    i2b2_meta_schema='BLUEHERONMETADATA', enrollment_months_back='2', network_id='C4',
+                    i2b2_meta_schema='BLUEHERONMETADATA', enrollment_months_back='42', network_id='C4',
                     network_name='GPC', i2b2_etl_schema='HERON_ETL_3')
 
 
@@ -25,6 +25,7 @@ class condition(CDMScriptTask):
 
     def requires(self):
         return [encounter()]
+
 
 class death(CDMScriptTask):
     script = Script.death
