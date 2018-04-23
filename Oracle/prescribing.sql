@@ -127,7 +127,7 @@ begin
 PMN_DROPSQL('DROP TABLE prescribing_transfer');
 end;
 /
-create global temporary table prescribing_transfer on commit preserve rows as
+create table prescribing_transfer as
 select * from prescribing where 1 = 0
 /
 
@@ -212,7 +212,7 @@ insert /*+ append */ into prescribing_transfer (
 	PATID, ENCOUNTERID, RX_PROVIDERID, RX_ORDER_DATE, RX_ORDER_TIME, RX_START_DATE, RX_END_DATE, RXNORM_CUI,
     RX_QUANTITY, RX_QUANTITY_UNIT, RX_REFILLS, RX_DAYS_SUPPLY, RX_FREQUENCY, RX_BASIS, RAW_RX_MED_NAME, RAW_RXNORM_CUI
 )
-    select /*+ use_nl(freq quantity supply refills) parallel(10) */
+    select /*+ use_nl(freq quantity supply refills) */
     m.patient_num PATID,
     m.Encounter_Num ENCOUNTERID,
     m.provider_id RX_PROVIDERID,
@@ -272,7 +272,7 @@ insert /*+ append */ into prescribing_transfer (
 
 commit;
 
-insert /*+ append parallel(10) */ into prescribing (
+insert /*+ append */ into prescribing (
 	PATID, ENCOUNTERID, RX_PROVIDERID, RX_ORDER_DATE, RX_ORDER_TIME, RX_START_DATE, RX_END_DATE, RXNORM_CUI,
     RX_QUANTITY, RX_QUANTITY_UNIT, RX_REFILLS, RX_DAYS_SUPPLY, RX_FREQUENCY, RX_BASIS, RAW_RX_MED_NAME, RAW_RXNORM_CUI
 )
@@ -292,7 +292,9 @@ BEGIN
 PCORNetPrescribing();
 END;
 /
-truncate table prescribing_transfer
+BEGIN
+PMN_DROPSQL('DROP TABLE prescribing_transfer');
+END;
 /
 insert into cdm_status (status, last_update, records) select 'prescribing', sysdate, count(*) from prescribing
 /
