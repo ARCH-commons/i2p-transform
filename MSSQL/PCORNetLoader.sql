@@ -117,7 +117,7 @@ create view i2b2loyalty_patients as
 ELSE
 SET @SQL='
 create view i2b2loyalty_patients as
-(select top 0 patient_num,cast(''2010/1/1'' as datetime) period_start,cast(''2010/1/1'' as datetime) period_end from i2b2patient)'
+(select top 0 patient_num,cast(''2010/1/1'' as datetime) period_start,cast(''2010/1/1'' as datetime) period_end from i2b2patient_list)'
 
 EXEC(@SQL)
 GO
@@ -1070,7 +1070,7 @@ DECLARE @sqltext NVARCHAR(4000);
 DECLARE @batchid numeric
 declare getsql cursor local for 
 --1 --  S,R,NH
-	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
+	select 'insert into PMNDEMOGRAPHIC WITH (TABLOCK)(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
 	'	select ''1'',patient_num, '+
 	'	birth_date, '+
 	'	substring(convert(varchar,birth_date,20),12,5), '+
@@ -1087,7 +1087,7 @@ declare getsql cursor local for
 	and sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX\%'
 	and sex.c_visualattributes like 'L%'
 union -- A - S,R,H
-select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
+select 'insert into PMNDEMOGRAPHIC WITH (TABLOCK)(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
 	'	select ''A'',patient_num, '+
 	'	birth_date, '+
 	'	substring(convert(varchar,birth_date,20),12,5), '+
@@ -1107,7 +1107,7 @@ select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HI
 	and sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX\%'
 	and sex.c_visualattributes like 'L%'
 union --2 S, nR, nH
-	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
+	select 'insert into PMNDEMOGRAPHIC WITH (TABLOCK)(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
 	'	select ''2'',patient_num, '+
 	'	birth_date, '+
 	'	substring(convert(varchar,birth_date,20),12,5), '+
@@ -1122,7 +1122,7 @@ union --2 S, nR, nH
 	where sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX\%'
 	and sex.c_visualattributes like 'L%'
 union --3 -- nS,R, NH
-	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
+	select 'insert into PMNDEMOGRAPHIC WITH (TABLOCK)(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
 	'	select ''3'',patient_num, '+
 	'	birth_date, '+
 	'	substring(convert(varchar,birth_date,20),12,5), '+
@@ -1137,7 +1137,7 @@ union --3 -- nS,R, NH
 	where race.c_fullname like '\PCORI\DEMOGRAPHIC\RACE\%'
 	and race.c_visualattributes like 'L%'
 union --B -- nS,R, H
-	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
+	select 'insert into PMNDEMOGRAPHIC WITH (TABLOCK)(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
 	'	select ''B'',patient_num, '+
 	'	birth_date, '+
 	'	substring(convert(varchar,birth_date,20),12,5), '+
@@ -1155,7 +1155,7 @@ union --B -- nS,R, H
 	and hisp.c_fullname like '\PCORI\DEMOGRAPHIC\HISPANIC\Y%'
 	and hisp.c_visualattributes like 'L%'
 union --4 -- S, NR, H
-	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
+	select 'insert into PMNDEMOGRAPHIC WITH (TABLOCK)(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
 	'	select ''4'',patient_num, '+
 	'	birth_date, '+
 	'	substring(convert(varchar,birth_date,20),12,5), '+
@@ -1170,7 +1170,7 @@ union --4 -- S, NR, H
 	where sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX\%'
 	and sex.c_visualattributes like 'L%'
 union --5 -- NS, NR, H
-	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
+	select 'insert into PMNDEMOGRAPHIC WITH (TABLOCK)(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
 	'	select ''5'',patient_num, '+
 	'	birth_date, '+
 	'	substring(convert(varchar,birth_date,20),12,5), '+
@@ -1182,7 +1182,7 @@ union --5 -- NS, NR, H
 	'	and lower(isnull(p.race_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''RACE'') '+
 	'	and lower(isnull(p.race_cd,''xx'')) in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'')'
 union --6 -- NS, NR, nH
-	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
+	select 'insert into PMNDEMOGRAPHIC WITH (TABLOCK)(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
 	'	select ''6'',patient_num, '+
 	'	birth_date, '+
 	'	substring(convert(varchar,birth_date,20),12,5), '+
@@ -1251,10 +1251,12 @@ create procedure PCORNetEncounter as
 DECLARE @sqltext NVARCHAR(4000);
 begin
 
-insert into pmnencounter(PATID,ENCOUNTERID,admit_date ,ADMIT_TIME , 
+ALTER INDEX index_patid ON pmnencounter DISABLE; 
+
+insert into pmnencounter WITH (TABLOCK) (PATID,ENCOUNTERID,admit_date ,ADMIT_TIME , 
 		DISCHARGE_DATE ,DISCHARGE_TIME ,PROVIDERID ,FACILITY_LOCATION  
 		,ENC_TYPE ,FACILITYID ,DISCHARGE_DISPOSITION , 
-		DISCHARGE_STATUS ,DRG ,DRG_TYPE ,ADMITTING_SOURCE) 
+		DISCHARGE_STATUS ,DRG ,DRG_TYPE ,ADMITTING_SOURCE)  
 select distinct v.patient_num, v.encounter_num,  
 	start_Date, 
 	substring(convert(varchar,start_Date,20),12,5), 
@@ -1278,6 +1280,8 @@ left outer join
 (select patient_num, encounter_num, inout_cd,substring(pcori_basecode,charindex(':',pcori_basecode)+1,2) pcori_enctype from i2b2visit v
  inner join pcornet_enc e on c_dimcode like '%'''+inout_cd+'''%' and e.c_fullname like '\PCORI\ENCOUNTER\ENC_TYPE\%') enctype
   on enctype.patient_num=v.patient_num and enctype.encounter_num=v.encounter_num
+
+ALTER INDEX index_patid ON pmnencounter REBUILD; 
 
 end
 go
@@ -1313,7 +1317,7 @@ inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounte
 inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode  
 and dxsource.c_fullname like '\PCORI_MOD\DX_ORIGIN\%'
 
-insert into pmndiagnosis (patid,			encounterid,	enc_type, admit_date, providerid, dx, dx_type, dx_source, pdx, dx_origin)
+insert into pmndiagnosis WITH (TABLOCK) (patid,			encounterid,	enc_type, admit_date, providerid, dx, dx_type, dx_source, pdx, dx_origin) 
 select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, enc.admit_date, enc.providerid, --bug fix MJ 10/7/16
 substring(diag.pcori_basecode,charindex(':',diag.pcori_basecode)+1,10), -- jgk bugfix 10/3 
 substring(diag.c_fullname,18,2) dxtype,  
@@ -1373,7 +1377,7 @@ inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounte
 inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode 
 where dxsource.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\%'
 
-insert into pmncondition (patid, encounterid, report_date, resolve_date, condition, condition_type, condition_status, condition_source)
+insert into pmncondition WITH (TABLOCK) (patid, encounterid, report_date, resolve_date, condition, condition_type, condition_status, condition_source)
 select distinct factline.patient_num, min(factline.encounter_num) encounterid, min(factline.start_date) report_date, isnull(max(factline.end_date),null) resolve_date, 
 substring(diag.pcori_basecode,charindex(':',diag.pcori_basecode)+1,10), -- jgk bugfix 10/3 
 substring(diag.c_fullname,18,2) condition_type,  
@@ -1404,7 +1408,7 @@ go
 create procedure PCORNetProcedure as
 
 begin
-insert into pmnprocedure( 
+insert into pmnprocedure WITH (TABLOCK) ( 
 				patid,			encounterid,	enc_type, admit_date, providerid, px, px_type, px_source,px_date) 
 select  distinct fact.patient_num, enc.encounterid,	enc.enc_type, enc.admit_date, 
 		enc.providerid, substring(pr.pcori_basecode,charindex(':',pr.pcori_basecode)+1,11) px, substring(pr.c_fullname,18,2) pxtype, 'NI' px_source,fact.start_date
@@ -1433,7 +1437,7 @@ GO
 create procedure PCORNetVital as
 begin
 -- jgk: I took out admit_date - it doesn't appear in the scheme. Now in SQLServer format - date, substring, name on inner select, no nested with. Added modifiers and now use only pathnames, not codes.
-insert into pmnVITAL(patid, encounterid, measure_date, measure_time,vital_source,ht, wt, diastolic, systolic, original_bmi, bp_position,smoking,tobacco,tobacco_type)
+insert into pmnVITAL WITH (TABLOCK)(patid, encounterid, measure_date, measure_time,vital_source,ht, wt, diastolic, systolic, original_bmi, bp_position,smoking,tobacco,tobacco_type)
 select patid, encounterid, measure_date, measure_time,vital_source, ht, wt, diastolic, systolic, original_bmi, bp_position,smoking,tobacco, 
 case when tobacco in ('02','03','04') then -- no tobacco
     case when smoking in ('03','04') then '04' -- no smoking
@@ -1532,7 +1536,7 @@ GO
 create procedure PCORNetEnroll as
 begin
 
-INSERT INTO [pmnENROLLMENT]([PATID], [ENR_START_DATE], [ENR_END_DATE], [CHART], [ENR_BASIS]) 
+INSERT INTO [pmnENROLLMENT] WITH (TABLOCK) ([PATID], [ENR_START_DATE], [ENR_END_DATE], [CHART], [ENR_BASIS]) 
     select x.patient_num patid, case when l.patient_num is not null then l.period_start else enr_start end enr_start_date
     , case when l.patient_num is not null then l.period_end when enr_end_end>enr_end then enr_end_end else enr_end end enr_end_date 
     , 'Y' chart, case when l.patient_num is not null then 'A' else 'E' end enr_basis from 
@@ -1757,7 +1761,7 @@ begin
 			and unitcode.c_fullname like '\PCORI_MOD\RX_QUANTITY_UNIT\%'
 
 -- insert data with outer joins to ensure all records are included even if some data elements are missing
-insert into pmnprescribing (
+insert into pmnprescribing WITH (TABLOCK) (
 	PATID
     ,encounterid
     ,RX_PROVIDERID
@@ -1942,7 +1946,7 @@ select nval_num,encounter_num,concept_cd
 
 -- insert data with outer joins to ensure all records are included even if some data elements are missing
 
-insert into pmndispensing (
+insert into pmndispensing WITH (TABLOCK) (
 	PATID
     ,PRESCRIBINGID
 	,DISPENSE_DATE -- using start_date from i2b2
@@ -1990,7 +1994,7 @@ go
 create procedure PCORNetDeath as
 
 begin
-insert into pmndeath( 
+insert into pmndeath WITH (TABLOCK) ( 
 				patid,			death_date, death_date_impute, death_source,death_match_confidence) 
 select  distinct pat.patient_num, pat.death_date, case 
 when vital_status_cd like 'X%' then 'B'
@@ -2049,7 +2053,7 @@ DECLARE @sql varchar(4000);
 
 delete from i2b2patient_list ;
 
-SET @sql='insert into i2b2patient_list(patient_num)
+SET @sql='insert into i2b2patient_list WITH (TABLOCK) (patient_num)
 select distinct top '+cast(@xnum as varchar)+' f.patient_num from i2b2fact f
 inner join i2b2visit v on f.patient_num=v.patient_num
  where f.start_date>=''20100101'' and v.start_date>=''20100101'''
