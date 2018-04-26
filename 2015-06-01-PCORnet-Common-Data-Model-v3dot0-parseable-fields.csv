@@ -952,3 +952,7 @@ HARVEST,REFRESH_PRESCRIBING_DATE,RDBMS Date,SAS Date (Numeric),,NO,,,,Most recen
 HARVEST,REFRESH_PCORNET_TRIAL_DATE,RDBMS Date,SAS Date (Numeric),,NO,,,,Most recent date on which the present data were loaded into the PCORNET_TRIAL table. This date should be null if the table does not have records.,223
 HARVEST,REFRESH_DEATH_DATE,RDBMS Date,SAS Date (Numeric),,NO,,,,Most recent date on which the present data were loaded into the DEATH table. This date should be null if the table does not have records.,224
 HARVEST,REFRESH_DEATH_CAUSE_DATE,RDBMS Date,SAS Date (Numeric),,NO,,,,Most recent date on which the present data were loaded into the DEATH_CAUSE table. This date should be null if the table does not have records.,225
+MED_ADMIN,,,,,,,,,,
+PROVIDER,,,,,,,,,,
+OBS_CLIN,,,,,,,,,,
+OBS_GEN,,,,,,,,,,
