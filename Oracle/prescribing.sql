@@ -149,9 +149,10 @@ execute immediate 'truncate table refills';
 execute immediate 'truncate table supply';
 
 insert into basis
-select pcori_basecode,c_fullname,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd from i2b2medfact basis
-        inner join encounter enc on enc.patid = basis.patient_num and enc.encounterid = basis.encounter_Num
-     join pcornet_med basiscode
+select pcori_basecode,c_fullname,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd
+from i2b2medfact basis
+inner join encounter enc on enc.patid = basis.patient_num and enc.encounterid = basis.encounter_Num
+join pcornet_med basiscode
         on basis.modifier_cd = basiscode.c_basecode
         and basiscode.c_fullname like '\PCORI_MOD\RX_BASIS\%';
 

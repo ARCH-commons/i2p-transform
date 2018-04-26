@@ -14,6 +14,7 @@ CREATE TABLE demographic(
     HISPANIC varchar(2) NULL,
     BIOBANK_FLAG varchar(1) DEFAULT 'N',
     RACE varchar(2) NULL,
+    PAT_PREF_LANGUAGE_SPOKEN varchar(3) NULL,
     RAW_SEX varchar(50) NULL,
     RAW_SEXUAL_ORIENTATION varchar(50) NULL,
     RAW_GENDER_IDENTITY varchar(50) NULL,
@@ -186,6 +187,17 @@ FETCH getsql INTO sqltext;
 	COMMIT;
 END LOOP;
 CLOSE getsql;
+
+merge into demographic d
+using (
+  select NVL(code, 'OT') as code, language_cd, patient_num
+  from language_map
+  right join i2b2patient on
+  case when language_cd is NULL then 'no information' else language_cd end = lower(descriptive_text)
+) l
+on (d.patid = l.patient_num)
+when matched then update
+set d.PAT_PREF_LANGUAGE_SPOKEN = l.code;
 
 execute immediate 'create unique index demographic_pk on demographic (PATID)';
 GATHER_TABLE_STATS('DEMOGRAPHIC');
