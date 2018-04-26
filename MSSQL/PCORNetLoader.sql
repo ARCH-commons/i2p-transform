@@ -245,7 +245,7 @@ GO
 CREATE TABLE [dbo].[pmnPROCEDURES]( --Modified on 2/6/17 from procedure to procedures by Matthew Joss
 	[PROCEDURESID] [bigint]  IDENTITY(1,1) NOT NULL,
 	[PATID] [varchar](50) NOT NULL,
-	[ENCOUNTERID] [varchar](50) NOT NULL,
+	[ENCOUNTERID] [varchar](50) NULL,
 	[ENC_TYPE] [varchar](2) NULL,
 	[ADMIT_DATE] [datetime] NULL,
 	[PROVIDERID] [varchar](50) NULL,
@@ -253,9 +253,11 @@ CREATE TABLE [dbo].[pmnPROCEDURES]( --Modified on 2/6/17 from procedure to proce
 	[PX] [varchar](11) NOT NULL,
 	[PX_TYPE] [varchar](2) NOT NULL,
 	[PX_SOURCE] [varchar](2) NULL,
+    [PPX] [varchar](2) NULL,
 	[RAW_PX] [varchar](50) NULL,
 	[RAW_PX_TYPE] [varchar](50) NULL,
-PRIMARY KEY NONCLUSTERED 
+    [RAW_PPX] [varchar](50) NULL,
+ PRIMARY KEY NONCLUSTERED 
 (
 	[PROCEDURESID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -275,7 +277,7 @@ GO
 CREATE TABLE [dbo].[pmndiagnosis](
 	[DIAGNOSISID] [bigint] IDENTITY(1,1) NOT NULL,
 	[PATID] [varchar](50) NOT NULL,
-	[ENCOUNTERID] [varchar](50) NOT NULL,
+	[ENCOUNTERID] [varchar](50) NULL,
 	[ENC_TYPE] [varchar](2) NULL,
 	[ADMIT_DATE] [datetime] NULL,
 	[PROVIDERID] [varchar](50) NULL,
@@ -284,11 +286,13 @@ CREATE TABLE [dbo].[pmndiagnosis](
 	[DX_SOURCE] [varchar](2) NOT NULL,
     [DX_ORIGIN] [varchar] (2) NULL,
 	[PDX] [varchar](2) NULL,
+    [DX_POA] [varchar](2) NULL,
 	[RAW_DX] [varchar](50) NULL,
 	[RAW_DX_TYPE] [varchar](50) NULL,
 	[RAW_DX_SOURCE] [varchar](50) NULL,
 	[RAW_ORIGDX] [varchar](50) NULL,
 	[RAW_PDX] [varchar](50) NULL,
+    [RAW_DX_POA] [varchar](50) NULL,
 PRIMARY KEY NONCLUSTERED 
 (
 	[DIAGNOSISID]  ASC
@@ -316,7 +320,7 @@ CREATE TABLE [dbo].[pmnlab_result_cm]( --Modified on 2/6/17 from labresults_cm t
 	[PATID] [varchar](50) NOT NULL,
 	[ENCOUNTERID] [varchar](50) NULL,
 	[LAB_NAME] [varchar](10) NULL,
-	[SPECIMEN_SOURCE] [varchar](10) NULL,
+	[SPECIMEN_SOURCE] [varchar](50) NULL,
 	[LAB_LOINC] [varchar](10) NULL,
 	[PRIORITY] [varchar](2) NULL,
 	[RESULT_LOC] [varchar](2) NULL,
@@ -327,10 +331,11 @@ CREATE TABLE [dbo].[pmnlab_result_cm]( --Modified on 2/6/17 from labresults_cm t
 	[SPECIMEN_TIME] [varchar](5) NULL,
 	[RESULT_DATE] [datetime] NOT NULL,
 	[RESULT_TIME] [varchar](5) NULL,
-	[RESULT_QUAL] [varchar](12) NULL,
+	[RESULT_QUAL] [varchar](50) NULL,
+    [RESULT_SNOMED] [varchar] (50) NULL,
 	[RESULT_NUM] [decimal] (15,8) NULL,
 	[RESULT_MODIFIER] [varchar](2) NULL,
-	[RESULT_UNIT] [varchar](11) NULL,
+	[RESULT_UNIT] [varchar](50) NULL,
 	[NORM_RANGE_LOW] [varchar](10) NULL,
 	[NORM_MODIFIER_LOW] [varchar](2) NULL,
 	[NORM_RANGE_HIGH] [varchar](10) NULL,
@@ -457,7 +462,13 @@ CREATE TABLE [dbo].[pmndispensing](
 	[NDC] [varchar] (11) NOT NULL,
 	[DISPENSE_SUP] [numeric] (15, 8), 
 	[DISPENSE_AMT] [numeric] (15, 8), 
+    [DISPENSE_DOSE_DISP] [numeric] (15, 8),
+    [DISPENSE_DOSE_DISP_UNIT] [varchar] (50),
+    [DISPENSE_ROUTE] [varchar] (50),
 	[RAW_NDC] [varchar] (50),
+    [RAW_DISPENSE_DOSE_DISP] [varchar] (50),
+    [RAW_DISPENSE_DOSE_DISP_UNIT] [varchar] (50),
+    [RAW_DISPENSE_ROUTE] [varchar] (50),
 	
 PRIMARY KEY NONCLUSTERED 
 (
@@ -484,18 +495,29 @@ CREATE TABLE [dbo].[pmnprescribing](
 	[RX_ORDER_TIME] [varchar] (5) NULL,
 	[RX_START_DATE] [datetime] NULL,
 	[RX_END_DATE] [datetime] NULL,
+    [RX_DOSE_ORDERED] [numeric] (15, 8) NULL,
+    [RX_DOSE_ORDERED_UNIT] [varchar] (50) NULL,
 	[RX_QUANTITY] [numeric] (15, 8) NULL,
+    [RX_DOSE_FORM] [varchar] (50) NULL,
     [RX_QUANTITY_UNIT] [varchar] (2) NULL,
 	[RX_REFILLS] [numeric] (15, 8) NULL,
 	[RX_DAYS_SUPPLY] [numeric] (15, 8) NULL,
 	[RX_FREQUENCY] [varchar] (2) NULL, -- Data type error, fixed 1/11/16 jgk
-	[RX_BASIS] [varchar] (2) NULL,
+	[RX_PRN_FLAG] [varchar] (1) NULL,
+    [RX_ROUTE] [varchar] (50) NULL,
+    [RX_BASIS] [varchar] (2) NULL,
 	[RXNORM_CUI] [varchar] (8) NULL,
+    [RX_SOURCE] [varchar] (2) NULL,
+    [RX_DISPENSE_AS_WRITTEN] [varchar] (50) NULL,
 	[RAW_RX_MED_NAME] [varchar] (50) NULL,
 	[RAW_RX_FREQUENCY] [varchar] (50) NULL,
 	[RAW_RXNORM_CUI] [varchar] (50) NULL,
     [RAW_RX_QUANTITY] [varchar] (50) NULL,
-    [RAW_RX_NDC] [varchar] (50) NULL
+    [RAW_RX_NDC] [varchar] (50) NULL,
+    [RAW_RX_DOSE_ORDERED] [varchar] (50) NULL,
+    [RAW_RX_DOSE_ORDERED_UNIT] [varchar] (50) NULL,
+    [RAW_RX_ROUTE] [varchar] (50) NULL,
+    [RAW_RX_REFILLS] [varchar] (50) NULL,
 PRIMARY KEY NONCLUSTERED 
 (
 	[PRESCRIBINGID] ASC
@@ -570,22 +592,38 @@ CREATE TABLE [dbo].[pmnpro_cm](
 	[PRO_CM_ID] [bigint]  IDENTITY (1,1) NOT NULL,
 	[PATID] [varchar](50) NOT NULL,
 	[ENCOUNTERID]  [varchar](50) NULL,
-	[PRO_ITEM] [varchar] (20) NOT NULL,
 	[PRO_LOINC] [varchar] (10) NULL,
 	[PRO_DATE] [datetime] NOT NULL,
 	[PRO_TIME] [varchar] (5) NULL,
-	[PRO_RESPONSE] [numeric] (15, 8) NOT NULL,
+    [PRO_TYPE] [varchar] (2) NULL,
+    [PRO_ITEM_NAME] [varchar] (50) NULL,
+    [PRO_ITEM_LOINC] [varchar] (10) NULL,
+    [PRO_RESPONSE_TEXT] [varchar] (50) NULL,
+	[PRO_RESPONSE_NUM] [numeric] (15, 8) NOT NULL,
 	[PRO_METHOD] [varchar] (2) NULL,
 	[PRO_MODE] [varchar] (2) NULL,
 	[PRO_CAT] [varchar] (2) NULL,
-	[RAW_PRO_CODE] [varchar] (50) NULL,
-	[RAW_PRO_RESPONSE] [varchar] (50) NULL,
+    [PRO_ITEM_VERSION] [varchar] (50) NULL,
+    [PRO_MEASURE_NAME] [varchar] (50) NULL,
+    [PRO_MEASURE_SEQ] [varchar] (50) NULL,
+    [PRO_MEASURE_SCORE] [varchar] (8) NULL,
+    [PRO_MEASURE_THETA] [varchar] (8) NULL,
+    [PRO_MEASURE_SCALED_TSCORE] [varchar] (8) NULL,
+    [PRO_MEASURE_STANDARD_ERROR] [varchar] (8) NULL,
+    [PRO_MEASURE_COUNT_SCORED] [varchar] (8) NULL,
+    [PRO_MEASURE_LOINC] [varchar] (10) NULL,
+    [PRO_MEASURE_VERSION] [varchar] (50) NULL,
+    [PRO_ITEM_FULLNAME] [varchar] (50) NULL,
+    [PRO_ITEM_TEXT] [varchar] (50) NULL,
+    [PRO_MEASURE_FULLNAME] [varchar] (50) NULL,
+	
 PRIMARY KEY CLUSTERED 
 (
 	[PRO_CM_ID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+
 
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[pmnharvest]') AND type in (N'U'))
 DROP TABLE [dbo].[pmnharvest]
@@ -617,6 +655,11 @@ CREATE TABLE [dbo].[pmnharvest](
 	[REPORT_DATE_MGMT] [varchar](2) NULL,
 	[RESOLVE_DATE_MGMT] [varchar](2) NULL,
 	[PRO_DATE_MGMT] [varchar](2) NULL,
+    [DEATH_DATE_MGMT] [varchar] (2) NULL,
+    [MEDADMIN_START_DATE_MGMT] [varchar] (2) NULL,
+    [MEDADMIN_END_DATE_MGMT] [varchar] (2) NULL,
+    [OBSCLIN_DATE_MGMT] [varchar] (2) NULL,
+    [OBSGEN_DATE_MGMT] [varchar] (2) NULL,
 	[REFRESH_DEMOGRAPHIC_DATE] [datetime] NULL,
 	[REFRESH_ENROLLMENT_DATE] [datetime] NULL,
 	[REFRESH_ENCOUNTER_DATE] [datetime] NULL,
@@ -631,6 +674,11 @@ CREATE TABLE [dbo].[pmnharvest](
 	[REFRESH_PCORNET_TRIAL_DATE] [datetime] NULL,
 	[REFRESH_DEATH_DATE] [datetime] NULL,
 	[REFRESH_DEATH_CAUSE_DATE] [datetime] NULL,
+    [REFRESH_MED_ADMIN_DATE] [datetime] NULL,
+    [REFRESH_OBS_CLIN_DATE] [datetime] NULL,
+    [REFRESH_PROVIDER_DATE] [datetime] NULL,
+    [REFRESH_OBS_GEN_DATE] [datetime] NULL,
+
  CONSTRAINT [PK_pmnharvest] PRIMARY KEY CLUSTERED 
 (
 	[NETWORKID] ASC,
@@ -659,12 +707,22 @@ CREATE TABLE [dbo].[pmnENCOUNTER](
 	[DRG] [varchar](3) NULL,
 	[DRG_TYPE] [varchar](2) NULL,
 	[ADMITTING_SOURCE] [varchar](2) NULL,
-	[RAW_SITEID] [varchar] (50) NULL,
+	[PAYER_TYPE_PRIMARY] [varchar](4) NULL,
+	[PAYER_TYPE_SECONDARY] [varchar](4) NULL,
+    [FACILITY_TYPE] [varchar](50) NULL,
+    [RAW_SITEID] [varchar] (50) NULL,
 	[RAW_ENC_TYPE] [varchar](50) NULL,
 	[RAW_DISCHARGE_DISPOSITION] [varchar](50) NULL,
 	[RAW_DISCHARGE_STATUS] [varchar](50) NULL,
 	[RAW_DRG_TYPE] [varchar](50) NULL,
 	[RAW_ADMITTING_SOURCE] [varchar](50) NULL,
+    [RAW_FACILITY_TYPE] [varchar](50) NULL,
+    [RAW_PAYER_TYPE_PRIMARY] [varchar](50) NULL,
+    [RAW_PAYER_NAME_PRIMARY] [varchar](50) NULL,
+    [RAW_PAYER_ID_PRIMARY] [varchar](50) NULL,
+    [RAW_PAYER_TYPE_SECONDARY] [varchar](50) NULL,
+    [RAW_PAYER_NAME_SECONDARY] [varchar](50) NULL,
+    [RAW_PAYER_ID_SECONDARY] [varchar](50) NULL,
 PRIMARY KEY NONCLUSTERED 
 (
 	[ENCOUNTERID] ASC
@@ -698,11 +756,13 @@ CREATE TABLE [dbo].[pmndemographic](
 	[HISPANIC] [varchar](2) NULL,
     [BIOBANK_FLAG] [varchar](1),
 	[RACE] [varchar](2) NULL,
+    [PAT_PREF_LANGUAGE_SPOKEN] [varchar](3) NULL,
 	[RAW_SEX] [varchar](50) NULL,
 	[RAW_HISPANIC] [varchar](50) NULL,
 	[RAW_RACE] [varchar](50) NULL,
     [RAW_SEXUAL_ORIENTATION] [varchar] (50) NULL,
-    [RAW_GENDER_IDENTITY] [varchar] (50) NULL
+    [RAW_GENDER_IDENTITY] [varchar] (50) NULL,
+    [RAW_PAT_PREF_LANGUAGE_SPOKEN] [varchar] (50) NULL
 PRIMARY KEY NONCLUSTERED 
 (
 	[PATID] ASC
@@ -725,6 +785,150 @@ ALTER TABLE dbo.pmndemographic
 ADD CONSTRAINT biobank_default
 DEFAULT 'N' FOR BIOBANK_FLAG;
 GO
+
+
+
+----------------------------------------------------------New tables for CDM V4 BELOW------------------------------------------------------------
+
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[MED_ADMIN]') AND type in (N'U'))
+DROP TABLE [dbo].[MED_ADMIN]
+GO
+CREATE TABLE [dbo].[MED_ADMIN](
+    [MEDADMINID] [varchar] (50) NOT NULL,
+    [PATID] [varchar] (50) NOT NULL,
+    [ENCOUNTERID] [varchar] (50) NOT NULL,
+    [PRESCRIBINGID] [varchar] (50) NULL,
+    [MEDADMIN_PROVIDERID] [varchar] (50) NULL,
+    [MEDADMIN_START_DATE] [datetime] NULL,
+    [MEDADMIN_START_TIME] [varchar] (5) NULL,
+    [MEDADMIN_STOP_DATE] [datetime] NULL,
+    [MEDADMIN_STOP_TIME] [varchar] (5) NULL,
+    [MEDADMIN_TYPE] [varchar] (2) NULL,
+    [MEDADMIN_CODE] [varchar] (50) NULL,
+    [MEDADMIN_DOSE_ADMIN] [numeric] (15, 8) NULL,
+    [MEDADMIN_DOSE_ADMIN_UNIT] [varchar] (50) NULL,
+    [MEDADMIN_ROUTE] [varchar] (50) NULL,
+    [MEDADMIN_SOURCE] [varchar] (2) NULL,
+    [RAW_MEDADMIN_MED_NAME] [varchar] (50) NULL,
+    [RAW_MEDADMIN_CODE] [varchar] (50) NULL,
+    [RAW_MEDADMIN_DOSE_ADMIN] [varchar] (50) NUll,
+    [RAW_MEDADMIN_DOSE_ADMIN_UNIT] [varchar] (50) NUll,
+    [RAW_MEDADMIN_ROUTE] [varchar] (50) NUll,
+
+PRIMARY KEY NONCLUSTERED 
+(
+	[MEDADMINID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+CREATE CLUSTERED INDEX medadmin_clustered_index   
+ON MED_ADMIN (MEDADMINID)   
+go
+
+
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[PROVIDER]') AND type in (N'U'))
+DROP TABLE [dbo].[PROVIDER]
+GO
+CREATE TABLE [dbo].[PROVIDER](
+    [PROVIDERID] [varchar] (50) NULL,
+    [PROVIDER_SEX] [varchar] (2) NULL,
+    [PROVIDER_SPECIALTY_PRIMARY] [varchar] (50) NULL,
+    [PROVIDER_NPI] [numeric] (15, 8) NULL,
+    [PROVIDER_NPI_FLAG] [varchar] (1) NULL,
+    [RAW_PROVIDER_SPECIALTY_PRIMARY] [varchar] (50) NULL,
+
+PRIMARY KEY NONCLUSTERED 
+(
+	[PROVIDERID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+CREATE CLUSTERED INDEX provider_clustered_index   
+ON PROVIDER (PROVIDERID)   
+go
+
+
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[OBS_CLIN]') AND type in (N'U'))
+DROP TABLE [dbo].[OBS_CLIN]
+GO
+CREATE TABLE [dbo].[OBS_CLIN](
+    [OBSCLINID] [varchar] (50) NOT NULL,
+    [PATID] [varchar] (50) NOT NULL,
+    [ENCOUNTERID] [varchar] (50) NULL,
+    [OBSCLIN_PROVIDERID] [varchr] (50) NULL,
+    [OBSCLIN_DATE] [datetime] NULL,
+    [OBSCLIN_TIME] [varchar] (5) NULL,
+    [OBSCLIN_TYPE] [varchar] (2) NULL,
+    [OBSCLIN_CODE] [varchar] (50) NULL,
+    [OBSCLIN_RESULT_QUAL] [varchar] (50) NULL,
+    [OBSCLIN_RESULT_TEXT] [varchar] (50) NULL,
+    [OBSCLIN_RESULT_SNOMED] [varchar] (50) NULL,
+    [OBSLCIN_RESULT_NUM] [numeric] (15, 8) NULL,
+    [OBSCLIN_RESULT_MODIFIER] [varchar] (2) NULL,
+    [OBSCLIN_RESULT_UNIT] [varchar] (50) NULL,
+    [RAW_OBSCLIN_NAME] [varchar] (50) NULL,
+    [RAW_OBSCLIN_CODE] [varchar] (50) NULL,
+    [RAW_OBSCLIN_TYPE] [varchar] (50) NULL,
+    [RAW_OBSCLIN_RESULT] [varchar] (50) NULL,
+    [RAW_OBSCLIN_MODIFER] [varchar] (50) NULL,
+    [RAW_OBSCLIN_UNIT] [varchar] (50) NULL,
+
+PRIMARY KEY NONCLUSTERED 
+(
+	[OBSCLINID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+CREATE CLUSTERED INDEX obsclin_clustered_index   
+ON OBS_CLIN (OBSCLINID)   
+go
+
+
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[OBS_GEN]') AND type in (N'U'))
+DROP TABLE [dbo].[OBS_GEN]
+GO
+CREATE TABLE [dbo].[OBS_GEN](
+    [OBSGENID] [varchar] (50) NOT NULL,
+    [PATID] [varchar] (50) NOT NULL,
+    [ENCOUNTERID] [varchar] (50) NULL,
+    [OBSGEN_PROVIDERID] [varchr] (50) NULL,
+    [OBSGEN_DATE] [datetime] NULL,
+    [OBSGEN_TIME] [varchar] (5) NULL,
+    [OBSGEN_TYPE] [varchar] (30) NULL,
+    [OBSGEN_CODE] [varchar] (50) NULL,
+    [OBSGEN_RESULT_QUAL] [varchar] (50) NULL,
+    [OBSGEN_RESULT_TEXT] [varchar] (50) NULL,
+    [OBSGEN_RESULT_NUM] [numeric] (15, 8) NULL,
+    [OBSGEN_RESULT_MODIFIER] [varchar] (2) NULL,
+    [OBSGEN_RESULT_UNIT] [varchar] (50) NULL,
+    [OBSGEN_TABLE_MODIFIER] [varchar] (3) NULL,
+    [OBSGEN_ID_MODIFIED] [varchar] (50) NULL,
+    [RAW_OBSGEN_NAME] [varchar] (50) NULL,
+    [RAW_OBSGEN_CODE] [varchar] (50) NULL,
+    [RAW_OBSGEN_TYPE] [varchar] (50) NULL,
+    [RAW_OBSGEN_RESULT] [varchar] (50) NULL,
+    [RAW_OBSGEN_UNIT] [varchar] (50) NULL,
+
+PRIMARY KEY NONCLUSTERED 
+(
+	[OBSGENID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+CREATE CLUSTERED INDEX obsgen_clustered_index   
+ON OBS_GEN (OBSGENID)   
+go
+
+
+
 
 /****** Object:  ForeignKey [FK__pmndiagno__ENCOU__0AD2A005]    Script Date: 10/02/2014 15:59:37 ******/
 ALTER TABLE [dbo].[pmndiagnosis]  WITH CHECK ADD FOREIGN KEY([ENCOUNTERID])
@@ -1195,6 +1399,9 @@ union --6 -- NS, NR, nH
 	'   and lower(isnull(p.race_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''RACE'') ' 
 
 begin
+
+ALTER INDEX demographic_patid_index ON pmndemographic DISABLE;
+
 exec pcornet_popcodelist
 
 set @batchid = 0
@@ -1233,6 +1440,9 @@ from pmndemographic D inner join i2b2fact i on D.patid=i.patient_num
 INNER JOIN pcornet_demo P ON i.CONCEPT_CD = P.C_BASECODE 
 WHERE P.C_FULLNAME LIKE '\PCORI\DEMOGRAPHIC\SEXUAL_ORIENTATION\%'
 
+
+ALTER INDEX demographic_patid_index ON pmndemographic REBUILD; 
+
 end
 
 go
@@ -1252,6 +1462,7 @@ DECLARE @sqltext NVARCHAR(4000);
 begin
 
 ALTER INDEX index_patid ON pmnencounter DISABLE; 
+ALTER INDEX encounter_encounterid_index ON pmnencounter DISABLE;
 
 insert into pmnencounter WITH (TABLOCK) (PATID,ENCOUNTERID,admit_date ,ADMIT_TIME , 
 		DISCHARGE_DATE ,DISCHARGE_TIME ,PROVIDERID ,FACILITY_LOCATION  
@@ -1282,6 +1493,7 @@ left outer join
   on enctype.patient_num=v.patient_num and enctype.encounter_num=v.encounter_num
 
 ALTER INDEX index_patid ON pmnencounter REBUILD; 
+ALTER INDEX encounter_encounterid_index ON pmnencounter REBUILD; 
 
 end
 go
@@ -1296,6 +1508,8 @@ go
 create procedure PCORNetDiagnosis as
 declare @sqltext nvarchar(4000)
 begin
+
+ALTER INDEX diagnosis_encounterid_index ON pmndiagnosis DISABLE;
 
 -- Optimized to use temp tables, not views. Also removed the distinct for speed.
 select  patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode dxsource, dxsource.c_fullname
@@ -1352,6 +1566,9 @@ where (diag.c_fullname not like '\PCORI\DIAGNOSIS\10\%' or
   and not ( diag.pcori_basecode like '[E]%' and diag.c_fullname not like '\PCORI\DIAGNOSIS\10\([E]%\([E]%\([E]%' ) 
   and not (diag.c_fullname like '\PCORI\DIAGNOSIS\10\%' and diag.pcori_basecode like '[0-9]%') )) 
 and (sf.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\%' or sf.c_fullname is null)
+
+
+ALTER INDEX diagnosis_encounterid_index ON pmndiagnosis REBUILD; 
 
 end
 go
