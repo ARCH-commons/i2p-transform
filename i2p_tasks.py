@@ -8,7 +8,9 @@ from script_lib import Script
 from sql_syntax import Environment
 from sqlalchemy.engine import RowProxy
 from sqlalchemy.exc import DatabaseError
-from typing import List
+from typing import cast, List, Type
+
+import luigi
 
 class CDMScriptTask(SqlScriptTask):
 
@@ -84,6 +86,7 @@ class harvest(CDMScriptTask):
                 lab_result_cm(), med_admin(), obs_clin(), obs_gen(), pcornet_trial(),
                 prescribing(), pro_cm(), procedures(), provider(), vital()]
 
+
 class lab_result_cm(CDMScriptTask):
     script = Script.lab_result_cm
 
@@ -106,10 +109,51 @@ class obs_gen(CDMScriptTask):
     script = Script.obs_gen
 
 
+class CDMPatientGroupTask(CDMScriptTask):
+    patient_num_first = IntParam()
+    patient_num_last = IntParam()
+    patient_num_qty = IntParam(significant=False, default=-1)
+    group_num = IntParam(significant=False, default=-1)
+    group_qty = IntParam(significant=False, default=-1)
+
+    def run(self) -> None:
+        SqlScriptTask.run_bound(self, script_params=dict(
+            patient_num_first=self.patient_num_first, patient_num_last=self.patient_num_last))
+
+
+class _PatientNumGrouped(luigi.WrapperTask):
+    group_tasks = cast(List[Type[CDMPatientGroupTask]], [])  # abstract
+
+    def requires(self) -> List[luigi.Task]:
+        deps = []  # type: List[luigi.Task]
+        for group_task in self.group_tasks:
+            survey = patient_chunks_survey()
+            deps += [survey]
+            results = survey.results()
+            if results:
+                deps += [
+                    group_task(
+                        group_num=ntile.chunk_num,
+                        group_qty=len(results),
+                        patient_num_qty=ntile.patient_num_qty,
+                        patient_num_first=ntile.patient_num_first,
+                        patient_num_last=ntile.patient_num_last)
+                    for ntile in results
+                ]
+        return deps
+
+
 class patient_chunks_survey(SqlScriptTask):
     script = Script.patient_chunks_survey
-    patient_chunks = IntParam(default=200)
+    patient_chunks = IntParam(default=20)
     patient_chunk_max = IntParam(default=None)
+
+    @property
+    def variables(self) -> Environment:
+        return dict(chunk_qty=str(self.patient_chunks))
+
+    def run(self) -> None:
+        SqlScriptTask.run_bound(self, script_params=dict(chunk_qty=str(self.patient_chunks)))
 
     def results(self) -> List[RowProxy]:
         with self.connection(event='survey results') as lc:
