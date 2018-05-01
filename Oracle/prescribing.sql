@@ -80,12 +80,6 @@ join encounter en on rx.encounter_num = en.encounterid
 where rx.modifier_cd in ('MedObs:Inpatient', 'MedObs:Outpatient')
 /
 
---alter table prescribing_key modify (provider_id null)
-/
-
---alter table prescribing_key modify (encounter_num null)
-/
-
 /** prescribing_w_cui
 
 take care with cardinalities...
