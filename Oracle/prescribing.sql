@@ -66,18 +66,18 @@ from dual
 ;
 */
 create table prescribing_key as
-select prescribing_seq.nextval prescribingid
+select cast(prescribing_seq.nextval as varchar(19)) prescribingid
 , instance_num
-, patient_num
-, encounter_num
+, cast(patient_num as varchar(50)) patient_num
+, cast(encounter_num as varchar(50)) encounter_num
 , provider_id
 , start_date
 , end_date
 , concept_cd
 , modifier_cd
 from blueherondata.observation_fact rx
+join encounter en on rx.encounter_num = en.encounterid
 where rx.modifier_cd in ('MedObs:Inpatient', 'MedObs:Outpatient')
-and rx.START_DATE > to_date('&&min_pat_list_date_dd_mon_rrrr','dd-mon-rrrr')
 /
 
 alter table prescribing_key modify (provider_id null)
