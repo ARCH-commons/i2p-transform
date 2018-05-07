@@ -86,6 +86,7 @@ class MockCursor(object):
         eprint('fetch returning: ' + str(r))
         return r
 
+
 if __name__ == '__main__':
     def _tcb():
         from os import environ

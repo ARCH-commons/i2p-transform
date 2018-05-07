@@ -1,15 +1,19 @@
 from collections import defaultdict
 from csv import DictReader
 from datetime import datetime
+from typing import Dict
+
+from sqlalchemy import func, MetaData, Table, Column  # type: ignore
+from sqlalchemy.types import String  # type: ignore
+
 from etl_tasks import DBAccessTask
 from param_val import StrParam, IntParam
-from sqlalchemy import func, MetaData, Table, Column
-from sqlalchemy.types import String
 
 import logging
 import sqlalchemy as sqla
 
 log = logging.getLogger(__name__)
+
 
 class LoadCSV(DBAccessTask):
     tablename = StrParam()
@@ -17,7 +21,6 @@ class LoadCSV(DBAccessTask):
     rowcount = IntParam(default=1)
 
     def complete(self) -> bool:
-        #return False
         db = self._dbtarget().engine
         table = Table(self.tablename, sqla.MetaData())
         if not table.exists(bind=db):
@@ -25,7 +28,7 @@ class LoadCSV(DBAccessTask):
             return False
         with self.connection() as q:
             actual = q.scalar('select records from cdm_status where status = \'%s\'' % self.tablename)
-            actual = 0 if actual == None else actual
+            actual = 0 if actual is None else actual
             log.info('table %s has %d rows', self.tablename, actual)
             return actual >= self.rowcount  # type: ignore  # sqla
 
@@ -34,17 +37,18 @@ class LoadCSV(DBAccessTask):
         self.setStatus()
 
     def load(self) -> None:
-        def sz(l, chunk=16):
+        def sz(l: int, chunk: int=16) -> int:
             return max(chunk, chunk * ((l + chunk - 1) // chunk))
 
         db = self._dbtarget().engine
         schema = MetaData()
         l = list()
 
-        with open(self.csvname) as fin:
+        with open(self.csvname) as fin:  # ISSUE: ambient
             dr = DictReader(fin)
 
-            mcl = defaultdict(int)
+            Dict  # for tools that don't see type: comments.
+            mcl = defaultdict(int)  # type: Dict[str, int]
             for row in dr:
                 l.append(row)
                 for col in dr.fieldnames:
@@ -66,4 +70,4 @@ class LoadCSV(DBAccessTask):
         with self.connection() as q:
             actual = q.scalar(sqla.select([func.count()]).select_from(self.tablename))
 
-        db.execute(statusTable.insert(), [{'STATUS':self.tablename, 'LAST_UPDATE':datetime.now(), 'RECORDS':actual}])
+        db.execute(statusTable.insert(), [{'STATUS': self.tablename, 'LAST_UPDATE': datetime.now(), 'RECORDS': actual}])
