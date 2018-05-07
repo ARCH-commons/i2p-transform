@@ -1,7 +1,5 @@
---------------------------------------------------------------------------------
--- PROVIDER
---------------------------------------------------------------------------------
-
+/** provider - create and populate the provider table.
+*/
 BEGIN
 PMN_DROPSQL('DROP TABLE provider');
 END;
@@ -40,7 +38,10 @@ insert into provider(provider_sex, provider_specialty_primary, provider_npi, pro
 ;
 
 execute immediate 'create index provider_idx on provider (PROVIDERID)';
---GATHER_TABLE_STATS('PROVIDER');
+GATHER_TABLE_STATS('PROVIDER');
 
 end PCORNetProvider;
 /
+insert into cdm_status (status, last_update, records) select 'provider', sysdate, count(*) from provider
+/
+select 1 from cdm_status where status = 'provider'

@@ -1,7 +1,5 @@
---------------------------------------------------------------------------------
--- PRO_CM
---------------------------------------------------------------------------------
-
+/** pro_cm - create the pro_cm table.
+*/
 BEGIN
 PMN_DROPSQL('DROP TABLE pro_cm');
 END;
@@ -37,4 +35,6 @@ begin
   select pro_cm_seq.nextval into :new.PRO_CM_ID from dual;
 end;
 /
-SELECT 1 FROM dual
+insert into cdm_status (status, last_update, records) select 'pro_cm', sysdate, count(*) from pro_cm
+/
+select 1 from cdm_status where status = 'pro_cm'

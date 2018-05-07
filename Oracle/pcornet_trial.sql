@@ -1,7 +1,5 @@
---------------------------------------------------------------------------------
--- PCORNET_TRIAL
---------------------------------------------------------------------------------
-
+/** pcornet_trial - create the pcornet_trial table.
+*/
 BEGIN
 PMN_DROPSQL('DROP TABLE pcornet_trial');
 END;
@@ -17,4 +15,6 @@ CREATE TABLE pcornet_trial(
 	TRIAL_INVITE_CODE varchar(20) NULL
 )
 /
-SELECT 1 FROM dual
+insert into cdm_status (status, last_update, records) select 'pcornet_trial', sysdate, count(*) from pcornet_trial
+/
+select 1 from cdm_status where status = 'pcornet_trial'

@@ -1,7 +1,5 @@
---------------------------------------------------------------------------------
--- CONDITION
---------------------------------------------------------------------------------
-
+/** condition - create and populate the condition table.
+*/
 BEGIN
 PMN_DROPSQL('DROP TABLE condition');
 END;
@@ -96,7 +94,7 @@ log errors into ERR$_CONDITION reject limit unlimited
 ;
 
 execute immediate 'create index condition_idx on condition (PATID, ENCOUNTERID)';
---GATHER_TABLE_STATS('CONDITION');
+GATHER_TABLE_STATS('CONDITION');
 
 end PCORNetCondition;
 /
@@ -104,5 +102,6 @@ BEGIN
 PCORNetCondition();
 END;
 /
-SELECT count(CONDITIONID) from condition where rownum = 1
---SELECT 1 FROM dual
+insert into cdm_status (status, last_update, records) select 'condition', sysdate, count(*) from condition
+/
+select 1 from cdm_status where status = 'condition'

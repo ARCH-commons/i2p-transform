@@ -1,7 +1,5 @@
---------------------------------------------------------------------------------
--- DIAGNOSIS
---------------------------------------------------------------------------------
-
+/** diagnosis - create and populate the diagnosis table.
+*/
 BEGIN
 PMN_DROPSQL('DROP TABLE diagnosis');
 END;
@@ -211,9 +209,9 @@ select distinct factline.patient_num, factline.encounter_num encounterid,	enc_ty
      , factline.dx_type dxtype,
 	CASE WHEN enc_type='AV' THEN 'FI' ELSE nvl(SUBSTR(dxsource,INSTR(dxsource,':')+1,2) ,'NI') END dx_source,
     nvl(SUBSTR(originsource,INSTR(originsource, ':')+1,2),'NI') dx_origin,
-	CASE WHEN enc_type in ('EI', 'IP', 'IS')  -- PDX is "relevant only on IP and IS encounters"
+	CASE WHEN enc_type in ('EI', 'IP', 'IS', 'OS')
              THEN nvl(SUBSTR(pdxsource,INSTR(pdxsource, ':')+1,2),'NI')
-             ELSE 'X' END PDX
+             ELSE null END PDX
 from diag_fact_cutoff_filter factline
 inner join encounter enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num
  left outer join sourcefact
@@ -239,7 +237,7 @@ where (sourcefact.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\%' or so
 ;
 
 execute immediate 'create index diagnosis_idx on diagnosis (PATID, ENCOUNTERID)';
---GATHER_TABLE_STATS('DIAGNOSIS');
+GATHER_TABLE_STATS('DIAGNOSIS');
 
 end PCORNetDiagnosis;
 /
@@ -247,5 +245,7 @@ BEGIN
 PCORNetDiagnosis();
 END;
 /
-SELECT count(DIAGNOSISID) from diagnosis where rownum = 1
---SELECT 1 FROM dual
+insert into cdm_status (status, last_update, records) select 'diagnosis', sysdate, count(*) from diagnosis
+/
+select 1 from cdm_status where status = 'diagnosis'
+--SELECT count(DIAGNOSISID) from diagnosis where rownum = 1

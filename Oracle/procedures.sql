@@ -1,7 +1,5 @@
---------------------------------------------------------------------------------
--- PROCEDURES
---------------------------------------------------------------------------------
-
+/** procedures - create and populate the procedures table.
+*/
 BEGIN
 PMN_DROPSQL('DROP TABLE procedures');
 END;
@@ -41,10 +39,11 @@ PMN_DROPSQL('drop index procedures_idx');
 
 execute immediate 'truncate table procedures';
 
-insert into procedures(
-				patid,			encounterid,	enc_type, admit_date, px_date, providerid, px, px_type, px_source)
+insert into procedures(patid, encounterid, enc_type, admit_date, px_date, providerid, px, px_type, px_source)
 select  distinct fact.patient_num, enc.encounterid,	enc.enc_type, enc.admit_date, fact.start_date,
-		fact.provider_id, SUBSTR(pr.pcori_basecode,INSTR(pr.pcori_basecode, ':')+1,11) px, SUBSTR(pr.c_fullname,18,2) pxtype,
+		fact.provider_id, SUBSTR(pr.pcori_basecode,INSTR(pr.pcori_basecode, ':')+1,11) px,
+    -- Decode can be eliminated if pcornet_proc is updated.
+		decode(SUBSTR(pr.c_fullname,18,2), 'HC', 'CH', SUBSTR(pr.c_fullname,18,2)) pxtype,
     -- All are billing for now - see https://informatics.gpcnetwork.org/trac/Project/ticket/491
     'BI' px_source
 from i2b2fact fact
@@ -53,8 +52,15 @@ from i2b2fact fact
 where pr.c_fullname like '\PCORI\PROCEDURE\%';
 
 execute immediate 'create index procedures_idx on procedures (PATID, ENCOUNTERID)';
---GATHER_TABLE_STATS('PROCEDURES');
+GATHER_TABLE_STATS('PROCEDURES');
 
 end PCORNetProcedure;
 /
-SELECT count(PATID) from procedures where rownum = 1
+BEGIN
+PCORNetProcedure();
+END;
+/
+insert into cdm_status (status, last_update, records) select 'procedures', sysdate, count(*) from procedures
+/
+select 1 from cdm_status where status = 'procedures'
+--SELECT count(PATID) from procedures where rownum = 1

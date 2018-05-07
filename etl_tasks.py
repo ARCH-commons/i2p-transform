@@ -233,11 +233,11 @@ class SqlScriptTask(DBAccessTask):
     def requires(self) -> List[luigi.Task]:
         '''Wrap each of `self.script.deps()` in a SqlScriptTask.
         '''
-        return [SqlScriptTask(script=s,
-                              param_vars=self.vars_for_deps,
-                              account=self.account,
-                              passkey=self.passkey,
-                              echo=self.echo)
+        return [type(s.name, (SqlScriptTask,), {'script':s,
+                              'param_vars':self.vars_for_deps,
+                              'account':self.account,
+                              'passkey':self.passkey,
+                              'echo':self.echo})()
                 for s in self.script.deps()]
 
     def log_info(self) -> Dict[str, Any]:

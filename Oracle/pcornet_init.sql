@@ -1,7 +1,26 @@
---------------------------------------------------------------------------------
--- HELPER FUNCTIONS AND PROCEDURES
---------------------------------------------------------------------------------
-
+/** pcornet_init - create helper functions and procedures
+*/
+-- Make sure the ethnicity code has been added to the patient dimension
+-- See update_ethnicity_pdim.sql
+select ethnicity_cd from "&&i2b2_data_schema".patient_dimension where 1=0
+/
+-- Make sure that the providerid column has been added to the visit dimension
+select providerid from "&&i2b2_data_schema".visit_dimension where 1=0
+/
+-- Make sure the inout_cd has been populated
+-- See heron_encounter_style.sql
+select case when qty = 0 then 1/0 else 1 end inout_cd_populated from (
+  select count(*) qty from "&&i2b2_data_schema".visit_dimension where inout_cd is not null
+  )
+/
+-- Make sure the RXNorm mapping table exists
+select rxcui from "&&i2b2_etl_schema".clarity_med_id_to_rxcui@id where 1=0
+/
+-- Make sure the observation fact medication table is populated
+select case when qty > 0 then 1 else 1/0 end obs_fact_meds_populated from (
+  select count(*) qty from observation_fact_meds
+  )
+/
 create or replace PROCEDURE GATHER_TABLE_STATS(table_name VARCHAR2) AS
   BEGIN
   DBMS_STATS.GATHER_TABLE_STATS (
@@ -94,6 +113,20 @@ BEGIN
 END;
 /
 
+BEGIN
+PMN_DROPSQL('DROP TABLE cdm_status');
+END;
+/
+
+CREATE TABLE PCORNET_CDM.CDM_STATUS
+   (
+    STATUS VARCHAR2(50 BYTE) NOT NULL ENABLE,
+	LAST_UPDATE DATE NOT NULL ENABLE,
+	RECORDS NUMBER(*,0),
+	GROUP_START NUMBER,
+	GROUP_END NUMBER
+   )
+/
 
 BEGIN
 PMN_DROPSQL('DROP TABLE pcornet_codelist');
@@ -166,12 +199,6 @@ close getcodesql ;
 end pcornet_popcodelist;
 /
 
-
---------------------------------------------------------------------------------
--- I2B2 SYNONYMS, VIEWS, AND INTERMEDIARY TABLES
---------------------------------------------------------------------------------
-
-
 CREATE OR REPLACE SYNONYM I2B2FACT FOR "&&i2b2_data_schema".OBSERVATION_FACT
 /
 
@@ -216,4 +243,8 @@ CREATE OR REPLACE SYNONYM pcornet_vital FOR  "&&i2b2_meta_schema".pcornet_vital
 
 CREATE OR REPLACE SYNONYM pcornet_enc FOR  "&&i2b2_meta_schema".pcornet_enc
 /
-select 1 from dual
+
+insert into cdm_status (status, last_update) values ('pcornet_init', sysdate)
+/
+
+select 1 from cdm_status where status = 'pcornet_init'

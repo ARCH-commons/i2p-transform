@@ -1,35 +1,5 @@
-/** med_admin - Build Medication Administration table.
-
-Copyright (c) 2018 University of Kansas Medical Center
+/** med_admin - create and populate the med_admin table.
 */
-
---------------------------------------------------------------------------------
--- HELPER FUNCTIONS AND PROCEDURES
---------------------------------------------------------------------------------
---These helper functions also exist in PCORNetInit.sql.  They are reproduced
---here to make the med_admin script an independent luigi job.
---TODO: consolidate helpers in a single, table independent job.
-create or replace PROCEDURE GATHER_TABLE_STATS(table_name VARCHAR2) AS
-  BEGIN
-  DBMS_STATS.GATHER_TABLE_STATS (
-          ownname => 'PCORNET_CDM', -- This doesn't work as a parameter for some reason.
-          tabname => table_name,
-          estimate_percent => 50, -- Percentage picked somewhat arbitrarily
-          cascade => TRUE,
-          degree => 16
-          );
-END GATHER_TABLE_STATS;
-/
-create or replace PROCEDURE PMN_DROPSQL(sqlstring VARCHAR2) AS
-  BEGIN
-      EXECUTE IMMEDIATE sqlstring;
-  EXCEPTION
-      WHEN OTHERS THEN NULL;
-END PMN_DROPSQL;
-/
---------------------------------------------------------------------------------
--- MED_ADMIN
---------------------------------------------------------------------------------
 BEGIN
 PMN_DROPSQL('DROP TABLE med_admin');
 END;
@@ -46,15 +16,15 @@ CREATE TABLE med_admin(
     MEDADMIN_STOP_TIME varchar(5) NULL,
     MEDADMIN_TYPE varchar(2) NULL,
     MEDADMIN_CODE varchar(50) NULL,
-    MEDADMIN_DOSE_ADMIN NUMBER(18, 2) NULL, -- (8,0)
+    MEDADMIN_DOSE_ADMIN NUMBER(18, 5) NULL, -- (8,0)
     MEDADMIN_DOSE_ADMIN_UNIT varchar(50) NULL,
     MEDADMIN_ROUTE varchar(50) NULL,
     MEDADMIN_SOURCE varchar(2) NULL,
-    RAW_MEDADMIN_MED_NAME varchar(50) NULL,
+    RAW_MEDADMIN_MED_NAME varchar(2000) NULL,
     RAW_MEDADMIN_CODE varchar(50) NULL,
     RAW_MEDADMIN_DOSE_ADMIN varchar(50) NULL,
     RAW_MEDADMIN_DOSE_ADMIN_UNIT varchar(50) NULL,
-    RAW_MEDADMIN_ROUTE varchar(50) NULL
+    RAW_MEDADMIN_ROUTE varchar(100) NULL
 )
 /
 BEGIN
@@ -134,7 +104,7 @@ on med_p.c_basecode = med_start.concept_cd
 ;
 
 execute immediate 'create index med_admin_idx on med_admin (PATID, ENCOUNTERID)';
---GATHER_TABLE_STATS('MED_ADMIN');
+GATHER_TABLE_STATS('MED_ADMIN');
 
 end PCORNetMedAdmin;
 /
@@ -142,4 +112,6 @@ BEGIN
 PCORNetMedAdmin();
 END;
 /
-SELECT count(MEDADMINID) from med_admin where rownum = 1
+insert into cdm_status (status, last_update, records) select 'med_admin', sysdate, count(*) from med_admin
+/
+select 1 from cdm_status where status = 'med_admin'

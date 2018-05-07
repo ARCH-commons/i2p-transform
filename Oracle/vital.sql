@@ -1,7 +1,5 @@
---------------------------------------------------------------------------------
--- VITAL
---------------------------------------------------------------------------------
-
+/** vital - create and populate the vital table.
+*/
 BEGIN
 PMN_DROPSQL('DROP TABLE vital');
 END;
@@ -129,7 +127,7 @@ where ht is not null
 group by patid, encounterid, measure_date, measure_time, admit_date) y;
 
 execute immediate 'create index vital_idx on vital (PATID)';
---GATHER_TABLE_STATS('VITAL');
+GATHER_TABLE_STATS('VITAL');
 
 end PCORNetVital;
 /
@@ -137,4 +135,7 @@ BEGIN
 PCORNetVital();
 END;
 /
-SELECT count(VITALID) from vital where rownum = 1
+insert into cdm_status (status, last_update, records) select 'vital', sysdate, count(*) from vital
+/
+select 1 from cdm_status where status = 'vital'
+--SELECT count(VITALID) from vital where rownum = 1
