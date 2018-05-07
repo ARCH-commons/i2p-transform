@@ -10,6 +10,7 @@ from sqlalchemy.engine import RowProxy
 from sqlalchemy.exc import DatabaseError
 from typing import List
 
+
 class CDMScriptTask(SqlScriptTask):
 
     @property
@@ -83,6 +84,7 @@ class harvest(CDMScriptTask):
         return [condition(), death(), death_cause(), diagnosis(), dispensing(), enrollment(),
                 lab_result_cm(), med_admin(), obs_clin(), obs_gen(), pcornet_trial(),
                 prescribing(), pro_cm(), procedures(), provider(), vital()]
+
 
 class lab_result_cm(CDMScriptTask):
     script = Script.lab_result_cm

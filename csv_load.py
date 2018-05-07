@@ -11,13 +11,13 @@ import sqlalchemy as sqla
 
 log = logging.getLogger(__name__)
 
+
 class LoadCSV(DBAccessTask):
     tablename = StrParam()
     csvname = StrParam()
     rowcount = IntParam(default=1)
 
     def complete(self) -> bool:
-        #return False
         db = self._dbtarget().engine
         table = Table(self.tablename, sqla.MetaData())
         if not table.exists(bind=db):
@@ -25,7 +25,7 @@ class LoadCSV(DBAccessTask):
             return False
         with self.connection() as q:
             actual = q.scalar('select records from cdm_status where status = \'%s\'' % self.tablename)
-            actual = 0 if actual == None else actual
+            actual = 0 if actual is None else actual
             log.info('table %s has %d rows', self.tablename, actual)
             return actual >= self.rowcount  # type: ignore  # sqla
 
@@ -66,4 +66,4 @@ class LoadCSV(DBAccessTask):
         with self.connection() as q:
             actual = q.scalar(sqla.select([func.count()]).select_from(self.tablename))
 
-        db.execute(statusTable.insert(), [{'STATUS':self.tablename, 'LAST_UPDATE':datetime.now(), 'RECORDS':actual}])
+        db.execute(statusTable.insert(), [{'STATUS': self.tablename, 'LAST_UPDATE': datetime.now(), 'RECORDS': actual}])
