@@ -1,14 +1,17 @@
 """i2p_tasks -- Luigi CDM task support.
 """
 
+from typing import List
+
+import luigi
+from sqlalchemy.engine import RowProxy
+from sqlalchemy.exc import DatabaseError
+
 from csv_load import LoadCSV
 from etl_tasks import SqlScriptTask
 from param_val import IntParam
 from script_lib import Script
-from sql_syntax import Environment
-from sqlalchemy.engine import RowProxy
-from sqlalchemy.exc import DatabaseError
-from typing import List
+from sql_syntax import Environment, Params
 
 
 class CDMScriptTask(SqlScriptTask):
@@ -24,63 +27,63 @@ class CDMScriptTask(SqlScriptTask):
 class condition(CDMScriptTask):
     script = Script.condition
 
-    def requires(self):
+    def requires(self) -> List[luigi.Task]:
         return [encounter()]
 
 
 class death(CDMScriptTask):
     script = Script.death
 
-    def requires(self):
+    def requires(self) -> List[luigi.Task]:
         return [demographic()]
 
 
 class death_cause(CDMScriptTask):
     script = Script.death_cause
 
-    def requires(self):
+    def requires(self) -> List[luigi.Task]:
         return [pcornet_init()]
 
 
 class demographic(CDMScriptTask):
     script = Script.demographic
 
-    def requires(self):
+    def requires(self) -> List[luigi.Task]:
         return [pcornet_init()]
 
 
 class diagnosis(CDMScriptTask):
     script = Script.diagnosis
 
-    def requires(self):
+    def requires(self) -> List[luigi.Task]:
         return [encounter()]
 
 
 class dispensing(CDMScriptTask):
     script = Script.dispensing
 
-    def requires(self):
+    def requires(self) -> List[luigi.Task]:
         return [encounter()]
 
 
 class encounter(CDMScriptTask):
     script = Script.encounter
 
-    def requires(self):
+    def requires(self) -> List[luigi.Task]:
         return [demographic()]
 
 
 class enrollment(CDMScriptTask):
     script = Script.enrollment
 
-    def requires(self):
+    def requires(self) -> List[luigi.Task]:
         return [pcornet_init()]
 
 
 class harvest(CDMScriptTask):
     script = Script.harvest
 
-    def requires(self):
+    def requires(self) -> List[luigi.Task]:
         return [condition(), death(), death_cause(), diagnosis(), dispensing(), enrollment(),
                 lab_result_cm(), med_admin(), obs_clin(), obs_gen(), pcornet_trial(),
                 prescribing(), pro_cm(), procedures(), provider(), vital()]
@@ -89,14 +92,14 @@ class harvest(CDMScriptTask):
 class lab_result_cm(CDMScriptTask):
     script = Script.lab_result_cm
 
-    def requires(self):
+    def requires(self) -> List[luigi.Task]:
         return [encounter()]
 
 
 class med_admin(CDMScriptTask):
     script = Script.med_admin
 
-    def requires(self):
+    def requires(self) -> List[luigi.Task]:
         return [pcornet_init()]
 
 
@@ -126,7 +129,8 @@ class patient_chunks_survey(SqlScriptTask):
                       chunk_num <= :chunk_max)
                order by chunk_num
              '''
-            params = dict(chunk_max=self.patient_chunk_max, chunk_qty=self.patient_chunks)
+            Params
+            params = dict(chunk_max=self.patient_chunk_max, chunk_qty=self.patient_chunks)  # type: Params
 
             try:
                 return lc.execute(q, params=params).fetchall()
@@ -137,42 +141,42 @@ class patient_chunks_survey(SqlScriptTask):
 class pcornet_init(CDMScriptTask):
     script = Script.pcornet_init
 
-    def requires(self):
+    def requires(self) -> List[luigi.Task]:
         return [loadLabNormal(), loadHarvestLocal()]
 
 
 class pcornet_loader(CDMScriptTask):
     script = Script.pcornet_loader
 
-    def requires(self):
+    def requires(self) -> List[luigi.Task]:
         return [harvest()]
 
 
 class pcornet_trial(CDMScriptTask):
     script = Script.pcornet_trial
 
-    def requires(self):
+    def requires(self) -> List[luigi.Task]:
         return [pcornet_init()]
 
 
 class prescribing(CDMScriptTask):
     script = Script.prescribing
 
-    def requires(self):
+    def requires(self) -> List[luigi.Task]:
         return [encounter()]
 
 
 class pro_cm(CDMScriptTask):
     script = Script.pro_cm
 
-    def requires(self):
+    def requires(self) -> List[luigi.Task]:
         return [pcornet_init()]
 
 
 class procedures(CDMScriptTask):
     script = Script.procedures
 
-    def requires(self):
+    def requires(self) -> List[luigi.Task]:
         return [encounter()]
 
 
@@ -183,7 +187,7 @@ class provider(CDMScriptTask):
 class vital(CDMScriptTask):
     script = Script.vital
 
-    def requires(self):
+    def requires(self) -> List[luigi.Task]:
         return [encounter()]
 
 

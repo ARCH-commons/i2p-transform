@@ -1,10 +1,13 @@
 from collections import defaultdict
 from csv import DictReader
 from datetime import datetime
+from typing import Dict
+
+from sqlalchemy import func, MetaData, Table, Column  # type: ignore
+from sqlalchemy.types import String  # type: ignore
+
 from etl_tasks import DBAccessTask
 from param_val import StrParam, IntParam
-from sqlalchemy import func, MetaData, Table, Column
-from sqlalchemy.types import String
 
 import logging
 import sqlalchemy as sqla
@@ -34,17 +37,18 @@ class LoadCSV(DBAccessTask):
         self.setStatus()
 
     def load(self) -> None:
-        def sz(l, chunk=16):
+        def sz(l: int, chunk: int=16) -> int:
             return max(chunk, chunk * ((l + chunk - 1) // chunk))
 
         db = self._dbtarget().engine
         schema = MetaData()
         l = list()
 
-        with open(self.csvname) as fin:
+        with open(self.csvname) as fin:  # ISSUE: ambient
             dr = DictReader(fin)
 
-            mcl = defaultdict(int)
+            Dict  # for tools that don't see type: comments.
+            mcl = defaultdict(int)  # type: Dict[str, int]
             for row in dr:
                 l.append(row)
                 for col in dr.fieldnames:
