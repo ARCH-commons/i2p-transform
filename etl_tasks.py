@@ -380,7 +380,7 @@ class CDMStatusTask(DBAccessTask):
         statusTable = Table("cdm_status", MetaData(), Column('TASK'), Column('START_TIME'), Column('END_TIME'), Column('RECORDS'))
 
         db = self._dbtarget().engine
-        db.execute(statusTable.update(), [{'END_TIME': datetime.now(), 'RECORDS': rowCount}])
+        db.execute(statusTable.update().where(statusTable.c.task == self.taskName), [{'END_TIME': datetime.now(), 'RECORDS': rowCount}])
 
     def setTaskStart(self) -> None:
         statusTable = Table("cdm_status", MetaData(), Column('TASK'), Column('START_TIME'), Column('END_TIME'), Column('RECORDS'))
