@@ -287,7 +287,7 @@ class downloadNPI(CDMStatusTask):
     dl_path = '/d1/npi/'
     load_path = 'curated_data/'
     npi_zip = 'NPPES_Data_Dissemination_April_2018.zip'
-    npi_csv = 'npidata_pfile_20050523 - 20180408.csv'
+    npi_csv = 'npidata_pfile_20050523-20180408.csv'
     specialty_csv = 'provider_specialty_map.csv'
 
     taxonomy_col = 'Healthcare Provider Taxonomy Code_'
