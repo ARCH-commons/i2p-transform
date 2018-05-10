@@ -251,4 +251,4 @@ set records = 0
 where task = 'pcornet_init'
 /
 
-select 1 from cdm_status where status = 'pcornet_init'
+select 1 from dual
