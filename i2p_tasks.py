@@ -11,6 +11,7 @@ from typing import cast, List, Type
 
 import csv
 import luigi
+import subprocess
 import urllib.request
 import zipfile
 
@@ -306,8 +307,7 @@ class downloadNPI(CDMStatusTask):
         with open(self.dl_path + self.npi_zip, 'wb') as fout:
             fout.write(r.read())
 
-        with zipfile.ZipFile(self.dl_path + self.npi_zip, 'r') as zip_ref:
-            zip_ref.extractall(self.dl_path)
+        subprocess.call('unzip', '-o', self.dl_path + self.npi_zip)
 
     def extract(self):
         self.expectedRecords = 0
