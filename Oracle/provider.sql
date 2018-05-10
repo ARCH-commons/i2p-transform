@@ -46,12 +46,15 @@ select cs.prov_id
   , case when cs.sex = 'U' then 'UN'
     when cs.sex is null then 'NI'
     else cs.sex end as sex
-  , 'OT'
+  , case when sm.npi is null then 'NI'
+    else nvl(sm.specialty, 'UN') end as provider_specialty_primary
   , cs2.npi
-  , case when npi is not null then 'Y' else 'N' end as provider_npi_flag
-  , cs.prov_type
+  , case when cs2.npi is not null then 'Y' else 'N' end as provider_npi_flag
+  , sp.descriptive_text
   from clarity.clarity_ser@id cs
-  join clarity.clarity_ser_2@id cs2 on cs.prov_id = cs2.prov_id;
+  left join clarity.clarity_ser_2@id cs2 on cs.prov_id = cs2.prov_id
+  left join provider_specialty_map sm on sm.npi = cs2.npi
+  left join provider_specialty_code sp on sm.specialty = sp.code;
 
 execute immediate 'create index provider_idx on provider (PROVIDERID)';
 GATHER_TABLE_STATS('PROVIDER');

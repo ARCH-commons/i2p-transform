@@ -193,7 +193,7 @@ CLOSE getsql;
 merge into demographic d
 using (
   select NVL(code, 'OT') as code, language_cd, patient_num
-  from language_map
+  from language_code
   right join i2b2patient on
   case when language_cd is NULL then 'no information' else language_cd end = lower(descriptive_text)
 ) l

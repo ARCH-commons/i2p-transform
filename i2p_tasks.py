@@ -230,7 +230,7 @@ class provider(CDMScriptTask):
     script = Script.provider
 
     def requires(self):
-        return [loadSpecialty(), encounter()]
+        return [loadSpecialtyMap(), loadSpecialtyCode(), encounter()]
 
 
 class vital(CDMScriptTask):
@@ -242,7 +242,7 @@ class vital(CDMScriptTask):
 
 class loadLabNormal(LoadCSV):
     taskName = 'LABNORMAL'
-    csvname = 'Oracle/labnormal.csv'
+    csvname = 'curated_data/labnormal.csv'
 
     def requires(self):
         return [pcornet_init()]
@@ -250,37 +250,44 @@ class loadLabNormal(LoadCSV):
 
 class loadHarvestLocal(LoadCSV):
     taskName = 'HARVEST_LOCAL'
-    csvname = 'Oracle/harvest_local.csv'
+    csvname = 'curated_data/harvest_local.csv'
 
     def requires(self):
         return [pcornet_init()]
 
 
 class loadLanguage(LoadCSV):
-    taskName = 'LANGUAGE_MAP'
-    csvname = 'Oracle/language.csv'
+    taskName = 'LANGUAGE_CODE'
+    # language.csv is a copy of the CDM spec's patient_pref_language_spoke spreadsheet.
+    csvname = 'curated_data/language.csv'
 
     def requires(self):
         return [pcornet_init()]
 
 
-class loadSpecialty(LoadCSV):
-    taskName = 'SPECIALTY_MAP'
-    csvname = 'Oracle/specialty.csv'
+class loadSpecialtyMap(LoadCSV):
+    taskName = 'PROVIDER_SPECIALTY_MAP'
+    # provider_specialty_map.csv is created on demand by the downloadNPI method.
+    csvname = 'curated_data/provider_specialty_map.csv'
 
     def requires(self):
         return [pcornet_init(), downloadNPI()]
 
 
+class loadSpecialtyCode(LoadCSV):
+    taskName = 'PROVIDER_SPECIALTY_CODE'
+    # provider_specialty_code.csv is a copy of the CDM spec's provider_primary_specialty spreadsheet.
+    csvname = 'curated_data/provider_specialty_code.csv'
+
+
 class downloadNPI(CDMStatusTask):
     taskName = 'NPI_LOAD'
-
     npi_url = 'http://download.cms.gov/nppes/'
     dl_path = '/d1/npi/'
-    load_path = 'Oracle/'
-    npi_zip = 'NPPES_Data_Dissemination_040918_041518_Weekly.zip'
-    npi_csv = 'npidata_pfile_20180409-20180415.csv'
-    specialty_csv = 'specialty.csv'
+    load_path = 'curated_data/'
+    npi_zip = 'NPPES_Data_Dissemination_April_2018.zip'
+    npi_csv = 'npidata_pfile_20050523 - 20180408.csv'
+    specialty_csv = 'provider_specialty_map.csv'
 
     taxonomy_col = 'Healthcare Provider Taxonomy Code_'
     switch_col = 'Healthcare Provider Primary Taxonomy Switch_'
