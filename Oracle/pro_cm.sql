@@ -1,5 +1,7 @@
 /** pro_cm - create the pro_cm table.
 */
+insert into cdm_status (task, start_time) select 'pro_cm', sysdate from dual
+/
 BEGIN
 PMN_DROPSQL('DROP TABLE pro_cm');
 END;
@@ -35,6 +37,9 @@ begin
   select pro_cm_seq.nextval into :new.PRO_CM_ID from dual;
 end;
 /
-insert into cdm_status (status, last_update, records) select 'pro_cm', sysdate, count(*) from pro_cm
+update cdm_status
+set end_time = sysdate
+set records = (select count(*) from pro_cm)
+where task = 'pro_cm'
 /
 select 1 from cdm_status where status = 'pro_cm'

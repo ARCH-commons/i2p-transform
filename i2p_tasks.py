@@ -1,8 +1,7 @@
 """i2p_tasks -- Luigi CDM task support.
 """
-
 from csv_load import LoadCSV
-from etl_tasks import SqlScriptTask
+from etl_tasks import CDMStatusTask, SqlScriptTask
 from param_val import IntParam
 from script_lib import Script
 from sql_syntax import Environment
@@ -10,7 +9,10 @@ from sqlalchemy.engine import RowProxy
 from sqlalchemy.exc import DatabaseError
 from typing import cast, List, Type
 
+import csv
 import luigi
+import urllib.request
+import zipfile
 
 class CDMScriptTask(SqlScriptTask):
 
@@ -47,7 +49,7 @@ class demographic(CDMScriptTask):
     script = Script.demographic
 
     def requires(self):
-        return [pcornet_init()]
+        return [loadLanguage(), pcornet_init()]
 
 
 class diagnosis(CDMScriptTask):
@@ -83,7 +85,7 @@ class harvest(CDMScriptTask):
 
     def requires(self):
         return [condition(), death(), death_cause(), diagnosis(), dispensing(), enrollment(),
-                lab_result_cm(), med_admin(), obs_clin(), obs_gen(), pcornet_trial(),
+                lab_result_cm(), loadHarvestLocal(), med_admin(), obs_clin(), obs_gen(), pcornet_trial(),
                 prescribing(), pro_cm(), procedures(), provider(), vital()]
 
 
@@ -91,7 +93,7 @@ class lab_result_cm(CDMScriptTask):
     script = Script.lab_result_cm
 
     def requires(self):
-        return [encounter()]
+        return [encounter(), loadLabNormal()]
 
 
 class med_admin(CDMScriptTask):
@@ -180,7 +182,7 @@ class pcornet_init(CDMScriptTask):
     script = Script.pcornet_init
 
     def requires(self):
-        return [loadLabNormal(), loadHarvestLocal()]
+        return []
 
 
 class pcornet_loader(CDMScriptTask):
@@ -221,6 +223,9 @@ class procedures(CDMScriptTask):
 class provider(CDMScriptTask):
     script = Script.provider
 
+    def requires(self):
+        return [encounter()]
+
 
 class vital(CDMScriptTask):
     script = Script.vital
@@ -230,15 +235,81 @@ class vital(CDMScriptTask):
 
 
 class loadLabNormal(LoadCSV):
-    tablename = 'LABNORMAL'
+    taskName = 'LABNORMAL'
     csvname = 'Oracle/labnormal.csv'
 
 
 class loadHarvestLocal(LoadCSV):
-    tablename = 'HARVEST_LOCAL'
+    taskName = 'HARVEST_LOCAL'
     csvname = 'Oracle/harvest_local.csv'
 
 
 class loadLanguage(LoadCSV):
-    tablename = 'LANGUAGE_MAP'
+    taskName = 'LANGUAGE_MAP'
     csvname = 'Oracle/language.csv'
+
+
+class loadSpecialty(LoadCSV):
+    taskName = 'SPECIALTY_MAP'
+    csvname = 'Oracle/specialty.csv'
+    #csvname = 'Oracle/specialty.csv'
+
+    def requires(self):
+        return [downloadNPI()]
+
+
+class downloadNPI(CDMStatusTask):
+    taskName = 'NPI_LOAD'
+    expectedRecords = 0
+
+    npi_url = 'http://download.cms.gov/nppes/'
+    dl_path = 'd1/npi/'
+    load_path = 'Oracle/'
+    npi_zip = 'NPPES_Data_Dissemination_040918_041518_Weekly.zip'
+    npi_csv = 'npidata_pfile_20180409-20180415.csv'
+    specialty_csv = 'specialty.csv'
+
+    taxonomy_col = 'Healthcare Provider Taxonomy Code_'
+    switch_col = 'Healthcare Provider Primary Taxonomy Switch_'
+    npi_col = 'NPI'
+    taxonomy_ct = 15
+
+    def requires(self):
+        return []
+
+    def run(self):
+        self.setTaskStart()
+        self.fetch()
+        self.extract()
+        self.setTaskEnd(self.expectedRecords)
+
+    def fetch(self):
+        r = urllib.request.urlopen(self.npi_url + self.npi_zip)
+
+        with open(self.dl_path + self.zip_file, 'wb') as fout:
+            fout.write(r.read())
+
+        with zipfile.ZipFile(self.dl_path + self.zip_file, 'r') as zip_ref:
+            zip_ref.extractall(self.dl_path)
+
+    def extract(self):
+        with open(self.dl_path + self.npi_csv, 'r') as fin:
+            with open(self.dl_path + self.specialty_csv, 'w', newline='') as fout:
+                reader = csv.DictReader(fin)
+                writer = csv.writer(fout)
+                writer.writerow(['NPI', 'SPECIALTY'])
+                for row in reader:
+                    useDefault = True
+                    expectedRecords = expectedRecords + 1
+                    for i in range(1, self.taxonomy_ct + 1):
+                        if row[self.switch_col + str(i)] == 'Y':
+                            useDefault = False
+                            writer.writerow([row[self.npi_col], row[self.taxonomy_col + str(i)]])
+                            continue
+
+                    if (useDefault):
+                        writer.writerow([row[self.npi_col], row[self.taxonomy_col + str(1)]])
+
+    def output(self):
+        return luigi.LocalTarget(self.load_path + self.specialty_csv)
+

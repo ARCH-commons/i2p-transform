@@ -1,5 +1,7 @@
 /** harvest - create and populate the harvest table.
 */
+insert into cdm_status (task, start_time) select 'harvest', sysdate from dual
+/
 BEGIN
 PMN_DROPSQL('DROP TABLE harvest');
 END;
@@ -101,6 +103,9 @@ BEGIN
 PCORNetHarvest();
 END;
 /
-insert into cdm_status (status, last_update, records) select 'harvest', sysdate, count(*) from harvest
+update cdm_status
+set end_time = sysdate
+set records = (select count(*) from harvest)
+where task = 'harvest'
 /
 select 1 from cdm_status where status = 'harvest'

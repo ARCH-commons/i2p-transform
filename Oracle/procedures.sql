@@ -1,5 +1,7 @@
 /** procedures - create and populate the procedures table.
 */
+insert into cdm_status (task, start_time) select 'procedures', sysdate from dual
+/
 BEGIN
 PMN_DROPSQL('DROP TABLE procedures');
 END;
@@ -60,7 +62,10 @@ BEGIN
 PCORNetProcedure();
 END;
 /
-insert into cdm_status (status, last_update, records) select 'procedures', sysdate, count(*) from procedures
+update cdm_status
+set end_time = sysdate
+set records = (select count(*) from procedures)
+where task = 'procedures'
 /
 select 1 from cdm_status where status = 'procedures'
 --SELECT count(PATID) from procedures where rownum = 1

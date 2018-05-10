@@ -1,5 +1,7 @@
 /** dispensing - create and populate the dispensing table.
 */
+insert into cdm_status (task, start_time) select 'dispensing', sysdate from dual
+/
 BEGIN
 PMN_DROPSQL('DROP TABLE dispensing');
 END;
@@ -178,7 +180,10 @@ BEGIN
 PCORNetDispensing();
 END;
 /
-insert into cdm_status (status, last_update, records) select 'dispensing', sysdate, count(*) from dispensing
+update cdm_status
+set end_time = sysdate
+set records = (select count(*) from dispensing)
+where task = 'dispensing'
 /
 select 1 from cdm_status where status = 'dispensing'
 --SELECT count(DISPENSINGID) from dispensing where rownum = 1

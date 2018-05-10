@@ -1,5 +1,7 @@
 /** demographic - create and populate the demographic table.
 */
+insert into cdm_status (task, start_time) select 'demographic', sysdate from dual
+/
 BEGIN
 PMN_DROPSQL('DROP TABLE demographic');
 END;
@@ -208,6 +210,9 @@ BEGIN
 PCORNetDemographic();
 END;
 /
-insert into cdm_status (status, last_update, records) select 'demographic', sysdate, count(*) from demographic
+update cdm_status
+set end_time = sysdate
+set records = (select count(*) from demographic)
+where task = 'demographic'
 /
 select 1 from cdm_status where status = 'demographic'

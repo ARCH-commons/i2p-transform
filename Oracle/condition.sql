@@ -1,5 +1,7 @@
 /** condition - create and populate the condition table.
 */
+insert into cdm_status (task, start_time) select 'condition', sysdate from dual
+/
 BEGIN
 PMN_DROPSQL('DROP TABLE condition');
 END;
@@ -102,6 +104,9 @@ BEGIN
 PCORNetCondition();
 END;
 /
-insert into cdm_status (status, last_update, records) select 'condition', sysdate, count(*) from condition
+update cdm_status
+set end_time = sysdate
+set records = (select count(*) from condition)
+where task = 'condition'
 /
 select 1 from cdm_status where status = 'condition'

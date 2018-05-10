@@ -1,5 +1,7 @@
 /** death - create and populate the death table.
 */
+insert into cdm_status (task, start_time) select 'death', sysdate from dual
+/
 BEGIN
 PMN_DROPSQL('DROP TABLE death');
 END;
@@ -45,7 +47,10 @@ BEGIN
 PCORNetDeath();
 END;
 /
-insert into cdm_status (status, last_update, records) select 'death', sysdate, count(*) from death
+update cdm_status
+set end_time = sysdate
+set records = (select count(*) from death)
+where task = 'death'
 /
 select 1 from cdm_status where status = 'death'
 

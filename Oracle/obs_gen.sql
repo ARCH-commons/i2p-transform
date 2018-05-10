@@ -1,6 +1,7 @@
 /** obs_gen - create the obs_gen table.
 */
-
+insert into cdm_status (task, start_time) select 'obs_gen', sysdate from dual
+/
 BEGIN
 PMN_DROPSQL('DROP TABLE obs_gen');
 END;
@@ -28,6 +29,9 @@ CREATE TABLE obs_gen(
     RAW_OBSGEN_UNIT varchar(50) NULL
 )
 /
-insert into cdm_status (status, last_update, records) select 'obs_gen', sysdate, count(*) from obs_gen
+update cdm_status
+set end_time = sysdate
+set records = (select count(*) from obs_gen)
+where task = 'obs_gen'
 /
 select 1 from cdm_status where status = 'obs_gen'

@@ -1,6 +1,7 @@
 /** prescribing - create and populate the prescribing table.
 */
-
+insert into cdm_status (task, start_time) select 'prescribing', sysdate from dual
+/
 BEGIN
 PMN_DROPSQL('DROP TABLE prescribing');
 END;
@@ -223,7 +224,10 @@ GATHER_TABLE_STATS('PRESCRIBING');
 END;
 /
 
-insert into cdm_status (status, last_update, records) select 'prescribing', sysdate, count(*) from prescribing
+update cdm_status
+set end_time = sysdate
+set records = (select count(*) from prescribing)
+where task = 'prescribing'
 /
 
 select 1 from cdm_status where status = 'prescribing'

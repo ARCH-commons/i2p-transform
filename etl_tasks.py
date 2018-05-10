@@ -12,7 +12,7 @@ import csv
 import logging
 
 from luigi.contrib.sqla import SQLAlchemyTarget
-from sqlalchemy import text as sql_text, func, Table  # type: ignore
+from sqlalchemy import text as sql_text, Column, func, MetaData, Table  # type: ignore
 from sqlalchemy.engine import Connection, Engine
 from sqlalchemy.engine.result import ResultProxy
 from sqlalchemy.engine.url import make_url
@@ -359,6 +359,34 @@ class SqlScriptTask(DBAccessTask):
                     bulk_rows: int) -> int:
         raise NotImplementedError(
             'overriding is_bulk() requires overriding bulk_insert()')
+
+
+class CDMStatusTask(DBAccessTask):
+    taskName = StrParam()
+    expectedRecords = IntParam(default=1)
+
+    def complete(self) -> bool:
+        with self.connection() as q:
+            actualRecords = q.scalar('select records from cdm_status where task = \'%s\'' % self.taskName)
+            actualRecords = 0 if actualRecords == None else actualRecords
+            log.info('task %s has %d rows', self.taskName, actualRecords)
+            return actualRecords >= self.expectedRecords  # type: ignore  # sqla
+
+    def getRecordCount(self) -> int:
+        with self.connection() as q:
+            return q.scalar(sqla.select([func.count()]).select_from(self.taskName))
+
+    def setTaskEnd(self, rowCount: int):
+        statusTable = Table("cdm_status", MetaData(), Column('TASK'), Column('START_TIME'), Column('END_TIME'), Column('RECORDS'))
+
+        db = self._dbtarget().engine
+        db.execute(statusTable.update, [{'END_TIME': datetime.now(), 'RECORDS': rowCount}])
+
+    def setTaskStart(self) -> None:
+        statusTable = Table("cdm_status", MetaData(), Column('TASK'), Column('START_TIME'), Column('END_TIME'), Column('RECORDS'))
+
+        db = self._dbtarget().engine
+        db.execute(statusTable.insert(), [{'TASK': self.taskName, 'START_TIME': datetime.now()}])
 
 
 def log_plan(lc: LoggedConnection, event: str, params: Dict[str, Any],

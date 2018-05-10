@@ -1,5 +1,7 @@
 /** pcornet_loader - perform post-processing operations.
 */
+insert into cdm_status (task, start_time) select 'pcornet_loader', sysdate from dual
+/
 create or replace procedure PCORNetPostProc as
 begin
 
@@ -54,6 +56,9 @@ BEGIN
 PCORNetPostProc();
 END;
 /
-insert into cdm_status (status, last_update) values ('pcornet_loader', sysdate )
+update cdm_status
+set end_time = sysdate
+set records = 0
+where task = 'pcornet_loader'
 /
 select 1 from cdm_status where status = 'pcornet_loader'
