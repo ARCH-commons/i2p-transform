@@ -1,7 +1,5 @@
 /** pcornet_init - create helper functions and procedures
 */
-insert into cdm_status (task, start_time) select 'pcornet_init', sysdate from dual
-/
 -- Make sure the ethnicity code has been added to the patient dimension
 -- See update_ethnicity_pdim.sql
 select ethnicity_cd from "&&i2b2_data_schema".patient_dimension where 1=0
@@ -128,7 +126,8 @@ CREATE TABLE PCORNET_CDM.CDM_STATUS
 	RECORDS NUMBER(*,0)
    )
 /
-
+insert into cdm_status (task, start_time) select 'pcornet_init', sysdate from dual
+/
 BEGIN
 PMN_DROPSQL('DROP TABLE pcornet_codelist');
 END;
