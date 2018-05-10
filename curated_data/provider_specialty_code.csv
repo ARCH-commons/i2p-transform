@@ -71,16 +71,16 @@ Code,Descriptive_Text,Grouping
 126900000X,Dental Laboratory Technician ,Dental Providers
 132700000X,Dietary Manager ,Dietary & Nutritional Service Providers
 133N00000X,Nutritionist ,Dietary & Nutritional Service Providers
-133NN1002X,"Nutritionist Nutrition, Education",Dietary & Nutritional Service Providers
-133V00000X,"Dietitian, Registered ",Dietary & Nutritional Service Providers
-133VN1004X,"Dietitian, Registered Nutrition, Pediatric",Dietary & Nutritional Service Providers
-133VN1005X,"Dietitian, Registered Nutrition, Renal",Dietary & Nutritional Service Providers
-133VN1006X,"Dietitian, Registered Nutrition, Metabolic",Dietary & Nutritional Service Providers
-136A00000X,"Dietetic Technician, Registered ",Dietary & Nutritional Service Providers
+133NN1002X,Nutritionist Nutrition Education,Dietary & Nutritional Service Providers
+133V00000X,Dietitian Registered ,Dietary & Nutritional Service Providers
+133VN1004X,Dietitian Registered Nutrition Pediatric,Dietary & Nutritional Service Providers
+133VN1005X,Dietitian Registered Nutrition Renal,Dietary & Nutritional Service Providers
+133VN1006X,Dietitian Registered Nutrition Metabolic,Dietary & Nutritional Service Providers
+136A00000X,Dietetic Technician Registered ,Dietary & Nutritional Service Providers
 146D00000X,Personal Emergency Response Attendant ,Emergency Medical Service Providers
-146L00000X,"Emergency Medical Technician, Paramedic ",Emergency Medical Service Providers
-146M00000X,"Emergency Medical Technician, Intermediate ",Emergency Medical Service Providers
-146N00000X,"Emergency Medical Technician, Basic ",Emergency Medical Service Providers
+146L00000X,Emergency Medical Technician Paramedic ,Emergency Medical Service Providers
+146M00000X,Emergency Medical Technician Intermediate ,Emergency Medical Service Providers
+146N00000X,Emergency Medical Technician Basic ,Emergency Medical Service Providers
 152W00000X,Optometrist ,Eye and Vision Services Providers
 152WC0802X,Optometrist Corneal and Contact Management,Eye and Vision Services Providers
 152WL0500X,Optometrist Low Vision Rehabilitation,Eye and Vision Services Providers
@@ -109,7 +109,7 @@ Code,Descriptive_Text,Grouping
 163WC2100X,Registered Nurse Continence Care,Nursing Service Providers
 163WC3500X,Registered Nurse Cardiac Rehabilitation,Nursing Service Providers
 163WD0400X,Registered Nurse Diabetes Educator,Nursing Service Providers
-163WD1100X,"Registered Nurse Dialysis, Peritoneal",Nursing Service Providers
+163WD1100X,Registered Nurse Dialysis Peritoneal,Nursing Service Providers
 163WE0003X,Registered Nurse Emergency,Nursing Service Providers
 163WE0900X,Registered Nurse Enterostomal Therapy,Nursing Service Providers
 163WF0300X,Registered Nurse Flight,Nursing Service Providers
@@ -126,16 +126,16 @@ Code,Descriptive_Text,Grouping
 163WM0705X,Registered Nurse Medical-Surgical,Nursing Service Providers
 163WM1400X,Registered Nurse Nurse Massage Therapist (NMT),Nursing Service Providers
 163WN0002X,Registered Nurse Neonatal Intensive Care,Nursing Service Providers
-163WN0003X,"Registered Nurse Neonatal, Low-Risk",Nursing Service Providers
+163WN0003X,Registered Nurse Neonatal Low-Risk,Nursing Service Providers
 163WN0300X,Registered Nurse Nephrology,Nursing Service Providers
 163WN0800X,Registered Nurse Neuroscience,Nursing Service Providers
 163WN1003X,Registered Nurse Nutrition Support,Nursing Service Providers
 163WP0000X,Registered Nurse Pain Management,Nursing Service Providers
 163WP0200X,Registered Nurse Pediatrics,Nursing Service Providers
 163WP0218X,Registered Nurse Pediatric Oncology,Nursing Service Providers
-163WP0807X,"Registered Nurse Psych/Mental Health, Child & Adolescent",Nursing Service Providers
+163WP0807X,Registered Nurse Psych/Mental Health Child & Adolescent,Nursing Service Providers
 163WP0808X,Registered Nurse Psych/Mental Health,Nursing Service Providers
-163WP0809X,"Registered Nurse Psych/Mental Health, Adult",Nursing Service Providers
+163WP0809X,Registered Nurse Psych/Mental Health Adult,Nursing Service Providers
 163WP1700X,Registered Nurse Perinatal,Nursing Service Providers
 163WP2201X,Registered Nurse Ambulatory Care,Nursing Service Providers
 163WR0006X,Registered Nurse Registered Nurse First Assistant,Nursing Service Providers
@@ -145,9 +145,9 @@ Code,Descriptive_Text,Grouping
 163WS0200X,Registered Nurse School,Nursing Service Providers
 163WU0100X,Registered Nurse Urology,Nursing Service Providers
 163WW0000X,Registered Nurse Wound Care,Nursing Service Providers
-163WW0101X,"Registered Nurse Women's Health Care, Ambulatory",Nursing Service Providers
-163WX0002X,"Registered Nurse Obstetric, High-Risk",Nursing Service Providers
-163WX0003X,"Registered Nurse Obstetric, Inpatient",Nursing Service Providers
+163WW0101X,Registered Nurse Women's Health Care Ambulatory,Nursing Service Providers
+163WX0002X,Registered Nurse Obstetric High-Risk,Nursing Service Providers
+163WX0003X,Registered Nurse Obstetric Inpatient,Nursing Service Providers
 163WX0106X,Registered Nurse Occupational Health,Nursing Service Providers
 163WX0200X,Registered Nurse Oncology,Nursing Service Providers
 163WX0601X,Registered Nurse Otorhinolaryngology & Head-Neck,Nursing Service Providers
@@ -157,8 +157,8 @@ Code,Descriptive_Text,Grouping
 164W00000X,Licensed Practical Nurse ,Nursing Service Providers
 164X00000X,Licensed Vocational Nurse ,Nursing Service Providers
 167G00000X,Licensed Psychiatric Technician ,Nursing Service Providers
-170100000X,"Medical Genetics, Ph.D. Medical Genetics ",Other Service Providers
-170300000X,"Genetic Counselor, MS ",Other Service Providers
+170100000X,Medical Genetics Ph.D. Medical Genetics ,Other Service Providers
+170300000X,Genetic Counselor MS ,Other Service Providers
 171000000X,Military Health Care Provider ,Other Service Providers
 1710I1002X,Military Health Care Provider Independent Duty Corpsman,Other Service Providers
 1710I1003X,Military Health Care Provider Independent Duty Medical Technicians,Other Service Providers
@@ -174,7 +174,7 @@ Code,Descriptive_Text,Grouping
 172V00000X,Community Health Worker ,Other Service Providers
 173000000X,Legal Medicine ,Other Service Providers
 173C00000X,Reflexologist ,Other Service Providers
-173F00000X,"Sleep Specialist, PhD ",Other Service Providers
+173F00000X,Sleep Specialist PhD ,Other Service Providers
 174200000X,Meals ,Other Service Providers
 174400000X,Specialist ,Other Service Providers
 1744G0900X,Specialist Graphics Designer,Other Service Providers
@@ -184,11 +184,11 @@ Code,Descriptive_Text,Grouping
 174H00000X,Health Educator ,Other Service Providers
 174M00000X,Veterinarian ,Other Service Providers
 174MM1900X,Veterinarian Medical Research,Other Service Providers
-174N00000X,"Lactation Consultant, Non-RN ",Other Service Providers
+174N00000X,Lactation Consultant Non-RN ,Other Service Providers
 174V00000X,Clinical Ethicist ,Other Service Providers
 175F00000X,Naturopath ,Other Service Providers
 175L00000X,Homeopath ,Other Service Providers
-175M00000X,"Midwife, Lay ",Other Service Providers
+175M00000X,Midwife Lay ,Other Service Providers
 175T00000X,Peer Specialist ,Other Service Providers
 176B00000X,Midwife ,Other Service Providers
 176P00000X,Funeral Director ,Other Service Providers
@@ -210,7 +210,7 @@ Code,Descriptive_Text,Grouping
 193400000X,Single Specialty ,Group
 202C00000X,Independent Medical Examiner ,Allopathic & Osteopathic Physicians
 202K00000X,Phlebology ,Allopathic & Osteopathic Physicians
-204C00000X,"Neuromusculoskeletal Medicine, Sports Medicine ",Allopathic & Osteopathic Physicians
+204C00000X,Neuromusculoskeletal Medicine Sports Medicine ,Allopathic & Osteopathic Physicians
 204D00000X,Neuromusculoskeletal Medicine & OMM ,Allopathic & Osteopathic Physicians
 204E00000X,Oral & Maxillofacial Surgery ,Allopathic & Osteopathic Physicians
 204F00000X,Transplant Surgery ,Allopathic & Osteopathic Physicians
@@ -255,7 +255,7 @@ Code,Descriptive_Text,Grouping
 207RC0000X,Internal Medicine Cardiovascular Disease,Allopathic & Osteopathic Physicians
 207RC0001X,Internal Medicine Clinical Cardiac Electrophysiology,Allopathic & Osteopathic Physicians
 207RC0200X,Internal Medicine Critical Care Medicine,Allopathic & Osteopathic Physicians
-207RE0101X,"Internal Medicine Endocrinology, Diabetes & Metabolism",Allopathic & Osteopathic Physicians
+207RE0101X,Internal Medicine Endocrinology Diabetes & Metabolism,Allopathic & Osteopathic Physicians
 207RG0100X,Internal Medicine Gastroenterology,Allopathic & Osteopathic Physicians
 207RG0300X,Internal Medicine Geriatric Medicine,Allopathic & Osteopathic Physicians
 207RH0000X,Internal Medicine Hematology,Allopathic & Osteopathic Physicians
@@ -432,7 +432,7 @@ Code,Descriptive_Text,Grouping
 208VP0000X,Pain Medicine Pain Medicine,Allopathic & Osteopathic Physicians
 208VP0014X,Pain Medicine Interventional Pain Medicine,Allopathic & Osteopathic Physicians
 209800000X,Legal Medicine ,Allopathic & Osteopathic Physicians
-211D00000X,"Assistant, Podiatric ",Podiatric Medicine & Surgery Service Providers
+211D00000X,Assistant Podiatric ,Podiatric Medicine & Surgery Service Providers
 213E00000X,Podiatrist ,Podiatric Medicine & Surgery Service Providers
 213EG0000X,Podiatrist General Practice,Podiatric Medicine & Surgery Service Providers
 213EP0504X,Podiatrist Public Medicine,Podiatric Medicine & Surgery Service Providers
@@ -441,168 +441,168 @@ Code,Descriptive_Text,Grouping
 213ES0000X,Podiatrist Sports Medicine,Podiatric Medicine & Surgery Service Providers
 213ES0103X,Podiatrist Foot & Ankle Surgery,Podiatric Medicine & Surgery Service Providers
 213ES0131X,Podiatrist Foot Surgery,Podiatric Medicine & Surgery Service Providers
-221700000X,Art Therapist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-222Q00000X,Developmental Therapist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-222Z00000X,Orthotist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-224900000X,Mastectomy Fitter ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-224L00000X,Pedorthist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-224P00000X,Prosthetist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-224Y00000X,Clinical Exercise Physiologist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-224Z00000X,Occupational Therapy Assistant ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-224ZE0001X,Occupational Therapy Assistant Environmental Modification,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-224ZF0002X,"Occupational Therapy Assistant Feeding, Eating & Swallowing","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-224ZL0004X,Occupational Therapy Assistant Low Vision,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-224ZR0403X,Occupational Therapy Assistant Driving and Community Mobility,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225000000X,Orthotic Fitter ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225100000X,Physical Therapist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2251C2600X,Physical Therapist Cardiopulmonary,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2251E1200X,Physical Therapist Ergonomics,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2251E1300X,"Physical Therapist Electrophysiology, Clinical","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2251G0304X,Physical Therapist Geriatrics,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2251H1200X,Physical Therapist Hand,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2251H1300X,Physical Therapist Human Factors,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2251N0400X,Physical Therapist Neurology,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2251P0200X,Physical Therapist Pediatrics,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2251S0007X,Physical Therapist Sports,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2251X0800X,Physical Therapist Orthopedic,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225200000X,Physical Therapy Assistant ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225400000X,Rehabilitation Practitioner ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225500000X,Specialist/Technologist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2255A2300X,Specialist/Technologist Athletic Trainer,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2255R0406X,"Specialist/Technologist Rehabilitation, Blind","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225600000X,Dance Therapist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225700000X,Massage Therapist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225800000X,Recreation Therapist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225A00000X,Music Therapist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225B00000X,Pulmonary Function Technologist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225C00000X,Rehabilitation Counselor ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225CA2400X,Rehabilitation Counselor Assistive Technology Practitioner,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225CA2500X,Rehabilitation Counselor Assistive Technology Supplier,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225CX0006X,Rehabilitation Counselor Orientation and Mobility Training Provider,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225X00000X,Occupational Therapist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225XE0001X,Occupational Therapist Environmental Modification,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225XE1200X,Occupational Therapist Ergonomics,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225XF0002X,"Occupational Therapist Feeding, Eating & Swallowing","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225XG0600X,Occupational Therapist Gerontology,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225XH1200X,Occupational Therapist Hand,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225XH1300X,Occupational Therapist Human Factors,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225XL0004X,Occupational Therapist Low Vision,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225XM0800X,Occupational Therapist Mental Health,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225XN1300X,Occupational Therapist Neurorehabilitation,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225XP0019X,Occupational Therapist Physical Rehabilitation,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225XP0200X,Occupational Therapist Pediatrics,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-225XR0403X,Occupational Therapist Driving and Community Mobility,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-226000000X,Recreational Therapist Assistant ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-226300000X,Kinesiotherapist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-227800000X,"Respiratory Therapist, Certified ","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2278C0205X,"Respiratory Therapist, Certified Critical Care","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2278E0002X,"Respiratory Therapist, Certified Emergency Care","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2278E1000X,"Respiratory Therapist, Certified Educational","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2278G0305X,"Respiratory Therapist, Certified Geriatric Care","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2278G1100X,"Respiratory Therapist, Certified General Care","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2278H0200X,"Respiratory Therapist, Certified Home Health","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2278P1004X,"Respiratory Therapist, Certified Pulmonary Diagnostics","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2278P1005X,"Respiratory Therapist, Certified Pulmonary Rehabilitation","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2278P1006X,"Respiratory Therapist, Certified Pulmonary Function Technologist","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2278P3800X,"Respiratory Therapist, Certified Palliative/Hospice","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2278P3900X,"Respiratory Therapist, Certified Neonatal/Pediatrics","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2278P4000X,"Respiratory Therapist, Certified Patient Transport","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2278S1500X,"Respiratory Therapist, Certified SNF/Subacute Care","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-227900000X,"Respiratory Therapist, Registered ","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2279C0205X,"Respiratory Therapist, Registered Critical Care","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2279E0002X,"Respiratory Therapist, Registered Emergency Care","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2279E1000X,"Respiratory Therapist, Registered Educational","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2279G0305X,"Respiratory Therapist, Registered Geriatric Care","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2279G1100X,"Respiratory Therapist, Registered General Care","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2279H0200X,"Respiratory Therapist, Registered Home Health","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2279P1004X,"Respiratory Therapist, Registered Pulmonary Diagnostics","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2279P1005X,"Respiratory Therapist, Registered Pulmonary Rehabilitation","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2279P1006X,"Respiratory Therapist, Registered Pulmonary Function Technologist","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2279P3800X,"Respiratory Therapist, Registered Palliative/Hospice","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2279P3900X,"Respiratory Therapist, Registered Neonatal/Pediatrics","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2279P4000X,"Respiratory Therapist, Registered Patient Transport","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-2279S1500X,"Respiratory Therapist, Registered SNF/Subacute Care","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-229N00000X,Anaplastologist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
-231H00000X,Audiologist ,"Speech, Language and Hearing Service Providers"
-231HA2400X,Audiologist Assistive Technology Practitioner,"Speech, Language and Hearing Service Providers"
-231HA2500X,Audiologist Assistive Technology Supplier,"Speech, Language and Hearing Service Providers"
-235500000X,Specialist/Technologist ,"Speech, Language and Hearing Service Providers"
-2355A2700X,Specialist/Technologist Audiology Assistant,"Speech, Language and Hearing Service Providers"
-2355S0801X,Specialist/Technologist Speech-Language Assistant,"Speech, Language and Hearing Service Providers"
-235Z00000X,Speech-Language Pathologist ,"Speech, Language and Hearing Service Providers"
-237600000X,Audiologist-Hearing Aid Fitter ,"Speech, Language and Hearing Service Providers"
-237700000X,Hearing Instrument Specialist ,"Speech, Language and Hearing Service Providers"
-242T00000X,Perfusionist ,"Technologists, Technicians & Other Technical Service Providers"
-243U00000X,Radiology Practitioner Assistant ,"Technologists, Technicians & Other Technical Service Providers"
-246Q00000X,"Spec/Tech, Pathology ","Technologists, Technicians & Other Technical Service Providers"
-246QB0000X,"Spec/Tech, Pathology Blood Banking","Technologists, Technicians & Other Technical Service Providers"
-246QC1000X,"Spec/Tech, Pathology Chemistry","Technologists, Technicians & Other Technical Service Providers"
-246QC2700X,"Spec/Tech, Pathology Cytotechnology","Technologists, Technicians & Other Technical Service Providers"
-246QH0000X,"Spec/Tech, Pathology Hematology","Technologists, Technicians & Other Technical Service Providers"
-246QH0401X,"Spec/Tech, Pathology Hemapheresis Practitioner","Technologists, Technicians & Other Technical Service Providers"
-246QH0600X,"Spec/Tech, Pathology Histology","Technologists, Technicians & Other Technical Service Providers"
-246QI0000X,"Spec/Tech, Pathology Immunology","Technologists, Technicians & Other Technical Service Providers"
-246QL0900X,"Spec/Tech, Pathology Laboratory Management","Technologists, Technicians & Other Technical Service Providers"
-246QL0901X,"Spec/Tech, Pathology Laboratory Management, Diplomate","Technologists, Technicians & Other Technical Service Providers"
-246QM0706X,"Spec/Tech, Pathology Medical Technologist","Technologists, Technicians & Other Technical Service Providers"
-246QM0900X,"Spec/Tech, Pathology Microbiology","Technologists, Technicians & Other Technical Service Providers"
-246R00000X,"Technician, Pathology ","Technologists, Technicians & Other Technical Service Providers"
-246RH0600X,"Technician, Pathology Histology","Technologists, Technicians & Other Technical Service Providers"
-246RM2200X,"Technician, Pathology Medical Laboratory","Technologists, Technicians & Other Technical Service Providers"
-246RP1900X,"Technician, Pathology Phlebotomy","Technologists, Technicians & Other Technical Service Providers"
-246W00000X,"Technician, Cardiology ","Technologists, Technicians & Other Technical Service Providers"
-246X00000X,"Spec/Tech, Cardiovascular ","Technologists, Technicians & Other Technical Service Providers"
-246XC2901X,"Spec/Tech, Cardiovascular Cardiovascular Invasive Specialist","Technologists, Technicians & Other Technical Service Providers"
-246XC2903X,"Spec/Tech, Cardiovascular Vascular Specialist","Technologists, Technicians & Other Technical Service Providers"
-246XS1301X,"Spec/Tech, Cardiovascular Sonography","Technologists, Technicians & Other Technical Service Providers"
-246Y00000X,"Spec/Tech, Health Info ","Technologists, Technicians & Other Technical Service Providers"
-246YC3301X,"Spec/Tech, Health Info Coding Specialist, Hospital Based","Technologists, Technicians & Other Technical Service Providers"
-246YC3302X,"Spec/Tech, Health Info Coding Specialist, Physician Office Based","Technologists, Technicians & Other Technical Service Providers"
-246YR1600X,"Spec/Tech, Health Info Registered Record Administrator","Technologists, Technicians & Other Technical Service Providers"
-246Z00000X,"Specialist/Technologist, Other ","Technologists, Technicians & Other Technical Service Providers"
-246ZA2600X,"Specialist/Technologist, Other Art, Medical","Technologists, Technicians & Other Technical Service Providers"
-246ZB0301X,"Specialist/Technologist, Other Biomedical Engineering","Technologists, Technicians & Other Technical Service Providers"
-246ZB0302X,"Specialist/Technologist, Other Biomedical Photographer","Technologists, Technicians & Other Technical Service Providers"
-246ZB0500X,"Specialist/Technologist, Other Biochemist","Technologists, Technicians & Other Technical Service Providers"
-246ZB0600X,"Specialist/Technologist, Other Biostatistician","Technologists, Technicians & Other Technical Service Providers"
-246ZC0007X,"Specialist/Technologist, Other Surgical Assistant","Technologists, Technicians & Other Technical Service Providers"
-246ZE0500X,"Specialist/Technologist, Other EEG","Technologists, Technicians & Other Technical Service Providers"
-246ZE0600X,"Specialist/Technologist, Other Electroneurodiagnostic","Technologists, Technicians & Other Technical Service Providers"
-246ZG0701X,"Specialist/Technologist, Other Graphics Methods","Technologists, Technicians & Other Technical Service Providers"
-246ZG1000X,"Specialist/Technologist, Other Geneticist, Medical (PhD)","Technologists, Technicians & Other Technical Service Providers"
-246ZI1000X,"Specialist/Technologist, Other Illustration, Medical","Technologists, Technicians & Other Technical Service Providers"
-246ZN0300X,"Specialist/Technologist, Other Nephrology","Technologists, Technicians & Other Technical Service Providers"
-246ZS0410X,"Specialist/Technologist, Other Surgical Technologist","Technologists, Technicians & Other Technical Service Providers"
-246ZX2200X,"Specialist/Technologist, Other Orthopedic Assistant","Technologists, Technicians & Other Technical Service Providers"
-247000000X,"Technician, Health Information ","Technologists, Technicians & Other Technical Service Providers"
-2470A2800X,"Technician, Health Information Assistant Record Technician","Technologists, Technicians & Other Technical Service Providers"
-247100000X,Radiologic Technologist ,"Technologists, Technicians & Other Technical Service Providers"
-2471B0102X,Radiologic Technologist Bone Densitometry,"Technologists, Technicians & Other Technical Service Providers"
-2471C1101X,Radiologic Technologist Cardiovascular-Interventional Technology,"Technologists, Technicians & Other Technical Service Providers"
-2471C1106X,Radiologic Technologist Cardiac-Interventional Technology,"Technologists, Technicians & Other Technical Service Providers"
-2471C3401X,Radiologic Technologist Computed Tomography,"Technologists, Technicians & Other Technical Service Providers"
-2471C3402X,Radiologic Technologist Radiography,"Technologists, Technicians & Other Technical Service Providers"
-2471M1202X,Radiologic Technologist Magnetic Resonance Imaging,"Technologists, Technicians & Other Technical Service Providers"
-2471M2300X,Radiologic Technologist Mammography,"Technologists, Technicians & Other Technical Service Providers"
-2471N0900X,Radiologic Technologist Nuclear Medicine Technology,"Technologists, Technicians & Other Technical Service Providers"
-2471Q0001X,Radiologic Technologist Quality Management,"Technologists, Technicians & Other Technical Service Providers"
-2471R0002X,Radiologic Technologist Radiation Therapy,"Technologists, Technicians & Other Technical Service Providers"
-2471S1302X,Radiologic Technologist Sonography,"Technologists, Technicians & Other Technical Service Providers"
-2471V0105X,Radiologic Technologist Vascular Sonography,"Technologists, Technicians & Other Technical Service Providers"
-2471V0106X,Radiologic Technologist Vascular-Interventional Technology,"Technologists, Technicians & Other Technical Service Providers"
-247200000X,"Technician, Other ","Technologists, Technicians & Other Technical Service Providers"
-2472B0301X,"Technician, Other Biomedical Engineering","Technologists, Technicians & Other Technical Service Providers"
-2472D0500X,"Technician, Other Darkroom","Technologists, Technicians & Other Technical Service Providers"
-2472E0500X,"Technician, Other EEG","Technologists, Technicians & Other Technical Service Providers"
-2472R0900X,"Technician, Other Renal Dialysis","Technologists, Technicians & Other Technical Service Providers"
-2472V0600X,"Technician, Other Veterinary","Technologists, Technicians & Other Technical Service Providers"
-247ZC0005X,"Pathology Clinical Laboratory Director, Non-physician","Technologists, Technicians & Other Technical Service Providers"
+221700000X,Art Therapist ,Respiratory Developmental Rehabilitative and Restorative Service Providers
+222Q00000X,Developmental Therapist ,Respiratory Developmental Rehabilitative and Restorative Service Providers
+222Z00000X,Orthotist ,Respiratory Developmental Rehabilitative and Restorative Service Providers
+224900000X,Mastectomy Fitter ,Respiratory Developmental Rehabilitative and Restorative Service Providers
+224L00000X,Pedorthist ,Respiratory Developmental Rehabilitative and Restorative Service Providers
+224P00000X,Prosthetist ,Respiratory Developmental Rehabilitative and Restorative Service Providers
+224Y00000X,Clinical Exercise Physiologist ,Respiratory Developmental Rehabilitative and Restorative Service Providers
+224Z00000X,Occupational Therapy Assistant ,Respiratory Developmental Rehabilitative and Restorative Service Providers
+224ZE0001X,Occupational Therapy Assistant Environmental Modification,Respiratory Developmental Rehabilitative and Restorative Service Providers
+224ZF0002X,Occupational Therapy Assistant Feeding Eating & Swallowing,Respiratory Developmental Rehabilitative and Restorative Service Providers
+224ZL0004X,Occupational Therapy Assistant Low Vision,Respiratory Developmental Rehabilitative and Restorative Service Providers
+224ZR0403X,Occupational Therapy Assistant Driving and Community Mobility,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225000000X,Orthotic Fitter ,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225100000X,Physical Therapist ,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2251C2600X,Physical Therapist Cardiopulmonary,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2251E1200X,Physical Therapist Ergonomics,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2251E1300X,Physical Therapist Electrophysiology Clinical,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2251G0304X,Physical Therapist Geriatrics,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2251H1200X,Physical Therapist Hand,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2251H1300X,Physical Therapist Human Factors,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2251N0400X,Physical Therapist Neurology,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2251P0200X,Physical Therapist Pediatrics,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2251S0007X,Physical Therapist Sports,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2251X0800X,Physical Therapist Orthopedic,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225200000X,Physical Therapy Assistant ,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225400000X,Rehabilitation Practitioner ,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225500000X,Specialist/Technologist ,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2255A2300X,Specialist/Technologist Athletic Trainer,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2255R0406X,Specialist/Technologist Rehabilitation Blind,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225600000X,Dance Therapist ,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225700000X,Massage Therapist ,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225800000X,Recreation Therapist ,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225A00000X,Music Therapist ,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225B00000X,Pulmonary Function Technologist ,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225C00000X,Rehabilitation Counselor ,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225CA2400X,Rehabilitation Counselor Assistive Technology Practitioner,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225CA2500X,Rehabilitation Counselor Assistive Technology Supplier,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225CX0006X,Rehabilitation Counselor Orientation and Mobility Training Provider,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225X00000X,Occupational Therapist ,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225XE0001X,Occupational Therapist Environmental Modification,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225XE1200X,Occupational Therapist Ergonomics,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225XF0002X,Occupational Therapist Feeding Eating & Swallowing,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225XG0600X,Occupational Therapist Gerontology,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225XH1200X,Occupational Therapist Hand,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225XH1300X,Occupational Therapist Human Factors,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225XL0004X,Occupational Therapist Low Vision,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225XM0800X,Occupational Therapist Mental Health,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225XN1300X,Occupational Therapist Neurorehabilitation,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225XP0019X,Occupational Therapist Physical Rehabilitation,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225XP0200X,Occupational Therapist Pediatrics,Respiratory Developmental Rehabilitative and Restorative Service Providers
+225XR0403X,Occupational Therapist Driving and Community Mobility,Respiratory Developmental Rehabilitative and Restorative Service Providers
+226000000X,Recreational Therapist Assistant ,Respiratory Developmental Rehabilitative and Restorative Service Providers
+226300000X,Kinesiotherapist ,Respiratory Developmental Rehabilitative and Restorative Service Providers
+227800000X,Respiratory Therapist Certified ,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2278C0205X,Respiratory Therapist Certified Critical Care,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2278E0002X,Respiratory Therapist Certified Emergency Care,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2278E1000X,Respiratory Therapist Certified Educational,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2278G0305X,Respiratory Therapist Certified Geriatric Care,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2278G1100X,Respiratory Therapist Certified General Care,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2278H0200X,Respiratory Therapist Certified Home Health,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2278P1004X,Respiratory Therapist Certified Pulmonary Diagnostics,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2278P1005X,Respiratory Therapist Certified Pulmonary Rehabilitation,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2278P1006X,Respiratory Therapist Certified Pulmonary Function Technologist,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2278P3800X,Respiratory Therapist Certified Palliative/Hospice,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2278P3900X,Respiratory Therapist Certified Neonatal/Pediatrics,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2278P4000X,Respiratory Therapist Certified Patient Transport,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2278S1500X,Respiratory Therapist Certified SNF/Subacute Care,Respiratory Developmental Rehabilitative and Restorative Service Providers
+227900000X,Respiratory Therapist Registered ,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2279C0205X,Respiratory Therapist Registered Critical Care,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2279E0002X,Respiratory Therapist Registered Emergency Care,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2279E1000X,Respiratory Therapist Registered Educational,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2279G0305X,Respiratory Therapist Registered Geriatric Care,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2279G1100X,Respiratory Therapist Registered General Care,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2279H0200X,Respiratory Therapist Registered Home Health,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2279P1004X,Respiratory Therapist Registered Pulmonary Diagnostics,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2279P1005X,Respiratory Therapist Registered Pulmonary Rehabilitation,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2279P1006X,Respiratory Therapist Registered Pulmonary Function Technologist,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2279P3800X,Respiratory Therapist Registered Palliative/Hospice,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2279P3900X,Respiratory Therapist Registered Neonatal/Pediatrics,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2279P4000X,Respiratory Therapist Registered Patient Transport,Respiratory Developmental Rehabilitative and Restorative Service Providers
+2279S1500X,Respiratory Therapist Registered SNF/Subacute Care,Respiratory Developmental Rehabilitative and Restorative Service Providers
+229N00000X,Anaplastologist ,Respiratory Developmental Rehabilitative and Restorative Service Providers
+231H00000X,Audiologist ,Speech Language and Hearing Service Providers
+231HA2400X,Audiologist Assistive Technology Practitioner,Speech Language and Hearing Service Providers
+231HA2500X,Audiologist Assistive Technology Supplier,Speech Language and Hearing Service Providers
+235500000X,Specialist/Technologist ,Speech Language and Hearing Service Providers
+2355A2700X,Specialist/Technologist Audiology Assistant,Speech Language and Hearing Service Providers
+2355S0801X,Specialist/Technologist Speech-Language Assistant,Speech Language and Hearing Service Providers
+235Z00000X,Speech-Language Pathologist ,Speech Language and Hearing Service Providers
+237600000X,Audiologist-Hearing Aid Fitter ,Speech Language and Hearing Service Providers
+237700000X,Hearing Instrument Specialist ,Speech Language and Hearing Service Providers
+242T00000X,Perfusionist ,Technologists Technicians & Other Technical Service Providers
+243U00000X,Radiology Practitioner Assistant ,Technologists Technicians & Other Technical Service Providers
+246Q00000X,Spec/Tech Pathology ,Technologists Technicians & Other Technical Service Providers
+246QB0000X,Spec/Tech Pathology Blood Banking,Technologists Technicians & Other Technical Service Providers
+246QC1000X,Spec/Tech Pathology Chemistry,Technologists Technicians & Other Technical Service Providers
+246QC2700X,Spec/Tech Pathology Cytotechnology,Technologists Technicians & Other Technical Service Providers
+246QH0000X,Spec/Tech Pathology Hematology,Technologists Technicians & Other Technical Service Providers
+246QH0401X,Spec/Tech Pathology Hemapheresis Practitioner,Technologists Technicians & Other Technical Service Providers
+246QH0600X,Spec/Tech Pathology Histology,Technologists Technicians & Other Technical Service Providers
+246QI0000X,Spec/Tech Pathology Immunology,Technologists Technicians & Other Technical Service Providers
+246QL0900X,Spec/Tech Pathology Laboratory Management,Technologists Technicians & Other Technical Service Providers
+246QL0901X,Spec/Tech Pathology Laboratory Management Diplomate,Technologists Technicians & Other Technical Service Providers
+246QM0706X,Spec/Tech Pathology Medical Technologist,Technologists Technicians & Other Technical Service Providers
+246QM0900X,Spec/Tech Pathology Microbiology,Technologists Technicians & Other Technical Service Providers
+246R00000X,Technician Pathology ,Technologists Technicians & Other Technical Service Providers
+246RH0600X,Technician Pathology Histology,Technologists Technicians & Other Technical Service Providers
+246RM2200X,Technician Pathology Medical Laboratory,Technologists Technicians & Other Technical Service Providers
+246RP1900X,Technician Pathology Phlebotomy,Technologists Technicians & Other Technical Service Providers
+246W00000X,Technician Cardiology ,Technologists Technicians & Other Technical Service Providers
+246X00000X,Spec/Tech Cardiovascular ,Technologists Technicians & Other Technical Service Providers
+246XC2901X,Spec/Tech Cardiovascular Cardiovascular Invasive Specialist,Technologists Technicians & Other Technical Service Providers
+246XC2903X,Spec/Tech Cardiovascular Vascular Specialist,Technologists Technicians & Other Technical Service Providers
+246XS1301X,Spec/Tech Cardiovascular Sonography,Technologists Technicians & Other Technical Service Providers
+246Y00000X,Spec/Tech Health Info ,Technologists Technicians & Other Technical Service Providers
+246YC3301X,Spec/Tech Health Info Coding Specialist Hospital Based,Technologists Technicians & Other Technical Service Providers
+246YC3302X,Spec/Tech Health Info Coding Specialist Physician Office Based,Technologists Technicians & Other Technical Service Providers
+246YR1600X,Spec/Tech Health Info Registered Record Administrator,Technologists Technicians & Other Technical Service Providers
+246Z00000X,Specialist/Technologist Other ,Technologists Technicians & Other Technical Service Providers
+246ZA2600X,Specialist/Technologist Other Art Medical,Technologists Technicians & Other Technical Service Providers
+246ZB0301X,Specialist/Technologist Other Biomedical Engineering,Technologists Technicians & Other Technical Service Providers
+246ZB0302X,Specialist/Technologist Other Biomedical Photographer,Technologists Technicians & Other Technical Service Providers
+246ZB0500X,Specialist/Technologist Other Biochemist,Technologists Technicians & Other Technical Service Providers
+246ZB0600X,Specialist/Technologist Other Biostatistician,Technologists Technicians & Other Technical Service Providers
+246ZC0007X,Specialist/Technologist Other Surgical Assistant,Technologists Technicians & Other Technical Service Providers
+246ZE0500X,Specialist/Technologist Other EEG,Technologists Technicians & Other Technical Service Providers
+246ZE0600X,Specialist/Technologist Other Electroneurodiagnostic,Technologists Technicians & Other Technical Service Providers
+246ZG0701X,Specialist/Technologist Other Graphics Methods,Technologists Technicians & Other Technical Service Providers
+246ZG1000X,Specialist/Technologist Other Geneticist Medical (PhD),Technologists Technicians & Other Technical Service Providers
+246ZI1000X,Specialist/Technologist Other Illustration Medical,Technologists Technicians & Other Technical Service Providers
+246ZN0300X,Specialist/Technologist Other Nephrology,Technologists Technicians & Other Technical Service Providers
+246ZS0410X,Specialist/Technologist Other Surgical Technologist,Technologists Technicians & Other Technical Service Providers
+246ZX2200X,Specialist/Technologist Other Orthopedic Assistant,Technologists Technicians & Other Technical Service Providers
+247000000X,Technician Health Information ,Technologists Technicians & Other Technical Service Providers
+2470A2800X,Technician Health Information Assistant Record Technician,Technologists Technicians & Other Technical Service Providers
+247100000X,Radiologic Technologist ,Technologists Technicians & Other Technical Service Providers
+2471B0102X,Radiologic Technologist Bone Densitometry,Technologists Technicians & Other Technical Service Providers
+2471C1101X,Radiologic Technologist Cardiovascular-Interventional Technology,Technologists Technicians & Other Technical Service Providers
+2471C1106X,Radiologic Technologist Cardiac-Interventional Technology,Technologists Technicians & Other Technical Service Providers
+2471C3401X,Radiologic Technologist Computed Tomography,Technologists Technicians & Other Technical Service Providers
+2471C3402X,Radiologic Technologist Radiography,Technologists Technicians & Other Technical Service Providers
+2471M1202X,Radiologic Technologist Magnetic Resonance Imaging,Technologists Technicians & Other Technical Service Providers
+2471M2300X,Radiologic Technologist Mammography,Technologists Technicians & Other Technical Service Providers
+2471N0900X,Radiologic Technologist Nuclear Medicine Technology,Technologists Technicians & Other Technical Service Providers
+2471Q0001X,Radiologic Technologist Quality Management,Technologists Technicians & Other Technical Service Providers
+2471R0002X,Radiologic Technologist Radiation Therapy,Technologists Technicians & Other Technical Service Providers
+2471S1302X,Radiologic Technologist Sonography,Technologists Technicians & Other Technical Service Providers
+2471V0105X,Radiologic Technologist Vascular Sonography,Technologists Technicians & Other Technical Service Providers
+2471V0106X,Radiologic Technologist Vascular-Interventional Technology,Technologists Technicians & Other Technical Service Providers
+247200000X,Technician Other ,Technologists Technicians & Other Technical Service Providers
+2472B0301X,Technician Other Biomedical Engineering,Technologists Technicians & Other Technical Service Providers
+2472D0500X,Technician Other Darkroom,Technologists Technicians & Other Technical Service Providers
+2472E0500X,Technician Other EEG,Technologists Technicians & Other Technical Service Providers
+2472R0900X,Technician Other Renal Dialysis,Technologists Technicians & Other Technical Service Providers
+2472V0600X,Technician Other Veterinary,Technologists Technicians & Other Technical Service Providers
+247ZC0005X,Pathology Clinical Laboratory Director Non-physician,Technologists Technicians & Other Technical Service Providers
 251300000X,Local Education Agency (LEA) ,Agencies
 251B00000X,Case Management ,Agencies
-251C00000X,"Day Training, Developmentally Disabled Services ",Agencies
+251C00000X,Day Training Developmentally Disabled Services ,Agencies
 251E00000X,Home Health ,Agencies
 251F00000X,Home Infusion ,Agencies
-251G00000X,"Hospice Care, Community Based ",Agencies
+251G00000X,Hospice Care Community Based ,Agencies
 251J00000X,Nursing Care ,Agencies
 251K00000X,Public Health or Welfare ,Agencies
 251S00000X,Community/Behavioral Health ,Agencies
@@ -628,7 +628,7 @@ Code,Descriptive_Text,Grouping
 261QE0002X,Clinic/Center Emergency Care,Ambulatory Health Care Facilities
 261QE0700X,Clinic/Center End-Stage Renal Disease (ESRD) Treatment,Ambulatory Health Care Facilities
 261QE0800X,Clinic/Center Endoscopy,Ambulatory Health Care Facilities
-261QF0050X,"Clinic/Center Family Planning, Non-Surgical",Ambulatory Health Care Facilities
+261QF0050X,Clinic/Center Family Planning Non-Surgical,Ambulatory Health Care Facilities
 261QF0400X,Clinic/Center Federally Qualified Health Center (FQHC),Ambulatory Health Care Facilities
 261QG0250X,Clinic/Center Genetics,Ambulatory Health Care Facilities
 261QH0100X,Clinic/Center Health Service,Ambulatory Health Care Facilities
@@ -648,21 +648,21 @@ Code,Descriptive_Text,Grouping
 261QM2500X,Clinic/Center Medical Specialty,Ambulatory Health Care Facilities
 261QM2800X,Clinic/Center Methadone Clinic,Ambulatory Health Care Facilities
 261QM3000X,Clinic/Center Medically Fragile Intants and Children Day Care,Ambulatory Health Care Facilities
-261QP0904X,"Clinic/Center Public Health, Federal",Ambulatory Health Care Facilities
-261QP0905X,"Clinic/Center Public Health, State or Local",Ambulatory Health Care Facilities
+261QP0904X,Clinic/Center Public Health Federal,Ambulatory Health Care Facilities
+261QP0905X,Clinic/Center Public Health State or Local,Ambulatory Health Care Facilities
 261QP1100X,Clinic/Center Podiatric,Ambulatory Health Care Facilities
 261QP2000X,Clinic/Center Physical Therapy,Ambulatory Health Care Facilities
 261QP2300X,Clinic/Center Primary Care,Ambulatory Health Care Facilities
 261QP2400X,Clinic/Center Prison Health,Ambulatory Health Care Facilities
 261QP3300X,Clinic/Center Pain,Ambulatory Health Care Facilities
 261QR0200X,Clinic/Center Radiology,Ambulatory Health Care Facilities
-261QR0206X,"Clinic/Center Radiology, Mammography",Ambulatory Health Care Facilities
-261QR0207X,"Clinic/Center Radiology, Mobile Mammography",Ambulatory Health Care Facilities
-261QR0208X,"Clinic/Center Radiology, Mobile",Ambulatory Health Care Facilities
+261QR0206X,Clinic/Center Radiology Mammography,Ambulatory Health Care Facilities
+261QR0207X,Clinic/Center Radiology Mobile Mammography,Ambulatory Health Care Facilities
+261QR0208X,Clinic/Center Radiology Mobile,Ambulatory Health Care Facilities
 261QR0400X,Clinic/Center Rehabilitation,Ambulatory Health Care Facilities
-261QR0401X,"Clinic/Center Rehabilitation, Comprehensive Outpatient Rehabilitation Facility (CORF)",Ambulatory Health Care Facilities
-261QR0404X,"Clinic/Center Rehabilitation, Cardiac Facilities",Ambulatory Health Care Facilities
-261QR0405X,"Clinic/Center Rehabilitation, Substance Use Disorder",Ambulatory Health Care Facilities
+261QR0401X,Clinic/Center Rehabilitation Comprehensive Outpatient Rehabilitation Facility (CORF),Ambulatory Health Care Facilities
+261QR0404X,Clinic/Center Rehabilitation Cardiac Facilities,Ambulatory Health Care Facilities
+261QR0405X,Clinic/Center Rehabilitation Substance Use Disorder,Ambulatory Health Care Facilities
 261QR0800X,Clinic/Center Recovery Care,Ambulatory Health Care Facilities
 261QR1100X,Clinic/Center Research,Ambulatory Health Care Facilities
 261QR1300X,Clinic/Center Rural Health,Ambulatory Health Care Facilities
@@ -674,12 +674,12 @@ Code,Descriptive_Text,Grouping
 261QV0200X,Clinic/Center VA,Ambulatory Health Care Facilities
 261QX0100X,Clinic/Center Occupational Medicine,Ambulatory Health Care Facilities
 261QX0200X,Clinic/Center Oncology,Ambulatory Health Care Facilities
-261QX0203X,"Clinic/Center Oncology, Radiation",Ambulatory Health Care Facilities
+261QX0203X,Clinic/Center Oncology Radiation,Ambulatory Health Care Facilities
 273100000X,Epilepsy Unit ,Hospital Units
 273R00000X,Psychiatric Unit ,Hospital Units
 273Y00000X,Rehabilitation Unit ,Hospital Units
 275N00000X,Medicare Defined Swing Bed Unit ,Hospital Units
-276400000X,"Rehabilitation, Substance Use Disorder Unit ",Hospital Units
+276400000X,Rehabilitation Substance Use Disorder Unit ,Hospital Units
 281P00000X,Chronic Disease Hospital ,Hospitals
 281PC2000X,Chronic Disease Hospital Children,Hospitals
 282E00000X,Long Term Care Hospital ,Hospitals
@@ -707,26 +707,26 @@ Code,Descriptive_Text,Grouping
 305R00000X,Preferred Provider Organization ,Managed Care Organizations
 305S00000X,Point of Service ,Managed Care Organizations
 310400000X,Assisted Living Facility ,Nursing & Custodial Care Facilities
-3104A0625X,"Assisted Living Facility Assisted Living, Mental Illness",Nursing & Custodial Care Facilities
-3104A0630X,"Assisted Living Facility Assisted Living, Behavioral Disturbances",Nursing & Custodial Care Facilities
-310500000X,"Intermediate Care Facility, Mental Illness ",Nursing & Custodial Care Facilities
+3104A0625X,Assisted Living Facility Assisted Living Mental Illness,Nursing & Custodial Care Facilities
+3104A0630X,Assisted Living Facility Assisted Living Behavioral Disturbances,Nursing & Custodial Care Facilities
+310500000X,Intermediate Care Facility Mental Illness ,Nursing & Custodial Care Facilities
 311500000X,Alzheimer Center (Dementia Center) ,Nursing & Custodial Care Facilities
 311Z00000X,Custodial Care Facility ,Nursing & Custodial Care Facilities
 311ZA0620X,Custodial Care Facility Adult Care Home,Nursing & Custodial Care Facilities
 313M00000X,Nursing Facility/Intermediate Care Facility ,Nursing & Custodial Care Facilities
 314000000X,Skilled Nursing Facility ,Nursing & Custodial Care Facilities
-3140N1450X,"Skilled Nursing Facility Nursing Care, Pediatric",Nursing & Custodial Care Facilities
-315D00000X,"Hospice, Inpatient ",Nursing & Custodial Care Facilities
-315P00000X,"Intermediate Care Facility, Mentally Retarded ",Nursing & Custodial Care Facilities
+3140N1450X,Skilled Nursing Facility Nursing Care Pediatric,Nursing & Custodial Care Facilities
+315D00000X,Hospice Inpatient ,Nursing & Custodial Care Facilities
+315P00000X,Intermediate Care Facility Mentally Retarded ,Nursing & Custodial Care Facilities
 317400000X,Christian Science Facility ,Nursing & Custodial Care Facilities
-320600000X,"Residential Treatment Facility, Mental Retardation and/or Developmental Disabilities ",Residential Treatment Facilities
-320700000X,"Residential Treatment Facility, Physical Disabilities ",Residential Treatment Facilities
-320800000X,"Community Based Residential Treatment Facility, Mental Illness ",Residential Treatment Facilities
-320900000X,"Community Based Residential Treatment, Mental Retardation and/or Developmental Disabilities ",Residential Treatment Facilities
-322D00000X,"Residential Treatment Facility, Emotionally Disturbed Children ",Residential Treatment Facilities
+320600000X,Residential Treatment Facility Mental Retardation and/or Developmental Disabilities ,Residential Treatment Facilities
+320700000X,Residential Treatment Facility Physical Disabilities ,Residential Treatment Facilities
+320800000X,Community Based Residential Treatment Facility Mental Illness ,Residential Treatment Facilities
+320900000X,Community Based Residential Treatment Mental Retardation and/or Developmental Disabilities ,Residential Treatment Facilities
+322D00000X,Residential Treatment Facility Emotionally Disturbed Children ,Residential Treatment Facilities
 323P00000X,Psychiatric Residential Treatment Facility ,Residential Treatment Facilities
 324500000X,Substance Abuse Rehabilitation Facility ,Residential Treatment Facilities
-3245S0500X,"Substance Abuse Rehabilitation Facility Substance Abuse Treatment, Children",Residential Treatment Facilities
+3245S0500X,Substance Abuse Rehabilitation Facility Substance Abuse Treatment Children,Residential Treatment Facilities
 331L00000X,Blood Bank ,Suppliers
 332000000X,Military/U.S. Coast Guard Pharmacy ,Suppliers
 332100000X,Department of Veterans Affairs (VA) Pharmacy ,Suppliers
@@ -739,7 +739,7 @@ Code,Descriptive_Text,Grouping
 332BP3500X,Durable Medical Equipment & Medical Supplies Parenteral & Enteral Nutrition,Suppliers
 332BX2000X,Durable Medical Equipment & Medical Supplies Oxygen Equipment & Supplies,Suppliers
 332G00000X,Eye Bank ,Suppliers
-332H00000X,"Eyewear Supplier (Equipment, not the service) ",Suppliers
+332H00000X,Eyewear Supplier (Equipment not the service) ,Suppliers
 332S00000X,Hearing  Aid Equipment ,Suppliers
 332U00000X,Home Delivered Meals ,Suppliers
 333300000X,Emergency Response System Companies ,Suppliers
@@ -763,9 +763,9 @@ Code,Descriptive_Text,Grouping
 3416L0300X,Ambulance Land Transport,Transportation Services
 3416S0300X,Ambulance Water Transport,Transportation Services
 341800000X,Military/U.S. Coast Guard Transport ,Transportation Services
-3418M1110X,"Military/U.S. Coast Guard Transport Military or U.S. Coast Guard Ambulance, Ground Transport",Transportation Services
-3418M1120X,"Military/U.S. Coast Guard Transport Military or U.S. Coast Guard Ambulance, Air Transport",Transportation Services
-3418M1130X,"Military/U.S. Coast Guard Transport Military or U.S. Coast Guard Ambulance, Water Transport",Transportation Services
+3418M1110X,Military/U.S. Coast Guard Transport Military or U.S. Coast Guard Ambulance Ground Transport,Transportation Services
+3418M1120X,Military/U.S. Coast Guard Transport Military or U.S. Coast Guard Ambulance Air Transport,Transportation Services
+3418M1130X,Military/U.S. Coast Guard Transport Military or U.S. Coast Guard Ambulance Water Transport,Transportation Services
 343800000X,Secured Medical Transport (VAN) ,Transportation Services
 343900000X,Non-emergency Medical Transport (VAN) ,Transportation Services
 344600000X,Taxi ,Transportation Services
@@ -785,9 +785,9 @@ Code,Descriptive_Text,Grouping
 363LF0000X,Nurse Practitioner Family,Physician Assistants & Advanced Practice Nursing Providers
 363LG0600X,Nurse Practitioner Gerontology,Physician Assistants & Advanced Practice Nursing Providers
 363LN0000X,Nurse Practitioner Neonatal,Physician Assistants & Advanced Practice Nursing Providers
-363LN0005X,"Nurse Practitioner Neonatal, Critical Care",Physician Assistants & Advanced Practice Nursing Providers
+363LN0005X,Nurse Practitioner Neonatal Critical Care,Physician Assistants & Advanced Practice Nursing Providers
 363LP0200X,Nurse Practitioner Pediatrics,Physician Assistants & Advanced Practice Nursing Providers
-363LP0222X,"Nurse Practitioner Pediatrics, Critical Care",Physician Assistants & Advanced Practice Nursing Providers
+363LP0222X,Nurse Practitioner Pediatrics Critical Care,Physician Assistants & Advanced Practice Nursing Providers
 363LP0808X,Nurse Practitioner Psych/Mental Health,Physician Assistants & Advanced Practice Nursing Providers
 363LP1700X,Nurse Practitioner Perinatal,Physician Assistants & Advanced Practice Nursing Providers
 363LP2300X,Nurse Practitioner Primary Care,Physician Assistants & Advanced Practice Nursing Providers
@@ -813,13 +813,13 @@ Code,Descriptive_Text,Grouping
 364SN0000X,Clinical Nurse Specialist Neonatal,Physician Assistants & Advanced Practice Nursing Providers
 364SN0800X,Clinical Nurse Specialist Neuroscience,Physician Assistants & Advanced Practice Nursing Providers
 364SP0200X,Clinical Nurse Specialist Pediatrics,Physician Assistants & Advanced Practice Nursing Providers
-364SP0807X,"Clinical Nurse Specialist Psych/Mental Health, Child & Adolescent",Physician Assistants & Advanced Practice Nursing Providers
+364SP0807X,Clinical Nurse Specialist Psych/Mental Health Child & Adolescent,Physician Assistants & Advanced Practice Nursing Providers
 364SP0808X,Clinical Nurse Specialist Psych/Mental Health,Physician Assistants & Advanced Practice Nursing Providers
-364SP0809X,"Clinical Nurse Specialist Psych/Mental Health, Adult",Physician Assistants & Advanced Practice Nursing Providers
-364SP0810X,"Clinical Nurse Specialist Psych/Mental Health, Child & Family",Physician Assistants & Advanced Practice Nursing Providers
-364SP0811X,"Clinical Nurse Specialist Psych/Mental Health, Chronically Ill",Physician Assistants & Advanced Practice Nursing Providers
-364SP0812X,"Clinical Nurse Specialist Psych/Mental Health, Community",Physician Assistants & Advanced Practice Nursing Providers
-364SP0813X,"Clinical Nurse Specialist Psych/Mental Health, Geropsychiatric",Physician Assistants & Advanced Practice Nursing Providers
+364SP0809X,Clinical Nurse Specialist Psych/Mental Health Adult,Physician Assistants & Advanced Practice Nursing Providers
+364SP0810X,Clinical Nurse Specialist Psych/Mental Health Child & Family,Physician Assistants & Advanced Practice Nursing Providers
+364SP0811X,Clinical Nurse Specialist Psych/Mental Health Chronically Ill,Physician Assistants & Advanced Practice Nursing Providers
+364SP0812X,Clinical Nurse Specialist Psych/Mental Health Community,Physician Assistants & Advanced Practice Nursing Providers
+364SP0813X,Clinical Nurse Specialist Psych/Mental Health Geropsychiatric,Physician Assistants & Advanced Practice Nursing Providers
 364SP1700X,Clinical Nurse Specialist Perinatal,Physician Assistants & Advanced Practice Nursing Providers
 364SP2800X,Clinical Nurse Specialist Perioperative,Physician Assistants & Advanced Practice Nursing Providers
 364SR0400X,Clinical Nurse Specialist Rehabilitation,Physician Assistants & Advanced Practice Nursing Providers
@@ -828,8 +828,8 @@ Code,Descriptive_Text,Grouping
 364SW0102X,Clinical Nurse Specialist Women's Health,Physician Assistants & Advanced Practice Nursing Providers
 364SX0106X,Clinical Nurse Specialist Occupational Health,Physician Assistants & Advanced Practice Nursing Providers
 364SX0200X,Clinical Nurse Specialist Oncology,Physician Assistants & Advanced Practice Nursing Providers
-364SX0204X,"Clinical Nurse Specialist Oncology, Pediatrics",Physician Assistants & Advanced Practice Nursing Providers
-367500000X,"Nurse Anesthetist, Certified Registered ",Physician Assistants & Advanced Practice Nursing Providers
+364SX0204X,Clinical Nurse Specialist Oncology Pediatrics,Physician Assistants & Advanced Practice Nursing Providers
+367500000X,Nurse Anesthetist Certified Registered ,Physician Assistants & Advanced Practice Nursing Providers
 367A00000X,Advanced Practice Midwife ,Physician Assistants & Advanced Practice Nursing Providers
 367H00000X,Anesthesiologist Assistant ,Physician Assistants & Advanced Practice Nursing Providers
 372500000X,Chore Provider ,Nursing Service Related Providers
@@ -847,10 +847,10 @@ Code,Descriptive_Text,Grouping
 376K00000X,Nurse's Aide ,Nursing Service Related Providers
 385H00000X,Respite Care ,Respite Care Facility
 385HR2050X,Respite Care Respite Care Camp,Respite Care Facility
-385HR2055X,"Respite Care Respite Care, Mental Illness, Child",Respite Care Facility
-385HR2060X,"Respite Care Respite Care, Mental Retardation and/or Developmental Disabilities, Child",Respite Care Facility
-385HR2065X,"Respite Care Respite Care, Physical Disabilities, Child",Respite Care Facility
-390200000X,Student in an Organized Health Care Education/Training Program ,"Student, Health Care"
+385HR2055X,Respite Care Respite Care Mental Illness Child,Respite Care Facility
+385HR2060X,Respite Care Respite Care Mental Retardation and/or Developmental Disabilities Child,Respite Care Facility
+385HR2065X,Respite Care Respite Care Physical Disabilities Child,Respite Care Facility
+390200000X,Student in an Organized Health Care Education/Training Program ,Student Health Care
 405300000X,Prevention Professional ,Other Service Providers
 NI,No information,
 UN,Unknown,
