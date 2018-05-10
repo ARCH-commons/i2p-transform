@@ -18,7 +18,7 @@ CREATE TABLE pcornet_trial(
 )
 /
 update cdm_status
-set end_time = sysdate, records = (select count(*) from pcornet_trial)
+set end_time = sysdate, records = 0
 where task = 'pcornet_trial'
 /
-select 1 from cdm_status where task = 'pcornet_trial'
+select records + 1 from cdm_status where task = 'pcornet_trial'

@@ -303,14 +303,15 @@ class downloadNPI(CDMStatusTask):
             zip_ref.extractall(self.dl_path)
 
     def extract(self):
+        self.expectedRecords = 0
         with open(self.dl_path + self.npi_csv, 'r') as fin:
             with open(self.load_path + self.specialty_csv, 'w', newline='') as fout:
                 reader = csv.DictReader(fin)
                 writer = csv.writer(fout)
                 writer.writerow(['NPI', 'SPECIALTY'])
                 for row in reader:
+                    self.expectedRecords = self.expectedRecords + 1
                     useDefault = True
-                    expectedRecords = expectedRecords + 1
                     for i in range(1, self.taxonomy_ct + 1):
                         if row[self.switch_col + str(i)] == 'Y':
                             useDefault = False
