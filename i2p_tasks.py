@@ -244,15 +244,24 @@ class loadLabNormal(LoadCSV):
     taskName = 'LABNORMAL'
     csvname = 'Oracle/labnormal.csv'
 
+    def requires(self):
+        return [pcornet_init()]
+
 
 class loadHarvestLocal(LoadCSV):
     taskName = 'HARVEST_LOCAL'
     csvname = 'Oracle/harvest_local.csv'
 
+    def requires(self):
+        return [pcornet_init()]
+
 
 class loadLanguage(LoadCSV):
     taskName = 'LANGUAGE_MAP'
     csvname = 'Oracle/language.csv'
+
+    def requires(self):
+        return [pcornet_init()]
 
 
 class loadSpecialty(LoadCSV):
@@ -261,7 +270,7 @@ class loadSpecialty(LoadCSV):
     #csvname = 'Oracle/specialty.csv'
 
     def requires(self):
-        return [downloadNPI()]
+        return [pcornet_init(), downloadNPI()]
 
 
 class downloadNPI(CDMStatusTask):
