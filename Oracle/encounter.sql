@@ -102,8 +102,7 @@ PCORNetEncounter();
 END;
 /
 update cdm_status
-set end_time = sysdate
-set records = (select count(*) from encounter)
+set end_time = sysdate, records = (select count(*) from encounter)
 where task = 'encounter'
 /
 select 1 from cdm_status where status = 'encounter'

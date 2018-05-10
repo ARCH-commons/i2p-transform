@@ -246,8 +246,7 @@ CREATE OR REPLACE SYNONYM pcornet_enc FOR  "&&i2b2_meta_schema".pcornet_enc
 /
 
 update cdm_status
-set end_time = sysdate
-set records = 0
+set end_time = sysdate, records = 0
 where task = 'pcornet_init'
 /
 

@@ -167,8 +167,7 @@ END;
 /
 
 update cdm_status
-set end_time = sysdate
-set records = (select count(*) from lab_result_cm)
+set end_time = sysdate, records = (select count(*) from lab_result_cm)
 where task = 'lab_result_cm'
 /
 

@@ -30,8 +30,7 @@ CREATE TABLE obs_gen(
 )
 /
 update cdm_status
-set end_time = sysdate
-set records = (select count(*) from obs_gen)
+set end_time = sysdate, records = (select count(*) from obs_gen)
 where task = 'obs_gen'
 /
 select 1 from cdm_status where status = 'obs_gen'

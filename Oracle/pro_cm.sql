@@ -38,8 +38,7 @@ begin
 end;
 /
 update cdm_status
-set end_time = sysdate
-set records = (select count(*) from pro_cm)
+set end_time = sysdate, records = (select count(*) from pro_cm)
 where task = 'pro_cm'
 /
 select 1 from cdm_status where status = 'pro_cm'

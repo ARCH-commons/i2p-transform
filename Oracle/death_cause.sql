@@ -16,8 +16,7 @@ CREATE TABLE death_cause(
 )
 /
 update cdm_status
-set end_time = sysdate
-set records = (select count(*) from death_cause)
+set end_time = sysdate, records = (select count(*) from death_cause)
 where task = 'death_cause'
 /
 select 1 from cdm_status where status = 'death_cause'

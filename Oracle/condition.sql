@@ -105,8 +105,7 @@ PCORNetCondition();
 END;
 /
 update cdm_status
-set end_time = sysdate
-set records = (select count(*) from condition)
+set end_time = sysdate, records = (select count(*) from condition)
 where task = 'condition'
 /
 select 1 from cdm_status where status = 'condition'

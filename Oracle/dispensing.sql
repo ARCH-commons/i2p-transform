@@ -181,8 +181,7 @@ PCORNetDispensing();
 END;
 /
 update cdm_status
-set end_time = sysdate
-set records = (select count(*) from dispensing)
+set end_time = sysdate, records = (select count(*) from dispensing)
 where task = 'dispensing'
 /
 select 1 from cdm_status where status = 'dispensing'

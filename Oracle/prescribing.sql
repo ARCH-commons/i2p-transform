@@ -225,8 +225,7 @@ END;
 /
 
 update cdm_status
-set end_time = sysdate
-set records = (select count(*) from prescribing)
+set end_time = sysdate, records = (select count(*) from prescribing)
 where task = 'prescribing'
 /
 

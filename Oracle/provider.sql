@@ -65,8 +65,7 @@ end;
 /
 
 update cdm_status
-set end_time = sysdate
-set records = (select count(*) from provider)
+set end_time = sysdate, records = (select count(*) from provider)
 where task = 'provider'
 /
 

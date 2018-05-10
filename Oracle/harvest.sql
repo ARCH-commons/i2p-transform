@@ -104,8 +104,7 @@ PCORNetHarvest();
 END;
 /
 update cdm_status
-set end_time = sysdate
-set records = (select count(*) from harvest)
+set end_time = sysdate, records = (select count(*) from harvest)
 where task = 'harvest'
 /
 select 1 from cdm_status where status = 'harvest'

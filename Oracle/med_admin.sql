@@ -115,8 +115,7 @@ PCORNetMedAdmin();
 END;
 /
 update cdm_status
-set end_time = sysdate
-set records = (select count(*) from med_admin)
+set end_time = sysdate, records = (select count(*) from med_admin)
 where task = 'med_admin'
 /
 select 1 from cdm_status where status = 'med_admin'

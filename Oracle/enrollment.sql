@@ -53,8 +53,7 @@ PCORNetEnroll();
 END;
 /
 update cdm_status
-set end_time = sysdate
-set records = (select count(*) from enrollment)
+set end_time = sysdate, records = (select count(*) from enrollment)
 where task = 'enrollment'
 /
 select 1 from cdm_status where status = 'enrollment'
