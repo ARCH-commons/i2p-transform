@@ -64,7 +64,7 @@ select lab_result_cm_seq.nextval LAB_RESULT_CM_ID
 from blueherondata.observation_fact m
 join encounter enc on enc.patid = m.patient_num and enc.encounterid = m.encounter_Num
 where concept_cd between 'KUH|COMPONENT_ID:' and 'KUH|COMPONENT_ID:~'
-and modifier_cd in ('@');  -- exclude analyitics: Labs|Aggregate:Median, ...
+and modifier_cd in ('@')  -- exclude analyitics: Labs|Aggregate:Median, ...
 and m.valtype_cd in ('N','T')
 and (m.nval_num is null or m.nval_num<=9999999)
 /

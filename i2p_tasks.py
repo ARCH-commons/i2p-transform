@@ -230,7 +230,7 @@ class provider(CDMScriptTask):
     script = Script.provider
 
     def requires(self):
-        return [encounter()]
+        return [loadSpecialty(), encounter()]
 
 
 class vital(CDMScriptTask):
@@ -267,7 +267,6 @@ class loadLanguage(LoadCSV):
 class loadSpecialty(LoadCSV):
     taskName = 'SPECIALTY_MAP'
     csvname = 'Oracle/specialty.csv'
-    #csvname = 'Oracle/specialty.csv'
 
     def requires(self):
         return [pcornet_init(), downloadNPI()]
@@ -278,7 +277,7 @@ class downloadNPI(CDMStatusTask):
     expectedRecords = 0
 
     npi_url = 'http://download.cms.gov/nppes/'
-    dl_path = 'd1/npi/'
+    dl_path = '/d1/npi/'
     load_path = 'Oracle/'
     npi_zip = 'NPPES_Data_Dissemination_040918_041518_Weekly.zip'
     npi_csv = 'npidata_pfile_20180409-20180415.csv'
