@@ -33,4 +33,4 @@ update cdm_status
 set end_time = sysdate, records = (select count(*) from obs_gen)
 where task = 'obs_gen'
 /
-select 1 from cdm_status where status = 'obs_gen'
+select 1 from cdm_status where task = 'obs_gen'

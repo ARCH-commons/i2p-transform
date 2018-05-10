@@ -69,4 +69,4 @@ set end_time = sysdate, records = (select count(*) from provider)
 where task = 'provider'
 /
 
-select 1 from cdm_status where status = 'provider'
+select 1 from cdm_status where task = 'provider'

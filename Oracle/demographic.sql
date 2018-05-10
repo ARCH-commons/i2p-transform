@@ -214,4 +214,4 @@ update cdm_status
 set end_time = sysdate, records = (select count(*) from demographic)
 where task = 'demographic'
 /
-select 1 from cdm_status where status = 'demographic'
+select 1 from cdm_status where task = 'demographic'

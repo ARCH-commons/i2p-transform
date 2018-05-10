@@ -141,5 +141,5 @@ update cdm_status
 set end_time = sysdate, records = (select count(*) from vital)
 where task = 'vital'
 /
-select 1 from cdm_status where status = 'vital'
+select 1 from cdm_status where task = 'vital'
 --SELECT count(VITALID) from vital where rownum = 1

@@ -171,4 +171,4 @@ set end_time = sysdate, records = (select count(*) from lab_result_cm)
 where task = 'lab_result_cm'
 /
 
-select 1 from cdm_status where status = 'lab_result_cm'
+select 1 from cdm_status where task = 'lab_result_cm'

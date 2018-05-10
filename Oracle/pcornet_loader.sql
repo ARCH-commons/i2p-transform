@@ -60,4 +60,4 @@ update cdm_status
 set end_time = sysdate, records = 0
 where task = 'pcornet_loader'
 /
-select 1 from cdm_status where status = 'pcornet_loader'
+select 1 from cdm_status where task = 'pcornet_loader'

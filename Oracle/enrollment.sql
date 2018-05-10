@@ -56,5 +56,5 @@ update cdm_status
 set end_time = sysdate, records = (select count(*) from enrollment)
 where task = 'enrollment'
 /
-select 1 from cdm_status where status = 'enrollment'
+select 1 from cdm_status where task = 'enrollment'
 --SELECT count(PATID) from enrollment where rownum = 1

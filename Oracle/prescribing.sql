@@ -229,4 +229,4 @@ set end_time = sysdate, records = (select count(*) from prescribing)
 where task = 'prescribing'
 /
 
-select 1 from cdm_status where status = 'prescribing'
+select 1 from cdm_status where task = 'prescribing'

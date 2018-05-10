@@ -51,6 +51,6 @@ update cdm_status
 set end_time = sysdate, records = (select count(*) from death)
 where task = 'death'
 /
-select 1 from cdm_status where status = 'death'
+select 1 from cdm_status where task = 'death'
 
 --SELECT count(PATID) from death where rownum = 1

@@ -105,5 +105,5 @@ update cdm_status
 set end_time = sysdate, records = (select count(*) from encounter)
 where task = 'encounter'
 /
-select 1 from cdm_status where status = 'encounter'
+select 1 from cdm_status where task = 'encounter'
 --SELECT count(ENCOUNTERID) from encounter where rownum = 1
