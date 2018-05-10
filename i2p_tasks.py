@@ -106,9 +106,15 @@ class med_admin(CDMScriptTask):
 class obs_clin(CDMScriptTask):
     script = Script.obs_clin
 
+    def requires(self):
+        return [pcornet_init()]
+
 
 class obs_gen(CDMScriptTask):
     script = Script.obs_gen
+
+    def requires(self):
+        return [pcornet_init()]
 
 
 class CDMPatientGroupTask(CDMScriptTask):
