@@ -274,7 +274,6 @@ class loadSpecialty(LoadCSV):
 
 class downloadNPI(CDMStatusTask):
     taskName = 'NPI_LOAD'
-    expectedRecords = 0
 
     npi_url = 'http://download.cms.gov/nppes/'
     dl_path = '/d1/npi/'
@@ -287,9 +286,6 @@ class downloadNPI(CDMStatusTask):
     switch_col = 'Healthcare Provider Primary Taxonomy Switch_'
     npi_col = 'NPI'
     taxonomy_ct = 15
-
-    def requires(self):
-        return []
 
     def run(self):
         self.setTaskStart()
