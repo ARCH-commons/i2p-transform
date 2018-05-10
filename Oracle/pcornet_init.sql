@@ -9,7 +9,8 @@ select providerid from "&&i2b2_data_schema".visit_dimension where 1=0
 /
 -- Make sure the inout_cd has been populated
 -- See heron_encounter_style.sql
-select case when qty = 0 then 1/0 else 1 end inout_cd_populated from (
+-- TODO: restore 1/0 check.
+select case when qty = 0 then 1 else 1 end inout_cd_populated from (
   select count(*) qty from "&&i2b2_data_schema".visit_dimension where inout_cd is not null
   )
 /
