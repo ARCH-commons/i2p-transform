@@ -300,15 +300,15 @@ class downloadNPI(CDMStatusTask):
     def fetch(self):
         r = urllib.request.urlopen(self.npi_url + self.npi_zip)
 
-        with open(self.dl_path + self.zip_file, 'wb') as fout:
+        with open(self.dl_path + self.npi_zip, 'wb') as fout:
             fout.write(r.read())
 
-        with zipfile.ZipFile(self.dl_path + self.zip_file, 'r') as zip_ref:
+        with zipfile.ZipFile(self.dl_path + self.npi_zip, 'r') as zip_ref:
             zip_ref.extractall(self.dl_path)
 
     def extract(self):
         with open(self.dl_path + self.npi_csv, 'r') as fin:
-            with open(self.dl_path + self.specialty_csv, 'w', newline='') as fout:
+            with open(self.load_path + self.specialty_csv, 'w', newline='') as fout:
                 reader = csv.DictReader(fin)
                 writer = csv.writer(fout)
                 writer.writerow(['NPI', 'SPECIALTY'])
@@ -323,7 +323,4 @@ class downloadNPI(CDMStatusTask):
 
                     if (useDefault):
                         writer.writerow([row[self.npi_col], row[self.taxonomy_col + str(1)]])
-
-    def output(self):
-        return luigi.LocalTarget(self.load_path + self.specialty_csv)
 

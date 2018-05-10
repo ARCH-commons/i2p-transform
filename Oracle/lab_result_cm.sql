@@ -93,7 +93,7 @@ inner join
   select c_fullname, c_basecode
   from pcornet_lab
 ) parent
-on lab.C_PATH = parent.c_fullname;
+on lab.C_PATH = parent.c_fullname
 /
 
 create table lab_result_w_norm as
@@ -111,7 +111,7 @@ left join
 on lab.PATID = norm.patid
 and lab.RAW_FACILITY_CODE = norm.concept_cd
 and (lab.LAB_ORDER_DATE - norm.birth_date) > norm.age_lower
-and (lab.LAB_ORDER_DATE - norm.birth_date) <= norm.age_upper;
+and (lab.LAB_ORDER_DATE - norm.birth_date) <= norm.age_upper
 /
 
 create table lab_result_cm as
@@ -155,7 +155,7 @@ select distinct cast(norm.LAB_RESULT_CM_ID as varchar(19)) LAB_RESULT_CM_ID
 , cast(null as varchar(50)) RAW_UNIT
 , cast(null as varchar(50)) RAW_ORDER_DEPT
 , norm.RAW_FACILITY_CODE RAW_FACILITY_CODE
-from lab_result_w_norm norm;
+from lab_result_w_norm norm
 /
 
 create index lab_result_cm_idx on lab_result_cm (PATID, ENCOUNTERID)
