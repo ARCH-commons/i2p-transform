@@ -281,7 +281,7 @@ class loadSpecialtyCode(LoadCSV):
 
 
 class downloadNPI(CDMStatusTask):
-    taskName = 'NPI_LOAD'
+    taskName = 'NPI_DOWNLOAD'
     npi_url = 'http://download.cms.gov/nppes/'
     dl_path = '/d1/npi/'
     load_path = 'curated_data/'
