@@ -79,16 +79,16 @@ INSERT INTO harvest(NETWORKID, NETWORK_NAME, DATAMARTID, DATAMART_NAME, DATAMART
   case when (select records from cdm_status where task = 'demographic') > 0 then current_date else null end REFRESH_DEMOGRAPHIC_DATE,
   case when (select records from cdm_status where task = 'enrollment') > 0 then current_date else null end REFRESH_ENROLLMENT_DATE,
   case when (select records from cdm_status where task = 'encounter') > 0 then current_date else null end REFRESH_ENCOUNTER_DATE,
-  case when (select records from cdm_status where task = 'diagnosis_finalize') > 0 then current_date else null end REFRESH_DIAGNOSIS_DATE,
+  case when (select records from cdm_status where task = 'diagnosis') > 0 then current_date else null end REFRESH_DIAGNOSIS_DATE,
   case when (select records from cdm_status where task = 'procedures') > 0 then current_date else null end REFRESH_PROCEDURES_DATE,
   case when (select records from cdm_status where task = 'vital') > 0 then current_date else null end REFRESH_VITAL_DATE,
-  case when (select records from cdm_status where task = 'dispensing_finalize') > 0 then current_date else null end REFRESH_DISPENSING_DATE,
+  case when (select records from cdm_status where task = 'dispensing') > 0 then current_date else null end REFRESH_DISPENSING_DATE,
   case when (select records from cdm_status where task = 'lab_result_cm') > 0 then current_date else null end REFRESH_LAB_RESULT_CM_DATE,
-  case when (select records from cdm_status where task = 'condition_finalize') > 0 then current_date else null end REFRESH_CONDITION_DATE,
+  case when (select records from cdm_status where task = 'condition') > 0 then current_date else null end REFRESH_CONDITION_DATE,
   case when (select records from cdm_status where task = 'pro_cm') > 0 then current_date else null end REFRESH_PRO_CM_DATE,
   case when (select records from cdm_status where task = 'prescribing') > 0 then current_date else null end REFRESH_PRESCRIBING_DATE,
   case when (select records from cdm_status where task = 'pcornet_trial') > 0 then current_date else null end REFRESH_PCORNET_TRIAL_DATE,
-  case when (select records from cdm_status where task = 'death_finalize') > 0 then current_date else null end REFRESH_DEATH_DATE,
+  case when (select records from cdm_status where task = 'death') > 0 then current_date else null end REFRESH_DEATH_DATE,
   case when (select records from cdm_status where task = 'death_cause') > 0 then current_date else null end REFRESH_DEATH_CAUSE_DATE,
   case when (select records from cdm_status where task = 'med_admin') > 0 then current_date else null end REFRESH_MED_ADMIN_DATE,
   case when (select records from cdm_status where task = 'obs_clin') > 0 then current_date else null end REFRESH_OBS_CLIN_DATE,
@@ -107,4 +107,4 @@ update cdm_status
 set end_time = sysdate, records = (select count(*) from harvest)
 where task = 'harvest'
 /
-select 1 from cdm_status where task = 'harvest'
+select records from cdm_status where task = 'harvest'
