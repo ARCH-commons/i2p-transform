@@ -1,6 +1,6 @@
 /** pcornet_trial - create the pcornet_trial table.
 */
-insert into cdm_status (task, start_time) select 'pcornet_trail', sysdate from dual
+insert into cdm_status (task, start_time) select 'pcornet_trial', sysdate from dual
 /
 BEGIN
 PMN_DROPSQL('DROP TABLE pcornet_trial');
