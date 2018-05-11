@@ -50,7 +50,7 @@ select cs.prov_id
     else nvl(sm.specialty, 'UN') end as provider_specialty_primary
   , cs2.npi
   , case when cs2.npi is not null then 'Y' else 'N' end as provider_npi_flag
-  , sp.descriptive_text
+  , substr(sp.descriptive_text, 1, 50)
   from clarity.clarity_ser@id cs
   left join clarity.clarity_ser_2@id cs2 on cs.prov_id = cs2.prov_id
   left join provider_specialty_map sm on sm.npi = cs2.npi
