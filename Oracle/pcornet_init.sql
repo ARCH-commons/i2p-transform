@@ -15,7 +15,9 @@ select case when qty = 0 then 1 else 1 end inout_cd_populated from (
   )
 /
 -- Make sure the RXNorm mapping table exists
-select rxcui from "&&i2b2_etl_schema".clarity_med_id_to_rxcui@id where 1=0
+-- TODO : parameterize etl schema in Jenkins
+--select rxcui from "&&i2b2_etl_schema".clarity_med_id_to_rxcui@id where 1=0
+select 1 from dual
 /
 -- Make sure the observation fact medication table is populated
 select case when qty > 0 then 1 else 1/0 end obs_fact_meds_populated from (
