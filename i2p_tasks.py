@@ -307,7 +307,7 @@ class downloadNPI(CDMStatusTask):
         with open(self.dl_path + self.npi_zip, 'wb') as fout:
             fout.write(r.read())
 
-        subprocess.call(['unzip', '-o', self.dl_path + self.npi_zip])
+        subprocess.call(['unzip', '-o', self.dl_path + self.npi_zip, '-d', self.dl_path])
 
     def extract(self):
         self.expectedRecords = 0
