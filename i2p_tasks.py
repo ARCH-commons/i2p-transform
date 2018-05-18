@@ -109,14 +109,14 @@ class med_admin(CDMScriptTask):
 class obs_clin(CDMScriptTask):
     script = Script.obs_clin
 
-    def requires(self):
+    def requires(self) -> List[luigi.Task]:
         return [pcornet_init()]
 
 
 class obs_gen(CDMScriptTask):
     script = Script.obs_gen
 
-    def requires(self):
+    def requires(self) -> List[luigi.Task]:
         return [pcornet_init()]
 
 
@@ -233,7 +233,7 @@ class procedures(CDMScriptTask):
 class provider(CDMScriptTask):
     script = Script.provider
 
-    def requires(self):
+    def requires(self) -> List[luigi.Task]:
         return [loadSpecialtyMap(), loadSpecialtyCode(), encounter()]
 
 
@@ -248,7 +248,7 @@ class loadLabNormal(LoadCSV):
     taskName = 'LABNORMAL'
     csvname = 'curated_data/labnormal.csv'
 
-    def requires(self):
+    def requires(self) -> List[luigi.Task]:
         return [pcornet_init()]
 
 
@@ -256,7 +256,7 @@ class loadHarvestLocal(LoadCSV):
     taskName = 'HARVEST_LOCAL'
     csvname = 'curated_data/harvest_local.csv'
 
-    def requires(self):
+    def requires(self) -> List[luigi.Task]:
         return [pcornet_init()]
 
 
@@ -265,7 +265,7 @@ class loadLanguage(LoadCSV):
     # language.csv is a copy of the CDM spec's patient_pref_language_spoke spreadsheet.
     csvname = 'curated_data/language.csv'
 
-    def requires(self):
+    def requires(self) -> List[luigi.Task]:
         return [pcornet_init()]
 
 
@@ -274,7 +274,7 @@ class loadSpecialtyMap(LoadCSV):
     # provider_specialty_map.csv is created on demand by the downloadNPI method.
     csvname = 'curated_data/provider_specialty_map.csv'
 
-    def requires(self):
+    def requires(self) -> List[luigi.Task]:
         return [pcornet_init(), downloadNPI()]
 
 
@@ -298,13 +298,13 @@ class downloadNPI(CDMStatusTask):
     npi_col = 'NPI'
     taxonomy_ct = 15
 
-    def run(self):
+    def run(self) -> None:
         self.setTaskStart()
         self.fetch()
         self.extract()
         self.setTaskEnd(self.expectedRecords)
 
-    def fetch(self):
+    def fetch(self) -> None:
         r = urllib.request.urlopen(self.npi_url + self.npi_zip)
 
         with open(self.dl_path + self.npi_zip, 'wb') as fout:
@@ -312,7 +312,7 @@ class downloadNPI(CDMStatusTask):
 
         subprocess.call(['unzip', '-o', self.dl_path + self.npi_zip, '-d', self.dl_path])
 
-    def extract(self):
+    def extract(self) -> None:
         self.expectedRecords = 0
         with open(self.dl_path + self.npi_csv, 'r') as fin:
             with open(self.load_path + self.specialty_csv, 'w', newline='') as fout:
