@@ -1,6 +1,7 @@
 from collections import defaultdict
 from csv import DictReader
 from etl_tasks import CDMStatusTask
+from param_val import StrParam
 from typing import Dict
 
 from sqlalchemy import func, MetaData, Table, Column  # type: ignore
@@ -13,7 +14,6 @@ log = logging.getLogger(__name__)
 
 class LoadCSV(CDMStatusTask):
     csvname = StrParam()
-            actual = 0 if actual is None else actual
 
     def run(self) -> None:
         self.setTaskStart()
@@ -45,4 +45,3 @@ class LoadCSV(CDMStatusTask):
             table.create(db)
 
             db.execute(table.insert(), l)
-        db.execute(statusTable.insert(), [{'STATUS': self.tablename, 'LAST_UPDATE': datetime.now(), 'RECORDS': actual}])
