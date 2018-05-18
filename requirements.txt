@@ -3,13 +3,13 @@
 
 # Usage (development):
 #
-# $ virtualenv --python python3.5 ~/pyenv/grouse3
-# $ . ~/pyenv/grouse3/bin/activate
-# (grouse3)$ pip install -r requirements.txt
+# $ virtualenv --python python3 ~/pyenv/luigi_cdm
+# $ . ~/pyenv/luigi_cdm/bin/activate
+# (luigi_cdm)$ pip install -r requirements.txt
 # ...
 # Successfully built luigi tornado
 # Installing collected packages: ...
-# ... tornado-4.4.2
+# ... tornado-4.5.3
 
 
 # Production usage is more like:

@@ -202,9 +202,9 @@ def created_objects(statement: SQL) -> List[ObjectId]:
     >>> created_objects('create or replace view x\nas ...')
     [view x]
     '''
-    m = re.search('^create or replace view (\S+)', statement.strip())
+    m = re.search('(?i)^create or replace view (\S+)', statement.strip())
     views = [ViewId(m.group(1))] if m else []  # type: List[ObjectId]
-    m = re.search('^create table (\S+)', statement.strip())
+    m = re.search('(?i)^create table (\w+)', statement.strip())
     tables = [TableId(m.group(1))] if m else []  # type: List[ObjectId]
     return tables + views
 

@@ -1,9 +1,11 @@
 from collections import defaultdict
 from csv import DictReader
 from etl_tasks import CDMStatusTask
-from param_val import StrParam
-from sqlalchemy import MetaData, Table, Column
-from sqlalchemy.types import String
+from typing import Dict
+
+from sqlalchemy import func, MetaData, Table, Column  # type: ignore
+from sqlalchemy.types import String  # type: ignore
+
 
 import logging
 
@@ -11,6 +13,7 @@ log = logging.getLogger(__name__)
 
 class LoadCSV(CDMStatusTask):
     csvname = StrParam()
+            actual = 0 if actual is None else actual
 
     def run(self) -> None:
         self.setTaskStart()
@@ -18,17 +21,18 @@ class LoadCSV(CDMStatusTask):
         self.setTaskEnd(self.getRecordCount())
 
     def load(self) -> None:
-        def sz(l, chunk=16):
+        def sz(l: int, chunk: int=16) -> int:
             return max(chunk, chunk * ((l + chunk - 1) // chunk))
 
         db = self._dbtarget().engine
         schema = MetaData()
         l = list()
 
-        with open(self.csvname) as fin:
+        with open(self.csvname) as fin:  # ISSUE: ambient
             dr = DictReader(fin)
 
-            mcl = defaultdict(int)
+            Dict  # for tools that don't see type: comments.
+            mcl = defaultdict(int)  # type: Dict[str, int]
             for row in dr:
                 l.append(row)
                 for col in dr.fieldnames:
@@ -41,3 +45,4 @@ class LoadCSV(CDMStatusTask):
             table.create(db)
 
             db.execute(table.insert(), l)
+        db.execute(statusTable.insert(), [{'STATUS': self.tablename, 'LAST_UPDATE': datetime.now(), 'RECORDS': actual}])

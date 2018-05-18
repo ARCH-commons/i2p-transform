@@ -74,7 +74,8 @@ class EventLogger(logging.LoggerAdapter):
         List  # let flake8 know we're using it
 
     def __repr__(self) -> str:
-        return '%s(%s, %s)' % (self.__class__.__name__, self.name, self.event)
+        # typeshed doesn't know that LoggerAdapter has .name?
+        return '%s(%s, %s)' % (self.__class__.__name__, self.name, self.event)  # type: ignore
 
     def process(self, msg: str, kwargs: KWArgs) -> Tuple[str, KWArgs]:
         extra = dict(kwargs.get('extra', {}),

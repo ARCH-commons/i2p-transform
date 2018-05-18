@@ -4,22 +4,23 @@ Scripts are pkg_resources, i.e. design-time constants.
 
 Each script should have a title, taken from the first line::
 
-    >>> Script.migrate_fact_upload.title
-    'append data from a workspace table.'
+    >>> Script.med_admin.title
+    'create and populate the med_admin table.'
 
-    >>> text = Script.migrate_fact_upload.value
+    >>> text = Script.med_admin.value
     >>> lines = text.split('\n')
     >>> print(lines[0])
     ... #doctest: +NORMALIZE_WHITESPACE
-    /** migrate_fact_upload - append data from a workspace table.
+    /** med_admin - create and populate the med_admin table.
 
 We can separate the script into statements::
 
-    >>> statements = Script.epic_flowsheets_transform.statements()
+    >>> statements = Script.med_admin.statements()
     >>> print(next(s for s in statements if 'insert' in s))
     ... #doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-    insert into etl_test_values (test_value, test_domain, test_name, result_id, result_date)
-    with test_key as ( ...
+    create or replace trigger med_admin_trg
+    before insert on med_admin
+    ...
 
 A bit of sqlplus syntax is supported for ignoring errors in just part
 of a script:
@@ -31,46 +32,17 @@ of a script:
     >>> Script.sqlerror('select 1 + 1 from dual') is None
     True
 
-Dependencies between scripts are declared as follows::
-
-    >>> print(next(decl for decl in statements if "'dep'" in decl))
-    ... #doctest: +ELLIPSIS
-    select test_name from etl_tests where 'dep' = 'etl_tests_init.sql'
-
-    >>> Script.epic_flowsheets_transform.deps()
-    ... #doctest: +ELLIPSIS
-    [<Script(etl_tests_init)>]
-
-We statically detect relevant effects; i.e. tables and views created::
-
-    >>> Script.epic_flowsheets_transform.created_objects()
-    ... #doctest: +ELLIPSIS
-    [view etl_test_domain_flowsheets, view flo_meas_type, view flowsheet_day, ...
-
-as well as tables inserted into::
-
-    >>> variables={I2B2STAR: 'I2B2DEMODATA',
-    ...            CMS_RIF: 'CMS_DEID', 'upload_id': '20', 'chunk_qty': 20,
-    ...            'cms_source_cd': "'ccwdata.org'", 'source_table': 'T'}
-    >>> Script.epic_flowsheets_transform.inserted_tables(variables)
-    ['etl_test_values', 'approved_deid_flowsheets', 'etl_test_values']
-
 The last statement should be a scalar query that returns non-zero to
 signal that the script is complete:
 
     >>> print(statements[-1])
     ... #doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-    select 1 up_to_date
-    from epic_flowsheets_txform_sql where design_digest = &&design_digest
+    select 1 from cdm_status where status = 'med_admin'
 
 The completion test may depend on a digest of the script and its dependencies:
 
-    >>> design_digest = Script.epic_flowsheets_transform.digest()
-    >>> last = Script.epic_flowsheets_transform.statements(variables)[-1].strip()
-    >>> print(last)
-    ... #doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-    select 1 up_to_date
-    from epic_flowsheets_txform_sql where design_digest = ...
+    >>> Script.med_admin.digest() != 0
+    True
 
 ISSUE : Python hashes are senstive to the machine running the test?
 
@@ -79,8 +51,8 @@ example, `&&upload_id` is used in names of objects such as tables and
 partitions; these scripts must not refer to such variables in their
 completion query:
 
-    >>> del variables['upload_id']
-    >>> print(Script.migrate_fact_upload.statements(variables,
+    ..> del variables['upload_id']
+    ..> print(Script.migrate_fact_upload.statements(variables,
     ...     skip_unbound=True)[-1].strip())
     commit
 
@@ -187,12 +159,12 @@ class SQLMixin(enum.Enum):
     def _text(self) -> List[str]:
         '''Get the text of this script and its dependencies.
 
-        >>> nodeps = Script.migrate_fact_upload
+        >>> nodeps = Script.med_admin
         >>> nodeps._text() == [nodeps.value]
         True
 
-        >>> complex = Script.epic_flowsheets_transform
-        >>> complex._text() != [complex.value]
+        ..> complex = Script.epic_flowsheets_transform
+        ..> complex._text() != [complex.value]
         True
         '''
         return sorted(set(s.sql for s in self.dep_closure()))
