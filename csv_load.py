@@ -13,12 +13,18 @@ import logging
 log = logging.getLogger(__name__)
 
 class LoadCSV(CDMStatusTask):
+    '''
+    Creates a table in the db with the name taskName.
+
+    The table is loaded with data from the csv file specifed by csvname.
+    Table creation is logged in the cdm status table.
+    '''
     csvname = StrParam()
 
     def run(self) -> None:
         self.setTaskStart()
         self.load()
-        self.setTaskEnd(self.getRecordCount())
+        self.setTaskEnd(self.getRecordCountFromTable())
 
     def load(self) -> None:
         def sz(l: int, chunk: int=16) -> int:
@@ -33,6 +39,8 @@ class LoadCSV(CDMStatusTask):
 
             Dict  # for tools that don't see type: comments.
             mcl = defaultdict(int)  # type: Dict[str, int]
+            # Iterate data in the input csv, find the largest data item
+            # and set the column size to the item size rounded to the nearest chunk.
             for row in dr:
                 l.append(row)
                 for col in dr.fieldnames:

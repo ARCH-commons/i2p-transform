@@ -9,15 +9,12 @@ select providerid from "&&i2b2_data_schema".visit_dimension where 1=0
 /
 -- Make sure the inout_cd has been populated
 -- See heron_encounter_style.sql
--- TODO: restore 1/0 check.
-select case when qty = 0 then 1 else 1 end inout_cd_populated from (
+select case when qty = 0 then 1/0 else 1 end inout_cd_populated from (
   select count(*) qty from "&&i2b2_data_schema".visit_dimension where inout_cd is not null
   )
 /
 -- Make sure the RXNorm mapping table exists
--- TODO : parameterize etl schema in Jenkins
---select rxcui from "&&i2b2_etl_schema".clarity_med_id_to_rxcui@id where 1=0
-select 1 from dual
+select rxcui from "&&i2b2_etl_schema".clarity_med_id_to_rxcui@id where 1=0
 /
 -- Make sure the observation fact medication table is populated
 select case when qty > 0 then 1 else 1/0 end obs_fact_meds_populated from (
@@ -252,4 +249,4 @@ set end_time = sysdate, records = 0
 where task = 'pcornet_init'
 /
 
-select 1 from cdm_status where task = 'pcornet_init'
+select records + 1 from cdm_status where task = 'pcornet_init'

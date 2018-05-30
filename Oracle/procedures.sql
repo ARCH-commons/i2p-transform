@@ -66,5 +66,4 @@ update cdm_status
 set end_time = sysdate, records = (select count(*) from procedures)
 where task = 'procedures'
 /
-select 1 from cdm_status where task = 'procedures'
---SELECT count(PATID) from procedures where rownum = 1
+select records from cdm_status where task = 'procedures'

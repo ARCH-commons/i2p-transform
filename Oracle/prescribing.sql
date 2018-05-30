@@ -191,6 +191,21 @@ left join
   ) basis on basis.instance_num = rx.instance_num and basis.concept_cd = rx.concept_cd
 /
 
+create table prescribing_w_dose as
+select rx.*
+, units_cd rx_dose_ordered
+, nval_num rx_dose_ordered_unit
+from prescribing_w_basis rx
+left join
+  (select instance_num
+  , concept_cd
+  , case when units_cd = 'mcg' then 'ug' when units_cd = 'l' then 'ml' else units_cd end units_cd
+  , case when units_cd = 'l' then nval_num * 1000 else nval_num end nval_num
+  from blueherondata.observation_fact
+  where modifier_cd in ('MedObs:Dose|mg', 'MedObs:Dose|meq', 'MedObs:Dose|l')
+  ) dose on dose.instance_num = rx.instance_num and dose.concept_cd = rx.concept_cd
+/
+
 create table prescribing as
 select rx.prescribingid
 , rx.patient_num patid
@@ -200,6 +215,8 @@ select rx.prescribingid
 , to_char(rx.start_date, 'HH24:MI') rx_order_time
 , trunc(rx.start_date) rx_start_date
 , trunc(rx.end_date) rx_end_date
+, rx.rx_dose_ordered
+, rx.rx_dose_ordered_unit
 , rx.rx_quantity
 , 'NI' rx_quantity_unit
 , rx.rx_refills
@@ -214,7 +231,7 @@ select rx.prescribingid
 , rx.raw_rxnorm_cui
 /* ISSUE: HERON should have an actual order time.
    idea: store real difference between order date start data, possibly using the update date */
-from prescribing_w_basis rx
+from prescribing_w_dose rx
 /
 
 create index prescribing_idx on prescribing (PATID, ENCOUNTERID)
@@ -229,4 +246,4 @@ set end_time = sysdate, records = (select count(*) from prescribing)
 where task = 'prescribing'
 /
 
-select 1 from cdm_status where task = 'prescribing'
+select records from cdm_status where task = 'prescribing'

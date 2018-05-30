@@ -184,5 +184,4 @@ update cdm_status
 set end_time = sysdate, records = (select count(*) from dispensing)
 where task = 'dispensing'
 /
-select 1 from cdm_status where task = 'dispensing'
---SELECT count(DISPENSINGID) from dispensing where rownum = 1
+select records from cdm_status where task = 'dispensing'
