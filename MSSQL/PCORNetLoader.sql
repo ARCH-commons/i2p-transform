@@ -117,7 +117,7 @@ create view i2b2loyalty_patients as
 ELSE
 SET @SQL='
 create view i2b2loyalty_patients as
-(select top 0 patient_num,cast(''2010/1/1'' as datetime) period_start,cast(''2010/1/1'' as datetime) period_end from i2b2patient_list)'
+(select top 0 patient_num,cast(''2010/1/1'' as datetime) period_start,cast(''2010/1/1'' as datetime) period_end from i2b2patient)'
 
 EXEC(@SQL)
 GO
@@ -508,7 +508,7 @@ CREATE TABLE [dbo].[pmnprescribing](
     [RX_BASIS] [varchar] (2) NULL,
 	[RXNORM_CUI] [varchar] (8) NULL,
     [RX_SOURCE] [varchar] (2) NULL,
-    [RX_DISPENSE_AS_WRITTEN] [varchar] (50) NULL,
+    [RX_DISPENSE_AS_WRITTEN] [varchar] (2) NULL,
 	[RAW_RX_MED_NAME] [varchar] (50) NULL,
 	[RAW_RX_FREQUENCY] [varchar] (50) NULL,
 	[RAW_RXNORM_CUI] [varchar] (50) NULL,
@@ -606,11 +606,11 @@ CREATE TABLE [dbo].[pmnpro_cm](
     [PRO_ITEM_VERSION] [varchar] (50) NULL,
     [PRO_MEASURE_NAME] [varchar] (50) NULL,
     [PRO_MEASURE_SEQ] [varchar] (50) NULL,
-    [PRO_MEASURE_SCORE] [varchar] (8) NULL,
-    [PRO_MEASURE_THETA] [varchar] (8) NULL,
-    [PRO_MEASURE_SCALED_TSCORE] [varchar] (8) NULL,
-    [PRO_MEASURE_STANDARD_ERROR] [varchar] (8) NULL,
-    [PRO_MEASURE_COUNT_SCORED] [varchar] (8) NULL,
+    [PRO_MEASURE_SCORE] [numeric](15, 8) NULL,
+    [PRO_MEASURE_THETA] [numeric](15, 8) NULL,
+    [PRO_MEASURE_SCALED_TSCORE] [numeric](15, 8) NULL,
+    [PRO_MEASURE_STANDARD_ERROR] [numeric](15, 8) NULL,
+    [PRO_MEASURE_COUNT_SCORED] [numeric](15, 8) NULL,
     [PRO_MEASURE_LOINC] [varchar] (10) NULL,
     [PRO_MEASURE_VERSION] [varchar] (50) NULL,
     [PRO_ITEM_FULLNAME] [varchar] (50) NULL,
@@ -657,7 +657,7 @@ CREATE TABLE [dbo].[pmnharvest](
 	[PRO_DATE_MGMT] [varchar](2) NULL,
     [DEATH_DATE_MGMT] [varchar] (2) NULL,
     [MEDADMIN_START_DATE_MGMT] [varchar] (2) NULL,
-    [MEDADMIN_END_DATE_MGMT] [varchar] (2) NULL,
+    [MEDADMIN_STOP_DATE_MGMT] [varchar] (2) NULL,
     [OBSCLIN_DATE_MGMT] [varchar] (2) NULL,
     [OBSGEN_DATE_MGMT] [varchar] (2) NULL,
 	[REFRESH_DEMOGRAPHIC_DATE] [datetime] NULL,
@@ -707,8 +707,8 @@ CREATE TABLE [dbo].[pmnENCOUNTER](
 	[DRG] [varchar](3) NULL,
 	[DRG_TYPE] [varchar](2) NULL,
 	[ADMITTING_SOURCE] [varchar](2) NULL,
-	[PAYER_TYPE_PRIMARY] [varchar](4) NULL,
-	[PAYER_TYPE_SECONDARY] [varchar](4) NULL,
+	[PAYER_TYPE_PRIMARY] [varchar](5) NULL,
+	[PAYER_TYPE_SECONDARY] [varchar](5) NULL,
     [FACILITY_TYPE] [varchar](50) NULL,
     [RAW_SITEID] [varchar] (50) NULL,
 	[RAW_ENC_TYPE] [varchar](50) NULL,
@@ -829,11 +829,14 @@ go
 
 
 
+
+
+
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[PROVIDER]') AND type in (N'U'))
 DROP TABLE [dbo].[PROVIDER]
 GO
 CREATE TABLE [dbo].[PROVIDER](
-    [PROVIDERID] [varchar] (50) NULL,
+    [PROVIDERID] [varchar] (50) NOT NULL,
     [PROVIDER_SEX] [varchar] (2) NULL,
     [PROVIDER_SPECIALTY_PRIMARY] [varchar] (50) NULL,
     [PROVIDER_NPI] [numeric] (15, 8) NULL,
@@ -853,6 +856,8 @@ go
 
 
 
+
+
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[OBS_CLIN]') AND type in (N'U'))
 DROP TABLE [dbo].[OBS_CLIN]
 GO
@@ -860,7 +865,7 @@ CREATE TABLE [dbo].[OBS_CLIN](
     [OBSCLINID] [varchar] (50) NOT NULL,
     [PATID] [varchar] (50) NOT NULL,
     [ENCOUNTERID] [varchar] (50) NULL,
-    [OBSCLIN_PROVIDERID] [varchr] (50) NULL,
+    [OBSCLIN_PROVIDERID] [varchar] (50) NULL,
     [OBSCLIN_DATE] [datetime] NULL,
     [OBSCLIN_TIME] [varchar] (5) NULL,
     [OBSCLIN_TYPE] [varchar] (2) NULL,
@@ -891,6 +896,11 @@ go
 
 
 
+
+
+
+
+
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[OBS_GEN]') AND type in (N'U'))
 DROP TABLE [dbo].[OBS_GEN]
 GO
@@ -898,7 +908,7 @@ CREATE TABLE [dbo].[OBS_GEN](
     [OBSGENID] [varchar] (50) NOT NULL,
     [PATID] [varchar] (50) NOT NULL,
     [ENCOUNTERID] [varchar] (50) NULL,
-    [OBSGEN_PROVIDERID] [varchr] (50) NULL,
+    [OBSGEN_PROVIDERID] [varchar] (50) NULL,
     [OBSGEN_DATE] [datetime] NULL,
     [OBSGEN_TIME] [varchar] (5) NULL,
     [OBSGEN_TYPE] [varchar] (30) NULL,
@@ -926,6 +936,10 @@ GO
 CREATE CLUSTERED INDEX obsgen_clustered_index   
 ON OBS_GEN (OBSGENID)   
 go
+
+
+
+
 
 
 
@@ -1274,7 +1288,7 @@ DECLARE @sqltext NVARCHAR(4000);
 DECLARE @batchid numeric
 declare getsql cursor local for 
 --1 --  S,R,NH
-	select 'insert into PMNDEMOGRAPHIC WITH (TABLOCK)(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
+	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
 	'	select ''1'',patient_num, '+
 	'	birth_date, '+
 	'	substring(convert(varchar,birth_date,20),12,5), '+
@@ -1291,7 +1305,7 @@ declare getsql cursor local for
 	and sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX\%'
 	and sex.c_visualattributes like 'L%'
 union -- A - S,R,H
-select 'insert into PMNDEMOGRAPHIC WITH (TABLOCK)(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
+select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
 	'	select ''A'',patient_num, '+
 	'	birth_date, '+
 	'	substring(convert(varchar,birth_date,20),12,5), '+
@@ -1311,7 +1325,7 @@ select 'insert into PMNDEMOGRAPHIC WITH (TABLOCK)(raw_sex,PATID, BIRTH_DATE, BIR
 	and sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX\%'
 	and sex.c_visualattributes like 'L%'
 union --2 S, nR, nH
-	select 'insert into PMNDEMOGRAPHIC WITH (TABLOCK)(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
+	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
 	'	select ''2'',patient_num, '+
 	'	birth_date, '+
 	'	substring(convert(varchar,birth_date,20),12,5), '+
@@ -1326,7 +1340,7 @@ union --2 S, nR, nH
 	where sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX\%'
 	and sex.c_visualattributes like 'L%'
 union --3 -- nS,R, NH
-	select 'insert into PMNDEMOGRAPHIC WITH (TABLOCK)(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
+	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
 	'	select ''3'',patient_num, '+
 	'	birth_date, '+
 	'	substring(convert(varchar,birth_date,20),12,5), '+
@@ -1341,7 +1355,7 @@ union --3 -- nS,R, NH
 	where race.c_fullname like '\PCORI\DEMOGRAPHIC\RACE\%'
 	and race.c_visualattributes like 'L%'
 union --B -- nS,R, H
-	select 'insert into PMNDEMOGRAPHIC WITH (TABLOCK)(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
+	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
 	'	select ''B'',patient_num, '+
 	'	birth_date, '+
 	'	substring(convert(varchar,birth_date,20),12,5), '+
@@ -1359,7 +1373,7 @@ union --B -- nS,R, H
 	and hisp.c_fullname like '\PCORI\DEMOGRAPHIC\HISPANIC\Y%'
 	and hisp.c_visualattributes like 'L%'
 union --4 -- S, NR, H
-	select 'insert into PMNDEMOGRAPHIC WITH (TABLOCK)(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
+	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
 	'	select ''4'',patient_num, '+
 	'	birth_date, '+
 	'	substring(convert(varchar,birth_date,20),12,5), '+
@@ -1374,7 +1388,7 @@ union --4 -- S, NR, H
 	where sex.c_fullname like '\PCORI\DEMOGRAPHIC\SEX\%'
 	and sex.c_visualattributes like 'L%'
 union --5 -- NS, NR, H
-	select 'insert into PMNDEMOGRAPHIC WITH (TABLOCK)(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
+	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
 	'	select ''5'',patient_num, '+
 	'	birth_date, '+
 	'	substring(convert(varchar,birth_date,20),12,5), '+
@@ -1386,7 +1400,7 @@ union --5 -- NS, NR, H
 	'	and lower(isnull(p.race_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''RACE'') '+
 	'	and lower(isnull(p.race_cd,''xx'')) in (select lower(code) from pcornet_codelist where codetype=''HISPANIC'')'
 union --6 -- NS, NR, nH
-	select 'insert into PMNDEMOGRAPHIC WITH (TABLOCK)(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
+	select 'insert into PMNDEMOGRAPHIC(raw_sex,PATID, BIRTH_DATE, BIRTH_TIME,SEX, HISPANIC, RACE) '+
 	'	select ''6'',patient_num, '+
 	'	birth_date, '+
 	'	substring(convert(varchar,birth_date,20),12,5), '+
@@ -1399,9 +1413,6 @@ union --6 -- NS, NR, nH
 	'   and lower(isnull(p.race_cd,''xx'')) not in (select lower(code) from pcornet_codelist where codetype=''RACE'') ' 
 
 begin
-
-ALTER INDEX demographic_patid_index ON pmndemographic DISABLE;
-
 exec pcornet_popcodelist
 
 set @batchid = 0
@@ -1440,9 +1451,6 @@ from pmndemographic D inner join i2b2fact i on D.patid=i.patient_num
 INNER JOIN pcornet_demo P ON i.CONCEPT_CD = P.C_BASECODE 
 WHERE P.C_FULLNAME LIKE '\PCORI\DEMOGRAPHIC\SEXUAL_ORIENTATION\%'
 
-
-ALTER INDEX demographic_patid_index ON pmndemographic REBUILD; 
-
 end
 
 go
@@ -1461,13 +1469,10 @@ create procedure PCORNetEncounter as
 DECLARE @sqltext NVARCHAR(4000);
 begin
 
-ALTER INDEX index_patid ON pmnencounter DISABLE; 
-ALTER INDEX encounter_encounterid_index ON pmnencounter DISABLE;
-
-insert into pmnencounter WITH (TABLOCK) (PATID,ENCOUNTERID,admit_date ,ADMIT_TIME , 
+insert into pmnencounter(PATID,ENCOUNTERID,admit_date ,ADMIT_TIME , 
 		DISCHARGE_DATE ,DISCHARGE_TIME ,PROVIDERID ,FACILITY_LOCATION  
 		,ENC_TYPE ,FACILITYID ,DISCHARGE_DISPOSITION , 
-		DISCHARGE_STATUS ,DRG ,DRG_TYPE ,ADMITTING_SOURCE)  
+		DISCHARGE_STATUS ,DRG ,DRG_TYPE ,ADMITTING_SOURCE) 
 select distinct v.patient_num, v.encounter_num,  
 	start_Date, 
 	substring(convert(varchar,start_Date,20),12,5), 
@@ -1492,9 +1497,6 @@ left outer join
  inner join pcornet_enc e on c_dimcode like '%'''+inout_cd+'''%' and e.c_fullname like '\PCORI\ENCOUNTER\ENC_TYPE\%') enctype
   on enctype.patient_num=v.patient_num and enctype.encounter_num=v.encounter_num
 
-ALTER INDEX index_patid ON pmnencounter REBUILD; 
-ALTER INDEX encounter_encounterid_index ON pmnencounter REBUILD; 
-
 end
 go
 
@@ -1508,8 +1510,6 @@ go
 create procedure PCORNetDiagnosis as
 declare @sqltext nvarchar(4000)
 begin
-
-ALTER INDEX diagnosis_encounterid_index ON pmndiagnosis DISABLE;
 
 -- Optimized to use temp tables, not views. Also removed the distinct for speed.
 select  patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode dxsource, dxsource.c_fullname
@@ -1531,7 +1531,7 @@ inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounte
 inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode  
 and dxsource.c_fullname like '\PCORI_MOD\DX_ORIGIN\%'
 
-insert into pmndiagnosis WITH (TABLOCK) (patid,			encounterid,	enc_type, admit_date, providerid, dx, dx_type, dx_source, pdx, dx_origin) 
+insert into pmndiagnosis (patid,			encounterid,	enc_type, admit_date, providerid, dx, dx_type, dx_source, pdx, dx_origin)
 select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, enc.admit_date, enc.providerid, --bug fix MJ 10/7/16
 substring(diag.pcori_basecode,charindex(':',diag.pcori_basecode)+1,10), -- jgk bugfix 10/3 
 substring(diag.c_fullname,18,2) dxtype,  
@@ -1567,9 +1567,6 @@ where (diag.c_fullname not like '\PCORI\DIAGNOSIS\10\%' or
   and not (diag.c_fullname like '\PCORI\DIAGNOSIS\10\%' and diag.pcori_basecode like '[0-9]%') )) 
 and (sf.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\DX_SOURCE\%' or sf.c_fullname is null)
 
-
-ALTER INDEX diagnosis_encounterid_index ON pmndiagnosis REBUILD; 
-
 end
 go
 
@@ -1594,7 +1591,7 @@ inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounte
 inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode 
 where dxsource.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\%'
 
-insert into pmncondition WITH (TABLOCK) (patid, encounterid, report_date, resolve_date, condition, condition_type, condition_status, condition_source)
+insert into pmncondition (patid, encounterid, report_date, resolve_date, condition, condition_type, condition_status, condition_source)
 select distinct factline.patient_num, min(factline.encounter_num) encounterid, min(factline.start_date) report_date, isnull(max(factline.end_date),null) resolve_date, 
 substring(diag.pcori_basecode,charindex(':',diag.pcori_basecode)+1,10), -- jgk bugfix 10/3 
 substring(diag.c_fullname,18,2) condition_type,  
@@ -1625,7 +1622,7 @@ go
 create procedure PCORNetProcedure as
 
 begin
-insert into pmnprocedure WITH (TABLOCK) ( 
+insert into pmnprocedure( 
 				patid,			encounterid,	enc_type, admit_date, providerid, px, px_type, px_source,px_date) 
 select  distinct fact.patient_num, enc.encounterid,	enc.enc_type, enc.admit_date, 
 		enc.providerid, substring(pr.pcori_basecode,charindex(':',pr.pcori_basecode)+1,11) px, substring(pr.c_fullname,18,2) pxtype, 'NI' px_source,fact.start_date
@@ -1654,7 +1651,7 @@ GO
 create procedure PCORNetVital as
 begin
 -- jgk: I took out admit_date - it doesn't appear in the scheme. Now in SQLServer format - date, substring, name on inner select, no nested with. Added modifiers and now use only pathnames, not codes.
-insert into pmnVITAL WITH (TABLOCK)(patid, encounterid, measure_date, measure_time,vital_source,ht, wt, diastolic, systolic, original_bmi, bp_position,smoking,tobacco,tobacco_type)
+insert into pmnVITAL(patid, encounterid, measure_date, measure_time,vital_source,ht, wt, diastolic, systolic, original_bmi, bp_position,smoking,tobacco,tobacco_type)
 select patid, encounterid, measure_date, measure_time,vital_source, ht, wt, diastolic, systolic, original_bmi, bp_position,smoking,tobacco, 
 case when tobacco in ('02','03','04') then -- no tobacco
     case when smoking in ('03','04') then '04' -- no smoking
@@ -1753,7 +1750,7 @@ GO
 create procedure PCORNetEnroll as
 begin
 
-INSERT INTO [pmnENROLLMENT] WITH (TABLOCK) ([PATID], [ENR_START_DATE], [ENR_END_DATE], [CHART], [ENR_BASIS]) 
+INSERT INTO [pmnENROLLMENT]([PATID], [ENR_START_DATE], [ENR_END_DATE], [CHART], [ENR_BASIS]) 
     select x.patient_num patid, case when l.patient_num is not null then l.period_start else enr_start end enr_start_date
     , case when l.patient_num is not null then l.period_end when enr_end_end>enr_end then enr_end_end else enr_end end enr_end_date 
     , 'Y' chart, case when l.patient_num is not null then 'A' else 'E' end enr_basis from 
@@ -1788,17 +1785,7 @@ inner join pmnENCOUNTER enc on enc.patid = i2b2fact.patient_num and enc.encounte
 inner join pcornet_lab lsource on i2b2fact.modifier_cd =lsource.c_basecode
 where c_fullname LIKE '\PCORI_MOD\RESULT_LOC\%'
 
--- Optimization - build temp ont table
-select lab.pcori_basecode,lab.c_basecode,lab.pcori_specimen_source,ont_parent.c_basecode parent_basecode,norm.* into #pcornet_lab2
-from pcornet_lab lab 
-inner join pcornet_lab ont_loinc on lab.pcori_basecode=ont_loinc.pcori_basecode and ont_loinc.c_basecode like 'LOINC:%' --NOTE: You will need to change 'LOINC:' to our local term.
-inner JOIN pcornet_lab ont_parent on ont_loinc.c_path=ont_parent.c_fullname
-left outer join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
-where lab.c_fullname like '\PCORI\LAB_RESULT_CM\%'
-
-CREATE INDEX IDX_pcornetlab2_1 ON #pcornet_lab2(c_basecode)
-
-INSERT INTO dbo.[pmnlabresults_cm] WITH (TABLOCK)
+INSERT INTO dbo.[pmnlabresults_cm]
       ([PATID]
       ,[ENCOUNTERID]
       ,[LAB_NAME]
@@ -1829,20 +1816,18 @@ INSERT INTO dbo.[pmnlabresults_cm] WITH (TABLOCK)
       ,[RAW_UNIT]
       ,[RAW_ORDER_DEPT]
       ,[RAW_FACILITY_CODE])
-      
 
 --select max(len(raw_result)),max(len(specimen_time)),max(len(result_time)),max(len(result_unit))
 --max(len(lab_name)),max(len(lab_loinc)),max(len(priority)), max(len(result_loc)), max(len(lab_px)),max(len(result_qual)),max(len(result_num)) 
 
 SELECT DISTINCT  M.patient_num patid,
 M.encounter_num encounterid,
-CASE WHEN parent_basecode LIKE 'LAB_NAME%' then SUBSTRING (parent_basecode,10, 10) ELSE 'UN' END LAB_NAME,
+CASE WHEN ont_parent.C_BASECODE LIKE 'LAB_NAME%' then SUBSTRING (ont_parent.c_basecode,10, 10) ELSE 'UN' END LAB_NAME,
 CASE WHEN lab.pcori_specimen_source like '%or SR_PLS' THEN 'SR_PLS' WHEN lab.pcori_specimen_source is null then 'NI' ELSE lab.pcori_specimen_source END specimen_source, -- (Better way would be to fix the column in the ontology but this will work)
-isnull(substring(lab.pcori_basecode,charindex(':',lab.pcori_basecode)+1,10), 'NI') LAB_LOINC, 
- -- TODO: Prefix (LOINC vs SNOMED) should actually be checked so it SNOMED doesn't go in LAB_LOINC. Our network doesn't have any SNOMED right now yet though.
+isnull(lab.pcori_basecode, 'NI') LAB_LOINC,
 isnull(p.PRIORITY,'NI') PRIORITY,
 isnull(l.RESULT_LOC,'NI') RESULT_LOC,
-isnull(substring(lab.pcori_basecode,charindex(':',lab.pcori_basecode)+1,11), 'NI') LAB_PX,
+isnull(lab.pcori_basecode, 'NI') LAB_PX,
 'LC'  LAB_PX_TYPE,
 m.start_date LAB_ORDER_DATE, 
 m.start_date SPECIMEN_DATE,
@@ -1850,13 +1835,13 @@ CAST(CONVERT(char(5), M.start_date, 108) as TIME) SPECIMEN_TIME,
 isnull (m.end_date, m.start_date) RESULT_DATE,   -- Bug fix MJ 10/06/16
 CAST(CONVERT(char(5), M.end_date, 108) as TIME) RESULT_TIME,
 CASE WHEN m.ValType_Cd='T' THEN CASE WHEN m.Tval_Char IS NOT NULL THEN 'OT' ELSE 'NI' END END RESULT_QUAL, -- TODO: Should be a standardized value
-CASE WHEN m.ValType_Cd='N' AND m.NVAL_NUM<9999999 THEN m.NVAL_NUM ELSE null END RESULT_NUM, --  BUGFIX 4/9/18 don't allow extreme values
+CASE WHEN m.ValType_Cd='N' THEN m.NVAL_NUM ELSE null END RESULT_NUM,
 CASE WHEN m.ValType_Cd='N' THEN (CASE isnull(nullif(m.TVal_Char,''),'NI') WHEN 'E' THEN 'EQ' WHEN 'NE' THEN 'OT' WHEN 'L' THEN 'LT' WHEN 'LE' THEN 'LE' WHEN 'G' THEN 'GT' WHEN 'GE' THEN 'GE' ELSE 'NI' END)  ELSE 'TX' END RESULT_MODIFIER,
 isnull(m.Units_CD,'NI') RESULT_UNIT, -- TODO: Should be standardized units
-nullif(lab.NORM_RANGE_LOW,'') NORM_RANGE_LOW
-,isnull(lab.NORM_MODIFIER_LOW, 'UN') NORM_MODIFIER_LOW,
-nullif(lab.NORM_RANGE_HIGH,'') NORM_RANGE_HIGH
-,isnull(lab.NORM_MODIFIER_HIGH, 'UN') NORM_MODIFIER_HIGH,
+nullif(norm.NORM_RANGE_LOW,'') NORM_RANGE_LOW
+,isnull(norm.NORM_MODIFIER_LOW, 'UN') NORM_MODIFIER_LOW,
+nullif(norm.NORM_RANGE_HIGH,'') NORM_RANGE_HIGH
+,isnull(norm.NORM_MODIFIER_HIGH, 'UN') NORM_MODIFIER_HIGH,
 CASE isnull(nullif(m.VALUEFLAG_CD,''),'NI') WHEN 'H' THEN 'AH' WHEN 'L' THEN 'AL' WHEN 'A' THEN 'AB' ELSE 'NI' END ABN_IND,
 NULL [RAW_LAB_NAME],
 NULL [RAW_LAB_CODE],
@@ -1874,7 +1859,11 @@ NULL [RAW_FACILITY_CODE]
 */
 FROM i2b2fact M   --JK bug fix 10/7/16
 inner join pmnENCOUNTER enc on enc.patid = m.patient_num and enc.encounterid = m.encounter_Num -- Constraint to selected encounters
-inner join #pcornet_lab2 lab on lab.c_basecode  = M.concept_cd
+inner join pcornet_lab lab on lab.c_basecode  = M.concept_cd and lab.c_fullname like '\PCORI\LAB_RESULT_CM\%'
+inner join pcornet_lab ont_loinc on lab.pcori_basecode=ont_loinc.pcori_basecode and ont_loinc.c_basecode like 'LOINC:%' --NOTE: You will need to change 'LOINC:' to our local term.
+inner JOIN pcornet_lab ont_parent on ont_loinc.c_path=ont_parent.c_fullname
+left outer join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
+
 
 LEFT OUTER JOIN
 #priority p
@@ -1893,7 +1882,7 @@ and M.concept_cd=l.concept_Cd
 and M.start_date=l.start_Date
  
 WHERE m.ValType_Cd in ('N','T')
---and parent_basecode LIKE 'LAB_NAME%' -- 4/5/18 - no longer exclude non-pcori labs, supporting SNOW LAB ontology
+and ont_parent.C_BASECODE LIKE 'LAB_NAME%' -- Exclude non-pcori labs
 and m.MODIFIER_CD='@'
 
 END
@@ -1978,7 +1967,7 @@ begin
 			and unitcode.c_fullname like '\PCORI_MOD\RX_QUANTITY_UNIT\%'
 
 -- insert data with outer joins to ensure all records are included even if some data elements are missing
-insert into pmnprescribing WITH (TABLOCK) (
+insert into pmnprescribing (
 	PATID
     ,encounterid
     ,RX_PROVIDERID
@@ -2163,7 +2152,7 @@ select nval_num,encounter_num,concept_cd
 
 -- insert data with outer joins to ensure all records are included even if some data elements are missing
 
-insert into pmndispensing WITH (TABLOCK) (
+insert into pmndispensing (
 	PATID
     ,PRESCRIBINGID
 	,DISPENSE_DATE -- using start_date from i2b2
@@ -2211,7 +2200,7 @@ go
 create procedure PCORNetDeath as
 
 begin
-insert into pmndeath WITH (TABLOCK) ( 
+insert into pmndeath( 
 				patid,			death_date, death_date_impute, death_source,death_match_confidence) 
 select  distinct pat.patient_num, pat.death_date, case 
 when vital_status_cd like 'X%' then 'B'
@@ -2270,7 +2259,7 @@ DECLARE @sql varchar(4000);
 
 delete from i2b2patient_list ;
 
-SET @sql='insert into i2b2patient_list WITH (TABLOCK) (patient_num)
+SET @sql='insert into i2b2patient_list(patient_num)
 select distinct top '+cast(@xnum as varchar)+' f.patient_num from i2b2fact f
 inner join i2b2visit v on f.patient_num=v.patient_num
  where f.start_date>=''20100101'' and v.start_date>=''20100101'''
