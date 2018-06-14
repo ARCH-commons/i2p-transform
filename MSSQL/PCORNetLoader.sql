@@ -51,6 +51,7 @@ IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'pcornet_lab') DROP SYNONYM
 IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'pcornet_med') DROP SYNONYM pcornet_med
 IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'pcornet_vital') DROP SYNONYM pcornet_vital
 IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'pcornet_enc') DROP SYNONYM pcornet_enc
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'provider_dimension') DROP SYNONYM provider_dimension
 IF OBJECTPROPERTY (object_id('dbo.getDataMartID'), 'IsScalarFunction') = 1 DROP function getDataMartID
 IF OBJECTPROPERTY (object_id('dbo.getDataMartName'), 'IsScalarFunction') = 1 DROP function getDataMartName
 IF OBJECTPROPERTY (object_id('dbo.getDataMartPlatform'), 'IsScalarFunction') = 1 DROP function getDataMartPlatform
@@ -86,6 +87,8 @@ GO
 create synonym pcornet_vital for PCORI_Mart..pcornet_vital
 GO
 create synonym pcornet_enc for PCORI_Mart..pcornet_enc
+GO
+create synonym provider_dimension for PCORI_dev..provider_dimension
 GO
 
 -- Update your data mart info for the Harvest table!
@@ -2214,10 +2217,28 @@ where (pat.death_date is not null or vital_status_cd like 'Z%') and pat.patient_
 end
 go
 
+--------------------------------------------------------------------------------
+-- 11. PROVIDER - Written by Matthew Joss and Jeff Klann, Phd
+--
+--------------------------------------------------------------------------------
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'PCORnetProvider') AND type in (N'P', N'PC')) DROP PROCEDURE PCORNetProvider
+go
+
+create procedure PCORNetProvider as
+begin
+
+insert into provider(providerid)
+select  distinct prov.provider_id 
+from pcori_dev.dbo.provider_dimension prov
+
+end
+go
+
 ----------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------------
--- 10. clear Program - includes all tables
+-- 12. clear Program - includes all tables
 ----------------------------------------------------------------------------------------------------------------------------------------
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'pcornetclear') AND type in (N'P', N'PC')) DROP PROCEDURE pcornetclear
 go
@@ -2238,6 +2259,7 @@ delete from pmndeath
 DELETE FROM pmnencounter
 DELETE FROM pmndemographic
 DELETE FROM pmnharvest
+DELETE FROM provider
 
 end
 go
