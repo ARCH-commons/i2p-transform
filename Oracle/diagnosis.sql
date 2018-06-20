@@ -1,5 +1,7 @@
 /** diagnosis - create and populate the diagnosis table.
 */
+insert into cdm_status (task, start_time) select 'diagnosis', sysdate from dual
+/
 BEGIN
 PMN_DROPSQL('DROP TABLE diagnosis');
 END;
@@ -245,7 +247,8 @@ BEGIN
 PCORNetDiagnosis();
 END;
 /
-insert into cdm_status (status, last_update, records) select 'diagnosis', sysdate, count(*) from diagnosis
+update cdm_status
+set end_time = sysdate, records = (select count(*) from diagnosis)
+where task = 'diagnosis'
 /
-select 1 from cdm_status where status = 'diagnosis'
---SELECT count(DIAGNOSISID) from diagnosis where rownum = 1
+select records from cdm_status where task = 'diagnosis'

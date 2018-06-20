@@ -120,14 +120,14 @@ END;
 
 CREATE TABLE PCORNET_CDM.CDM_STATUS
    (
-    STATUS VARCHAR2(50 BYTE) NOT NULL ENABLE,
-	LAST_UPDATE DATE NOT NULL ENABLE,
-	RECORDS NUMBER(*,0),
-	GROUP_START NUMBER,
-	GROUP_END NUMBER
+    TASK VARCHAR2(50 BYTE) primary key,
+	START_TIME DATE NULL,
+	END_TIME DATE NULL,
+	RECORDS NUMBER(*,0) NULL
    )
 /
-
+insert into cdm_status (task, start_time) select 'pcornet_init', sysdate from dual
+/
 BEGIN
 PMN_DROPSQL('DROP TABLE pcornet_codelist');
 END;
@@ -244,7 +244,9 @@ CREATE OR REPLACE SYNONYM pcornet_vital FOR  "&&i2b2_meta_schema".pcornet_vital
 CREATE OR REPLACE SYNONYM pcornet_enc FOR  "&&i2b2_meta_schema".pcornet_enc
 /
 
-insert into cdm_status (status, last_update) values ('pcornet_init', sysdate)
+update cdm_status
+set end_time = sysdate, records = 0
+where task = 'pcornet_init'
 /
 
-select 1 from cdm_status where status = 'pcornet_init'
+select records + 1 from cdm_status where task = 'pcornet_init'

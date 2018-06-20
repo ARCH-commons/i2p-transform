@@ -1,5 +1,7 @@
 /** demographic - create and populate the demographic table.
 */
+insert into cdm_status (task, start_time) select 'demographic', sysdate from dual
+/
 BEGIN
 PMN_DROPSQL('DROP TABLE demographic');
 END;
@@ -191,7 +193,7 @@ CLOSE getsql;
 merge into demographic d
 using (
   select NVL(code, 'OT') as code, language_cd, patient_num
-  from language_map
+  from language_code
   right join i2b2patient on
   case when language_cd is NULL then 'no information' else language_cd end = lower(descriptive_text)
 ) l
@@ -208,6 +210,8 @@ BEGIN
 PCORNetDemographic();
 END;
 /
-insert into cdm_status (status, last_update, records) select 'demographic', sysdate, count(*) from demographic
+update cdm_status
+set end_time = sysdate, records = (select count(*) from demographic)
+where task = 'demographic'
 /
-select 1 from cdm_status where status = 'demographic'
+select records from cdm_status where task = 'demographic'

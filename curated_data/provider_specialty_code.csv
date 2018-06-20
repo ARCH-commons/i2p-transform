@@ -1,0 +1,857 @@
+CODE,DESCRIPTIVE_TEXT,GROUPING
+101Y00000X,Counselor,Behavioral Health & Social Service Providers
+101YA0400X,Counselor Addiction Substance Use Disorder,Behavioral Health & Social Service Providers
+101YM0800X,Counselor Mental Health,Behavioral Health & Social Service Providers
+101YP1600X,Counselor Pastoral,Behavioral Health & Social Service Providers
+101YP2500X,Counselor Professional,Behavioral Health & Social Service Providers
+101YS0200X,Counselor School,Behavioral Health & Social Service Providers
+102L00000X,Psychoanalyst ,Behavioral Health & Social Service Providers
+102X00000X,Poetry Therapist ,Behavioral Health & Social Service Providers
+103G00000X,Clinical Neuropsychologist ,Behavioral Health & Social Service Providers
+103GC0700X,Clinical Neuropsychologist Clinical,Behavioral Health & Social Service Providers
+103K00000X,Behavioral Analyst ,Behavioral Health & Social Service Providers
+103T00000X,Psychologist ,Behavioral Health & Social Service Providers
+103TA0400X,Psychologist Addiction (Substance Use Disorder),Behavioral Health & Social Service Providers
+103TA0700X,Psychologist Adult Development & Aging,Behavioral Health & Social Service Providers
+103TB0200X,Psychologist Cognitive & Behavioral,Behavioral Health & Social Service Providers
+103TC0700X,Psychologist Clinical,Behavioral Health & Social Service Providers
+103TC1900X,Psychologist Counseling,Behavioral Health & Social Service Providers
+103TC2200X,Psychologist Clinical Child & Adolescent,Behavioral Health & Social Service Providers
+103TE1000X,Psychologist Educational,Behavioral Health & Social Service Providers
+103TE1100X,Psychologist Exercise & Sports,Behavioral Health & Social Service Providers
+103TF0000X,Psychologist Family,Behavioral Health & Social Service Providers
+103TF0200X,Psychologist Forensic,Behavioral Health & Social Service Providers
+103TH0004X,Psychologist Health,Behavioral Health & Social Service Providers
+103TH0100X,Psychologist Health Service,Behavioral Health & Social Service Providers
+103TM1700X,Psychologist Men & Masculinity,Behavioral Health & Social Service Providers
+103TM1800X,Psychologist Mental Retardation & Developmental Disabilities,Behavioral Health & Social Service Providers
+103TP0016X,Psychologist Prescribing (Medical),Behavioral Health & Social Service Providers
+103TP0814X,Psychologist Psychoanalysis,Behavioral Health & Social Service Providers
+103TP2700X,Psychologist Psychotherapy,Behavioral Health & Social Service Providers
+103TP2701X,Psychologist Group Psychotherapy,Behavioral Health & Social Service Providers
+103TR0400X,Psychologist Rehabilitation,Behavioral Health & Social Service Providers
+103TS0200X,Psychologist School,Behavioral Health & Social Service Providers
+103TW0100X,Psychologist Women,Behavioral Health & Social Service Providers
+104100000X,Social Worker ,Behavioral Health & Social Service Providers
+1041C0700X,Social Worker Clinical,Behavioral Health & Social Service Providers
+1041S0200X,Social Worker School,Behavioral Health & Social Service Providers
+106E00000X,Assistant Behavior Analyst ,Behavioral Health & Social Service Providers
+106H00000X,Marriage & Family Therapist ,Behavioral Health & Social Service Providers
+106S00000X,Behavior Technician ,Behavioral Health & Social Service Providers
+111N00000X,Chiropractor ,Chiropractic Providers
+111NI0013X,Chiropractor Independent Medical Examiner,Chiropractic Providers
+111NI0900X,Chiropractor Internist,Chiropractic Providers
+111NN0400X,Chiropractor Neurology,Chiropractic Providers
+111NN1001X,Chiropractor Nutrition,Chiropractic Providers
+111NP0017X,Chiropractor Pediatric Chiropractor,Chiropractic Providers
+111NR0200X,Chiropractor Radiology,Chiropractic Providers
+111NR0400X,Chiropractor Rehabilitation,Chiropractic Providers
+111NS0005X,Chiropractor Sports Physician,Chiropractic Providers
+111NT0100X,Chiropractor Thermography,Chiropractic Providers
+111NX0100X,Chiropractor Occupational Health,Chiropractic Providers
+111NX0800X,Chiropractor Orthopedic,Chiropractic Providers
+122300000X,Dentist ,Dental Providers
+1223D0001X,Dentist Dental Public Health,Dental Providers
+1223D0004X,Dentist Dentist Anesthesiologist,Dental Providers
+1223E0200X,Dentist Endodontics,Dental Providers
+1223G0001X,Dentist General Practice,Dental Providers
+1223P0106X,Dentist Oral and Maxillofacial Pathology,Dental Providers
+1223P0221X,Dentist Pediatric Dentistry,Dental Providers
+1223P0300X,Dentist Periodontics,Dental Providers
+1223P0700X,Dentist Prosthodontics,Dental Providers
+1223S0112X,Dentist Oral and Maxillofacial Surgery,Dental Providers
+1223X0008X,Dentist Oral and Maxillofacial Radiology,Dental Providers
+1223X0400X,Dentist Orthodontics and Dentofacial Orthopedics,Dental Providers
+122400000X,Denturist ,Dental Providers
+124Q00000X,Dental Hygienist ,Dental Providers
+125J00000X,Dental Therapist ,Dental Providers
+125K00000X,Advanced Practice Dental Therapist ,Dental Providers
+125Q00000X,Oral Medicinist ,Dental Providers
+126800000X,Dental Assistant ,Dental Providers
+126900000X,Dental Laboratory Technician ,Dental Providers
+132700000X,Dietary Manager ,Dietary & Nutritional Service Providers
+133N00000X,Nutritionist ,Dietary & Nutritional Service Providers
+133NN1002X,"Nutritionist Nutrition, Education",Dietary & Nutritional Service Providers
+133V00000X,"Dietitian, Registered ",Dietary & Nutritional Service Providers
+133VN1004X,"Dietitian, Registered Nutrition, Pediatric",Dietary & Nutritional Service Providers
+133VN1005X,"Dietitian, Registered Nutrition, Renal",Dietary & Nutritional Service Providers
+133VN1006X,"Dietitian, Registered Nutrition, Metabolic",Dietary & Nutritional Service Providers
+136A00000X,"Dietetic Technician, Registered ",Dietary & Nutritional Service Providers
+146D00000X,Personal Emergency Response Attendant ,Emergency Medical Service Providers
+146L00000X,"Emergency Medical Technician, Paramedic ",Emergency Medical Service Providers
+146M00000X,"Emergency Medical Technician, Intermediate ",Emergency Medical Service Providers
+146N00000X,"Emergency Medical Technician, Basic ",Emergency Medical Service Providers
+152W00000X,Optometrist ,Eye and Vision Services Providers
+152WC0802X,Optometrist Corneal and Contact Management,Eye and Vision Services Providers
+152WL0500X,Optometrist Low Vision Rehabilitation,Eye and Vision Services Providers
+152WP0200X,Optometrist Pediatrics,Eye and Vision Services Providers
+152WS0006X,Optometrist Sports Vision,Eye and Vision Services Providers
+152WV0400X,Optometrist Vision Therapy,Eye and Vision Services Providers
+152WX0102X,Optometrist Occupational Vision,Eye and Vision Services Providers
+156F00000X,Technician/Technologist ,Eye and Vision Services Providers
+156FC0800X,Technician/Technologist Contact Lens,Eye and Vision Services Providers
+156FC0801X,Technician/Technologist Contact Lens Fitter,Eye and Vision Services Providers
+156FX1100X,Technician/Technologist Ophthalmic,Eye and Vision Services Providers
+156FX1101X,Technician/Technologist Ophthalmic Assistant,Eye and Vision Services Providers
+156FX1201X,Technician/Technologist Optometric Assistant,Eye and Vision Services Providers
+156FX1202X,Technician/Technologist Optometric Technician,Eye and Vision Services Providers
+156FX1700X,Technician/Technologist Ocularist,Eye and Vision Services Providers
+156FX1800X,Technician/Technologist Optician,Eye and Vision Services Providers
+156FX1900X,Technician/Technologist Orthoptist,Eye and Vision Services Providers
+163W00000X,Registered Nurse ,Nursing Service Providers
+163WA0400X,Registered Nurse Addiction (Substance Use Disorder),Nursing Service Providers
+163WA2000X,Registered Nurse Administrator,Nursing Service Providers
+163WC0200X,Registered Nurse Critical Care Medicine,Nursing Service Providers
+163WC0400X,Registered Nurse Case Management,Nursing Service Providers
+163WC1400X,Registered Nurse College Health,Nursing Service Providers
+163WC1500X,Registered Nurse Community Health,Nursing Service Providers
+163WC1600X,Registered Nurse Continuing Education/Staff Development,Nursing Service Providers
+163WC2100X,Registered Nurse Continence Care,Nursing Service Providers
+163WC3500X,Registered Nurse Cardiac Rehabilitation,Nursing Service Providers
+163WD0400X,Registered Nurse Diabetes Educator,Nursing Service Providers
+163WD1100X,"Registered Nurse Dialysis, Peritoneal",Nursing Service Providers
+163WE0003X,Registered Nurse Emergency,Nursing Service Providers
+163WE0900X,Registered Nurse Enterostomal Therapy,Nursing Service Providers
+163WF0300X,Registered Nurse Flight,Nursing Service Providers
+163WG0000X,Registered Nurse General Practice,Nursing Service Providers
+163WG0100X,Registered Nurse Gastroenterology,Nursing Service Providers
+163WG0600X,Registered Nurse Gerontology,Nursing Service Providers
+163WH0200X,Registered Nurse Home Health,Nursing Service Providers
+163WH0500X,Registered Nurse Hemodialysis,Nursing Service Providers
+163WH1000X,Registered Nurse Hospice,Nursing Service Providers
+163WI0500X,Registered Nurse Infusion Therapy,Nursing Service Providers
+163WI0600X,Registered Nurse Infection Control,Nursing Service Providers
+163WL0100X,Registered Nurse Lactation Consultant,Nursing Service Providers
+163WM0102X,Registered Nurse Maternal Newborn,Nursing Service Providers
+163WM0705X,Registered Nurse Medical-Surgical,Nursing Service Providers
+163WM1400X,Registered Nurse Nurse Massage Therapist (NMT),Nursing Service Providers
+163WN0002X,Registered Nurse Neonatal Intensive Care,Nursing Service Providers
+163WN0003X,"Registered Nurse Neonatal, Low-Risk",Nursing Service Providers
+163WN0300X,Registered Nurse Nephrology,Nursing Service Providers
+163WN0800X,Registered Nurse Neuroscience,Nursing Service Providers
+163WN1003X,Registered Nurse Nutrition Support,Nursing Service Providers
+163WP0000X,Registered Nurse Pain Management,Nursing Service Providers
+163WP0200X,Registered Nurse Pediatrics,Nursing Service Providers
+163WP0218X,Registered Nurse Pediatric Oncology,Nursing Service Providers
+163WP0807X,"Registered Nurse Psych/Mental Health, Child & Adolescent",Nursing Service Providers
+163WP0808X,Registered Nurse Psych/Mental Health,Nursing Service Providers
+163WP0809X,"Registered Nurse Psych/Mental Health, Adult",Nursing Service Providers
+163WP1700X,Registered Nurse Perinatal,Nursing Service Providers
+163WP2201X,Registered Nurse Ambulatory Care,Nursing Service Providers
+163WR0006X,Registered Nurse Registered Nurse First Assistant,Nursing Service Providers
+163WR0400X,Registered Nurse Rehabilitation,Nursing Service Providers
+163WR1000X,Registered Nurse Reproductive Endocrinology/Infertility,Nursing Service Providers
+163WS0121X,Registered Nurse Plastic Surgery,Nursing Service Providers
+163WS0200X,Registered Nurse School,Nursing Service Providers
+163WU0100X,Registered Nurse Urology,Nursing Service Providers
+163WW0000X,Registered Nurse Wound Care,Nursing Service Providers
+163WW0101X,"Registered Nurse Women's Health Care, Ambulatory",Nursing Service Providers
+163WX0002X,"Registered Nurse Obstetric, High-Risk",Nursing Service Providers
+163WX0003X,"Registered Nurse Obstetric, Inpatient",Nursing Service Providers
+163WX0106X,Registered Nurse Occupational Health,Nursing Service Providers
+163WX0200X,Registered Nurse Oncology,Nursing Service Providers
+163WX0601X,Registered Nurse Otorhinolaryngology & Head-Neck,Nursing Service Providers
+163WX0800X,Registered Nurse Orthopedic,Nursing Service Providers
+163WX1100X,Registered Nurse Ophthalmic,Nursing Service Providers
+163WX1500X,Registered Nurse Ostomy Care,Nursing Service Providers
+164W00000X,Licensed Practical Nurse ,Nursing Service Providers
+164X00000X,Licensed Vocational Nurse ,Nursing Service Providers
+167G00000X,Licensed Psychiatric Technician ,Nursing Service Providers
+170100000X,"Medical Genetics, Ph.D. Medical Genetics ",Other Service Providers
+170300000X,"Genetic Counselor, MS ",Other Service Providers
+171000000X,Military Health Care Provider ,Other Service Providers
+1710I1002X,Military Health Care Provider Independent Duty Corpsman,Other Service Providers
+1710I1003X,Military Health Care Provider Independent Duty Medical Technicians,Other Service Providers
+171100000X,Acupuncturist ,Other Service Providers
+171M00000X,Case Manager/Care Coordinator ,Other Service Providers
+171R00000X,Interpreter ,Other Service Providers
+171W00000X,Contractor ,Other Service Providers
+171WH0202X,Contractor Home Modifications,Other Service Providers
+171WV0202X,Contractor Vehicle Modifications,Other Service Providers
+172A00000X,Driver ,Other Service Providers
+172M00000X,Mechanotherapist ,Other Service Providers
+172P00000X,Naprapath ,Other Service Providers
+172V00000X,Community Health Worker ,Other Service Providers
+173000000X,Legal Medicine ,Other Service Providers
+173C00000X,Reflexologist ,Other Service Providers
+173F00000X,"Sleep Specialist, PhD ",Other Service Providers
+174200000X,Meals ,Other Service Providers
+174400000X,Specialist ,Other Service Providers
+1744G0900X,Specialist Graphics Designer,Other Service Providers
+1744P3200X,Specialist Prosthetics Case Management,Other Service Providers
+1744R1102X,Specialist Research Study,Other Service Providers
+1744R1103X,Specialist Research Data Abstracter/Coder,Other Service Providers
+174H00000X,Health Educator ,Other Service Providers
+174M00000X,Veterinarian ,Other Service Providers
+174MM1900X,Veterinarian Medical Research,Other Service Providers
+174N00000X,"Lactation Consultant, Non-RN ",Other Service Providers
+174V00000X,Clinical Ethicist ,Other Service Providers
+175F00000X,Naturopath ,Other Service Providers
+175L00000X,Homeopath ,Other Service Providers
+175M00000X,"Midwife, Lay ",Other Service Providers
+175T00000X,Peer Specialist ,Other Service Providers
+176B00000X,Midwife ,Other Service Providers
+176P00000X,Funeral Director ,Other Service Providers
+177F00000X,Lodging ,Other Service Providers
+183500000X,Pharmacist ,Pharmacy Service Providers
+1835C0205X,Pharmacist Critical Care,Pharmacy Service Providers
+1835G0000X,Pharmacist General Practice,Pharmacy Service Providers
+1835G0303X,Pharmacist Geriatric,Pharmacy Service Providers
+1835N0905X,Pharmacist Nuclear,Pharmacy Service Providers
+1835N1003X,Pharmacist Nutrition Support,Pharmacy Service Providers
+1835P0018X,Pharmacist Pharmacist Clinician (PhC)/ Clinical Pharmacy Specialist,Pharmacy Service Providers
+1835P0200X,Pharmacist Pediatrics,Pharmacy Service Providers
+1835P1200X,Pharmacist Pharmacotherapy,Pharmacy Service Providers
+1835P1300X,Pharmacist Psychiatric,Pharmacy Service Providers
+1835P2201X,Pharmacist Ambulatory Care,Pharmacy Service Providers
+1835X0200X,Pharmacist Oncology,Pharmacy Service Providers
+183700000X,Pharmacy Technician ,Pharmacy Service Providers
+193200000X,Multi-Specialty ,Group
+193400000X,Single Specialty ,Group
+202C00000X,Independent Medical Examiner ,Allopathic & Osteopathic Physicians
+202K00000X,Phlebology ,Allopathic & Osteopathic Physicians
+204C00000X,"Neuromusculoskeletal Medicine, Sports Medicine ",Allopathic & Osteopathic Physicians
+204D00000X,Neuromusculoskeletal Medicine & OMM ,Allopathic & Osteopathic Physicians
+204E00000X,Oral & Maxillofacial Surgery ,Allopathic & Osteopathic Physicians
+204F00000X,Transplant Surgery ,Allopathic & Osteopathic Physicians
+204R00000X,Electrodiagnostic Medicine ,Allopathic & Osteopathic Physicians
+207K00000X,Allergy & Immunology ,Allopathic & Osteopathic Physicians
+207KA0200X,Allergy & Immunology Allergy,Allopathic & Osteopathic Physicians
+207KI0005X,Allergy & Immunology Clinical & Laboratory Immunology,Allopathic & Osteopathic Physicians
+207L00000X,Anesthesiology ,Allopathic & Osteopathic Physicians
+207LA0401X,Anesthesiology Addiction Medicine,Allopathic & Osteopathic Physicians
+207LC0200X,Anesthesiology Critical Care Medicine,Allopathic & Osteopathic Physicians
+207LH0002X,Anesthesiology Hospice and Palliative Medicine,Allopathic & Osteopathic Physicians
+207LP2900X,Anesthesiology Pain Medicine,Allopathic & Osteopathic Physicians
+207LP3000X,Anesthesiology Pediatric Anesthesiology,Allopathic & Osteopathic Physicians
+207N00000X,Dermatology ,Allopathic & Osteopathic Physicians
+207ND0101X,Dermatology MOHS-Micrographic Surgery,Allopathic & Osteopathic Physicians
+207ND0900X,Dermatology Dermatopathology,Allopathic & Osteopathic Physicians
+207NI0002X,Dermatology Clinical & Laboratory Dermatological Immunology,Allopathic & Osteopathic Physicians
+207NP0225X,Dermatology Pediatric Dermatology,Allopathic & Osteopathic Physicians
+207NS0135X,Dermatology Procedural Dermatology,Allopathic & Osteopathic Physicians
+207P00000X,Emergency Medicine ,Allopathic & Osteopathic Physicians
+207PE0004X,Emergency Medicine Emergency Medical Services,Allopathic & Osteopathic Physicians
+207PE0005X,Emergency Medicine Undersea and Hyperbaric Medicine,Allopathic & Osteopathic Physicians
+207PH0002X,Emergency Medicine Hospice and Palliative Medicine,Allopathic & Osteopathic Physicians
+207PP0204X,Emergency Medicine Pediatric Emergency Medicine,Allopathic & Osteopathic Physicians
+207PS0010X,Emergency Medicine Sports Medicine,Allopathic & Osteopathic Physicians
+207PT0002X,Emergency Medicine Medical Toxicology,Allopathic & Osteopathic Physicians
+207Q00000X,Family Medicine ,Allopathic & Osteopathic Physicians
+207QA0000X,Family Medicine Adolescent Medicine,Allopathic & Osteopathic Physicians
+207QA0401X,Family Medicine Addiction Medicine,Allopathic & Osteopathic Physicians
+207QA0505X,Family Medicine Adult Medicine,Allopathic & Osteopathic Physicians
+207QB0002X,Family Medicine Obesity Medicine,Allopathic & Osteopathic Physicians
+207QG0300X,Family Medicine Geriatric Medicine,Allopathic & Osteopathic Physicians
+207QH0002X,Family Medicine Hospice and Palliative Medicine,Allopathic & Osteopathic Physicians
+207QS0010X,Family Medicine Sports Medicine,Allopathic & Osteopathic Physicians
+207QS1201X,Family Medicine Sleep Medicine,Allopathic & Osteopathic Physicians
+207R00000X,Internal Medicine ,Allopathic & Osteopathic Physicians
+207RA0000X,Internal Medicine Adolescent Medicine,Allopathic & Osteopathic Physicians
+207RA0001X,Internal Medicine Advanced Heart Failure and Transplant Cardiology,Allopathic & Osteopathic Physicians
+207RA0201X,Internal Medicine Allergy & Immunology,Allopathic & Osteopathic Physicians
+207RA0401X,Internal Medicine Addiction Medicine,Allopathic & Osteopathic Physicians
+207RB0002X,Internal Medicine Obesity Medicine,Allopathic & Osteopathic Physicians
+207RC0000X,Internal Medicine Cardiovascular Disease,Allopathic & Osteopathic Physicians
+207RC0001X,Internal Medicine Clinical Cardiac Electrophysiology,Allopathic & Osteopathic Physicians
+207RC0200X,Internal Medicine Critical Care Medicine,Allopathic & Osteopathic Physicians
+207RE0101X,"Internal Medicine Endocrinology, Diabetes & Metabolism",Allopathic & Osteopathic Physicians
+207RG0100X,Internal Medicine Gastroenterology,Allopathic & Osteopathic Physicians
+207RG0300X,Internal Medicine Geriatric Medicine,Allopathic & Osteopathic Physicians
+207RH0000X,Internal Medicine Hematology,Allopathic & Osteopathic Physicians
+207RH0002X,Internal Medicine Hospice and Palliative Medicine,Allopathic & Osteopathic Physicians
+207RH0003X,Internal Medicine Hematology & Oncology,Allopathic & Osteopathic Physicians
+207RH0005X,Internal Medicine Hypertension Specialist,Allopathic & Osteopathic Physicians
+207RI0001X,Internal Medicine Clinical & Laboratory Immunology,Allopathic & Osteopathic Physicians
+207RI0008X,Internal Medicine Hepatology,Allopathic & Osteopathic Physicians
+207RI0011X,Internal Medicine Interventional Cardiology,Allopathic & Osteopathic Physicians
+207RI0200X,Internal Medicine Infectious Disease,Allopathic & Osteopathic Physicians
+207RM1200X,Internal Medicine Magnetic Resonance Imaging (MRI),Allopathic & Osteopathic Physicians
+207RN0300X,Internal Medicine Nephrology,Allopathic & Osteopathic Physicians
+207RP1001X,Internal Medicine Pulmonary Disease,Allopathic & Osteopathic Physicians
+207RR0500X,Internal Medicine Rheumatology,Allopathic & Osteopathic Physicians
+207RS0010X,Internal Medicine Sports Medicine,Allopathic & Osteopathic Physicians
+207RS0012X,Internal Medicine Sleep Medicine,Allopathic & Osteopathic Physicians
+207RT0003X,Internal Medicine Transplant Hepatology,Allopathic & Osteopathic Physicians
+207RX0202X,Internal Medicine Medical Oncology,Allopathic & Osteopathic Physicians
+207SC0300X,Medical Genetics Clinical Cytogenetic,Allopathic & Osteopathic Physicians
+207SG0201X,Medical Genetics Clinical Genetics (M.D.),Allopathic & Osteopathic Physicians
+207SG0202X,Medical Genetics Clinical Biochemical Genetics,Allopathic & Osteopathic Physicians
+207SG0203X,Medical Genetics Clinical Molecular Genetics,Allopathic & Osteopathic Physicians
+207SG0205X,Medical Genetics Ph.D. Medical Genetics,Allopathic & Osteopathic Physicians
+207SM0001X,Medical Genetics Molecular Genetic Pathology,Allopathic & Osteopathic Physicians
+207T00000X,Neurological Surgery ,Allopathic & Osteopathic Physicians
+207U00000X,Nuclear Medicine ,Allopathic & Osteopathic Physicians
+207UN0901X,Nuclear Medicine Nuclear Cardiology,Allopathic & Osteopathic Physicians
+207UN0902X,Nuclear Medicine Nuclear Imaging & Therapy,Allopathic & Osteopathic Physicians
+207UN0903X,Nuclear Medicine In Vivo & In Vitro Nuclear Medicine,Allopathic & Osteopathic Physicians
+207V00000X,Obstetrics & Gynecology ,Allopathic & Osteopathic Physicians
+207VB0002X,Obstetrics & Gynecology Obesity Medicine,Allopathic & Osteopathic Physicians
+207VC0200X,Obstetrics & Gynecology Critical Care Medicine,Allopathic & Osteopathic Physicians
+207VE0102X,Obstetrics & Gynecology Reproductive Endocrinology,Allopathic & Osteopathic Physicians
+207VF0040X,Obstetrics & Gynecology Female Pelvic Medicine and Reconstructive Surgery,Allopathic & Osteopathic Physicians
+207VG0400X,Obstetrics & Gynecology Gynecology,Allopathic & Osteopathic Physicians
+207VH0002X,Obstetrics & Gynecology Hospice and Palliative Medicine,Allopathic & Osteopathic Physicians
+207VM0101X,Obstetrics & Gynecology Maternal & Fetal Medicine,Allopathic & Osteopathic Physicians
+207VX0000X,Obstetrics & Gynecology Obstetrics,Allopathic & Osteopathic Physicians
+207VX0201X,Obstetrics & Gynecology Gynecologic Oncology,Allopathic & Osteopathic Physicians
+207W00000X,Ophthalmology ,Allopathic & Osteopathic Physicians
+207WX0009X,Ophthalmology Glaucoma Specialist,Allopathic & Osteopathic Physicians
+207WX0107X,Ophthalmology Retina Specialist,Allopathic & Osteopathic Physicians
+207WX0108X,Ophthalmology Uveitis and Ocular Inflammatory Disease,Allopathic & Osteopathic Physicians
+207WX0109X,Ophthalmology Neuro-ophthalmology,Allopathic & Osteopathic Physicians
+207WX0110X,Ophthalmology Pediatric Ophthalmology and Strabismus Specialist,Allopathic & Osteopathic Physicians
+207WX0200X,Ophthalmology Ophthalmic Plastic and Reconstructive Surgery,Allopathic & Osteopathic Physicians
+207X00000X,Orthopaedic Surgery ,Allopathic & Osteopathic Physicians
+207XP3100X,Orthopaedic Surgery Pediatric Orthopaedic Surgery,Allopathic & Osteopathic Physicians
+207XS0106X,Orthopaedic Surgery Hand Surgery,Allopathic & Osteopathic Physicians
+207XS0114X,Orthopaedic Surgery Adult Reconstructive Orthopaedic Surgery,Allopathic & Osteopathic Physicians
+207XS0117X,Orthopaedic Surgery Orthopaedic Surgery of the Spine,Allopathic & Osteopathic Physicians
+207XX0004X,Orthopaedic Surgery Foot and Ankle Surgery,Allopathic & Osteopathic Physicians
+207XX0005X,Orthopaedic Surgery Sports Medicine,Allopathic & Osteopathic Physicians
+207XX0801X,Orthopaedic Surgery Orthopaedic Trauma,Allopathic & Osteopathic Physicians
+207Y00000X,Otolaryngology ,Allopathic & Osteopathic Physicians
+207YP0228X,Otolaryngology Pediatric Otolaryngology,Allopathic & Osteopathic Physicians
+207YS0012X,Otolaryngology Sleep Medicine,Allopathic & Osteopathic Physicians
+207YS0123X,Otolaryngology Facial Plastic Surgery,Allopathic & Osteopathic Physicians
+207YX0007X,Otolaryngology Plastic Surgery within the Head & Neck,Allopathic & Osteopathic Physicians
+207YX0602X,Otolaryngology Otolaryngic Allergy,Allopathic & Osteopathic Physicians
+207YX0901X,Otolaryngology Otology & Neurotology,Allopathic & Osteopathic Physicians
+207YX0905X,Otolaryngology Otolaryngology/Facial Plastic Surgery,Allopathic & Osteopathic Physicians
+207ZB0001X,Pathology Blood Banking & Transfusion Medicine,Allopathic & Osteopathic Physicians
+207ZC0006X,Pathology Clinical Pathology,Allopathic & Osteopathic Physicians
+207ZC0008X,Pathology Clinical Informatics,Allopathic & Osteopathic Physicians
+207ZC0500X,Pathology Cytopathology,Allopathic & Osteopathic Physicians
+207ZD0900X,Pathology Dermatopathology,Allopathic & Osteopathic Physicians
+207ZF0201X,Pathology Forensic Pathology,Allopathic & Osteopathic Physicians
+207ZH0000X,Pathology Hematology,Allopathic & Osteopathic Physicians
+207ZI0100X,Pathology Immunopathology,Allopathic & Osteopathic Physicians
+207ZM0300X,Pathology Medical Microbiology,Allopathic & Osteopathic Physicians
+207ZN0500X,Pathology Neuropathology,Allopathic & Osteopathic Physicians
+207ZP0007X,Pathology Molecular Genetic Pathology,Allopathic & Osteopathic Physicians
+207ZP0101X,Pathology Anatomic Pathology,Allopathic & Osteopathic Physicians
+207ZP0102X,Pathology Anatomic Pathology & Clinical Pathology,Allopathic & Osteopathic Physicians
+207ZP0104X,Pathology Chemical Pathology,Allopathic & Osteopathic Physicians
+207ZP0105X,Pathology Clinical Pathology/Laboratory Medicine,Allopathic & Osteopathic Physicians
+207ZP0213X,Pathology Pediatric Pathology,Allopathic & Osteopathic Physicians
+208000000X,Pediatrics ,Allopathic & Osteopathic Physicians
+2080A0000X,Pediatrics Adolescent Medicine,Allopathic & Osteopathic Physicians
+2080B0002X,Pediatrics Obesity Medicine,Allopathic & Osteopathic Physicians
+2080C0008X,Pediatrics Child Abuse Pediatrics,Allopathic & Osteopathic Physicians
+2080H0002X,Pediatrics Hospice and Palliative Medicine,Allopathic & Osteopathic Physicians
+2080I0007X,Pediatrics Clinical & Laboratory Immunology,Allopathic & Osteopathic Physicians
+2080N0001X,Pediatrics Neonatal-Perinatal Medicine,Allopathic & Osteopathic Physicians
+2080P0006X,Pediatrics Developmental - Behavioral Pediatrics,Allopathic & Osteopathic Physicians
+2080P0008X,Pediatrics Neurodevelopmental Disabilities,Allopathic & Osteopathic Physicians
+2080P0201X,Pediatrics Pediatric Allergy/Immunology,Allopathic & Osteopathic Physicians
+2080P0202X,Pediatrics Pediatric Cardiology,Allopathic & Osteopathic Physicians
+2080P0203X,Pediatrics Pediatric Critical Care Medicine,Allopathic & Osteopathic Physicians
+2080P0204X,Pediatrics Pediatric Emergency Medicine,Allopathic & Osteopathic Physicians
+2080P0205X,Pediatrics Pediatric Endocrinology,Allopathic & Osteopathic Physicians
+2080P0206X,Pediatrics Pediatric Gastroenterology,Allopathic & Osteopathic Physicians
+2080P0207X,Pediatrics Pediatric Hematology-Oncology,Allopathic & Osteopathic Physicians
+2080P0208X,Pediatrics Pediatric Infectious Diseases,Allopathic & Osteopathic Physicians
+2080P0210X,Pediatrics Pediatric Nephrology,Allopathic & Osteopathic Physicians
+2080P0214X,Pediatrics Pediatric Pulmonology,Allopathic & Osteopathic Physicians
+2080P0216X,Pediatrics Pediatric Rheumatology,Allopathic & Osteopathic Physicians
+2080S0010X,Pediatrics Sports Medicine,Allopathic & Osteopathic Physicians
+2080S0012X,Pediatrics Sleep Medicine,Allopathic & Osteopathic Physicians
+2080T0002X,Pediatrics Medical Toxicology,Allopathic & Osteopathic Physicians
+2080T0004X,Pediatrics Pediatric Transplant Hepatology,Allopathic & Osteopathic Physicians
+208100000X,Physical Medicine & Rehabilitation ,Allopathic & Osteopathic Physicians
+2081H0002X,Physical Medicine & Rehabilitation Hospice and Palliative Medicine,Allopathic & Osteopathic Physicians
+2081N0008X,Physical Medicine & Rehabilitation Neuromuscular Medicine,Allopathic & Osteopathic Physicians
+2081P0004X,Physical Medicine & Rehabilitation Spinal Cord Injury Medicine,Allopathic & Osteopathic Physicians
+2081P0010X,Physical Medicine & Rehabilitation Pediatric Rehabilitation Medicine,Allopathic & Osteopathic Physicians
+2081P0301X,Physical Medicine & Rehabilitation Brain Injury Medicine,Allopathic & Osteopathic Physicians
+2081P2900X,Physical Medicine & Rehabilitation Pain Medicine,Allopathic & Osteopathic Physicians
+2081S0010X,Physical Medicine & Rehabilitation Sports Medicine,Allopathic & Osteopathic Physicians
+208200000X,Plastic Surgery ,Allopathic & Osteopathic Physicians
+2082S0099X,Plastic Surgery Plastic Surgery Within the Head and Neck,Allopathic & Osteopathic Physicians
+2082S0105X,Plastic Surgery Surgery of the Hand,Allopathic & Osteopathic Physicians
+2083A0100X,Preventive Medicine Aerospace Medicine,Allopathic & Osteopathic Physicians
+2083B0002X,Preventive Medicine Obesity Medicine,Allopathic & Osteopathic Physicians
+2083C0008X,Preventive Medicine Clinical Informatics,Allopathic & Osteopathic Physicians
+2083P0011X,Preventive Medicine Undersea and Hyperbaric Medicine,Allopathic & Osteopathic Physicians
+2083P0500X,Preventive Medicine Preventive Medicine/Occupational Environmental Medicine,Allopathic & Osteopathic Physicians
+2083P0901X,Preventive Medicine Public Health & General Preventive Medicine,Allopathic & Osteopathic Physicians
+2083S0010X,Preventive Medicine Sports Medicine,Allopathic & Osteopathic Physicians
+2083T0002X,Preventive Medicine Medical Toxicology,Allopathic & Osteopathic Physicians
+2083X0100X,Preventive Medicine Occupational Medicine,Allopathic & Osteopathic Physicians
+2084A0401X,Psychiatry & Neurology Addiction Medicine,Allopathic & Osteopathic Physicians
+2084A2900X,Psychiatry & Neurology Neurocritical Care,Allopathic & Osteopathic Physicians
+2084B0002X,Psychiatry & Neurology Obesity Medicine,Allopathic & Osteopathic Physicians
+2084B0040X,Psychiatry & Neurology Behavioral Neurology & Neuropsychiatry,Allopathic & Osteopathic Physicians
+2084D0003X,Psychiatry & Neurology Diagnostic Neuroimaging,Allopathic & Osteopathic Physicians
+2084F0202X,Psychiatry & Neurology Forensic Psychiatry,Allopathic & Osteopathic Physicians
+2084H0002X,Psychiatry & Neurology Hospice and Palliative Medicine,Allopathic & Osteopathic Physicians
+2084N0008X,Psychiatry & Neurology Neuromuscular Medicine,Allopathic & Osteopathic Physicians
+2084N0400X,Psychiatry & Neurology Neurology,Allopathic & Osteopathic Physicians
+2084N0402X,Psychiatry & Neurology Neurology with Special Qualifications in Child Neurology,Allopathic & Osteopathic Physicians
+2084N0600X,Psychiatry & Neurology Clinical Neurophysiology,Allopathic & Osteopathic Physicians
+2084P0005X,Psychiatry & Neurology Neurodevelopmental Disabilities,Allopathic & Osteopathic Physicians
+2084P0015X,Psychiatry & Neurology Psychosomatic Medicine,Allopathic & Osteopathic Physicians
+2084P0301X,Psychiatry & Neurology Brain Injury Medicine,Allopathic & Osteopathic Physicians
+2084P0800X,Psychiatry & Neurology Psychiatry,Allopathic & Osteopathic Physicians
+2084P0802X,Psychiatry & Neurology Addiction Psychiatry,Allopathic & Osteopathic Physicians
+2084P0804X,Psychiatry & Neurology Child & Adolescent Psychiatry,Allopathic & Osteopathic Physicians
+2084P0805X,Psychiatry & Neurology Geriatric Psychiatry,Allopathic & Osteopathic Physicians
+2084P2900X,Psychiatry & Neurology Pain Medicine,Allopathic & Osteopathic Physicians
+2084S0010X,Psychiatry & Neurology Sports Medicine,Allopathic & Osteopathic Physicians
+2084S0012X,Psychiatry & Neurology Sleep Medicine,Allopathic & Osteopathic Physicians
+2084V0102X,Psychiatry & Neurology Vascular Neurology,Allopathic & Osteopathic Physicians
+2085B0100X,Radiology Body Imaging,Allopathic & Osteopathic Physicians
+2085D0003X,Radiology Diagnostic Neuroimaging,Allopathic & Osteopathic Physicians
+2085H0002X,Radiology Hospice and Palliative Medicine,Allopathic & Osteopathic Physicians
+2085N0700X,Radiology Neuroradiology,Allopathic & Osteopathic Physicians
+2085N0904X,Radiology Nuclear Radiology,Allopathic & Osteopathic Physicians
+2085P0229X,Radiology Pediatric Radiology,Allopathic & Osteopathic Physicians
+2085R0001X,Radiology Radiation Oncology,Allopathic & Osteopathic Physicians
+2085R0202X,Radiology Diagnostic Radiology,Allopathic & Osteopathic Physicians
+2085R0203X,Radiology Therapeutic Radiology,Allopathic & Osteopathic Physicians
+2085R0204X,Radiology Vascular & Interventional Radiology,Allopathic & Osteopathic Physicians
+2085R0205X,Radiology Radiological Physics,Allopathic & Osteopathic Physicians
+2085U0001X,Radiology Diagnostic Ultrasound,Allopathic & Osteopathic Physicians
+208600000X,Surgery ,Allopathic & Osteopathic Physicians
+2086H0002X,Surgery Hospice and Palliative Medicine,Allopathic & Osteopathic Physicians
+2086S0102X,Surgery Surgical Critical Care,Allopathic & Osteopathic Physicians
+2086S0105X,Surgery Surgery of the Hand,Allopathic & Osteopathic Physicians
+2086S0120X,Surgery Pediatric Surgery,Allopathic & Osteopathic Physicians
+2086S0122X,Surgery Plastic and Reconstructive Surgery,Allopathic & Osteopathic Physicians
+2086S0127X,Surgery Trauma Surgery,Allopathic & Osteopathic Physicians
+2086S0129X,Surgery Vascular Surgery,Allopathic & Osteopathic Physicians
+2086X0206X,Surgery Surgical Oncology,Allopathic & Osteopathic Physicians
+208800000X,Urology ,Allopathic & Osteopathic Physicians
+2088F0040X,Urology Female Pelvic Medicine and Reconstructive Surgery,Allopathic & Osteopathic Physicians
+2088P0231X,Urology Pediatric Urology,Allopathic & Osteopathic Physicians
+208C00000X,Colon & Rectal Surgery ,Allopathic & Osteopathic Physicians
+208D00000X,General Practice ,Allopathic & Osteopathic Physicians
+208G00000X,Thoracic Surgery (Cardiothoracic Vascular Surgery) ,Allopathic & Osteopathic Physicians
+208M00000X,Hospitalist ,Allopathic & Osteopathic Physicians
+208U00000X,Clinical Pharmacology ,Allopathic & Osteopathic Physicians
+208VP0000X,Pain Medicine Pain Medicine,Allopathic & Osteopathic Physicians
+208VP0014X,Pain Medicine Interventional Pain Medicine,Allopathic & Osteopathic Physicians
+209800000X,Legal Medicine ,Allopathic & Osteopathic Physicians
+211D00000X,"Assistant, Podiatric ",Podiatric Medicine & Surgery Service Providers
+213E00000X,Podiatrist ,Podiatric Medicine & Surgery Service Providers
+213EG0000X,Podiatrist General Practice,Podiatric Medicine & Surgery Service Providers
+213EP0504X,Podiatrist Public Medicine,Podiatric Medicine & Surgery Service Providers
+213EP1101X,Podiatrist Primary Podiatric Medicine,Podiatric Medicine & Surgery Service Providers
+213ER0200X,Podiatrist Radiology,Podiatric Medicine & Surgery Service Providers
+213ES0000X,Podiatrist Sports Medicine,Podiatric Medicine & Surgery Service Providers
+213ES0103X,Podiatrist Foot & Ankle Surgery,Podiatric Medicine & Surgery Service Providers
+213ES0131X,Podiatrist Foot Surgery,Podiatric Medicine & Surgery Service Providers
+221700000X,Art Therapist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+222Q00000X,Developmental Therapist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+222Z00000X,Orthotist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+224900000X,Mastectomy Fitter ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+224L00000X,Pedorthist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+224P00000X,Prosthetist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+224Y00000X,Clinical Exercise Physiologist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+224Z00000X,Occupational Therapy Assistant ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+224ZE0001X,Occupational Therapy Assistant Environmental Modification,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+224ZF0002X,"Occupational Therapy Assistant Feeding, Eating & Swallowing","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+224ZL0004X,Occupational Therapy Assistant Low Vision,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+224ZR0403X,Occupational Therapy Assistant Driving and Community Mobility,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225000000X,Orthotic Fitter ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225100000X,Physical Therapist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2251C2600X,Physical Therapist Cardiopulmonary,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2251E1200X,Physical Therapist Ergonomics,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2251E1300X,"Physical Therapist Electrophysiology, Clinical","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2251G0304X,Physical Therapist Geriatrics,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2251H1200X,Physical Therapist Hand,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2251H1300X,Physical Therapist Human Factors,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2251N0400X,Physical Therapist Neurology,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2251P0200X,Physical Therapist Pediatrics,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2251S0007X,Physical Therapist Sports,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2251X0800X,Physical Therapist Orthopedic,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225200000X,Physical Therapy Assistant ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225400000X,Rehabilitation Practitioner ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225500000X,Specialist/Technologist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2255A2300X,Specialist/Technologist Athletic Trainer,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2255R0406X,"Specialist/Technologist Rehabilitation, Blind","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225600000X,Dance Therapist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225700000X,Massage Therapist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225800000X,Recreation Therapist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225A00000X,Music Therapist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225B00000X,Pulmonary Function Technologist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225C00000X,Rehabilitation Counselor ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225CA2400X,Rehabilitation Counselor Assistive Technology Practitioner,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225CA2500X,Rehabilitation Counselor Assistive Technology Supplier,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225CX0006X,Rehabilitation Counselor Orientation and Mobility Training Provider,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225X00000X,Occupational Therapist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225XE0001X,Occupational Therapist Environmental Modification,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225XE1200X,Occupational Therapist Ergonomics,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225XF0002X,"Occupational Therapist Feeding, Eating & Swallowing","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225XG0600X,Occupational Therapist Gerontology,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225XH1200X,Occupational Therapist Hand,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225XH1300X,Occupational Therapist Human Factors,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225XL0004X,Occupational Therapist Low Vision,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225XM0800X,Occupational Therapist Mental Health,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225XN1300X,Occupational Therapist Neurorehabilitation,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225XP0019X,Occupational Therapist Physical Rehabilitation,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225XP0200X,Occupational Therapist Pediatrics,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+225XR0403X,Occupational Therapist Driving and Community Mobility,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+226000000X,Recreational Therapist Assistant ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+226300000X,Kinesiotherapist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+227800000X,"Respiratory Therapist, Certified ","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2278C0205X,"Respiratory Therapist, Certified Critical Care","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2278E0002X,"Respiratory Therapist, Certified Emergency Care","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2278E1000X,"Respiratory Therapist, Certified Educational","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2278G0305X,"Respiratory Therapist, Certified Geriatric Care","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2278G1100X,"Respiratory Therapist, Certified General Care","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2278H0200X,"Respiratory Therapist, Certified Home Health","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2278P1004X,"Respiratory Therapist, Certified Pulmonary Diagnostics","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2278P1005X,"Respiratory Therapist, Certified Pulmonary Rehabilitation","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2278P1006X,"Respiratory Therapist, Certified Pulmonary Function Technologist","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2278P3800X,"Respiratory Therapist, Certified Palliative/Hospice","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2278P3900X,"Respiratory Therapist, Certified Neonatal/Pediatrics","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2278P4000X,"Respiratory Therapist, Certified Patient Transport","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2278S1500X,"Respiratory Therapist, Certified SNF/Subacute Care","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+227900000X,"Respiratory Therapist, Registered ","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2279C0205X,"Respiratory Therapist, Registered Critical Care","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2279E0002X,"Respiratory Therapist, Registered Emergency Care","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2279E1000X,"Respiratory Therapist, Registered Educational","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2279G0305X,"Respiratory Therapist, Registered Geriatric Care","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2279G1100X,"Respiratory Therapist, Registered General Care","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2279H0200X,"Respiratory Therapist, Registered Home Health","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2279P1004X,"Respiratory Therapist, Registered Pulmonary Diagnostics","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2279P1005X,"Respiratory Therapist, Registered Pulmonary Rehabilitation","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2279P1006X,"Respiratory Therapist, Registered Pulmonary Function Technologist","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2279P3800X,"Respiratory Therapist, Registered Palliative/Hospice","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2279P3900X,"Respiratory Therapist, Registered Neonatal/Pediatrics","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2279P4000X,"Respiratory Therapist, Registered Patient Transport","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+2279S1500X,"Respiratory Therapist, Registered SNF/Subacute Care","Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+229N00000X,Anaplastologist ,"Respiratory, Developmental, Rehabilitative and Restorative Service Providers"
+231H00000X,Audiologist ,"Speech, Language and Hearing Service Providers"
+231HA2400X,Audiologist Assistive Technology Practitioner,"Speech, Language and Hearing Service Providers"
+231HA2500X,Audiologist Assistive Technology Supplier,"Speech, Language and Hearing Service Providers"
+235500000X,Specialist/Technologist ,"Speech, Language and Hearing Service Providers"
+2355A2700X,Specialist/Technologist Audiology Assistant,"Speech, Language and Hearing Service Providers"
+2355S0801X,Specialist/Technologist Speech-Language Assistant,"Speech, Language and Hearing Service Providers"
+235Z00000X,Speech-Language Pathologist ,"Speech, Language and Hearing Service Providers"
+237600000X,Audiologist-Hearing Aid Fitter ,"Speech, Language and Hearing Service Providers"
+237700000X,Hearing Instrument Specialist ,"Speech, Language and Hearing Service Providers"
+242T00000X,Perfusionist ,"Technologists, Technicians & Other Technical Service Providers"
+243U00000X,Radiology Practitioner Assistant ,"Technologists, Technicians & Other Technical Service Providers"
+246Q00000X,"Spec/Tech, Pathology ","Technologists, Technicians & Other Technical Service Providers"
+246QB0000X,"Spec/Tech, Pathology Blood Banking","Technologists, Technicians & Other Technical Service Providers"
+246QC1000X,"Spec/Tech, Pathology Chemistry","Technologists, Technicians & Other Technical Service Providers"
+246QC2700X,"Spec/Tech, Pathology Cytotechnology","Technologists, Technicians & Other Technical Service Providers"
+246QH0000X,"Spec/Tech, Pathology Hematology","Technologists, Technicians & Other Technical Service Providers"
+246QH0401X,"Spec/Tech, Pathology Hemapheresis Practitioner","Technologists, Technicians & Other Technical Service Providers"
+246QH0600X,"Spec/Tech, Pathology Histology","Technologists, Technicians & Other Technical Service Providers"
+246QI0000X,"Spec/Tech, Pathology Immunology","Technologists, Technicians & Other Technical Service Providers"
+246QL0900X,"Spec/Tech, Pathology Laboratory Management","Technologists, Technicians & Other Technical Service Providers"
+246QL0901X,"Spec/Tech, Pathology Laboratory Management, Diplomate","Technologists, Technicians & Other Technical Service Providers"
+246QM0706X,"Spec/Tech, Pathology Medical Technologist","Technologists, Technicians & Other Technical Service Providers"
+246QM0900X,"Spec/Tech, Pathology Microbiology","Technologists, Technicians & Other Technical Service Providers"
+246R00000X,"Technician, Pathology ","Technologists, Technicians & Other Technical Service Providers"
+246RH0600X,"Technician, Pathology Histology","Technologists, Technicians & Other Technical Service Providers"
+246RM2200X,"Technician, Pathology Medical Laboratory","Technologists, Technicians & Other Technical Service Providers"
+246RP1900X,"Technician, Pathology Phlebotomy","Technologists, Technicians & Other Technical Service Providers"
+246W00000X,"Technician, Cardiology ","Technologists, Technicians & Other Technical Service Providers"
+246X00000X,"Spec/Tech, Cardiovascular ","Technologists, Technicians & Other Technical Service Providers"
+246XC2901X,"Spec/Tech, Cardiovascular Cardiovascular Invasive Specialist","Technologists, Technicians & Other Technical Service Providers"
+246XC2903X,"Spec/Tech, Cardiovascular Vascular Specialist","Technologists, Technicians & Other Technical Service Providers"
+246XS1301X,"Spec/Tech, Cardiovascular Sonography","Technologists, Technicians & Other Technical Service Providers"
+246Y00000X,"Spec/Tech, Health Info ","Technologists, Technicians & Other Technical Service Providers"
+246YC3301X,"Spec/Tech, Health Info Coding Specialist, Hospital Based","Technologists, Technicians & Other Technical Service Providers"
+246YC3302X,"Spec/Tech, Health Info Coding Specialist, Physician Office Based","Technologists, Technicians & Other Technical Service Providers"
+246YR1600X,"Spec/Tech, Health Info Registered Record Administrator","Technologists, Technicians & Other Technical Service Providers"
+246Z00000X,"Specialist/Technologist, Other ","Technologists, Technicians & Other Technical Service Providers"
+246ZA2600X,"Specialist/Technologist, Other Art, Medical","Technologists, Technicians & Other Technical Service Providers"
+246ZB0301X,"Specialist/Technologist, Other Biomedical Engineering","Technologists, Technicians & Other Technical Service Providers"
+246ZB0302X,"Specialist/Technologist, Other Biomedical Photographer","Technologists, Technicians & Other Technical Service Providers"
+246ZB0500X,"Specialist/Technologist, Other Biochemist","Technologists, Technicians & Other Technical Service Providers"
+246ZB0600X,"Specialist/Technologist, Other Biostatistician","Technologists, Technicians & Other Technical Service Providers"
+246ZC0007X,"Specialist/Technologist, Other Surgical Assistant","Technologists, Technicians & Other Technical Service Providers"
+246ZE0500X,"Specialist/Technologist, Other EEG","Technologists, Technicians & Other Technical Service Providers"
+246ZE0600X,"Specialist/Technologist, Other Electroneurodiagnostic","Technologists, Technicians & Other Technical Service Providers"
+246ZG0701X,"Specialist/Technologist, Other Graphics Methods","Technologists, Technicians & Other Technical Service Providers"
+246ZG1000X,"Specialist/Technologist, Other Geneticist, Medical (PhD)","Technologists, Technicians & Other Technical Service Providers"
+246ZI1000X,"Specialist/Technologist, Other Illustration, Medical","Technologists, Technicians & Other Technical Service Providers"
+246ZN0300X,"Specialist/Technologist, Other Nephrology","Technologists, Technicians & Other Technical Service Providers"
+246ZS0410X,"Specialist/Technologist, Other Surgical Technologist","Technologists, Technicians & Other Technical Service Providers"
+246ZX2200X,"Specialist/Technologist, Other Orthopedic Assistant","Technologists, Technicians & Other Technical Service Providers"
+247000000X,"Technician, Health Information ","Technologists, Technicians & Other Technical Service Providers"
+2470A2800X,"Technician, Health Information Assistant Record Technician","Technologists, Technicians & Other Technical Service Providers"
+247100000X,Radiologic Technologist ,"Technologists, Technicians & Other Technical Service Providers"
+2471B0102X,Radiologic Technologist Bone Densitometry,"Technologists, Technicians & Other Technical Service Providers"
+2471C1101X,Radiologic Technologist Cardiovascular-Interventional Technology,"Technologists, Technicians & Other Technical Service Providers"
+2471C1106X,Radiologic Technologist Cardiac-Interventional Technology,"Technologists, Technicians & Other Technical Service Providers"
+2471C3401X,Radiologic Technologist Computed Tomography,"Technologists, Technicians & Other Technical Service Providers"
+2471C3402X,Radiologic Technologist Radiography,"Technologists, Technicians & Other Technical Service Providers"
+2471M1202X,Radiologic Technologist Magnetic Resonance Imaging,"Technologists, Technicians & Other Technical Service Providers"
+2471M2300X,Radiologic Technologist Mammography,"Technologists, Technicians & Other Technical Service Providers"
+2471N0900X,Radiologic Technologist Nuclear Medicine Technology,"Technologists, Technicians & Other Technical Service Providers"
+2471Q0001X,Radiologic Technologist Quality Management,"Technologists, Technicians & Other Technical Service Providers"
+2471R0002X,Radiologic Technologist Radiation Therapy,"Technologists, Technicians & Other Technical Service Providers"
+2471S1302X,Radiologic Technologist Sonography,"Technologists, Technicians & Other Technical Service Providers"
+2471V0105X,Radiologic Technologist Vascular Sonography,"Technologists, Technicians & Other Technical Service Providers"
+2471V0106X,Radiologic Technologist Vascular-Interventional Technology,"Technologists, Technicians & Other Technical Service Providers"
+247200000X,"Technician, Other ","Technologists, Technicians & Other Technical Service Providers"
+2472B0301X,"Technician, Other Biomedical Engineering","Technologists, Technicians & Other Technical Service Providers"
+2472D0500X,"Technician, Other Darkroom","Technologists, Technicians & Other Technical Service Providers"
+2472E0500X,"Technician, Other EEG","Technologists, Technicians & Other Technical Service Providers"
+2472R0900X,"Technician, Other Renal Dialysis","Technologists, Technicians & Other Technical Service Providers"
+2472V0600X,"Technician, Other Veterinary","Technologists, Technicians & Other Technical Service Providers"
+247ZC0005X,"Pathology Clinical Laboratory Director, Non-physician","Technologists, Technicians & Other Technical Service Providers"
+251300000X,Local Education Agency (LEA) ,Agencies
+251B00000X,Case Management ,Agencies
+251C00000X,"Day Training, Developmentally Disabled Services ",Agencies
+251E00000X,Home Health ,Agencies
+251F00000X,Home Infusion ,Agencies
+251G00000X,"Hospice Care, Community Based ",Agencies
+251J00000X,Nursing Care ,Agencies
+251K00000X,Public Health or Welfare ,Agencies
+251S00000X,Community/Behavioral Health ,Agencies
+251T00000X,PACE Provider Organization ,Agencies
+251V00000X,Voluntary or Charitable ,Agencies
+251X00000X,Supports Brokerage ,Agencies
+252Y00000X,Early Intervention Provider Agency ,Agencies
+253J00000X,Foster Care Agency ,Agencies
+253Z00000X,In Home Supportive Care ,Agencies
+261Q00000X,Clinic/Center ,Ambulatory Health Care Facilities
+261QA0005X,Clinic/Center Ambulatory Family Planning Facility,Ambulatory Health Care Facilities
+261QA0006X,Clinic/Center Ambulatory Fertility Facility,Ambulatory Health Care Facilities
+261QA0600X,Clinic/Center Adult Day Care,Ambulatory Health Care Facilities
+261QA0900X,Clinic/Center Amputee,Ambulatory Health Care Facilities
+261QA1903X,Clinic/Center Ambulatory Surgical,Ambulatory Health Care Facilities
+261QA3000X,Clinic/Center Augmentative Communication,Ambulatory Health Care Facilities
+261QB0400X,Clinic/Center Birthing,Ambulatory Health Care Facilities
+261QC0050X,Clinic/Center Critical Access Hospital,Ambulatory Health Care Facilities
+261QC1500X,Clinic/Center Community Health,Ambulatory Health Care Facilities
+261QC1800X,Clinic/Center Corporate Health,Ambulatory Health Care Facilities
+261QD0000X,Clinic/Center Dental,Ambulatory Health Care Facilities
+261QD1600X,Clinic/Center Developmental Disabilities,Ambulatory Health Care Facilities
+261QE0002X,Clinic/Center Emergency Care,Ambulatory Health Care Facilities
+261QE0700X,Clinic/Center End-Stage Renal Disease (ESRD) Treatment,Ambulatory Health Care Facilities
+261QE0800X,Clinic/Center Endoscopy,Ambulatory Health Care Facilities
+261QF0050X,"Clinic/Center Family Planning, Non-Surgical",Ambulatory Health Care Facilities
+261QF0400X,Clinic/Center Federally Qualified Health Center (FQHC),Ambulatory Health Care Facilities
+261QG0250X,Clinic/Center Genetics,Ambulatory Health Care Facilities
+261QH0100X,Clinic/Center Health Service,Ambulatory Health Care Facilities
+261QH0700X,Clinic/Center Hearing and Speech,Ambulatory Health Care Facilities
+261QI0500X,Clinic/Center Infusion Therapy,Ambulatory Health Care Facilities
+261QL0400X,Clinic/Center Lithotripsy,Ambulatory Health Care Facilities
+261QM0801X,Clinic/Center Mental Health (Including Community Mental Health Center),Ambulatory Health Care Facilities
+261QM0850X,Clinic/Center Adult Mental Health,Ambulatory Health Care Facilities
+261QM0855X,Clinic/Center Adolescent and Children Mental Health,Ambulatory Health Care Facilities
+261QM1000X,Clinic/Center Migrant Health,Ambulatory Health Care Facilities
+261QM1100X,Clinic/Center Military/U.S. Coast Guard Outpatient,Ambulatory Health Care Facilities
+261QM1101X,Clinic/Center Military and U.S. Coast Guard Ambulatory Procedure,Ambulatory Health Care Facilities
+261QM1102X,Clinic/Center Military Outpatient Operational (Transportable) Component,Ambulatory Health Care Facilities
+261QM1103X,Clinic/Center Military Ambulatory Procedure Visits Operational (Transportable),Ambulatory Health Care Facilities
+261QM1200X,Clinic/Center Magnetic Resonance Imaging (MRI),Ambulatory Health Care Facilities
+261QM1300X,Clinic/Center Multi-Specialty,Ambulatory Health Care Facilities
+261QM2500X,Clinic/Center Medical Specialty,Ambulatory Health Care Facilities
+261QM2800X,Clinic/Center Methadone Clinic,Ambulatory Health Care Facilities
+261QM3000X,Clinic/Center Medically Fragile Intants and Children Day Care,Ambulatory Health Care Facilities
+261QP0904X,"Clinic/Center Public Health, Federal",Ambulatory Health Care Facilities
+261QP0905X,"Clinic/Center Public Health, State or Local",Ambulatory Health Care Facilities
+261QP1100X,Clinic/Center Podiatric,Ambulatory Health Care Facilities
+261QP2000X,Clinic/Center Physical Therapy,Ambulatory Health Care Facilities
+261QP2300X,Clinic/Center Primary Care,Ambulatory Health Care Facilities
+261QP2400X,Clinic/Center Prison Health,Ambulatory Health Care Facilities
+261QP3300X,Clinic/Center Pain,Ambulatory Health Care Facilities
+261QR0200X,Clinic/Center Radiology,Ambulatory Health Care Facilities
+261QR0206X,"Clinic/Center Radiology, Mammography",Ambulatory Health Care Facilities
+261QR0207X,"Clinic/Center Radiology, Mobile Mammography",Ambulatory Health Care Facilities
+261QR0208X,"Clinic/Center Radiology, Mobile",Ambulatory Health Care Facilities
+261QR0400X,Clinic/Center Rehabilitation,Ambulatory Health Care Facilities
+261QR0401X,"Clinic/Center Rehabilitation, Comprehensive Outpatient Rehabilitation Facility (CORF)",Ambulatory Health Care Facilities
+261QR0404X,"Clinic/Center Rehabilitation, Cardiac Facilities",Ambulatory Health Care Facilities
+261QR0405X,"Clinic/Center Rehabilitation, Substance Use Disorder",Ambulatory Health Care Facilities
+261QR0800X,Clinic/Center Recovery Care,Ambulatory Health Care Facilities
+261QR1100X,Clinic/Center Research,Ambulatory Health Care Facilities
+261QR1300X,Clinic/Center Rural Health,Ambulatory Health Care Facilities
+261QS0112X,Clinic/Center Oral and Maxillofacial Surgery,Ambulatory Health Care Facilities
+261QS0132X,Clinic/Center Ophthalmologic Surgery,Ambulatory Health Care Facilities
+261QS1000X,Clinic/Center Student Health,Ambulatory Health Care Facilities
+261QS1200X,Clinic/Center Sleep Disorder Diagnostic,Ambulatory Health Care Facilities
+261QU0200X,Clinic/Center Urgent Care,Ambulatory Health Care Facilities
+261QV0200X,Clinic/Center VA,Ambulatory Health Care Facilities
+261QX0100X,Clinic/Center Occupational Medicine,Ambulatory Health Care Facilities
+261QX0200X,Clinic/Center Oncology,Ambulatory Health Care Facilities
+261QX0203X,"Clinic/Center Oncology, Radiation",Ambulatory Health Care Facilities
+273100000X,Epilepsy Unit ,Hospital Units
+273R00000X,Psychiatric Unit ,Hospital Units
+273Y00000X,Rehabilitation Unit ,Hospital Units
+275N00000X,Medicare Defined Swing Bed Unit ,Hospital Units
+276400000X,"Rehabilitation, Substance Use Disorder Unit ",Hospital Units
+281P00000X,Chronic Disease Hospital ,Hospitals
+281PC2000X,Chronic Disease Hospital Children,Hospitals
+282E00000X,Long Term Care Hospital ,Hospitals
+282J00000X,Religious Nonmedical Health Care Institution ,Hospitals
+282N00000X,General Acute Care Hospital ,Hospitals
+282NC0060X,General Acute Care Hospital Critical Access,Hospitals
+282NC2000X,General Acute Care Hospital Children,Hospitals
+282NR1301X,General Acute Care Hospital Rural,Hospitals
+282NW0100X,General Acute Care Hospital Women,Hospitals
+283Q00000X,Psychiatric Hospital ,Hospitals
+283X00000X,Rehabilitation Hospital ,Hospitals
+283XC2000X,Rehabilitation Hospital Children,Hospitals
+284300000X,Special Hospital ,Hospitals
+286500000X,Military Hospital ,Hospitals
+2865C1500X,Military Hospital Community Health,Hospitals
+2865M2000X,Military Hospital Military General Acute Care Hospital,Hospitals
+2865X1600X,Military Hospital Military General Acute Care Hospital. Operational (Transportable),Hospitals
+287300000X,Christian Science Sanitorium ,Hospitals
+291900000X,Military Clinical Medical Laboratory ,Laboratories
+291U00000X,Clinical Medical Laboratory ,Laboratories
+292200000X,Dental Laboratory ,Laboratories
+293D00000X,Physiological Laboratory ,Laboratories
+302F00000X,Exclusive Provider Organization ,Managed Care Organizations
+302R00000X,Health Maintenance Organization ,Managed Care Organizations
+305R00000X,Preferred Provider Organization ,Managed Care Organizations
+305S00000X,Point of Service ,Managed Care Organizations
+310400000X,Assisted Living Facility ,Nursing & Custodial Care Facilities
+3104A0625X,"Assisted Living Facility Assisted Living, Mental Illness",Nursing & Custodial Care Facilities
+3104A0630X,"Assisted Living Facility Assisted Living, Behavioral Disturbances",Nursing & Custodial Care Facilities
+310500000X,"Intermediate Care Facility, Mental Illness ",Nursing & Custodial Care Facilities
+311500000X,Alzheimer Center (Dementia Center) ,Nursing & Custodial Care Facilities
+311Z00000X,Custodial Care Facility ,Nursing & Custodial Care Facilities
+311ZA0620X,Custodial Care Facility Adult Care Home,Nursing & Custodial Care Facilities
+313M00000X,Nursing Facility/Intermediate Care Facility ,Nursing & Custodial Care Facilities
+314000000X,Skilled Nursing Facility ,Nursing & Custodial Care Facilities
+3140N1450X,"Skilled Nursing Facility Nursing Care, Pediatric",Nursing & Custodial Care Facilities
+315D00000X,"Hospice, Inpatient ",Nursing & Custodial Care Facilities
+315P00000X,"Intermediate Care Facility, Mentally Retarded ",Nursing & Custodial Care Facilities
+317400000X,Christian Science Facility ,Nursing & Custodial Care Facilities
+320600000X,"Residential Treatment Facility, Mental Retardation and/or Developmental Disabilities ",Residential Treatment Facilities
+320700000X,"Residential Treatment Facility, Physical Disabilities ",Residential Treatment Facilities
+320800000X,"Community Based Residential Treatment Facility, Mental Illness ",Residential Treatment Facilities
+320900000X,"Community Based Residential Treatment, Mental Retardation and/or Developmental Disabilities ",Residential Treatment Facilities
+322D00000X,"Residential Treatment Facility, Emotionally Disturbed Children ",Residential Treatment Facilities
+323P00000X,Psychiatric Residential Treatment Facility ,Residential Treatment Facilities
+324500000X,Substance Abuse Rehabilitation Facility ,Residential Treatment Facilities
+3245S0500X,"Substance Abuse Rehabilitation Facility Substance Abuse Treatment, Children",Residential Treatment Facilities
+331L00000X,Blood Bank ,Suppliers
+332000000X,Military/U.S. Coast Guard Pharmacy ,Suppliers
+332100000X,Department of Veterans Affairs (VA) Pharmacy ,Suppliers
+332800000X,Indian Health Service/Tribal/Urban Indian Health (I/T/U) Pharmacy ,Suppliers
+332900000X,Non-Pharmacy Dispensing Site ,Suppliers
+332B00000X,Durable Medical Equipment & Medical Supplies ,Suppliers
+332BC3200X,Durable Medical Equipment & Medical Supplies Customized Equipment,Suppliers
+332BD1200X,Durable Medical Equipment & Medical Supplies Dialysis Equipment & Supplies,Suppliers
+332BN1400X,Durable Medical Equipment & Medical Supplies Nursing Facility Supplies,Suppliers
+332BP3500X,Durable Medical Equipment & Medical Supplies Parenteral & Enteral Nutrition,Suppliers
+332BX2000X,Durable Medical Equipment & Medical Supplies Oxygen Equipment & Supplies,Suppliers
+332G00000X,Eye Bank ,Suppliers
+332H00000X,"Eyewear Supplier (Equipment, not the service) ",Suppliers
+332S00000X,Hearing  Aid Equipment ,Suppliers
+332U00000X,Home Delivered Meals ,Suppliers
+333300000X,Emergency Response System Companies ,Suppliers
+333600000X,Pharmacy ,Suppliers
+3336C0002X,Pharmacy Clinic Pharmacy,Suppliers
+3336C0003X,Pharmacy Community/Retail Pharmacy,Suppliers
+3336C0004X,Pharmacy Compounding Pharmacy,Suppliers
+3336H0001X,Pharmacy Home Infusion Therapy Pharmacy,Suppliers
+3336I0012X,Pharmacy Institutional Pharmacy,Suppliers
+3336L0003X,Pharmacy Long Term Care Pharmacy,Suppliers
+3336M0002X,Pharmacy Mail Order Pharmacy,Suppliers
+3336M0003X,Pharmacy Managed Care Organization Pharmacy,Suppliers
+3336N0007X,Pharmacy Nuclear Pharmacy,Suppliers
+3336S0011X,Pharmacy Specialty Pharmacy,Suppliers
+335E00000X,Prosthetic/Orthotic Supplier ,Suppliers
+335G00000X,Medical Foods Supplier ,Suppliers
+335U00000X,Organ Procurement Organization ,Suppliers
+335V00000X,Portable X-ray and/or Other Portable Diagnostic Imaging Supplier ,Suppliers
+341600000X,Ambulance ,Transportation Services
+3416A0800X,Ambulance Air Transport,Transportation Services
+3416L0300X,Ambulance Land Transport,Transportation Services
+3416S0300X,Ambulance Water Transport,Transportation Services
+341800000X,Military/U.S. Coast Guard Transport ,Transportation Services
+3418M1110X,"Military/U.S. Coast Guard Transport Military or U.S. Coast Guard Ambulance, Ground Transport",Transportation Services
+3418M1120X,"Military/U.S. Coast Guard Transport Military or U.S. Coast Guard Ambulance, Air Transport",Transportation Services
+3418M1130X,"Military/U.S. Coast Guard Transport Military or U.S. Coast Guard Ambulance, Water Transport",Transportation Services
+343800000X,Secured Medical Transport (VAN) ,Transportation Services
+343900000X,Non-emergency Medical Transport (VAN) ,Transportation Services
+344600000X,Taxi ,Transportation Services
+344800000X,Air Carrier ,Transportation Services
+347B00000X,Bus ,Transportation Services
+347C00000X,Private Vehicle ,Transportation Services
+347D00000X,Train ,Transportation Services
+347E00000X,Transportation Broker ,Transportation Services
+363A00000X,Physician Assistant ,Physician Assistants & Advanced Practice Nursing Providers
+363AM0700X,Physician Assistant Medical,Physician Assistants & Advanced Practice Nursing Providers
+363AS0400X,Physician Assistant Surgical Technologist,Physician Assistants & Advanced Practice Nursing Providers
+363L00000X,Nurse Practitioner ,Physician Assistants & Advanced Practice Nursing Providers
+363LA2100X,Nurse Practitioner Acute Care,Physician Assistants & Advanced Practice Nursing Providers
+363LA2200X,Nurse Practitioner Adult Health,Physician Assistants & Advanced Practice Nursing Providers
+363LC0200X,Nurse Practitioner Critical Care Medicine,Physician Assistants & Advanced Practice Nursing Providers
+363LC1500X,Nurse Practitioner Community Health,Physician Assistants & Advanced Practice Nursing Providers
+363LF0000X,Nurse Practitioner Family,Physician Assistants & Advanced Practice Nursing Providers
+363LG0600X,Nurse Practitioner Gerontology,Physician Assistants & Advanced Practice Nursing Providers
+363LN0000X,Nurse Practitioner Neonatal,Physician Assistants & Advanced Practice Nursing Providers
+363LN0005X,"Nurse Practitioner Neonatal, Critical Care",Physician Assistants & Advanced Practice Nursing Providers
+363LP0200X,Nurse Practitioner Pediatrics,Physician Assistants & Advanced Practice Nursing Providers
+363LP0222X,"Nurse Practitioner Pediatrics, Critical Care",Physician Assistants & Advanced Practice Nursing Providers
+363LP0808X,Nurse Practitioner Psych/Mental Health,Physician Assistants & Advanced Practice Nursing Providers
+363LP1700X,Nurse Practitioner Perinatal,Physician Assistants & Advanced Practice Nursing Providers
+363LP2300X,Nurse Practitioner Primary Care,Physician Assistants & Advanced Practice Nursing Providers
+363LS0200X,Nurse Practitioner School,Physician Assistants & Advanced Practice Nursing Providers
+363LW0102X,Nurse Practitioner Women's Health,Physician Assistants & Advanced Practice Nursing Providers
+363LX0001X,Nurse Practitioner Obstetrics & Gynecology,Physician Assistants & Advanced Practice Nursing Providers
+363LX0106X,Nurse Practitioner Occupational Health,Physician Assistants & Advanced Practice Nursing Providers
+364S00000X,Clinical Nurse Specialist ,Physician Assistants & Advanced Practice Nursing Providers
+364SA2100X,Clinical Nurse Specialist Acute Care,Physician Assistants & Advanced Practice Nursing Providers
+364SA2200X,Clinical Nurse Specialist Adult Health,Physician Assistants & Advanced Practice Nursing Providers
+364SC0200X,Clinical Nurse Specialist Critical Care Medicine,Physician Assistants & Advanced Practice Nursing Providers
+364SC1501X,Clinical Nurse Specialist Community Health/Public Health,Physician Assistants & Advanced Practice Nursing Providers
+364SC2300X,Clinical Nurse Specialist Chronic Care,Physician Assistants & Advanced Practice Nursing Providers
+364SE0003X,Clinical Nurse Specialist Emergency,Physician Assistants & Advanced Practice Nursing Providers
+364SE1400X,Clinical Nurse Specialist Ethics,Physician Assistants & Advanced Practice Nursing Providers
+364SF0001X,Clinical Nurse Specialist Family Health,Physician Assistants & Advanced Practice Nursing Providers
+364SG0600X,Clinical Nurse Specialist Gerontology,Physician Assistants & Advanced Practice Nursing Providers
+364SH0200X,Clinical Nurse Specialist Home Health,Physician Assistants & Advanced Practice Nursing Providers
+364SH1100X,Clinical Nurse Specialist Holistic,Physician Assistants & Advanced Practice Nursing Providers
+364SI0800X,Clinical Nurse Specialist Informatics,Physician Assistants & Advanced Practice Nursing Providers
+364SL0600X,Clinical Nurse Specialist Long-Term Care,Physician Assistants & Advanced Practice Nursing Providers
+364SM0705X,Clinical Nurse Specialist Medical-Surgical,Physician Assistants & Advanced Practice Nursing Providers
+364SN0000X,Clinical Nurse Specialist Neonatal,Physician Assistants & Advanced Practice Nursing Providers
+364SN0800X,Clinical Nurse Specialist Neuroscience,Physician Assistants & Advanced Practice Nursing Providers
+364SP0200X,Clinical Nurse Specialist Pediatrics,Physician Assistants & Advanced Practice Nursing Providers
+364SP0807X,"Clinical Nurse Specialist Psych/Mental Health, Child & Adolescent",Physician Assistants & Advanced Practice Nursing Providers
+364SP0808X,Clinical Nurse Specialist Psych/Mental Health,Physician Assistants & Advanced Practice Nursing Providers
+364SP0809X,"Clinical Nurse Specialist Psych/Mental Health, Adult",Physician Assistants & Advanced Practice Nursing Providers
+364SP0810X,"Clinical Nurse Specialist Psych/Mental Health, Child & Family",Physician Assistants & Advanced Practice Nursing Providers
+364SP0811X,"Clinical Nurse Specialist Psych/Mental Health, Chronically Ill",Physician Assistants & Advanced Practice Nursing Providers
+364SP0812X,"Clinical Nurse Specialist Psych/Mental Health, Community",Physician Assistants & Advanced Practice Nursing Providers
+364SP0813X,"Clinical Nurse Specialist Psych/Mental Health, Geropsychiatric",Physician Assistants & Advanced Practice Nursing Providers
+364SP1700X,Clinical Nurse Specialist Perinatal,Physician Assistants & Advanced Practice Nursing Providers
+364SP2800X,Clinical Nurse Specialist Perioperative,Physician Assistants & Advanced Practice Nursing Providers
+364SR0400X,Clinical Nurse Specialist Rehabilitation,Physician Assistants & Advanced Practice Nursing Providers
+364SS0200X,Clinical Nurse Specialist School,Physician Assistants & Advanced Practice Nursing Providers
+364ST0500X,Clinical Nurse Specialist Transplantation,Physician Assistants & Advanced Practice Nursing Providers
+364SW0102X,Clinical Nurse Specialist Women's Health,Physician Assistants & Advanced Practice Nursing Providers
+364SX0106X,Clinical Nurse Specialist Occupational Health,Physician Assistants & Advanced Practice Nursing Providers
+364SX0200X,Clinical Nurse Specialist Oncology,Physician Assistants & Advanced Practice Nursing Providers
+364SX0204X,"Clinical Nurse Specialist Oncology, Pediatrics",Physician Assistants & Advanced Practice Nursing Providers
+367500000X,"Nurse Anesthetist, Certified Registered ",Physician Assistants & Advanced Practice Nursing Providers
+367A00000X,Advanced Practice Midwife ,Physician Assistants & Advanced Practice Nursing Providers
+367H00000X,Anesthesiologist Assistant ,Physician Assistants & Advanced Practice Nursing Providers
+372500000X,Chore Provider ,Nursing Service Related Providers
+372600000X,Adult Companion ,Nursing Service Related Providers
+373H00000X,Day Training/Habilitation Specialist ,Nursing Service Related Providers
+374700000X,Technician ,Nursing Service Related Providers
+3747A0650X,Technician Attendant Care Provider,Nursing Service Related Providers
+3747P1801X,Technician Personal Care Attendant,Nursing Service Related Providers
+374J00000X,Doula ,Nursing Service Related Providers
+374K00000X,Religious Nonmedical Practitioner ,Nursing Service Related Providers
+374T00000X,Religious Nonmedical Nursing Personnel ,Nursing Service Related Providers
+374U00000X,Home Health Aide ,Nursing Service Related Providers
+376G00000X,Nursing Home Administrator ,Nursing Service Related Providers
+376J00000X,Homemaker ,Nursing Service Related Providers
+376K00000X,Nurse's Aide ,Nursing Service Related Providers
+385H00000X,Respite Care ,Respite Care Facility
+385HR2050X,Respite Care Respite Care Camp,Respite Care Facility
+385HR2055X,"Respite Care Respite Care, Mental Illness, Child",Respite Care Facility
+385HR2060X,"Respite Care Respite Care, Mental Retardation and/or Developmental Disabilities, Child",Respite Care Facility
+385HR2065X,"Respite Care Respite Care, Physical Disabilities, Child",Respite Care Facility
+390200000X,Student in an Organized Health Care Education/Training Program ,"Student, Health Care"
+405300000X,Prevention Professional ,Other Service Providers
+NI,No information,
+UN,Unknown,
+OT,Other,

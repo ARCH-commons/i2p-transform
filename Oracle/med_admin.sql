@@ -1,5 +1,7 @@
 /** med_admin - create and populate the med_admin table.
 */
+insert into cdm_status (task, start_time) select 'med_admin', sysdate from dual
+/
 BEGIN
 PMN_DROPSQL('DROP TABLE med_admin');
 END;
@@ -112,6 +114,8 @@ BEGIN
 PCORNetMedAdmin();
 END;
 /
-insert into cdm_status (status, last_update, records) select 'med_admin', sysdate, count(*) from med_admin
+update cdm_status
+set end_time = sysdate, records = (select count(*) from med_admin)
+where task = 'med_admin'
 /
-select 1 from cdm_status where status = 'med_admin'
+select records from cdm_status where task = 'med_admin'

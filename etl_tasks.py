@@ -12,7 +12,7 @@ import csv
 import logging
 
 from luigi.contrib.sqla import SQLAlchemyTarget
-from sqlalchemy import text as sql_text, func, Table  # type: ignore
+from sqlalchemy import text as sql_text, Column, func, MetaData, Table  # type: ignore
 from sqlalchemy.engine import Connection, Engine
 from sqlalchemy.engine.result import ResultProxy
 from sqlalchemy.engine.url import make_url
@@ -362,6 +362,64 @@ class SqlScriptTask(DBAccessTask):
                     bulk_rows: int) -> int:
         raise NotImplementedError(
             'overriding is_bulk() requires overriding bulk_insert()')
+
+
+class CDMStatusTask(DBAccessTask):
+    '''
+    A DBAccessTask that relies on the CDM status table to assess completion.
+
+    Typical usage is to record the start of the task, run task operations and then record
+    the end of the task.
+        self.setTaskStart()
+        self.load()
+        self.setTaskEnd(self.getRecordCountFromTable())
+    '''
+    taskName = StrParam()
+
+    # Basic status check, assume the typical task produces at least one record.
+    expectedRecords = IntParam(default=1)
+
+    def complete(self) -> bool:
+        '''
+        Complete when the CDM status table reports at least as many records as expected for the task.
+        '''
+        with self.connection() as q:
+            statusTableRecordCount = q.scalar('select records from cdm_status where task = \'%s\'' % self.taskName)
+
+            # If true, the task has not been logged in the CDM status table or has been logged and is in an
+            # inconsistent state with the number of records set to null.
+            if statusTableRecordCount == None:
+                return False
+
+            log.info('task %s has %d rows', self.taskName, statusTableRecordCount)
+            return statusTableRecordCount >= self.expectedRecords  # type: ignore  # sqla
+
+    def getRecordCountFromTable(self) -> int:
+        '''
+        Queries the database for the number of records in the table named taskName
+        '''
+        # This op is out of sync with the rest of the class, in that it assumes
+        # the task must represent the creation of a table in the db.
+        with self.connection() as q:
+            return q.scalar(sqla.select([func.count()]).select_from(self.taskName))
+
+    def setTaskEnd(self, rowCount: int) -> None:
+        '''
+        Updates the taskName entry in the CDM status table with an end time of now and a count of records.
+        '''
+        statusTable = Table("cdm_status", MetaData(), Column('TASK'), Column('START_TIME'), Column('END_TIME'), Column('RECORDS'))
+
+        db = self._dbtarget().engine
+        db.execute(statusTable.update().where(statusTable.c.TASK == self.taskName), [{'END_TIME': datetime.now(), 'RECORDS': rowCount}])
+
+    def setTaskStart(self) -> None:
+        '''
+        Adds taskName to the CDM status table with a start time of now.
+        '''
+        statusTable = Table("cdm_status", MetaData(), Column('TASK'), Column('START_TIME'), Column('END_TIME'), Column('RECORDS'))
+
+        db = self._dbtarget().engine
+        db.execute(statusTable.insert(), [{'TASK': self.taskName, 'START_TIME': datetime.now()}])
 
 
 def log_plan(lc: LoggedConnection, event: str, params: Dict[str, Any],
