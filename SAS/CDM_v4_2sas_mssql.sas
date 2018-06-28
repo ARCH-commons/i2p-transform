@@ -26,7 +26,7 @@ Instructions:
 
 libname sql_cdm odbc datasrc='PopMedNet'; 
 /* optionally add a password above: e.g., libname sql_cdm odbc datasrc='ORACLE_PMN' password=myPassWord; */
-libname cdm "C:\Users\maj60\Documents\CDM_v4_april2018";
+libname cdm "E:\maj60\CDM_v4_april2018";
 
 
 proc sql noprint; 
@@ -269,7 +269,6 @@ SELECT
 	   PUT(LAB_RESULT_CM_ID,32.) AS LAB_RESULT_CM_ID ,
        PATID ,
        ENCOUNTERID ,
-       LAB_NAME ,
        SPECIMEN_SOURCE ,
        LAB_LOINC ,
        PRIORITY ,
@@ -375,6 +374,103 @@ SELECT PATID ,
        DEATH_CAUSE_SOURCE ,
        DEATH_CAUSE_CONFIDENCE 
 FROM SQL_CDM.PMNDEATH_CAUSE
+;
+
+
+proc sql noprint; 
+
+create table cdm.PROVIDER (compress=yes) as
+
+SELECT PROVIDERID ,
+       PROVIDER_SEX ,
+       PROVIDER_SPECIALTY_PRIMARY ,
+       PROVIDER_NPI ,
+       PROVIDER_NPI_FLAG ,
+       RAW_PROVIDER_SPECIALTY_PRIMARY
+FROM SQL_CDM.PROVIDER
+;
+
+proc sql noprint; 
+
+create table cdm.MED_ADMIN (compress=yes) as
+
+SELECT MEDADMINID ,
+       PATID ,
+       ENCOUNTERID ,
+       PRESCRIBINGID ,
+       MEDADMIN_PROVIDERID ,
+       MEDADMIN_START_DATE ,
+       MEDADMIN_START_TIME ,
+       MEDADMIN_STOP_DATE ,
+       MEDADMIN_STOP_TIME ,
+       MEDADMIN_TYPE ,
+       MEDADMIN_CODE ,
+       MEDADMIN_DOSE_ADMIN ,
+       MEDADMIN_DOSE_ADMIN_UNIT ,
+       MEDADMIN_ROUTE ,
+       MEDADMIN_SOURCE ,
+       RAW_MEDADMIN_MED_NAME ,
+       RAW_MEDADMIN_CODE ,
+       RAW_MEDADMIN_DOSE_ADMIN ,
+       RAW_MEDADMIN_DOSE_ADMIN_UNIT ,
+       RAW_MEDADMIN_ROUTE 
+FROM SQL_CDM.MED_ADMIN
+;
+
+
+proc sql noprint; 
+
+create table cdm.OBS_CLIN (compress=yes) as
+
+SELECT OBSCLINID ,
+       PATID ,
+       ENCOUNTERID ,
+       OBSCLIN_PROVIDERID ,
+       OBSCLIN_DATE ,
+       OBSCLIN_TIME ,
+       OBSCLIN_TYPE ,
+       OBSCLIN_CODE ,
+       OBSCLIN_RESULT_QUAL ,
+       OBSCLIN_RESULT_TEXT ,
+       OBSCLIN_RESULT_SNOMED ,
+       OBSLCIN_RESULT_NUM ,
+       OBSCLIN_RESULT_MODIFIER ,
+       OBSCLIN_RESULT_UNIT ,
+       RAW_OBSCLIN_NAME ,
+       RAW_OBSCLIN_CODE ,
+       RAW_OBSCLIN_TYPE ,
+       RAW_OBSCLIN_RESULT ,
+       RAW_OBSCLIN_MODIFER ,
+       RAW_OBSCLIN_UNIT
+FROM SQL_CDM.OBS_CLIN
+;
+
+
+proc sql noprint; 
+
+create table cdm.OBS_GEN (compress=yes) as
+
+SELECT OBSGENID ,
+       PATID ,
+       ENCOUNTERID ,
+       OBSGEN_PROVIDERID ,
+       OBSGEN_DATE ,
+       OBSGEN_TIME ,
+       OBSGEN_TYPE ,
+       OBSGEN_CODE ,
+       OBSGEN_RESULT_QUAL ,
+       OBSGEN_RESULT_TEXT ,
+       OBSGEN_RESULT_NUM ,
+       OBSGEN_RESULT_MODIFIER ,
+       OBSGEN_RESULT_UNIT ,
+       OBSGEN_TABLE_MODIFIER ,
+       OBSGEN_ID_MODIFIED ,
+       RAW_OBSGEN_NAME ,
+       RAW_OBSGEN_CODE ,
+       RAW_OBSGEN_TYPE ,
+       RAW_OBSGEN_RESULT ,
+       RAW_OBSGEN_UNIT 
+FROM SQL_CDM.OBS_GEN
 ;
 
 
