@@ -322,7 +322,6 @@ CREATE TABLE [dbo].[pmnlab_result_cm]( --Modified on 2/6/17 from labresults_cm t
 	[LAB_RESULT_CM_ID] [bigint]  IDENTITY (1,1) NOT NULL,
 	[PATID] [varchar](50) NOT NULL,
 	[ENCOUNTERID] [varchar](50) NULL,
-	[LAB_NAME] [varchar](10) NULL,
 	[SPECIMEN_SOURCE] [varchar](50) NULL,
 	[LAB_LOINC] [varchar](10) NULL,
 	[PRIORITY] [varchar](2) NULL,
