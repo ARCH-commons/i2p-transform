@@ -22,12 +22,22 @@ CREATE TABLE encounter(
 	DRG varchar(3) NULL,
 	DRG_TYPE varchar(2) NULL,
 	ADMITTING_SOURCE varchar(2) NULL,
+	PAYER_TYPE_PRIMARY varchar(5) NULL,
+	PAYER_TYPE_SECONDARY varchar(5) NULL,
+	FACILITY_TYPE varchar(50) NULL,
 	RAW_SITEID varchar (50) NULL,
 	RAW_ENC_TYPE varchar(50) NULL,
 	RAW_DISCHARGE_DISPOSITION varchar(50) NULL,
 	RAW_DISCHARGE_STATUS varchar(50) NULL,
 	RAW_DRG_TYPE varchar(50) NULL,
-	RAW_ADMITTING_SOURCE varchar(50) NULL
+	RAW_ADMITTING_SOURCE varchar(50) NULL,
+	RAW_FACILITY_TYPE varchar(50) NULL,
+	RAW_PAYER_TYPE_PRIMARY varchar(50) NULL,
+	RAW_PAYER_NAME_PRIMARY varchar(50) NULL,
+	RAW_PAYER_ID_PRIMARY varchar(50) NULL,
+	RAW_PAYER_TYPE_SECONDARY varchar(50) NULL,
+	RAW_PAYER_NAME_SECONDARY varchar(50) NULL,
+	RAW_PAYER_ID_SECONDARY varchar(50) NULL
 )
 /
 BEGIN
@@ -65,23 +75,56 @@ where rn=1;
 execute immediate 'create index drg_idx on drg (patient_num, encounter_num)';
 --GATHER_TABLE_STATS('drg');
 
-insert into encounter(PATID,ENCOUNTERID,admit_date ,ADMIT_TIME ,
-		DISCHARGE_DATE ,DISCHARGE_TIME ,PROVIDERID ,FACILITY_LOCATION
-		,ENC_TYPE ,FACILITYID ,DISCHARGE_DISPOSITION ,
-		DISCHARGE_STATUS ,DRG ,DRG_TYPE ,ADMITTING_SOURCE)
-select distinct v.patient_num, v.encounter_num,
+insert into encounter(PATID, ENCOUNTERID, admit_date, ADMIT_TIME, DISCHARGE_DATE, DISCHARGE_TIME, PROVIDERID
+    , FACILITY_LOCATION, ENC_TYPE, FACILITYID, DISCHARGE_DISPOSITION, DISCHARGE_STATUS, DRG, DRG_TYPE
+    , ADMITTING_SOURCE, PAYER_TYPE_PRIMARY, PAYER_TYPE_SECONDARY, FACILITY_TYPE, RAW_SITEID, RAW_ENC_TYPE
+    , RAW_DISCHARGE_DISPOSITION, RAW_DISCHARGE_STATUS, RAW_DRG_TYPE, RAW_ADMITTING_SOURCE, RAW_FACILITY_TYPE
+    , RAW_PAYER_TYPE_PRIMARY, RAW_PAYER_NAME_PRIMARY, RAW_PAYER_ID_PRIMARY, RAW_PAYER_TYPE_SECONDARY
+    , RAW_PAYER_NAME_SECONDARY, RAW_PAYER_ID_SECONDARY)
+with payer as (
+select f.encounter_num
+    , f.patient_num
+    , pm.code payer_type_primary
+    ,f.tval_char raw_payer_name_primary
+    , SUBSTR(f.concept_cd, INSTR(f.concept_cd, ':', 1, 1) + 1) raw_payer_id_primary
+    , sf.tval_char raw_payer_type_primary
+from i2b2fact f
+join demographic d on f.patient_num = d.patid
+left join blueherondata.supplemental_fact sf on f.instance_num = sf.instance_num
+left join payer_mapping pm on lower(pm.payer_name) = lower(f.tval_char) and lower(pm.financial_class) = lower(sf.tval_char)
+where concept_cd like 'KUH|PAYER:%' or concept_cd like 'KUMC|PAYER:%'
+and sf.source_column = 'FINANCIAL_CLASS'
+)
+select distinct v.patient_num,
+    v.encounter_num,
 	start_Date,
 	to_char(start_Date,'HH24:MI'),
 	end_Date,
 	to_char(end_Date,'HH24:MI'),
 	providerid,
-  'NI' location_zip, /* See TODO above */
-(case when pcori_enctype is not null then pcori_enctype else 'UN' end) enc_type,
-  'NI' facility_id,  /* See TODO above */
-  CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE  discharge_disposition END,
-  CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE discharge_status END,
-  drg.drg, drg_type,
-  CASE WHEN admitting_source IS NULL THEN 'NI' ELSE admitting_source END admitting_source
+    'NI' location_zip, /* See TODO above */
+    (case when pcori_enctype is not null then pcori_enctype else 'UN' end) enc_type,
+    'NI' facility_id,  /* See TODO above */
+    CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE  discharge_disposition END,
+    CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE discharge_status END,
+    drg.drg, drg_type,
+    CASE WHEN admitting_source IS NULL THEN 'NI' ELSE admitting_source END admitting_source,
+    p.payer_type_primary,
+    null payer_type_secondary,
+    null facility_type,
+    null raw_siteid,
+    null raw_enc_type,
+    null raw_discharge_disposition,
+    null raw_discharge_status,
+    null raw_drg_type,
+    null raw_admitting_source,
+    null raw_facility_type,
+    p.raw_payer_type_primary,
+    p.raw_payer_name_primary,
+    p.raw_payer_id_primary,
+    null raw_payer_type_secondary,
+    null raw_payer_name_secondary,
+    null raw_payer_id_secondary
 from i2b2visit v inner join demographic d on v.patient_num=d.patid
 left outer join drg -- This section is bugfixed to only include 1 drg if multiple DRG types exist in a single encounter...
   on drg.patient_num=v.patient_num and drg.encounter_num=v.encounter_num
@@ -89,7 +132,9 @@ left outer join
 -- Encounter type. Note that this requires a full table scan on the ontology table, so it is not particularly efficient.
 (select patient_num, encounter_num, inout_cd,SUBSTR(pcori_basecode,INSTR(pcori_basecode, ':')+1,2) pcori_enctype from i2b2visit v
  inner join pcornet_enc e on c_dimcode like '%'''||inout_cd||'''%' and e.c_fullname like '\PCORI\ENCOUNTER\ENC_TYPE\%') enctype
-  on enctype.patient_num=v.patient_num and enctype.encounter_num=v.encounter_num;
+  on enctype.patient_num=v.patient_num and enctype.encounter_num=v.encounter_num
+left outer join payer p on p.patient_num = v.patient_num and p.encounter_num = v.encounter_num
+;
 
 execute immediate 'create unique index encounter_pk on encounter (ENCOUNTERID)';
 execute immediate 'create index encounter_idx on encounter (PATID, ENCOUNTERID)';
