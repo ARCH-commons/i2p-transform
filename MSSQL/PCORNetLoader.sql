@@ -1787,10 +1787,20 @@ inner join pmnENCOUNTER enc on enc.patid = i2b2fact.patient_num and enc.encounte
 inner join pcornet_lab lsource on i2b2fact.modifier_cd =lsource.c_basecode
 where c_fullname LIKE '\PCORI_MOD\RESULT_LOC\%'
 
-INSERT INTO dbo.[pmnlabresults_cm]
+-- Optimization - build temp ont table
+select lab.pcori_basecode,lab.c_basecode,lab.pcori_specimen_source,ont_parent.c_basecode parent_basecode,norm.* into #pcornet_lab2
+from pcornet_lab lab 
+inner join pcornet_lab ont_loinc on lab.pcori_basecode=ont_loinc.pcori_basecode and ont_loinc.c_basecode like 'LOINC:%' --NOTE: You will need to change 'LOINC:' to our local term.
+inner JOIN pcornet_lab ont_parent on ont_loinc.c_path=ont_parent.c_fullname
+left outer join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
+where lab.c_fullname like '\PCORI\LAB_RESULT_CM\%'
+
+CREATE INDEX IDX_pcornetlab2_1 ON #pcornet_lab2(c_basecode)
+
+INSERT INTO dbo.[pmnlabresults_cm] WITH (TABLOCK)
       ([PATID]
       ,[ENCOUNTERID]
-      ,[LAB_NAME]
+      --,[LAB_NAME]
       ,[SPECIMEN_SOURCE]
       ,[LAB_LOINC]
       ,[PRIORITY]
@@ -1818,18 +1828,20 @@ INSERT INTO dbo.[pmnlabresults_cm]
       ,[RAW_UNIT]
       ,[RAW_ORDER_DEPT]
       ,[RAW_FACILITY_CODE])
+      
 
 --select max(len(raw_result)),max(len(specimen_time)),max(len(result_time)),max(len(result_unit))
 --max(len(lab_name)),max(len(lab_loinc)),max(len(priority)), max(len(result_loc)), max(len(lab_px)),max(len(result_qual)),max(len(result_num)) 
 
 SELECT DISTINCT  M.patient_num patid,
 M.encounter_num encounterid,
-CASE WHEN ont_parent.C_BASECODE LIKE 'LAB_NAME%' then SUBSTRING (ont_parent.c_basecode,10, 10) ELSE 'UN' END LAB_NAME,
+--CASE WHEN parent_basecode LIKE 'LAB_NAME%' then SUBSTRING (parent_basecode,10, 10) ELSE 'UN' END LAB_NAME,
 CASE WHEN lab.pcori_specimen_source like '%or SR_PLS' THEN 'SR_PLS' WHEN lab.pcori_specimen_source is null then 'NI' ELSE lab.pcori_specimen_source END specimen_source, -- (Better way would be to fix the column in the ontology but this will work)
-isnull(lab.pcori_basecode, 'NI') LAB_LOINC,
+isnull(substring(lab.pcori_basecode,charindex(':',lab.pcori_basecode)+1,10), 'NI') LAB_LOINC, 
+ -- TODO: Prefix (LOINC vs SNOMED) should actually be checked so it SNOMED doesn't go in LAB_LOINC. Our network doesn't have any SNOMED right now yet though.
 isnull(p.PRIORITY,'NI') PRIORITY,
 isnull(l.RESULT_LOC,'NI') RESULT_LOC,
-isnull(lab.pcori_basecode, 'NI') LAB_PX,
+isnull(substring(lab.pcori_basecode,charindex(':',lab.pcori_basecode)+1,11), 'NI') LAB_PX,
 'LC'  LAB_PX_TYPE,
 m.start_date LAB_ORDER_DATE, 
 m.start_date SPECIMEN_DATE,
@@ -1837,13 +1849,13 @@ CAST(CONVERT(char(5), M.start_date, 108) as TIME) SPECIMEN_TIME,
 isnull (m.end_date, m.start_date) RESULT_DATE,   -- Bug fix MJ 10/06/16
 CAST(CONVERT(char(5), M.end_date, 108) as TIME) RESULT_TIME,
 CASE WHEN m.ValType_Cd='T' THEN CASE WHEN m.Tval_Char IS NOT NULL THEN 'OT' ELSE 'NI' END END RESULT_QUAL, -- TODO: Should be a standardized value
-CASE WHEN m.ValType_Cd='N' THEN m.NVAL_NUM ELSE null END RESULT_NUM,
+CASE WHEN m.ValType_Cd='N' AND m.NVAL_NUM<9999999 THEN m.NVAL_NUM ELSE null END RESULT_NUM, --  BUGFIX 4/9/18 don't allow extreme values
 CASE WHEN m.ValType_Cd='N' THEN (CASE isnull(nullif(m.TVal_Char,''),'NI') WHEN 'E' THEN 'EQ' WHEN 'NE' THEN 'OT' WHEN 'L' THEN 'LT' WHEN 'LE' THEN 'LE' WHEN 'G' THEN 'GT' WHEN 'GE' THEN 'GE' ELSE 'NI' END)  ELSE 'TX' END RESULT_MODIFIER,
 isnull(m.Units_CD,'NI') RESULT_UNIT, -- TODO: Should be standardized units
-nullif(norm.NORM_RANGE_LOW,'') NORM_RANGE_LOW
-,isnull(norm.NORM_MODIFIER_LOW, 'UN') NORM_MODIFIER_LOW,
-nullif(norm.NORM_RANGE_HIGH,'') NORM_RANGE_HIGH
-,isnull(norm.NORM_MODIFIER_HIGH, 'UN') NORM_MODIFIER_HIGH,
+nullif(lab.NORM_RANGE_LOW,'') NORM_RANGE_LOW
+,isnull(lab.NORM_MODIFIER_LOW, 'UN') NORM_MODIFIER_LOW,
+nullif(lab.NORM_RANGE_HIGH,'') NORM_RANGE_HIGH
+,isnull(lab.NORM_MODIFIER_HIGH, 'UN') NORM_MODIFIER_HIGH,
 CASE isnull(nullif(m.VALUEFLAG_CD,''),'NI') WHEN 'H' THEN 'AH' WHEN 'L' THEN 'AL' WHEN 'A' THEN 'AB' ELSE 'NI' END ABN_IND,
 NULL [RAW_LAB_NAME],
 NULL [RAW_LAB_CODE],
@@ -1861,11 +1873,7 @@ NULL [RAW_FACILITY_CODE]
 */
 FROM i2b2fact M   --JK bug fix 10/7/16
 inner join pmnENCOUNTER enc on enc.patid = m.patient_num and enc.encounterid = m.encounter_Num -- Constraint to selected encounters
-inner join pcornet_lab lab on lab.c_basecode  = M.concept_cd and lab.c_fullname like '\PCORI\LAB_RESULT_CM\%'
-inner join pcornet_lab ont_loinc on lab.pcori_basecode=ont_loinc.pcori_basecode and ont_loinc.c_basecode like 'LOINC:%' --NOTE: You will need to change 'LOINC:' to our local term.
-inner JOIN pcornet_lab ont_parent on ont_loinc.c_path=ont_parent.c_fullname
-left outer join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
-
+inner join #pcornet_lab2 lab on lab.c_basecode  = M.concept_cd
 
 LEFT OUTER JOIN
 #priority p
@@ -1884,7 +1892,7 @@ and M.concept_cd=l.concept_Cd
 and M.start_date=l.start_Date
  
 WHERE m.ValType_Cd in ('N','T')
-and ont_parent.C_BASECODE LIKE 'LAB_NAME%' -- Exclude non-pcori labs
+--and parent_basecode LIKE 'LAB_NAME%' -- 4/5/18 - no longer exclude non-pcori labs, supporting SNOW LAB ontology
 and m.MODIFIER_CD='@'
 
 END
