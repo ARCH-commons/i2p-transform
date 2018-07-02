@@ -91,7 +91,7 @@ select f.encounter_num
 from i2b2fact f
 join demographic d on f.patient_num = d.patid
 left join blueherondata.supplemental_fact sf on f.instance_num = sf.instance_num
-left join payer_mapping pm on lower(pm.payer_name) = lower(f.tval_char) and lower(pm.financial_class) = lower(sf.tval_char)
+left join payer_map pm on lower(pm.payer_name) = lower(f.tval_char) and lower(pm.financial_class) = lower(sf.tval_char)
 where concept_cd like 'KUH|PAYER:%' or concept_cd like 'KUMC|PAYER:%'
 and sf.source_column = 'FINANCIAL_CLASS'
 )
