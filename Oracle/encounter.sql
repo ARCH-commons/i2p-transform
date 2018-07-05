@@ -82,6 +82,7 @@ insert into encounter(PATID, ENCOUNTERID, admit_date, ADMIT_TIME, DISCHARGE_DATE
     , RAW_PAYER_TYPE_PRIMARY, RAW_PAYER_NAME_PRIMARY, RAW_PAYER_ID_PRIMARY, RAW_PAYER_TYPE_SECONDARY
     , RAW_PAYER_NAME_SECONDARY, RAW_PAYER_ID_SECONDARY)
 with payer as (
+-- TODO: Nulls and IDX.
 select f.encounter_num
     , f.patient_num
     , pm.code payer_type_primary
@@ -92,7 +93,7 @@ from i2b2fact f
 join demographic d on f.patient_num = d.patid
 left join blueherondata.supplemental_fact sf on f.instance_num = sf.instance_num
 left join payer_map pm on lower(pm.payer_name) = lower(f.tval_char) and lower(pm.financial_class) = lower(sf.tval_char)
-where concept_cd like 'KUH|PAYER:%' or concept_cd like 'KUMC|PAYER:%'
+where concept_cd like 'O2|PRIMARYPAYER:%' or concept_cd like 'IDX|PRIMARYPAYER:%'
 and sf.source_column = 'FINANCIAL_CLASS'
 )
 select distinct v.patient_num,
