@@ -93,7 +93,7 @@ from i2b2fact f
 join demographic d on f.patient_num = d.patid
 left join blueherondata.supplemental_fact sf on f.instance_num = sf.instance_num
 left join payer_map pm on lower(pm.payer_name) = lower(f.tval_char) and lower(pm.financial_class) = lower(sf.tval_char)
-where concept_cd like 'O2|PRIMARYPAYER:%' or concept_cd like 'IDX|PRIMARYPAYER:%'
+where concept_cd like 'O2|PAYER_PRIMARY:%' or concept_cd like 'IDX|PAYER_PRIMARY:%'
 and sf.source_column = 'FINANCIAL_CLASS'
 )
 select distinct v.patient_num,
