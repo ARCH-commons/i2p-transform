@@ -289,6 +289,8 @@ class loadLanguage(LoadCSV):
 
 class loadSpecimenSourceMap(LoadCSV):
     taskName = 'SPECIMEN_SOURCE_MAP'
+    # specimen_source_map.csv matches values in the CDM spec's specimen_source spreadsheet
+    # to specimen type values from Epic's order_proc table.
     csvname = 'curated_data/specimen_source_map.csv'
 
     def requires(self) -> List[luigi.Task]:
