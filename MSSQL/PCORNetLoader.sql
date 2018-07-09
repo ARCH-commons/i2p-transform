@@ -1,4 +1,4 @@
-----------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------------
 -- PCORNetLoader Script
 -- Current version will not transform: Death_Condition, PCORnet_Trial, PRO_CM 
@@ -1800,7 +1800,7 @@ CREATE INDEX IDX_pcornetlab2_1 ON #pcornet_lab2(c_basecode)
 INSERT INTO dbo.[pmnlabresults_cm] WITH (TABLOCK)
       ([PATID]
       ,[ENCOUNTERID]
-      --,[LAB_NAME]
+      ,[LAB_NAME]  --not removing until august refresh is done because it is still required by pcori. 
       ,[SPECIMEN_SOURCE]
       ,[LAB_LOINC]
       ,[PRIORITY]
@@ -1835,7 +1835,7 @@ INSERT INTO dbo.[pmnlabresults_cm] WITH (TABLOCK)
 
 SELECT DISTINCT  M.patient_num patid,
 M.encounter_num encounterid,
---CASE WHEN parent_basecode LIKE 'LAB_NAME%' then SUBSTRING (parent_basecode,10, 10) ELSE 'UN' END LAB_NAME,
+CASE WHEN parent_basecode LIKE 'LAB_NAME%' then SUBSTRING (parent_basecode,10, 10) ELSE 'UN' END LAB_NAME, --re-adding lab_name support for now.
 CASE WHEN lab.pcori_specimen_source like '%or SR_PLS' THEN 'SR_PLS' WHEN lab.pcori_specimen_source is null then 'NI' ELSE lab.pcori_specimen_source END specimen_source, -- (Better way would be to fix the column in the ontology but this will work)
 isnull(substring(lab.pcori_basecode,charindex(':',lab.pcori_basecode)+1,10), 'NI') LAB_LOINC, 
  -- TODO: Prefix (LOINC vs SNOMED) should actually be checked so it SNOMED doesn't go in LAB_LOINC. Our network doesn't have any SNOMED right now yet though.
@@ -1892,7 +1892,7 @@ and M.concept_cd=l.concept_Cd
 and M.start_date=l.start_Date
  
 WHERE m.ValType_Cd in ('N','T')
---and parent_basecode LIKE 'LAB_NAME%' -- 4/5/18 - no longer exclude non-pcori labs, supporting SNOW LAB ontology
+and parent_basecode LIKE 'LAB_NAME%' -- 4/5/18 - no longer exclude non-pcori labs, supporting SNOW LAB ontology --re-adding lab_name support for now.
 and m.MODIFIER_CD='@'
 
 END
@@ -1909,8 +1909,8 @@ GO
 create procedure PCORNetHarvest as
 begin
 
-INSERT INTO [dbo].[pmnharvest]([NETWORKID], [NETWORK_NAME], [DATAMARTID], [DATAMART_NAME], [DATAMART_PLATFORM], [CDM_VERSION], [DATAMART_CLAIMS], [DATAMART_EHR], [BIRTH_DATE_MGMT], [ENR_START_DATE_MGMT], [ENR_END_DATE_MGMT], [ADMIT_DATE_MGMT], [DISCHARGE_DATE_MGMT], [PX_DATE_MGMT], [RX_ORDER_DATE_MGMT], [RX_START_DATE_MGMT], [RX_END_DATE_MGMT], [DISPENSE_DATE_MGMT], [LAB_ORDER_DATE_MGMT], [SPECIMEN_DATE_MGMT], [RESULT_DATE_MGMT], [MEASURE_DATE_MGMT], [ONSET_DATE_MGMT], [REPORT_DATE_MGMT], [RESOLVE_DATE_MGMT], [PRO_DATE_MGMT], [REFRESH_DEMOGRAPHIC_DATE], [REFRESH_ENROLLMENT_DATE], [REFRESH_ENCOUNTER_DATE], [REFRESH_DIAGNOSIS_DATE], [REFRESH_PROCEDURES_DATE], [REFRESH_VITAL_DATE], [REFRESH_DISPENSING_DATE], [REFRESH_LAB_RESULT_CM_DATE], [REFRESH_CONDITION_DATE], [REFRESH_PRO_CM_DATE], [REFRESH_PRESCRIBING_DATE], [REFRESH_PCORNET_TRIAL_DATE], [REFRESH_DEATH_DATE], [REFRESH_DEATH_CAUSE_DATE]) 
-	VALUES('C1', 'SCILHS', dbo.getDataMartID(), dbo.getDataMartName(), dbo.getDataMartPlatform(), 4.1, '01', '02', '01','01','02','01','02','01','02','01','02','01','01','02','02','01','01','01','02','01',getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),null,getdate(),null,null,null)
+INSERT INTO [dbo].[pmnharvest]([NETWORKID], [NETWORK_NAME], [DATAMARTID], [DATAMART_NAME], [DATAMART_PLATFORM], [CDM_VERSION], [DATAMART_CLAIMS], [DATAMART_EHR], [BIRTH_DATE_MGMT], [ENR_START_DATE_MGMT], [ENR_END_DATE_MGMT], [ADMIT_DATE_MGMT], [DISCHARGE_DATE_MGMT], [PX_DATE_MGMT], [RX_ORDER_DATE_MGMT], [RX_START_DATE_MGMT], [RX_END_DATE_MGMT], [DISPENSE_DATE_MGMT], [LAB_ORDER_DATE_MGMT], [SPECIMEN_DATE_MGMT], [RESULT_DATE_MGMT], [MEASURE_DATE_MGMT], [ONSET_DATE_MGMT], [REPORT_DATE_MGMT], [RESOLVE_DATE_MGMT], [PRO_DATE_MGMT], [REFRESH_DEMOGRAPHIC_DATE], [REFRESH_ENROLLMENT_DATE], [REFRESH_ENCOUNTER_DATE], [REFRESH_DIAGNOSIS_DATE], [REFRESH_PROCEDURES_DATE], [REFRESH_VITAL_DATE], [REFRESH_DISPENSING_DATE], [REFRESH_LAB_RESULT_CM_DATE], [REFRESH_CONDITION_DATE], [REFRESH_PRO_CM_DATE], [REFRESH_PRESCRIBING_DATE], [REFRESH_PCORNET_TRIAL_DATE], [REFRESH_DEATH_DATE], [REFRESH_DEATH_CAUSE_DATE], [MEDADMIN_START_DATE_MGMT], [MEDADMIN_STOP_DATE_MGMT], [REFRESH_MED_ADMIN_DATE], [REFRESH_OBS_CLIN_DATE], [REFRESH_PROVIDER_DATE], [REFRESH_OBS_GEN_DATE]) 
+	VALUES('C1', 'SCILHS', dbo.getDataMartID(), dbo.getDataMartName(), dbo.getDataMartPlatform(), 4.1, '01', '02', '01','01','02','01','02','01','02','01','02','01','01','02','02','01','01','01','02','01',getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),getdate(),null,getdate(),null,null,null,'01','02',getdate(),getdate(),getdate(),getdate())
 
 end
 GO
@@ -1974,7 +1974,7 @@ begin
 			inner join pmnENCOUNTER enc on enc.patid = unit.patient_num and enc.encounterid = unit.encounter_Num
 		 join pcornet_med unitcode 
 			on unit.modifier_cd = unitcode.c_basecode
-			and unitcode.c_fullname like '\PCORI_MOD\RX_QUANTITY_UNIT\%'
+			and unitcode.c_fullname like '\PCORI_MOD\RX_DOSE_FORM\%' ---changed RX_QUANTITY_UNIT to RX_DOSE_FORM
 
 -- insert data with outer joins to ensure all records are included even if some data elements are missing
 insert into pmnprescribing (
