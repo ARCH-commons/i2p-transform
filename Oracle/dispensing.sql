@@ -14,7 +14,13 @@ CREATE TABLE dispensing(
 	NDC varchar (11) NOT NULL,
 	DISPENSE_SUP number(18) NULL,
 	DISPENSE_AMT number(18) NULL,
-	RAW_NDC varchar (50) NULL
+	DISPENSE_DOSE_DISP number(18) NULL,
+    DISPENSE_DOSE_DISP_UNIT  varchar(50) NULL,
+    DISPENSE_ROUTE  varchar(50) NULL,
+	RAW_NDC varchar (50) NULL,
+	RAW_DISPENSE_DOSE_DISP  varchar(50) NULL,
+    RAW_DISPENSE_DOSE_DISP_UNIT varchar(50) NULL,
+    RAW_DISPENSE_ROUTE varchar(50) NULL
 )
 /
 
@@ -91,7 +97,13 @@ insert into dispensing (
   ,NDC --using pcornet_med pcori_ndc - new column!
   ,DISPENSE_SUP ---- modifier nval_num
   ,DISPENSE_AMT  -- modifier nval_num
---    ,RAW_NDC
+  ,DISPENSE_DOSE_DISP
+  ,DISPENSE_DOSE_DISP_UNIT
+  ,DISPENSE_ROUTE
+  ,RAW_NDC
+  ,RAW_DISPENSE_DOSE_DISP
+  ,RAW_DISPENSE_DOSE_DISP_UNIT
+  ,RAW_DISPENSE_ROUTE
 )
 /* Below is the Cycle 2 fix for populating the DISPENSING table  */
 with disp_status as (
@@ -124,7 +136,14 @@ select distinct
   st.start_date dispense_date,
   replace(st.concept_cd, 'NDC:', '') ndc, -- TODO: Generalize this for other sites.
   ds.nval_num dispense_sup,
-  qt.nval_num dispense_amt
+  qt.nval_num dispense_amt,
+  to_number(sf1.tval_char)  dispense_dose_disp,
+  sf2.tval_char dispense_dose_disp_unit,
+  sf3.tval_char dispense_route,
+  null raw_ndc,
+  sf1.tval_char raw_dispense_dose_disp,
+  sf2.tval_char raw_dispense_dose_disp_unit,
+  sf3.tval_char raw_dispense_route
 from disp_status st
 left outer join disp_quantity qt
   on st.patient_num=qt.patient_num
@@ -138,6 +157,18 @@ left outer join disp_supply ds
   and st.concept_cd=ds.concept_cd
   and st.instance_num=ds.instance_num
   and st.start_date=ds.start_date
+left outer join blueherondata.supplemental_fact sf1
+  on st.encounter_num = sf1.encounter_num
+  and st.instance_num = sf1.instance_num
+  and sf1.source_column = 'DISCRETE_DOSE'
+left outer join blueherondata.supplemental_fact sf2
+  on st.encounter_num = sf2.encounter_num
+  and st.instance_num = sf2.instance_num
+  and sf2.source_column = 'DOSE_UNITS'
+left outer join blueherondata.supplemental_fact sf3
+  on st.encounter_num = sf3.encounter_num
+  and st.instance_num = sf3.instance_num
+  and sf3.source_column = 'ADMIN_ROUTE'
 ;
 
 /* NOTE: The original SCILHS transformation is below.
