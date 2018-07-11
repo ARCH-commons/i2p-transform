@@ -260,6 +260,19 @@ class vital(I2PScriptTask):
         return [encounter()]
 
 
+class loadPayerMap(LoadCSV):
+    taskName = 'PAYER_MAP'
+    # payer_map.csv is a combination of the CDM spec's payer_type spreadsheet
+    # with payer_name and financial_class values from epic's clarity_epm table.
+    # payer_name and financial_class are used together to determine the CDM's
+    # payer type code.
+    # TODO: incorporte IDX.
+    csvname = 'curated_data/payer_map.csv'
+
+    def requires(self) -> List[luigi.Task]:
+        return [pcornet_init()]
+
+
 class loadLabNormal(LoadCSV):
     taskName = 'LABNORMAL'
     csvname = 'curated_data/labnormal.csv'
