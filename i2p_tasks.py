@@ -300,6 +300,16 @@ class loadLanguage(LoadCSV):
         return [pcornet_init()]
 
 
+class loadSpecimenSourceMap(LoadCSV):
+    taskName = 'SPECIMEN_SOURCE_MAP'
+    # specimen_source_map.csv matches values in the CDM spec's specimen_source spreadsheet
+    # to specimen type values from Epic's order_proc table.
+    csvname = 'curated_data/specimen_source_map.csv'
+
+    def requires(self) -> List[luigi.Task]:
+        return [pcornet_init()]
+
+
 class NPIDownloadConfig(luigi.Config):
     # The configured 'path' and 'npi' variables are used by the downloadNPI method to fetch and
     # store the NPPES zip file.  Changes to these may require changes to the file system.

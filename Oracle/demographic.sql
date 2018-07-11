@@ -190,6 +190,9 @@ FETCH getsql INTO sqltext;
 END LOOP;
 CLOSE getsql;
 
+-- Logic of the using statment is -
+-- When the source (i2b2patient) doesn't provide a lanaguage_cd, substitute 'no information', which will be coded
+-- as 'NI'.  When the source provides a language_cd that isn't in the mapping table, substitute the code 'OT'.
 merge into demographic d
 using (
   select NVL(code, 'OT') as code, language_cd, patient_num

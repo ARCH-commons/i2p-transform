@@ -28,6 +28,10 @@ END;
 /
 
 BEGIN
+PMN_DROPSQL('drop table lab_result_w_source');
+END;
+
+BEGIN
 PMN_DROPSQL('DROP SEQUENCE lab_result_cm_seq');
 END;
 /
@@ -52,6 +56,7 @@ create table lab_result_key as
 select lab_result_cm_seq.nextval LAB_RESULT_CM_ID
 , patient_num PATID
 , encounter_num ENCOUNTERID
+, instance_num INSTANCE_NUM
 , provider_id PROVIDERID
 , start_date LAB_ORDER_DATE
 , end_date RESULT_DATE
@@ -71,13 +76,12 @@ and (m.nval_num is null or m.nval_num<=9999999)
 
 create table lab_result_w_base as
 select lab.*
-, pl.pcori_specimen_source SPECIMEN_SOURCE
 , pl.pcori_basecode LAB_LOINC
 , pl.c_path C_PATH
 from lab_result_key lab
-inner join
+left join
 (
-  select c_basecode, c_path, pcori_basecode, pcori_specimen_source
+  select c_basecode, c_path, pcori_basecode
   from pcornet_lab
   where c_fullname like '\PCORI\LAB_RESULT_CM\%'
 ) pl
@@ -88,7 +92,7 @@ create table lab_result_w_parent as
 select lab.*
 , parent.c_basecode LAB_NAME
 from lab_result_w_base lab
-inner join
+left join
 (
   select c_fullname, c_basecode
   from pcornet_lab
@@ -114,48 +118,62 @@ and (lab.LAB_ORDER_DATE - norm.birth_date) > norm.age_lower
 and (lab.LAB_ORDER_DATE - norm.birth_date) <= norm.age_upper
 /
 
+create table lab_result_w_source as
+select lab.*
+, NVL(code, 'NI') SPECIMEN_SOURCE
+from lab_result_w_norm lab
+left join
+(
+  select distinct instance_num, NVL(code, 'OT') code
+  from &&i2b2_data_schema.supplemental_fact sf
+  left join specimen_source_map ssm on lower(sf.tval_char) = lower(ssm.specimen_source_name)
+  and ssm.specimen_source_name is not null
+) map
+on lab.instance_num = map.instance_num
+/
+
 create table lab_result_cm as
-select distinct cast(norm.LAB_RESULT_CM_ID as varchar(19)) LAB_RESULT_CM_ID
-, cast(norm.PATID as varchar(50)) PATID
-, cast(norm.ENCOUNTERID as varchar(50)) ENCOUNTERID
-, case when norm.LAB_NAME like 'LAB_NAME%' then substr(norm.LAB_NAME, 10, 10) else 'UN' end LAB_NAME
-, case when norm.SPECIMEN_SOURCE like '%or SR_PLS' then 'SR_PLS' when norm.SPECIMEN_SOURCE is null then 'NI' else norm.SPECIMEN_SOURCE end SPECIMEN_SOURCE
-, nvl(norm.LAB_LOINC, 'NI') LAB_LOINC
+select distinct cast(lab.LAB_RESULT_CM_ID as varchar(19)) LAB_RESULT_CM_ID
+, cast(lab.PATID as varchar(50)) PATID
+, cast(lab.ENCOUNTERID as varchar(50)) ENCOUNTERID
+, case when lab.LAB_NAME like 'LAB_NAME%' then substr(lab.LAB_NAME, 10, 10) else 'UN' end LAB_NAME
+, lab.SPECIMEN_SOURCE
+, nvl(lab.LAB_LOINC, 'NI') LAB_LOINC
 , 'NI' PRIORITY
 , 'NI' RESULT_LOC
-, nvl(norm.LAB_LOINC, 'NI') LAB_PX
+, nvl(lab.LAB_LOINC, 'NI') LAB_PX
 , 'LC'  LAB_PX_TYPE
-, norm.LAB_ORDER_DATE LAB_ORDER_DATE
-, norm.LAB_ORDER_DATE SPECIMEN_DATE
-, to_char(norm.LAB_ORDER_DATE, 'HH24:MI')  SPECIMEN_TIME
-, norm.RESULT_DATE
-, to_char(norm.RESULT_DATE, 'HH24:MI') RESULT_TIME
+, lab.LAB_ORDER_DATE LAB_ORDER_DATE
+, lab.LAB_ORDER_DATE SPECIMEN_DATE
+, to_char(lab.LAB_ORDER_DATE, 'HH24:MI')  SPECIMEN_TIME
+, lab.RESULT_DATE
+, to_char(lab.RESULT_DATE, 'HH24:MI') RESULT_TIME
 , 'NI' RESULT_QUAL
-, case when norm.RAW_RESULT = 'N' then norm.RESULT_NUM else null end RESULT_NUM
-, case when norm.RAW_RESULT = 'N' then (case nvl(nullif(norm.RESULT_MODIFIER, ''),'NI') when 'E' then 'EQ' when 'NE' then 'OT' when 'L' then 'LT' when 'LE' then 'LE' when 'G' then 'GT' when 'GE' then 'GE' else 'NI' end)  else 'TX' end RESULT_MODIFIER
+, case when lab.RAW_RESULT = 'N' then lab.RESULT_NUM else null end RESULT_NUM
+, case when lab.RAW_RESULT = 'N' then (case nvl(nullif(lab.RESULT_MODIFIER, ''),'NI') when 'E' then 'EQ' when 'NE' then 'OT' when 'L' then 'LT' when 'LE' then 'LE' when 'G' then 'GT' when 'GE' then 'GE' else 'NI' end)  else 'TX' end RESULT_MODIFIER
 , case
-  when instr(norm.RESULT_UNIT, '%') > 0 then 'PERCENT'
-  when norm.RESULT_UNIT is null then nvl(norm.RESULT_UNIT, 'NI')
-  when length(norm.RESULT_UNIT) > 11 then substr(norm.RESULT_UNIT, 1, 11)
-  else trim(replace(upper(norm.RESULT_UNIT), '(CALC)', ''))
+  when instr(lab.RESULT_UNIT, '%') > 0 then 'PERCENT'
+  when lab.RESULT_UNIT is null then nvl(lab.RESULT_UNIT, 'NI')
+  when length(lab.RESULT_UNIT) > 11 then substr(lab.RESULT_UNIT, 1, 11)
+  else trim(replace(upper(lab.RESULT_UNIT), '(CALC)', ''))
   end RESULT_UNIT
-, norm.NORM_RANGE_LOW
+, lab.NORM_RANGE_LOW
 , case
-  when norm.NORM_RANGE_LOW is not null and norm.NORM_RANGE_HIGH is not null then 'EQ'
-  when norm.NORM_RANGE_LOW is not null and norm.NORM_RANGE_HIGH is null then 'GE'
-  when norm.NORM_RANGE_LOW is null and norm.NORM_RANGE_HIGH is not null then 'NO'
+  when lab.NORM_RANGE_LOW is not null and lab.NORM_RANGE_HIGH is not null then 'EQ'
+  when lab.NORM_RANGE_LOW is not null and lab.NORM_RANGE_HIGH is null then 'GE'
+  when lab.NORM_RANGE_LOW is null and lab.NORM_RANGE_HIGH is not null then 'NO'
   else 'NI'
   end NORM_MODIFIER_LOW
-, norm.NORM_RANGE_HIGH
-, case nvl(nullif(norm.ABN_IND, ''), 'NI') when 'H' then 'AH' when 'L' then 'AL' when 'A' then 'AB' else 'NI' end ABN_IND
+, lab.NORM_RANGE_HIGH
+, case nvl(nullif(lab.ABN_IND, ''), 'NI') when 'H' then 'AH' when 'L' then 'AL' when 'A' then 'AB' else 'NI' end ABN_IND
 , cast(null as varchar(50)) RAW_LAB_NAME
 , cast(null as varchar(50)) RAW_LAB_CODE
 , cast(null as varchar(50)) RAW_PANEL
-, case when norm.RAW_RESULT = 'T' then substr(norm.RESULT_MODIFIER, 1, 50) else to_char(norm.RESULT_NUM) end RAW_RESULT
+, case when lab.RAW_RESULT = 'T' then substr(lab.RESULT_MODIFIER, 1, 50) else to_char(lab.RESULT_NUM) end RAW_RESULT
 , cast(null as varchar(50)) RAW_UNIT
 , cast(null as varchar(50)) RAW_ORDER_DEPT
-, norm.RAW_FACILITY_CODE RAW_FACILITY_CODE
-from lab_result_w_norm norm
+, lab.RAW_FACILITY_CODE RAW_FACILITY_CODE
+from lab_result_w_source lab
 /
 
 create index lab_result_cm_idx on lab_result_cm (PATID, ENCOUNTERID)
