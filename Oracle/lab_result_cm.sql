@@ -136,7 +136,6 @@ create table lab_result_cm as
 select distinct cast(lab.LAB_RESULT_CM_ID as varchar(19)) LAB_RESULT_CM_ID
 , cast(lab.PATID as varchar(50)) PATID
 , cast(lab.ENCOUNTERID as varchar(50)) ENCOUNTERID
-, case when lab.LAB_NAME like 'LAB_NAME%' then substr(lab.LAB_NAME, 10, 10) else 'UN' end LAB_NAME
 , lab.SPECIMEN_SOURCE
 , nvl(lab.LAB_LOINC, 'NI') LAB_LOINC
 , 'NI' PRIORITY
@@ -149,6 +148,7 @@ select distinct cast(lab.LAB_RESULT_CM_ID as varchar(19)) LAB_RESULT_CM_ID
 , lab.RESULT_DATE
 , to_char(lab.RESULT_DATE, 'HH24:MI') RESULT_TIME
 , 'NI' RESULT_QUAL
+, cast(null as varchar(50)) RESULT_SNOMED
 , case when lab.RAW_RESULT = 'N' then lab.RESULT_NUM else null end RESULT_NUM
 , case when lab.RAW_RESULT = 'N' then (case nvl(nullif(lab.RESULT_MODIFIER, ''),'NI') when 'E' then 'EQ' when 'NE' then 'OT' when 'L' then 'LT' when 'LE' then 'LE' when 'G' then 'GT' when 'GE' then 'GE' else 'NI' end)  else 'TX' end RESULT_MODIFIER
 , case

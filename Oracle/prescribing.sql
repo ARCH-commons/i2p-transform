@@ -210,6 +210,22 @@ left join
   ) dose on dose.instance_num = rx.instance_num and dose.concept_cd = rx.concept_cd
 /
 
+create table prescribing_w_prn as
+select rx.*
+, nvl(prn.tval_char, 'NO') rx_prn_flag
+from prescribing_w_dose rx
+left join
+  (select instance_num
+  , concept_cd
+  , 'YES' as tval_char
+  from blueherondata.observation_fact
+  where modifier_cd = 'MedObs:PRN'
+    /* aka:
+    select c_basecode from pcornet_med code
+    where code.c_fullname like '\PCORI_MOD\RX_BASIS\PR\02\MedObs:PRN\' */
+  ) prn on prn.instance_num = rx.instance_num and prn.concept_cd = rx.concept_cd
+/
+
 create table prescribing as
 select rx.prescribingid
 , rx.patient_num patid
@@ -222,20 +238,29 @@ select rx.prescribingid
 , rx.rx_dose_ordered
 , rx.rx_dose_ordered_unit
 , rx.rx_quantity
-, 'NI' rx_quantity_unit
+, 'NI' rx_dose_form
 , rx.rx_refills
 , rx.rx_days_supply
 , rx.rx_frequency
+, rx.rx_prn_flag
+, null rx_route
 , decode(rx.modifier_cd, 'MedObs:Inpatient', '01', 'MedObs:Outpatient', '02') rx_basis
 , rx.rxnorm_cui
+, null rx_source
+, null rx_dispense_as_written
 , rx.raw_rx_med_name
 , cast(null as varchar(50)) raw_rx_frequency
+, rx.raw_rxnorm_cui
 , cast(null as varchar(50)) raw_rx_quantity
 , cast(null as varchar(50)) raw_rx_ndc
-, rx.raw_rxnorm_cui
+, cast(null as varchar(50)) raw_rx_dose_ordered
+, cast(null as varchar(50)) raw_rx_dose_ordered_unit
+, cast(null as varchar(50)) raw_rx_route
+, cast(null as varchar(50)) raw_rx_refills
+
 /* ISSUE: HERON should have an actual order time.
    idea: store real difference between order date start data, possibly using the update date */
-from prescribing_w_dose rx
+from prescribing_w_prn rx
 /
 
 create index prescribing_idx on prescribing (PATID, ENCOUNTERID)
