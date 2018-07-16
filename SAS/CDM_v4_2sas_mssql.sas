@@ -26,7 +26,7 @@ Instructions:
 
 libname sql_cdm odbc datasrc='PopMedNet'; 
 /* optionally add a password above: e.g., libname sql_cdm odbc datasrc='ORACLE_PMN' password=myPassWord; */
-libname cdm "E:\maj60\CDM_v4_april2018";
+libname cdm "E:\maj60\CDM_july_test";
 
 
 proc sql noprint; 
