@@ -1,0 +1,208 @@
+ROUTE_NAME,CODE
+adductor canal block,OT
+Apheresis,EXTRACORPOREAL
+Apply externally,OT
+Arterial,INTRA_ARTERIAL
+Base of the eyelashes,OT
+Bladder Instillation,OT
+Block,OT
+Both Ears,OTIC
+Both Eyes,INTRAOCULAR
+Buccal,BUCCAL
+Catheter Sheath,OT
+Caudal Block,CAUDAL
+Central,OT
+central line irrigation,OT
+Cervical,OT
+Chest Tube,OT
+Combination,OT
+CONT CAUDAL INFUSION,CAUDAL
+CONT INTRAARTER INF,OT
+CONT INTRAOSSEOUS IF,OT
+CONT INTRATHECAL INF,INTRATHECAL
+CONT NEBULIZATION,OT
+CONT SUBCUTAN INFUSI,SUBCUTANEOUS
+Contin. Intraosseous Infusion,OT
+Contin. Intrathecal Infusion,INTRATHECAL
+Contin. Subcutaneous Infusion,SUBCUTANEOUS
+Contin.Intra-Arterial Infusion,INTRA_ARTERIAL
+continuous adductor canal block,OT
+Continuous Caudal Infusion,CAUDAL
+CONTINUOUS EPIDURAL,EPIDURAL
+CONTINUOUS INFILTRAT,OT
+continuous infraclavicular,OT
+CONTINUOUS INFUSION,OT
+continuous interscalene,OT
+Continuous Intraperitoneal Infusion,INTRAPERITONEAL
+Continuous IV Infusion,INTRAVENOUS
+Continuous Nebulization,OT
+CRRT,OT
+cytapheresis,OT
+deal,OT
+dental,DENTAL
+Dialysis,OT
+Does not apply,UN
+Each Nostril,NASAL
+Endotracheal,OT
+Epidural,EPIDURAL
+EXTRACORPOREAL,EXTRACORPOREAL
+Feeding,OT
+Feeding Tube,OT
+Flush,OT
+Gastrostomy Tube,GASTROSTOMY
+GU irrigant,OT
+Gums,GINGIVAL
+HAND BULB NEBULIZER,OT
+Hemodialysis,OT
+hemodialysis port injection,OT
+IM/PO DISCRETIONARY,OT
+Implant,OT
+In Vitro,OT
+Infiltration,OT
+infraclavicular,OT
+Inhalation,OT
+Injection,OT
+Insufflation,OT
+Intercatheter,OT
+interscalene,INTRAMUSCULAR
+Intra-amniotic,INTRAAMNIOTIC
+Intra-arterial,INTRA_ARTERIAL
+Intra-articular,INTRA_ARTICULAR
+INTRABURSAL,INTRABURSAL
+Intracameral,INTRACAMERAL
+Intracardiac,INTRACARDIAC
+Intra-catheter,OT
+Intracavernosal,INTRACAVERNOUS
+INTRACAVITY,BODY_CAVITY
+Intradermal,INTRADERMAL
+INTRADETRUSOR,OT
+Intraductal,INTRADUCTAL
+Intralesional,INTRALESIONAL
+Intra-Lesional,INTRALESIONAL
+INTRALUMBAR,INTRASPINAL
+Intra-lymphatic,INTRALYMPHATIC
+Intramuscular,INTRAMUSCULAR
+Intranasal,INTRASINAL
+Intraocular,INTRAOCULAR
+intraocular injection,INTRAOCULAR
+intraocular irrigation,INTRAOCULAR
+Intraosseous,INTRAOSSEOUS
+INTRAPERICARDIAL,INTRAPERICARDIAL
+Intraperitoneal,INTRAPERITONEAL
+Intrapleural,INTRAPLEURAL
+Intraspinal,INTRASPINAL
+Intrasynovial,INTRASYNOVIAL
+Intrathecal,INTRATHECAL
+Intrathoracic,INTRATHORACIC
+Intratracheal,INTRATRACHEAL
+intratympanic,INTRATYMPANIC
+INTRA-URETHRAL,URETHRAL
+Intrauterine,INTRAUTERINE
+INTRAVARICEAL,INTRAVENOUS
+Intravenous,INTRAVENOUS
+intravenous push,OT
+INTRAVENTRICULAR,INTRACEREBROVENTRICULAR
+Intravesical,INTRAVESICAL
+intravesical irrigation,INTRAVESICAL
+INTRAVITREAL,INTRAVITREAL
+Iontophoresis,OT
+IPPB,OT
+Irrigation,OT
+JUXTASCLERAL,OT
+Laryngotracheal,OT
+Left Ear,OTIC
+Left Eye,INTRAOCULAR
+Local Infiltration,OT
+local intranasal application,OT
+Misc.(Non-Drug; Combo Route),OT
+MISCELLANEOUS,OT
+Mouth/Throat,ORAL
+Mucous Membrane,OT
+Nares,NASAL
+Nasal,NASAL
+Nasogastric,NASOGASTRIC
+nasogastric tube,NASOGASTRIC
+Nebulization,OT
+NEBULIZATION -UNSPEC,OT
+NOT APPLICABLE,UN
+O2 AEROSOLIZATION,OT
+Ommaya Reservior,OT
+One Nostril,NASAL
+Ophthalmic,OPHTHALMIC
+Oral,ORAL
+ORAL/IV,OT
+ORAL/RECTAL/IM,OT
+ORAL/RECTAL/IV,OT
+Osteochondrial,OT
+Otic,OTIC
+PEG Tube,PERCUTANEOUS
+PEG Tube,PERCUTANEOUS
+PEG-J tube,PERCUTANEOUS
+Per Corpak Tube,OT
+Per Dobhoff Tube,NASOGASTRIC
+Per G Tube,GASTROSTOMY
+Per J Tube,JEJUNOSTOMY
+Per NG tube,NASOGASTRIC
+Per OG Tube,OROGASTRIC
+Percutaneous,PERCUTANEOUS
+Perfusion,OT
+Perianal,OT
+periarticular,OT
+Peri-articular,PERIARTICULAR
+PERIBULBAR,PERIBULBAR
+Pericapsular,OT
+Perineal,OT
+perineural injection,PERINEURAL
+Periodontal,PERIODONTAL
+Periodontal pocket,OT
+Peripheral,OT
+Peripheral Arterial Line,OT
+peripheral nerve block,OT
+Peripheral Nerve Cath,OT
+Peritoneal catheter,OT
+Pump Refill,OT
+Rectal,RECTAL
+RECTAL/ORAL DISCRET,OT
+RETROBULBAR,RETROBULBAR
+Retrobulbular,RETROBULBAR
+Right Ear,OTIC
+Right Eye,INTRAOCULAR
+scalp,OT
+Scratch,OT
+SEE ADMIN INSTRUCTIONS,UN
+Service,OT
+Sheath,OT
+Sub lesionally,SUBLESIONAL
+SUBCONJUCTIVAL,SUBCONJUNCTIVAL
+Subconjunctival,SUBCONJUNCTIVAL
+Subcutaneous,SUBCUTANEOUS
+Subdermal,OT
+Subgingival-Local,SUBGINGIVAL
+Sublesional,SUBLESIONAL
+Sublesionally,SUBLESIONAL
+Sublingual,SUBLINGUAL
+Submucosal anal canal,OT
+SUBMUCOSAL INJ,SUBMUCOSAL
+Submucosal Injection,SUBMUCOSAL
+SubQ Pump,OT
+subretinal,OT
+SUB-TENON,OT
+Swish & Spit,ORAL
+Swish & Swallow,ORAL
+TENDON SHEATH INJ.,OT
+Tendon Sheath Injection,OT
+Test,OT
+Topical,TOPICAL
+Tracheal Tube,OT
+Transdermal,TRANSDERMAL
+Translingual,OT
+TRANSTRACHEAL,TRANSTRACHEAL
+TRANSURETHRAL,TRANSURETHRAL
+Tube,OT
+Umbilical Artery Cath,OT
+Unknown,UN
+Urethral,URETHRAL
+urinary catheter irrigation,OT
+Vaginal,VAGINAL
+venous line irrigation,OT
+Wound irrigation,OT

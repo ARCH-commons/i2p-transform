@@ -38,9 +38,9 @@ Bartholin Cyst,BARTHOLIN_CYST
 Biliary Fluid,BIL_FLD
 Blood,BLD
 Blood Clot,BLD
-"Blood, Arterial",BLD
+"Blood, Arterial",BLDA
 "Blood,Line Draw",BLD
-"Blood,Peripheral",BLD
+"Blood,Peripheral",BLDP
 ,BLD_MC
 ,BLD.BUFFY_COAT
 ,BLD.DOT
@@ -177,7 +177,7 @@ Corneal Scrapings,EYE
 Conjunctiva,EYE
 Eye Drainage,EYE
 Eyelid,EYE
-Contact Lens Solution,EYE
+Contact Lens Solution,OT
 ,FACILITY
 ,FEATHER
 ,FEED

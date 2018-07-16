@@ -310,9 +310,20 @@ class loadSpecimenSourceMap(LoadCSV):
         return [pcornet_init()]
 
 
+class loadRouteMap(LoadCSV):
+    taskName = 'ROUTE_MAP'
+    # route_map.csv matches values in the CDM spec's _route spreadsheet
+    # to route values from Epic's zc_admin_route table.
+    csvname = 'curated_data/route_map.csv'
+
+    def requires(self) -> List[luigi.Task]:
+        return [pcornet_init()]
+
+
 class NPIDownloadConfig(luigi.Config):
     # The configured 'path' and 'npi' variables are used by the downloadNPI method to fetch and
     # store the NPPES zip file.  Changes to these may require changes to the file system.
+    # TODO: Update code to discover the npi_csv automatically.
     dl_path = StrParam(description='Path where the NPPES zip file will be stored and unzipped.')
     extract_path = StrParam(description='Path where the extract')
     npi_csv = StrParam(description='CSV file in the NPPES zip that contains NPI data.')
@@ -322,6 +333,7 @@ class NPIDownloadConfig(luigi.Config):
     # The configured 'col' and 'ct' variables reflect the layout of the NPI data file.
     # The extracNPI method uses these values to parse the NPI data file.
     # Changes to these may require code changes.
+    # Complete overkill making these configurable.  Consider reverting to hard coded values.
     taxonomy_col = StrParam(description='Header for the taxonomy columns in the NPI data file.')
     switch_col = StrParam(description='Header for the switch columns in the NPI data file.')
     npi_col = StrParam(description='Header for the NPI column in the NPI data file.')

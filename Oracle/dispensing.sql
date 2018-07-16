@@ -139,7 +139,7 @@ select distinct
   qt.nval_num dispense_amt,
   to_number(sf1.tval_char)  dispense_dose_disp,
   sf2.tval_char dispense_dose_disp_unit,
-  sf3.tval_char dispense_route,
+  rm.code dispense_route,
   null raw_ndc,
   sf1.tval_char raw_dispense_dose_disp,
   sf2.tval_char raw_dispense_dose_disp_unit,
@@ -169,6 +169,7 @@ left outer join blueherondata.supplemental_fact sf3
   on st.encounter_num = sf3.encounter_num
   and st.instance_num = sf3.instance_num
   and sf3.source_column = 'ADMIN_ROUTE'
+left outer join route_map rm on lower(sf3.tval_char) = lower(rm.route_name)
 ;
 
 /* NOTE: The original SCILHS transformation is below.
