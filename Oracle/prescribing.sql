@@ -243,11 +243,11 @@ select rx.prescribingid
 , rx.rx_days_supply
 , rx.rx_frequency
 , rx.rx_prn_flag
-, null rx_route
+, cast(null as varchar(50)) rx_route
 , decode(rx.modifier_cd, 'MedObs:Inpatient', '01', 'MedObs:Outpatient', '02') rx_basis
 , rx.rxnorm_cui
-, null rx_source
-, null rx_dispense_as_written
+, cast(null as varchar(2)) rx_source
+, cast(null as varchar(2)) rx_dispense_as_written
 , rx.raw_rx_med_name
 , cast(null as varchar(50)) raw_rx_frequency
 , rx.raw_rxnorm_cui

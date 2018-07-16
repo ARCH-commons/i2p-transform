@@ -30,6 +30,7 @@ END;
 BEGIN
 PMN_DROPSQL('drop table lab_result_w_source');
 END;
+/
 
 BEGIN
 PMN_DROPSQL('DROP SEQUENCE lab_result_cm_seq');
