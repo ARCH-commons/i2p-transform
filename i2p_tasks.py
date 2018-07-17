@@ -320,6 +320,16 @@ class loadRouteMap(LoadCSV):
         return [pcornet_init()]
 
 
+class loadUnitMap(LoadCSV):
+    taskName = 'UNIT_MAP'
+    # unit_map.csv matches values in the CDM spec's _unit spreadsheet
+    # to unit values from Epic's zc_med_unit table.
+    csvname = 'curated_data/unit_map.csv'
+
+    def requires(self) -> List[luigi.Task]:
+        return [pcornet_init()]
+
+
 class NPIDownloadConfig(luigi.Config):
     # The configured 'path' and 'npi' variables are used by the downloadNPI method to fetch and
     # store the NPPES zip file.  Changes to these may require changes to the file system.

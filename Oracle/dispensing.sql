@@ -130,6 +130,31 @@ with disp_status as (
     on ibf.modifier_cd=pnm.c_basecode
   where pnm.c_fullname like '\PCORI_MOD\RX_DAYS_SUPPLY\%'
 )
+, disp_dose as (
+  select encounter_num
+  , instance_num
+  , to_number(tval_char) dose
+  from blueherondata.supplemental_fact
+  where source_column = 'DISCRETE_DOSE'
+)
+, disp_unit as (
+  select sf.encounter_num
+  , sf.instance_num
+  , nvl(um.code, 'OT') code
+  , sf.tval_char
+  from blueherondata.supplemental_fact sf
+  left join unit_map um on sf.tval_char = um.unit_name
+  where sf.source_column = 'DOSE_UNITS'
+)
+, disp_route as (
+  select sf.encounter_num
+  , sf.instance_num
+  , rm.code
+  , sf.tval_char
+  from blueherondata.supplemental_fact sf
+  left join route_map rm on lower(sf.tval_char) = lower(rm.route_name)
+  where sf.source_column = 'ADMIN_ROUTE'
+)
 select distinct
   st.patient_num patid,
   null prescribingid,
@@ -137,13 +162,13 @@ select distinct
   replace(st.concept_cd, 'NDC:', '') ndc, -- TODO: Generalize this for other sites.
   ds.nval_num dispense_sup,
   qt.nval_num dispense_amt,
-  to_number(sf1.tval_char)  dispense_dose_disp,
-  sf2.tval_char dispense_dose_disp_unit,
-  rm.code dispense_route,
+  dd.dose dispense_dose_disp,
+  du.code dispense_dose_disp_unit,
+  dr.code dispense_route,
   null raw_ndc,
-  sf1.tval_char raw_dispense_dose_disp,
-  sf2.tval_char raw_dispense_dose_disp_unit,
-  sf3.tval_char raw_dispense_route
+  dd.dose raw_dispense_dose_disp,
+  du.tval_char raw_dispense_dose_disp_unit,
+  dr.tval_char raw_dispense_route
 from disp_status st
 left outer join disp_quantity qt
   on st.patient_num=qt.patient_num
@@ -157,19 +182,15 @@ left outer join disp_supply ds
   and st.concept_cd=ds.concept_cd
   and st.instance_num=ds.instance_num
   and st.start_date=ds.start_date
-left outer join blueherondata.supplemental_fact sf1
-  on st.encounter_num = sf1.encounter_num
-  and st.instance_num = sf1.instance_num
-  and sf1.source_column = 'DISCRETE_DOSE'
-left outer join blueherondata.supplemental_fact sf2
-  on st.encounter_num = sf2.encounter_num
-  and st.instance_num = sf2.instance_num
-  and sf2.source_column = 'DOSE_UNITS'
-left outer join blueherondata.supplemental_fact sf3
-  on st.encounter_num = sf3.encounter_num
-  and st.instance_num = sf3.instance_num
-  and sf3.source_column = 'ADMIN_ROUTE'
-left outer join route_map rm on lower(sf3.tval_char) = lower(rm.route_name)
+left outer join disp_dose dd
+  on st.encounter_num = dd.encounter_num
+  and st.instance_num = dd.instance_num
+left outer join disp_unit du
+  on st.encounter_num = du.encounter_num
+  and st.instance_num = du.instance_num
+left outer join disp_route dr
+  on st.encounter_num = dr.encounter_num
+  and st.instance_num = dr.instance_num
 ;
 
 /* NOTE: The original SCILHS transformation is below.

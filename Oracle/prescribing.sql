@@ -77,15 +77,20 @@ from dual
 create table prescribing_key as
 select cast(prescribing_seq.nextval as varchar(19)) prescribingid
 , instance_num
-, cast(patient_num as varchar(50)) patient_num
-, cast(encounter_num as varchar(50)) encounter_num
-, provider_id
+, cast(patient_num as varchar(50)) patid
+, cast(encounter_num as varchar(50)) encounterid
+, provider_id rx_providerid
 , start_date
 , end_date
 , concept_cd
 , modifier_cd
+, case when trim(translate(tval_char, '0123456789.', ' ')) is null then tval_char else null end rx_dose_ordered
+, case when trim(translate(tval_char, '0123456789.', ' ')) is null then um.code else null end rx_dose_order
+, tval_char raw_rx_dose_ordered
+, units_cd raw_rx_dose_ordered_unit
 from blueherondata.observation_fact rx
 join encounter en on rx.encounter_num = en.encounterid
+join unit_map um on rx.units_cd = um.unit_name
 where rx.modifier_cd in ('MedObs:Inpatient', 'MedObs:Outpatient')
 /
 
@@ -199,25 +204,10 @@ left join
   ) basis on basis.instance_num = rx.instance_num and basis.concept_cd = rx.concept_cd
 /
 
-create table prescribing_w_dose as
-select rx.*
-, nval_num rx_dose_ordered
-, units_cd rx_dose_ordered_unit
-from prescribing_w_basis rx
-left join
-  (select instance_num
-  , concept_cd
-  , case when units_cd = 'mcg' then 'ug' when units_cd = 'l' then 'ml' else units_cd end units_cd
-  , case when units_cd = 'l' then nval_num * 1000 else nval_num end nval_num
-  from blueherondata.observation_fact
-  where modifier_cd in ('MedObs:Dose|mg', 'MedObs:Dose|meq', 'MedObs:Dose|l')
-  ) dose on dose.instance_num = rx.instance_num and dose.concept_cd = rx.concept_cd
-/
-
 create table prescribing_w_prn as
 select rx.*
 , nvl(prn.tval_char, 'NO') rx_prn_flag
-from prescribing_w_dose rx
+from prescribing_w_basis rx
 left join
   (select instance_num
   , concept_cd
@@ -246,14 +236,14 @@ left join route_map rm on lower(rt.tval_char) = lower(rm.route_name)
 
 create table prescribing as
 select rx.prescribingid
-, rx.patient_num patid
-, rx.encounter_num encounterid
-, rx.provider_id rx_providerid
+, rx.patid
+, rx.encounterid
+, rx.rx_providerid
 , trunc(rx.start_date) rx_order_date
 , to_char(rx.start_date, 'HH24:MI') rx_order_time
 , trunc(rx.start_date) rx_start_date
 , trunc(rx.end_date) rx_end_date
-, rx.rx_dose_ordered
+, to_number(rx.rx_dose_ordered) rx_dose_ordered
 , rx.rx_dose_ordered_unit
 , rx.rx_quantity
 , 'NI' rx_dose_form
