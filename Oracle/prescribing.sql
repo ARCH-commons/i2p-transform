@@ -94,7 +94,7 @@ join unit_map um on rx.units_cd = um.unit_name
 where rx.modifier_cd in ('MedObs:Inpatient', 'MedObs:Outpatient')
 /
 
-alter table prescribing_key modify (provider_id null)
+alter table prescribing_key modify (rx_providerid null)
 /
 
 /** prescribing_w_cui
