@@ -1893,7 +1893,7 @@ and M.concept_cd=l.concept_Cd
 and M.start_date=l.start_Date
  
 WHERE m.ValType_Cd in ('N','T')
-and parent_basecode LIKE 'LAB_NAME%' -- 4/5/18 - no longer exclude non-pcori labs, supporting SNOW LAB ontology --re-adding lab_name support for now.
+--and parent_basecode LIKE 'LAB_NAME%' -- 4/5/18 - no longer exclude non-pcori labs, supporting SNOW LAB ontology --re-adding lab_name support for now.
 and m.MODIFIER_CD='@'
 
 END
