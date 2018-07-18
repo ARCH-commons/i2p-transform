@@ -203,7 +203,13 @@ class patient_chunks_survey(SqlScriptTask):
             except DatabaseError:
                 return []
 
-
+# TODO: pcornet_init drops and recreates the cdm_status table, forcing all tasks to wait until init is done.
+# Moving this operation to a distinct task would allow some other tasks (e.g. mapping tasks) to proceed, while init
+# performs other labor intesive SQL operations.
+# In the mean time, don't forget to make all tasks that use the status table dependent on pcornet_init.
+# TODO: On a related matter, if the cdm_status table is missing (e.g. on a db where CDM has never been run), running
+# the full pipeline, starting at pcornet_loader, will fail.  It would be nice to detect this situation and first run
+# pcornet_init before attempting other tasks.
 class pcornet_init(I2PScriptTask):
     script = Script.pcornet_init
 
@@ -366,6 +372,9 @@ class loadSpecialtyCode(LoadCSV):
     # It maps a provider specialty code to a descriptive text and grouping.
     csvname = 'curated_data/provider_specialty_code.csv'
 
+    def requires(self) -> List[luigi.Task]:
+        return [pcornet_init()]
+
 
 class downloadNPI(CDMStatusTask):
     '''
@@ -392,6 +401,9 @@ class downloadNPI(CDMStatusTask):
 
     def unzip(self) -> None:
         subprocess.call(['unzip', '-o', self.dl_path + self.npi_zip, '-d', self.dl_path])  # ISSUE: ambient
+
+    def requires(self) -> List[luigi.Task]:
+        return [pcornet_init()]
 
 
 class extractNPI(CDMStatusTask):
