@@ -49,10 +49,23 @@ PMN_DROPSQL('drop index med_admin_idx');
 
 execute immediate 'truncate table med_admin';
 
-insert into med_admin(patid, encounterid, medadmin_providerid, medadmin_start_date, medadmin_start_time, medadmin_stop_date,
-medadmin_stop_time, medadmin_type, medadmin_code, medadmin_dose_admin, medadmin_dose_admin_unit, medadmin_source, raw_medadmin_med_name,
-raw_medadmin_code, raw_medadmin_dose_admin, raw_medadmin_dose_admin_unit, raw_medadmin_route)
-
+insert into med_admin(patid
+  , encounterid
+  , medadmin_providerid
+  , medadmin_start_date
+  , medadmin_start_time
+  , medadmin_stop_date
+  , medadmin_stop_time
+  , medadmin_type
+  , medadmin_code
+  , medadmin_dose_admin
+  , medadmin_dose_admin_unit
+  , medadmin_source
+  , raw_medadmin_med_name
+  , raw_medadmin_code
+  , raw_medadmin_dose_admin
+  , raw_medadmin_dose_admin_unit
+  , raw_medadmin_route)
 with med_start as (
     select patient_num, encounter_num, provider_id, start_date, end_date, concept_cd, modifier_cd, instance_num
     from BLUEHERONDATA.observation_fact
@@ -78,9 +91,23 @@ with med_start as (
     or modifier_cd = 'MedObs|MAR:Bolus from Syringe'
     or modifier_cd = 'MedObs|MAR:Bolus.'
 )
-select med_start.patient_num, med_start.encounter_num, med_start.provider_id, med_start.start_date, to_char(med_start.start_date, 'HH24:MI'), med_start.end_date,
-to_char(med_start.end_date, 'HH24:MI'), 'RX', med_p.pcori_basecode, med_dose.nval_num, med_dose.units_cd, 'OD', med_p.c_name, med_start.concept_cd, med_dose.nval_num,
-med_dose.units_cd, med_start.modifier_cd
+select med_start.patient_num
+  , med_start.encounter_num
+  , med_start.provider_id
+  , med_start.start_date
+  , to_char(med_start.start_date, 'HH24:MI')
+  , med_start.end_date
+  , to_char(med_start.end_date, 'HH24:MI')
+  , 'RX'
+  , med_p.pcori_basecode
+  , med_dose.nval_num
+  , case when nval_num is null then null else nvl(um.code, 'OT') end
+  , 'OD'
+  , med_p.c_name
+  , med_start.concept_cd
+  , med_dose.nval_num
+  , med_dose.units_cd
+  , med_start.modifier_cd
 from med_start
 left join BLUEHERONDATA.observation_fact med_dose
 on med_dose.instance_num = med_start.instance_num
@@ -93,16 +120,17 @@ or med_dose.modifier_cd = 'MedObs:MAR_Dose|tab'
 or med_dose.modifier_cd = 'MedObs:MAR_Dose|units'
 or med_dose.modifier_cd = 'MedObs:MAR_Dose|l'
 or med_dose.modifier_cd = 'MedObs:MAR_Dose|mg'
-or med_dose.modifier_cd = 'MedObs:Dose|puff'
-or med_dose.modifier_cd = 'MedObs:Dose|drop'
-or med_dose.modifier_cd = 'MedObs:Dose|cap'
-or med_dose.modifier_cd = 'MedObs:Dose|meq'
-or med_dose.modifier_cd = 'MedObs:Dose|units'
-or med_dose.modifier_cd = 'MedObs:Dose|l'
-or med_dose.modifier_cd = 'MedObs:Dose|tab'
-or  med_dose.modifier_cd = 'MedObs:Dose|mg')
-left join BLUEHERONMETADATA.pcornet_med med_p
-on med_p.c_basecode = med_start.concept_cd
+--or med_dose.modifier_cd = 'MedObs:Dose|puff'
+--or med_dose.modifier_cd = 'MedObs:Dose|drop'
+--or med_dose.modifier_cd = 'MedObs:Dose|cap'
+--or med_dose.modifier_cd = 'MedObs:Dose|meq'
+--or med_dose.modifier_cd = 'MedObs:Dose|units'
+--or med_dose.modifier_cd = 'MedObs:Dose|l'
+--or med_dose.modifier_cd = 'MedObs:Dose|tab'
+--or med_dose.modifier_cd = 'MedObs:Dose|mg'
+)
+left join BLUEHERONMETADATA.pcornet_med med_p on med_p.c_basecode = med_start.concept_cd
+left join unit_map um on um.unit_name = med_dose.units_cd
 ;
 
 execute immediate 'create index med_admin_idx on med_admin (PATID, ENCOUNTERID)';

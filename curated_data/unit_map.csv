@@ -393,6 +393,7 @@ kU/L,
 kU/L{class},
 kU/mL,
 L,L
+L,l
 L/(24.h),
 L/(8.h),
 L/(min.m2),
@@ -476,6 +477,7 @@ mg/wk,
 mg{FEU}/L,
 min,
 mL,mL
+mL,ml
 mL/(10.h),
 mL/(12.h),
 mL/(2.h),
