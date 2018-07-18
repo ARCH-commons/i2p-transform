@@ -85,7 +85,7 @@ select cast(prescribing_seq.nextval as varchar(19)) prescribingid
 , concept_cd
 , modifier_cd
 , case when trim(translate(tval_char, '0123456789.', ' ')) is null then tval_char else null end rx_dose_ordered
-, case when trim(translate(tval_char, '0123456789.', ' ')) is null then um.code else null end rx_dose_order
+, case when trim(translate(tval_char, '0123456789.', ' ')) is null then um.code else null end rx_dose_order_units
 , tval_char raw_rx_dose_ordered
 , units_cd raw_rx_dose_ordered_unit
 from blueherondata.observation_fact rx
@@ -261,8 +261,8 @@ select rx.prescribingid
 , rx.raw_rxnorm_cui
 , cast(null as varchar(50)) raw_rx_quantity
 , cast(null as varchar(50)) raw_rx_ndc
-, rx.rx_dose_ordered raw_rx_dose_ordered
-, rx.rx_dose_ordered_unit raw_rx_dose_ordered_unit
+, rx.raw_rx_dose_ordered
+, rx.raw_rx_dose_ordered_unit
 , rx.raw_rx_route
 , cast(null as varchar(50)) raw_rx_refills
 
