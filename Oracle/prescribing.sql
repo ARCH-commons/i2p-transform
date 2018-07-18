@@ -35,11 +35,11 @@ PMN_DROPSQL('drop table prescribing_w_basis');
 END;
 /
 BEGIN
-PMN_DROPSQL('drop table prescribing_w_dose');
+PMN_DROPSQL('drop table prescribing_w_prn');
 END;
 /
 BEGIN
-PMN_DROPSQL('drop table prescribing_w_prn');
+PMN_DROPSQL('drop table prescribing_w_route');
 END;
 /
 BEGIN
