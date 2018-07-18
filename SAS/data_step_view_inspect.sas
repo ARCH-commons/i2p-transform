@@ -106,6 +106,30 @@ proc print data=sasdata.DEATH_CAUSE (firstobs=1 obs=10);
 run;
 
 
+proc contents data=sasdata.PROVIDER;
+run;
+proc print data=sasdata.PROVIDER (firstobs=1 obs=10);
+run;
+
+
+proc contents data=sasdata.OBS_CLIN;
+run;
+proc print data=sasdata.OBS_CLIN (firstobs=1 obs=10);
+run;
+
+
+proc contents data=sasdata.OBS_GEN;
+run;
+proc print data=sasdata.OBS_GEN (firstobs=1 obs=10);
+run;
+
+
+proc contents data=sasdata.MED_ADMIN;
+run;
+proc print data=sasdata.MED_ADMIN (firstobs=1 obs=10);
+run;
+
+
 proc contents data=sasdata.HARVEST;
 run;
 proc print data=sasdata.HARVEST (firstobs=1 obs=10);
