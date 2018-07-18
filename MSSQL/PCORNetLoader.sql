@@ -322,6 +322,7 @@ CREATE TABLE [dbo].[pmnlab_result_cm]( --Modified on 2/6/17 from labresults_cm t
 	[LAB_RESULT_CM_ID] [bigint]  IDENTITY (1,1) NOT NULL,
 	[PATID] [varchar](50) NOT NULL,
 	[ENCOUNTERID] [varchar](50) NULL,
+    [LAB_NAME] [varchar](10) NULL,
 	[SPECIMEN_SOURCE] [varchar](50) NULL,
 	[LAB_LOINC] [varchar](10) NULL,
 	[PRIORITY] [varchar](2) NULL,
@@ -1804,7 +1805,7 @@ inner JOIN pcornet_lab ont_parent on ont_loinc.c_path=ont_parent.c_fullname
 left outer join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
 where lab.c_fullname like '\PCORI\LAB_RESULT_CM\%'
 
-CREATE INDEX IDX_pcornetlab2_1 ON #pcornet_lab2(c_basecode)
+---CREATE INDEX IDX_pcornetlab2_1 ON #pcornet_lab2(c_basecode) ---pretty fast without it, and it was tripping MJ up so I commented it out. 
 
 INSERT INTO dbo.[pmnlabresults_cm] WITH (TABLOCK)
       ([PATID]
