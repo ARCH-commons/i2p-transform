@@ -111,7 +111,7 @@ select med_start.patient_num
   , med_start.concept_cd
   , med_dose.nval_num
   , med_dose.units_cd
-  , med_start.modifier_cd -- Modifier rather than raw route.
+  , med_start.modifier_cd -- Modifier code rather than raw route.
 from med_start
 left join BLUEHERONDATA.observation_fact med_dose
 on med_dose.instance_num = med_start.instance_num

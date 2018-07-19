@@ -158,7 +158,21 @@ insert into poafact
 	from i2b2fact factline
     inner join ENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num
     inner join pcornet_diag dxsource on factline.modifier_cd = dxsource.c_basecode
-	and dxsource.c_fullname like '\PCORI_MOD\DX_ORIGIN\BI\DX|BILL:POA\%';
+	and dxsource.c_fullname like '\PCORI_MOD\DX_ORIGIN\BI\DX|BILL:POA\%'
+
+	union all
+
+	select patient_num, factline.encounter_num, provider_id, concept_cd, start_date,
+	case
+	  when sf.tval_char = 'No' then 'N'
+	  when sf.tval_char = 'Unknown' then 'UN'
+	  when sf.tval_char = 'Clinically Undetermined' then 'W'
+	  when sf.tval_char = 'Exempt from POA reporting' then '1'
+	  else 'OT'
+	end poasource,
+	sf.tval_char rawpoasource, '@'
+	from i2b2fact factline
+	join supplemental_fact sf on factline.instance_num = sf.instance_num and sf.source_column = 'POA_ALT';
 
 execute immediate 'create index poafact_idx on poafact (patient_num, encounter_num, provider_id, concept_cd, start_date)';
 GATHER_TABLE_STATS('POAFACT');
@@ -247,7 +261,7 @@ select distinct factline.patient_num, factline.encounter_num encounterid,	enc_ty
              THEN nvl(SUBSTR(pdxsource,INSTR(pdxsource, ':')+1,2),'NI')
              ELSE null END PDX,
     CASE WHEN enc_type in ('EI', 'IP')
-             THEN nvl(SUBSTR(poasource,INSTR(poasource, ':')+1,2),'UN')
+             THEN nvl(SUBSTR(poasource,INSTR(poasource, ':')+1,2),'NI')
              ELSE null END DX_POA
      , rawpoasource RAW_DX_POA
 from diag_fact_cutoff_filter factline
