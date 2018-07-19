@@ -82,14 +82,14 @@ class dispensing(I2PScriptTask):
     script = Script.dispensing
 
     def requires(self) -> List[luigi.Task]:
-        return [encounter()]
+        return [encounter(), loadRouteMap(), loadUnitMap()]
 
 
 class encounter(I2PScriptTask):
     script = Script.encounter
 
     def requires(self) -> List[luigi.Task]:
-        return [demographic()]
+        return [demographic(), loadPayerMap()]
 
 
 class enrollment(I2PScriptTask):
@@ -112,14 +112,14 @@ class lab_result_cm(I2PScriptTask):
     script = Script.lab_result_cm
 
     def requires(self) -> List[luigi.Task]:
-        return [encounter(), loadLabNormal()]
+        return [encounter(), loadLabNormal(), loadSpecimenSourceMap()]
 
 
 class med_admin(I2PScriptTask):
     script = Script.med_admin
 
     def requires(self) -> List[luigi.Task]:
-        return [pcornet_init()]
+        return [pcornet_init(), loadRouteMap(), loadUnitMap()]
 
 
 class obs_clin(I2PScriptTask):
@@ -205,11 +205,11 @@ class patient_chunks_survey(SqlScriptTask):
 
 # TODO: pcornet_init drops and recreates the cdm_status table, forcing all tasks to wait until init is done.
 # Moving this operation to a distinct task would allow some other tasks (e.g. mapping tasks) to proceed, while init
-# performs other labor intesive SQL operations.
+# performs other labor intensive SQL operations.
 # In the mean time, don't forget to make all tasks that use the status table dependent on pcornet_init.
 # TODO: On a related matter, if the cdm_status table is missing (e.g. on a db where CDM has never been run), running
-# the full pipeline, starting at pcornet_loader, will fail.  It would be nice to detect this situation and first run
-# pcornet_init before attempting other tasks.
+# the full pipeline, starting at pcornet_loader, will fail.  It would be nice to detect this situation and first
+# build the status table before attempting other tasks.
 class pcornet_init(I2PScriptTask):
     script = Script.pcornet_init
 
@@ -235,7 +235,7 @@ class prescribing(I2PScriptTask):
     script = Script.prescribing
 
     def requires(self) -> List[luigi.Task]:
-        return [encounter()]
+        return [encounter(), loadRouteMap(), loadUnitMap()]
 
 
 class pro_cm(I2PScriptTask):

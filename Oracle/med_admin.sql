@@ -51,6 +51,7 @@ execute immediate 'truncate table med_admin';
 
 insert into med_admin(patid
   , encounterid
+  , prescribingid
   , medadmin_providerid
   , medadmin_start_date
   , medadmin_start_time
@@ -60,6 +61,7 @@ insert into med_admin(patid
   , medadmin_code
   , medadmin_dose_admin
   , medadmin_dose_admin_unit
+  , medadmin_route
   , medadmin_source
   , raw_medadmin_med_name
   , raw_medadmin_code
@@ -93,6 +95,7 @@ with med_start as (
 )
 select med_start.patient_num
   , med_start.encounter_num
+  , null
   , med_start.provider_id
   , med_start.start_date
   , to_char(med_start.start_date, 'HH24:MI')
@@ -102,12 +105,13 @@ select med_start.patient_num
   , med_p.pcori_basecode
   , med_dose.nval_num
   , case when nval_num is null then null else nvl(um.code, 'OT') end
+  , null
   , 'OD'
   , med_p.c_name
   , med_start.concept_cd
   , med_dose.nval_num
   , med_dose.units_cd
-  , med_start.modifier_cd
+  , med_start.modifier_cd -- Modifier rather than raw route.
 from med_start
 left join BLUEHERONDATA.observation_fact med_dose
 on med_dose.instance_num = med_start.instance_num
