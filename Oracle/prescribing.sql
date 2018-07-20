@@ -234,6 +234,18 @@ left join
 left join route_map rm on lower(rt.tval_char) = lower(rm.route_name)
 /
 
+create table prescribing_w_daw as
+select rx.*
+, nvl(tval_char, 'NI') rx_dispense_as_written
+from prescribing_w_route rx
+left join
+  (select instance_num
+  , tval_char
+  from &&i2b2_data_schema.supplemental_fact
+  where source_column = 'DISPENSE_AS_WRITTEN'
+  ) daw on daw.instance_num = rx.instance_num
+/
+
 create table prescribing as
 select rx.prescribingid
 , rx.patid
@@ -255,7 +267,7 @@ select rx.prescribingid
 , decode(rx.modifier_cd, 'MedObs:Inpatient', '01', 'MedObs:Outpatient', '02') rx_basis
 , rx.rxnorm_cui
 , 'OD' rx_source
-, cast(null as varchar(2)) rx_dispense_as_written
+, rx.rx_dispense_as_written
 , rx.raw_rx_med_name
 , cast(null as varchar(50)) raw_rx_frequency
 , rx.raw_rxnorm_cui
@@ -268,7 +280,7 @@ select rx.prescribingid
 
 /* ISSUE: HERON should have an actual order time.
    idea: store real difference between order date start data, possibly using the update date */
-from prescribing_w_route rx
+from prescribing_w_daw rx
 /
 
 create index prescribing_idx on prescribing (PATID, ENCOUNTERID)

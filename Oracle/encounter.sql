@@ -81,8 +81,8 @@ insert into encounter(PATID, ENCOUNTERID, admit_date, ADMIT_TIME, DISCHARGE_DATE
     , RAW_DISCHARGE_DISPOSITION, RAW_DISCHARGE_STATUS, RAW_DRG_TYPE, RAW_ADMITTING_SOURCE, RAW_FACILITY_TYPE
     , RAW_PAYER_TYPE_PRIMARY, RAW_PAYER_NAME_PRIMARY, RAW_PAYER_ID_PRIMARY, RAW_PAYER_TYPE_SECONDARY
     , RAW_PAYER_NAME_SECONDARY, RAW_PAYER_ID_SECONDARY)
+
 with payer as (
--- TODO: Nulls and IDX.
 select f.encounter_num
     , f.patient_num
     , pm.code payer_type_primary
@@ -93,9 +93,23 @@ from i2b2fact f
 join demographic d on f.patient_num = d.patid
 left join &&i2b2_data_schema.supplemental_fact sf on f.instance_num = sf.instance_num
 left join payer_map pm on lower(pm.payer_name) = lower(f.tval_char) and lower(pm.financial_class) = lower(sf.tval_char)
-where concept_cd like 'O2|PAYER_PRIMARY:%' or concept_cd like 'IDX|PAYER_PRIMARY:%'
+where concept_cd like 'O2|PAYER_PRIMARY:%'
 and sf.source_column = 'FINANCIAL_CLASS'
+
+union all
+
+select f.encounter_num
+    , f.patient_num
+    , pm.code payer_type_primary
+    ,f.tval_char raw_payer_name_primary
+    , SUBSTR(f.concept_cd, INSTR(f.concept_cd, ':', 1, 1) + 1) raw_payer_id_primary
+    , null raw_payer_type_primary
+from i2b2fact f
+join demographic d on f.patient_num = d.patid
+left join payer_map pm on lower(pm.payer_name) = lower(f.tval_char)
+where concept_cd like 'IDX|PAYER_PRIMARY:%'
 )
+
 select distinct v.patient_num,
     v.encounter_num,
 	start_Date,
