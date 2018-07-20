@@ -43,6 +43,10 @@ PMN_DROPSQL('drop table prescribing_w_route');
 END;
 /
 BEGIN
+PMN_DROPSQL('drop table prescribing_w_daw');
+END;
+/
+BEGIN
 PMN_DROPSQL('DROP sequence  prescribing_seq');
 END;
 /
