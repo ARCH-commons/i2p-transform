@@ -134,7 +134,7 @@ with disp_status as (
   select encounter_num
   , instance_num
   , to_number(tval_char) dose
-  from blueherondata.supplemental_fact
+  from &&i2b2_data_schema.supplemental_fact
   where source_column = 'DISCRETE_DOSE'
 )
 , disp_unit as (
@@ -142,7 +142,7 @@ with disp_status as (
   , sf.instance_num
   , nvl(um.code, 'OT') code
   , sf.tval_char
-  from blueherondata.supplemental_fact sf
+  from &&i2b2_data_schema.supplemental_fact sf
   left join unit_map um on sf.tval_char = um.unit_name
   where sf.source_column = 'DOSE_UNITS'
 )
@@ -151,7 +151,7 @@ with disp_status as (
   , sf.instance_num
   , rm.code
   , sf.tval_char
-  from blueherondata.supplemental_fact sf
+  from &&i2b2_data_schema.supplemental_fact sf
   left join route_map rm on lower(sf.tval_char) = lower(rm.route_name)
   where sf.source_column = 'ADMIN_ROUTE'
 )

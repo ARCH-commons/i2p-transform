@@ -172,7 +172,7 @@ insert into poafact
 	end poasource,
 	sf.tval_char rawpoasource, '@'
 	from i2b2fact factline
-	join supplemental_fact sf on factline.instance_num = sf.instance_num and sf.source_column = 'POA_ALT';
+	join &&i2b2_data_schema.supplemental_fact sf on factline.instance_num = sf.instance_num and sf.source_column = 'POA_ALT';
 
 execute immediate 'create index poafact_idx on poafact (patient_num, encounter_num, provider_id, concept_cd, start_date)';
 GATHER_TABLE_STATS('POAFACT');

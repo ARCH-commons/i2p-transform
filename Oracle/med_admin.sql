@@ -70,7 +70,7 @@ insert into med_admin(patid
   , raw_medadmin_route)
 with med_start as (
     select patient_num, encounter_num, provider_id, start_date, end_date, concept_cd, modifier_cd, instance_num
-    from BLUEHERONDATA.observation_fact
+    from &&i2b2_data_schema.observation_fact
     where modifier_cd = 'MedObs|MAR:New Bag'
     or modifier_cd = 'MedObs|MAR:Downtime Given - New Bag'
     or modifier_cd = 'MedObs|MAR:Given -  Without Order'
@@ -113,7 +113,7 @@ select med_start.patient_num
   , med_dose.units_cd
   , med_start.modifier_cd -- Modifier code rather than raw route.
 from med_start
-left join BLUEHERONDATA.observation_fact med_dose
+left join &&i2b2_data_schema.observation_fact med_dose
 on med_dose.instance_num = med_start.instance_num
 and med_dose.start_date = med_start.start_date
 and (med_dose.modifier_cd = 'MedObs:MAR_Dose|puff'

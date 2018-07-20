@@ -67,7 +67,7 @@ select lab_result_cm_seq.nextval LAB_RESULT_CM_ID
 , valueflag_cd ABN_IND
 , valtype_cd RAW_RESULT
 , concept_cd RAW_FACILITY_CODE
-from blueherondata.observation_fact m
+from &&i2b2_data_schema.observation_fact m
 join encounter enc on enc.patid = m.patient_num and enc.encounterid = m.encounter_Num
 where concept_cd between 'KUH|COMPONENT_ID:' and 'KUH|COMPONENT_ID:~'
 and modifier_cd in ('@')  -- exclude analyitics: Labs|Aggregate:Median, ...

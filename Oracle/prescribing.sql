@@ -88,7 +88,7 @@ select cast(prescribing_seq.nextval as varchar(19)) prescribingid
 , case when trim(translate(tval_char, '0123456789.', ' ')) is null then um.code else null end rx_dose_ordered_unit
 , tval_char raw_rx_dose_ordered
 , units_cd raw_rx_dose_ordered_unit
-from blueherondata.observation_fact rx
+from &&i2b2_data_schema.observation_fact rx
 join encounter en on rx.encounter_num = en.encounterid
 join unit_map um on rx.units_cd = um.unit_name
 where rx.modifier_cd in ('MedObs:Inpatient', 'MedObs:Outpatient')
@@ -135,7 +135,7 @@ left join
   (select instance_num
   , concept_cd
   , nval_num
-  from blueherondata.observation_fact
+  from &&i2b2_data_schema.observation_fact
   where modifier_cd = 'RX_REFILLS'
     /* aka:
     select c_basecode from pcornet_med refillscode
@@ -151,7 +151,7 @@ left join
   (select instance_num
   , concept_cd
   , pcori_basecode
-  from blueherondata.observation_fact
+  from &&i2b2_data_schema.observation_fact
   join pcornet_med on modifier_cd = c_basecode
   and c_fullname like '\PCORI_MOD\RX_FREQUENCY\%'
   ) freq on freq.instance_num = rx.instance_num and freq.concept_cd = rx.concept_cd
@@ -165,7 +165,7 @@ left join
   (select instance_num
   , concept_cd
   , nval_num
-  from blueherondata.observation_fact
+  from &&i2b2_data_schema.observation_fact
   where modifier_cd = 'RX_QUANTITY'
     /* aka:
     select c_basecode from pcornet_med refillscode
@@ -181,7 +181,7 @@ left join
   (select instance_num
   , concept_cd
   , nval_num
-  from blueherondata.observation_fact
+  from &&i2b2_data_schema.observation_fact
   where modifier_cd = 'RX_DAYS_SUPPLY'
     /* aka:
     select c_basecode from pcornet_med refillscode
@@ -197,7 +197,7 @@ left join
   (select instance_num
   , concept_cd
   , pcori_basecode
-  from blueherondata.observation_fact
+  from &&i2b2_data_schema.observation_fact
   join pcornet_med on modifier_cd = c_basecode
   and c_fullname like '\PCORI_MOD\RX_BASIS\%'
   and modifier_cd in ('MedObs:Inpatient', 'MedObs:Outpatient')
@@ -212,7 +212,7 @@ left join
   (select instance_num
   , concept_cd
   , 'YES' as tval_char
-  from blueherondata.observation_fact
+  from &&i2b2_data_schema.observation_fact
   where modifier_cd = 'MedObs:PRN'
     /* aka:
     select c_basecode from pcornet_med code
@@ -228,7 +228,7 @@ from prescribing_w_prn rx
 left join
   (select instance_num
   , tval_char
-  from blueherondata.supplemental_fact
+  from &&i2b2_data_schema.supplemental_fact
   where source_column = 'PRESCRIBING_ROUTE'
   ) rt on rt.instance_num = rx.instance_num
 left join route_map rm on lower(rt.tval_char) = lower(rm.route_name)
