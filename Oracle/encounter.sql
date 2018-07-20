@@ -94,7 +94,7 @@ select patient_num, encounter_num, inout_cd,SUBSTR(pcori_basecode,INSTR(pcori_ba
 from pcornet_cdm.i2b2visit v
 inner join pcornet_enc e on c_dimcode like '%'''||inout_cd||'''%' and e.c_fullname like '\PCORI\ENCOUNTER\ENC_TYPE\%';
 
-execute immediate 'create index enctype_idx on enc_type (patient_num, encounter_num)';
+execute immediate 'create index enctype_idx on enctype (patient_num, encounter_num)';
 
 insert into encounter(PATID, ENCOUNTERID, admit_date, ADMIT_TIME, DISCHARGE_DATE, DISCHARGE_TIME, PROVIDERID
     , FACILITY_LOCATION, ENC_TYPE, FACILITYID, DISCHARGE_DISPOSITION, DISCHARGE_STATUS, DRG, DRG_TYPE
