@@ -1511,6 +1511,18 @@ create procedure PCORNetEncounter as
 DECLARE @sqltext NVARCHAR(4000);
 begin
 
+select patient_num,encounter_num,max(payor_type) payor
+into #max_payor_type
+from (
+	select distinct f.patient_num,encounter_num,substring(pcori_basecode,charindex(':',pcori_basecode)+1,3) payor_type from i2b2fact f 
+	inner join pmndemographic d on f.patient_num=d.patid
+	inner join pcornet_enc enc on enc.c_basecode  = f.concept_cd   
+		and enc.c_fullname like '\PCORI\ENCOUNTER\PAYER_TYPE\%'
+) payor
+group by patient_num,encounter_num,payor_type;
+
+CREATE INDEX max_payor_pat_enc ON #max_payor_type (patient_num,encounter_num) INCLUDE (payor);
+
 insert into pmnencounter(PATID,ENCOUNTERID,admit_date ,ADMIT_TIME , 
 		DISCHARGE_DATE ,DISCHARGE_TIME ,PROVIDERID ,FACILITY_LOCATION  
 		,ENC_TYPE ,FACILITYID ,DISCHARGE_DISPOSITION , 
@@ -1523,7 +1535,8 @@ select distinct v.patient_num, v.encounter_num,
 	providerid,location_zip, 
 (case when pcori_enctype is not null then pcori_enctype else 'UN' end) enc_type, facilityid,  CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE  discharge_disposition END , CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE discharge_status END  , drg.drg, drg_type, CASE WHEN admitting_source IS NULL THEN 'NI' ELSE admitting_source END,
 payor -- TODO only supporting primary payer right now
-from i2b2visit v inner join pmndemographic d on v.patient_num=d.patid
+from i2b2visit v
+inner join pmndemographic d on v.patient_num=d.patid
 left outer join 
    (select * from
    (select *,row_number() over (partition by  patient_num, encounter_num order by drg_type desc) AS rn from 
@@ -1535,18 +1548,15 @@ left outer join
      where rn=1) drg -- This section is bugfixed to only include 1 drg if multiple DRG types exist in a single encounter...
   on drg.patient_num=v.patient_num and drg.encounter_num=v.encounter_num
 -- 7/16/18 - CDMv4.1 payer data - jklann
-left outer join 
-   (select patient_num,encounter_num,max(payor_type) payor  from
-    (select distinct f.patient_num,encounter_num,substring(pcori_basecode,charindex(':',pcori_basecode)+1,3) payor_type from i2b2fact f 
-     inner join pmndemographic d on f.patient_num=d.patid
-     inner join pcornet_enc enc on enc.c_basecode  = f.concept_cd   
-      and enc.c_fullname like '\PCORI\ENCOUNTER\PAYER_TYPE\%') payor group by patient_num,encounter_num,payor_type) pay
-  on drg.patient_num=v.patient_num and drg.encounter_num=v.encounter_num
+left outer join #max_payor_type pay
+  on pay.patient_num=v.patient_num and pay.encounter_num=v.encounter_num
 left outer join 
 -- Encounter type. Note that this requires a full table scan on the ontology table, so it is not particularly efficient.
 (select patient_num, encounter_num, inout_cd,substring(pcori_basecode,charindex(':',pcori_basecode)+1,2) pcori_enctype from i2b2visit v
  inner join pcornet_enc e on c_dimcode like '%'''+inout_cd+'''%' and e.c_fullname like '\PCORI\ENCOUNTER\ENC_TYPE\%') enctype
   on enctype.patient_num=v.patient_num and enctype.encounter_num=v.encounter_num
+
+drop table #max_payor_type;
 
 end
 go
