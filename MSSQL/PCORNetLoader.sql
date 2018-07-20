@@ -1076,6 +1076,30 @@ ALTER TABLE [dbo].[pmnpro_cm]  WITH CHECK ADD FOREIGN KEY([ENCOUNTERID])
 REFERENCES [dbo].[pmnENCOUNTER] ([ENCOUNTERID])
 GO
 
+ALTER TABLE [dbo].[MED_ADMIN]  WITH CHECK ADD FOREIGN KEY([ENCOUNTERID])
+REFERENCES [dbo].[pmnENCOUNTER] ([ENCOUNTERID])
+GO
+
+ALTER TABLE [dbo].[MED_ADMIN]  WITH CHECK ADD FOREIGN KEY([PATID])
+REFERENCES [dbo].[pmndemographic] ([PATID])
+GO
+
+ALTER TABLE [dbo].[OBS_GEN]  WITH CHECK ADD FOREIGN KEY([ENCOUNTERID])
+REFERENCES [dbo].[pmnENCOUNTER] ([ENCOUNTERID])
+GO
+
+ALTER TABLE [dbo].[OBS_GEN]  WITH CHECK ADD FOREIGN KEY([PATID])
+REFERENCES [dbo].[pmndemographic] ([PATID])
+GO
+
+ALTER TABLE [dbo].[OBS_CLIN]  WITH CHECK ADD FOREIGN KEY([ENCOUNTERID])
+REFERENCES [dbo].[pmnENCOUNTER] ([ENCOUNTERID])
+GO
+
+ALTER TABLE [dbo].[OBS_CLIN]  WITH CHECK ADD FOREIGN KEY([PATID])
+REFERENCES [dbo].[pmndemographic] ([PATID])
+GO
+
 
 
 ----------------------------------------------------------------------------------------------------------------------------------------
@@ -1121,6 +1145,15 @@ IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'death_condition') DROP SYN
 
 IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'pmndeath_cause') DROP SYNONYM pmndeath_cause --old form
 
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'pmnPROVIDER') DROP SYNONYM pmnPROVIDER 
+
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'pmnMED_ADMIN') DROP SYNONYM pmnMED_ADMIN 
+
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'pmnOBS_CLIN') DROP SYNONYM pmnOBS_CLIN
+
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE name = N'pmnOBS_GEN') DROP SYNONYM pmnOBS_GEN
+
+
 GO
 
 create synonym CONDITION for PMNCONDITION
@@ -1161,8 +1194,14 @@ create synonym death_condition for pmndeath_condition
 GO
 create synonym pmndeath_cause for pmndeath_condition --old table form
 GO
-
-
+create synonym pmnPROVIDER for PROVIDER   ---CDM v4.1 new synonyms for new tables here and below to OBS_GEN. 
+GO
+create synonym pmnMED_ADMIN for MED_ADMIN
+GO
+create synonym pmnOBS_CLIN for OBS_CLIN
+GO
+create synonym pmnOBS_GEN for OBS_GEN
+GO
 
 
 /* --Example query for the MDQ using the above synonyms
