@@ -52,15 +52,28 @@ CREATE TABLE drg (
   RN NUMBER
 )
 /
+BEGIN
+PMN_DROPSQL('DROP TABLE enctype');
+END;
+/
+CREATE TABLE enctype (
+  PATIENT_NUM NUMBER(38) NOT NULL,
+  ENCOUNTER_NUM NUMBER(38) NOT NULL,
+  INOUT_CD VARCHAR2(50),
+  PCORI_ENCTYPE VARCHAR2(3),
+)
+/
 create or replace procedure PCORNetEncounter as
 begin
 
 PMN_DROPSQL('drop index encounter_pk');
 PMN_DROPSQL('drop index encounter_idx');
 PMN_DROPSQL('drop index drg_idx');
+PMN_DROPSQL('drop index enctype_idx');
 
 execute immediate 'truncate table encounter';
 execute immediate 'truncate table drg';
+execute immediate 'truncate table enctype';
 
 insert into drg
 select * from
@@ -74,6 +87,14 @@ where rn=1;
 
 execute immediate 'create index drg_idx on drg (patient_num, encounter_num)';
 --GATHER_TABLE_STATS('drg');
+
+-- Encounter type. Note that this requires a full table scan on the ontology table, so it is not particularly efficient.
+insert into enctype
+select patient_num, encounter_num, inout_cd,SUBSTR(pcori_basecode,INSTR(pcori_basecode, ':')+1,2) pcori_enctype
+from pcornet_cdm.i2b2visit v
+inner join pcornet_enc e on c_dimcode like '%'''||inout_cd||'''%' and e.c_fullname like '\PCORI\ENCOUNTER\ENC_TYPE\%';
+
+execute immediate 'create index enctype_idx on enc_type (patient_num, encounter_num)';
 
 insert into encounter(PATID, ENCOUNTERID, admit_date, ADMIT_TIME, DISCHARGE_DATE, DISCHARGE_TIME, PROVIDERID
     , FACILITY_LOCATION, ENC_TYPE, FACILITYID, DISCHARGE_DISPOSITION, DISCHARGE_STATUS, DRG, DRG_TYPE
@@ -145,10 +166,7 @@ select distinct v.patient_num,
 from i2b2visit v inner join demographic d on v.patient_num=d.patid
 left outer join drg -- This section is bugfixed to only include 1 drg if multiple DRG types exist in a single encounter...
   on drg.patient_num=v.patient_num and drg.encounter_num=v.encounter_num
-left outer join
--- Encounter type. Note that this requires a full table scan on the ontology table, so it is not particularly efficient.
-(select patient_num, encounter_num, inout_cd,SUBSTR(pcori_basecode,INSTR(pcori_basecode, ':')+1,2) pcori_enctype from i2b2visit v
- inner join pcornet_enc e on c_dimcode like '%'''||inout_cd||'''%' and e.c_fullname like '\PCORI\ENCOUNTER\ENC_TYPE\%') enctype
+left outer join enctype
   on enctype.patient_num=v.patient_num and enctype.encounter_num=v.encounter_num
 left outer join payer p on p.patient_num = v.patient_num and p.encounter_num = v.encounter_num
 ;
