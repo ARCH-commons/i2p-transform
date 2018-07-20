@@ -96,6 +96,7 @@ left join payer_map pm on lower(pm.payer_name) = lower(f.tval_char) and lower(pm
 where concept_cd like 'O2|PAYER_PRIMARY:%'
 and sf.source_column = 'FINANCIAL_CLASS'
 
+/*
 union all
 
 select f.encounter_num
@@ -108,6 +109,7 @@ from i2b2fact f
 join demographic d on f.patient_num = d.patid
 left join payer_map pm on lower(pm.payer_name) = lower(f.tval_char)
 where concept_cd like 'IDX|PAYER_PRIMARY:%'
+*/
 )
 
 select distinct v.patient_num,
