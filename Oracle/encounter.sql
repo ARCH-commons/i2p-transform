@@ -95,37 +95,7 @@ insert into encounter(PATID
   , RAW_PAYER_NAME_PRIMARY
   , RAW_PAYER_ID_PRIMARY)
 
-with payer as (
-  select f.encounter_num
-  , f.patient_num
-  , pm.code payer_type_primary
-  ,f.tval_char raw_payer_name_primary
-  , SUBSTR(f.concept_cd, INSTR(f.concept_cd, ':', 1, 1) + 1) raw_payer_id_primary
-  , sf.tval_char raw_payer_type_primary
-  from i2b2fact f
-  join demographic d on f.patient_num = d.patid
-  left join blueherondata.supplemental_fact sf on f.instance_num = sf.instance_num
-  left join payer_map pm on lower(pm.payer_name) = lower(f.tval_char) and lower(pm.financial_class) = lower(sf.tval_char)
-  where concept_cd like 'O2|PAYER_PRIMARY:%'
-  and sf.source_column = 'FINANCIAL_CLASS'
-
-/*
-  union all
-
-  select f.encounter_num
-  , f.patient_num
-  , pm.code payer_type_primary
-  ,f.tval_char raw_payer_name_primary
-  , SUBSTR(f.concept_cd, INSTR(f.concept_cd, ':', 1, 1) + 1) raw_payer_id_primary
-  , null raw_payer_type_primary
-  from i2b2fact f
-  join demographic d on f.patient_num = d.patid
-  left join payer_map pm on lower(pm.payer_name) = lower(f.tval_char)
-  where concept_cd like 'IDX|PAYER_PRIMARY:%'
-*/
-)
-
-select v.patient_num,
+select distinct v.patient_num,
     v.encounter_num,
 	start_Date,
 	to_char(start_Date,'HH24:MI'),
@@ -140,10 +110,10 @@ select v.patient_num,
     drg.drg,
     drg_type,
     CASE WHEN admitting_source IS NULL THEN 'NI' ELSE admitting_source END admitting_source,
-    p.payer_type_primary,
-    p.raw_payer_type_primary,
-    p.raw_payer_name_primary,
-    p.raw_payer_id_primary
+    null,
+    null,
+    null,
+    null
 from i2b2visit v inner join demographic d on v.patient_num=d.patid
 left outer join drg -- This section is bugfixed to only include 1 drg if multiple DRG types exist in a single encounter...
   on drg.patient_num=v.patient_num and drg.encounter_num=v.encounter_num
@@ -152,12 +122,12 @@ left outer join
 (select patient_num, encounter_num, inout_cd,SUBSTR(pcori_basecode,INSTR(pcori_basecode, ':')+1,2) pcori_enctype from i2b2visit v
  inner join pcornet_enc e on c_dimcode like '%'''||inout_cd||'''%' and e.c_fullname like '\PCORI\ENCOUNTER\ENC_TYPE\%') enctype
   on enctype.patient_num=v.patient_num and enctype.encounter_num=v.encounter_num
-left outer join payer p on p.patient_num = v.patient_num and p.encounter_num = v.encounter_num
+--left outer join payer p on p.patient_num = v.patient_num and p.encounter_num = v.encounter_num
 ;
 
 -- TODO : Re-enable indices!!!!
---execute immediate 'create unique index encounter_pk on encounter (ENCOUNTERID)';
---execute immediate 'create index encounter_idx on encounter (PATID, ENCOUNTERID)';
+execute immediate 'create unique index encounter_pk on encounter (ENCOUNTERID)';
+execute immediate 'create index encounter_idx on encounter (PATID, ENCOUNTERID)';
 GATHER_TABLE_STATS('ENCOUNTER');
 
 end PCORNetEncounter;
