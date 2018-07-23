@@ -1895,7 +1895,7 @@ INSERT INTO dbo.[pmnlabresults_cm] WITH (TABLOCK)
 SELECT DISTINCT  M.patient_num patid,
 M.encounter_num encounterid,
 CASE WHEN parent_basecode LIKE 'LAB_NAME%' then SUBSTRING (parent_basecode,10, 10) ELSE 'UN' END LAB_NAME, --re-adding lab_name support for now.
-CASE WHEN lab.pcori_specimen_source like '%or SR_PLS' THEN 'SR_PLS' WHEN lab.pcori_specimen_source is null then 'NI' ELSE lab.pcori_specimen_source END specimen_source, -- (Better way would be to fix the column in the ontology but this will work)
+CASE WHEN lab.pcori_specimen_source like '%or SR_PLS' THEN 'SR_PLS' WHEN lab.pcori_specimen_source is null then 'NI' WHEN lab.pcori_specimen_source='' THEN 'NI' ELSE lab.pcori_specimen_source END specimen_source, -- (Better way would be to fix the column in the ontology but this will work)
 isnull(substring(lab.pcori_basecode,charindex(':',lab.pcori_basecode)+1,10), 'NI') LAB_LOINC, 
  -- TODO: Prefix (LOINC vs SNOMED) should actually be checked so it SNOMED doesn't go in LAB_LOINC. Our network doesn't have any SNOMED right now yet though.
 isnull(p.PRIORITY,'NI') PRIORITY,
