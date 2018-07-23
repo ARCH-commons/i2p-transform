@@ -2285,7 +2285,8 @@ end
 go
 
 --------------------------------------------------------------------------------
--- 11. PROVIDER - Written by Matthew Joss and Jeff Klann, Phd
+-- 11. PROVIDER - Written by Jeff Klann, Phd
+-- 7/23/18 - Version fixes orphan providerid by just inserting the providerid from the other tables - nothing else was coming from provider_dimension at the moment anyway
 --
 --------------------------------------------------------------------------------
 
@@ -2295,9 +2296,23 @@ go
 create procedure PCORNetProvider as
 begin
 
+
+-- 7/23/18: This only needs to derive from encounter and prescribing at present because that's where we're sourcing providerid from
+ select distinct providerid into #pv_e from pmnencounter
+-- select distinct providerid into #pv_d from pmndiagnosis
+ select distinct rx_providerid into #pv_r from pmnprescribing
+-- select distinct providerid into #pv_p from pmnprocedures
+-- select distinct medadmin_providerid into #pv_ma from pmnmed_admin
+-- select distinct obsclin_providerid into #pv_oc from pmnobs_clin
 insert into provider(providerid)
-select  distinct prov.provider_id 
-from pcori_dev.dbo.provider_dimension prov
+select  providerid 
+from #pv_e UNION 
+-- select * from #pv_d UNION 
+ select * from #pv_r  
+-- select * from #pv_p UNION 
+-- select * from #pv_ma UNION 
+-- select * from #pv_oc  
+ 
 
 end
 go
@@ -2410,6 +2425,7 @@ exec PCORNetLabResultCM
 exec PCORNetPrescribing
 exec PCORNetDispensing
 exec PCORNetDeath
+exec PCORNetProvider
 exec pcornetreport
 
 end

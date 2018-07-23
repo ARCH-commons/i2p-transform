@@ -19,10 +19,6 @@ GO
 
 exec pcornetclear
 GO
-delete from provider
-GO
-exec PCORNETProvider
-GO
 delete from pmnharvest
 GO
 exec PCORNetHarvest
@@ -70,6 +66,10 @@ GO
 delete from pmnDeath
 GO
 exec PCORNetDeath
+GO
+delete from provider
+GO
+exec PCORNETProvider
 GO
 exec pcornetreport
 GO
