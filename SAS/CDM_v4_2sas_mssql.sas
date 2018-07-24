@@ -26,7 +26,7 @@ Instructions:
 
 libname sql_cdm odbc datasrc='PopMedNet'; 
 /* optionally add a password above: e.g., libname sql_cdm odbc datasrc='ORACLE_PMN' password=myPassWord; */
-libname cdm "E:\maj60\CDM_july_test";
+libname cdm "E:\maj60\CDM_july_test_no_indexes";
 
 
 proc sql noprint; 
@@ -400,9 +400,9 @@ SELECT MEDADMINID ,
        PRESCRIBINGID ,
        MEDADMIN_PROVIDERID ,
        MEDADMIN_START_DATE ,
-       MEDADMIN_START_TIME ,
+       INPUT( MEDADMIN_START_TIME , time10.) AS MEDADMIN_START_TIME format hhmm.,
        MEDADMIN_STOP_DATE ,
-       MEDADMIN_STOP_TIME ,
+       INPUT( MEDADMIN_STOP_TIME , time10.) AS MEDADMIN_STOP_TIME format hhmm.,
        MEDADMIN_TYPE ,
        MEDADMIN_CODE ,
        MEDADMIN_DOSE_ADMIN ,
@@ -427,20 +427,20 @@ SELECT OBSCLINID ,
        ENCOUNTERID ,
        OBSCLIN_PROVIDERID ,
        OBSCLIN_DATE ,
-       OBSCLIN_TIME ,
+       INPUT( OBSCLIN_TIME , time10.) AS OBSCLIN_TIME format hhmm.,
        OBSCLIN_TYPE ,
        OBSCLIN_CODE ,
        OBSCLIN_RESULT_QUAL ,
        OBSCLIN_RESULT_TEXT ,
        OBSCLIN_RESULT_SNOMED ,
-       OBSLCIN_RESULT_NUM ,
+       OBSCLIN_RESULT_NUM ,
        OBSCLIN_RESULT_MODIFIER ,
        OBSCLIN_RESULT_UNIT ,
        RAW_OBSCLIN_NAME ,
        RAW_OBSCLIN_CODE ,
        RAW_OBSCLIN_TYPE ,
        RAW_OBSCLIN_RESULT ,
-       RAW_OBSCLIN_MODIFER ,
+       RAW_OBSCLIN_MODIFIER ,
        RAW_OBSCLIN_UNIT
 FROM SQL_CDM.OBS_CLIN
 ;
@@ -455,7 +455,7 @@ SELECT OBSGENID ,
        ENCOUNTERID ,
        OBSGEN_PROVIDERID ,
        OBSGEN_DATE ,
-       OBSGEN_TIME ,
+       INPUT( OBSGEN_TIME , time10.) AS OBSGEN_TIME format hhmm.,
        OBSGEN_TYPE ,
        OBSGEN_CODE ,
        OBSGEN_RESULT_QUAL ,
@@ -463,7 +463,7 @@ SELECT OBSGENID ,
        OBSGEN_RESULT_NUM ,
        OBSGEN_RESULT_MODIFIER ,
        OBSGEN_RESULT_UNIT ,
-       OBSGEN_TABLE_MODIFIER ,
+       OBSGEN_TABLE_MODIFIED ,
        OBSGEN_ID_MODIFIED ,
        RAW_OBSGEN_NAME ,
        RAW_OBSGEN_CODE ,
