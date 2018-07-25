@@ -1519,7 +1519,7 @@ from (
 	inner join pcornet_enc enc on enc.c_basecode  = f.concept_cd   
 		and enc.c_fullname like '\PCORI\ENCOUNTER\PAYER_TYPE\%'
 ) payor
-group by patient_num,encounter_num,payor_type;
+group by patient_num,encounter_num;
 
 CREATE INDEX max_payor_pat_enc ON #max_payor_type (patient_num,encounter_num) INCLUDE (payor);
 
