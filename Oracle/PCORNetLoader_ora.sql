@@ -344,7 +344,7 @@ END;
 CREATE TABLE pmnPROCEDURES( --Modified on 2/6/17 from procedure to procedures by Matthew Joss
 	PROCEDURESID NUMBER(19)  primary key,
 	PATID varchar(50) NOT NULL,
-	ENCOUNTERID varchar(50) NOT NULL,
+	ENCOUNTERID varchar(50) NULL,
 	ENC_TYPE varchar(2) NULL,
 	ADMIT_DATE date NULL,
 	PROVIDERID varchar(50) NULL,
@@ -352,8 +352,10 @@ CREATE TABLE pmnPROCEDURES( --Modified on 2/6/17 from procedure to procedures by
 	PX varchar(11) NOT NULL,
 	PX_TYPE varchar(2) NOT NULL,
 	PX_SOURCE varchar(2) NULL,
+    PPX varchar(2) NULL,
 	RAW_PX varchar(50) NULL,
-	RAW_PX_TYPE varchar(50) NULL
+	RAW_PX_TYPE varchar(50) NULL,
+    RAW_PPX varchar(50) NULL
 )
 /
 
@@ -381,7 +383,7 @@ END;
 CREATE TABLE pmndiagnosis(
 	DIAGNOSISID NUMBER(19)  primary key,
 	PATID varchar(50) NOT NULL,
-	ENCOUNTERID varchar(50) NOT NULL,
+	ENCOUNTERID varchar(50) NULL,
 	ENC_TYPE varchar(2) NULL,
 	ADMIT_DATE date NULL,
 	PROVIDERID varchar(50) NULL,
@@ -390,11 +392,13 @@ CREATE TABLE pmndiagnosis(
 	DX_SOURCE varchar(2) NOT NULL,
     DX_ORIGIN varchar (2) NULL,
 	PDX varchar(2) NULL,
+    DX_POA varchar(2) NULL,
 	RAW_DX varchar(50) NULL,
 	RAW_DX_TYPE varchar(50) NULL,
 	RAW_DX_SOURCE varchar(50) NULL,
 	RAW_ORIGDX varchar(50) NULL,
-	RAW_PDX varchar(50) NULL
+	RAW_PDX varchar(50) NULL,
+    RAW_DX_POA varchar(50) NULL
 )
 /
 
@@ -426,7 +430,7 @@ CREATE TABLE pmnlab_result_cm( --Modified on 2/6/17 from labresults_cm to lab_re
 	PATID varchar(50) NOT NULL,
 	ENCOUNTERID varchar(50) NULL,
 	LAB_NAME varchar(10) NULL,
-	SPECIMEN_SOURCE varchar(10) NULL,
+	SPECIMEN_SOURCE varchar(50) NULL,
 	LAB_LOINC varchar(10) NULL,
 	PRIORITY varchar(2) NULL,
 	RESULT_LOC varchar(2) NULL,
@@ -437,10 +441,11 @@ CREATE TABLE pmnlab_result_cm( --Modified on 2/6/17 from labresults_cm to lab_re
 	SPECIMEN_TIME varchar(5) NULL,
 	RESULT_DATE date NOT NULL,
 	RESULT_TIME varchar(5) NULL,
-	RESULT_QUAL varchar(12) NULL,
+	RESULT_QUAL varchar(50) NULL,
+    RESULT_SNOMED varchar (50) NULL,
 	RESULT_NUM number (15,8) NULL,
 	RESULT_MODIFIER varchar(2) NULL,
-	RESULT_UNIT varchar(11) NULL,
+	RESULT_UNIT varchar(50) NULL,
 	NORM_RANGE_LOW varchar(10) NULL,
 	NORM_MODIFIER_LOW varchar(2) NULL,
 	NORM_RANGE_HIGH varchar(10) NULL,
@@ -573,7 +578,13 @@ CREATE TABLE pmndispensing(
 	NDC varchar (11) NOT NULL,
 	DISPENSE_SUP numeric (15,8), 
 	DISPENSE_AMT numeric (15,8), 
-	RAW_NDC varchar (50)
+    DISPENSE_DOSE_DISP numeric (15, 8),
+    DISPENSE_DOSE_DISP_UNIT varchar (50),
+    DISPENSE_ROUTE varchar (50),
+	RAW_NDC varchar (50),
+    RAW_DISPENSE_DOSE_DISP varchar (50),
+    RAW_DISPENSE_DOSE_DISP_UNIT varchar (50),
+    RAW_DISPENSE_ROUTE varchar (50)
 )
 /
 
@@ -609,18 +620,28 @@ CREATE TABLE pmnprescribing(
 	RX_ORDER_TIME varchar (5) NULL,
 	RX_START_DATE date NULL,
 	RX_END_DATE date NULL,
+    RX_DOSE_ORDERED numeric (15, 8) NULL,
+    RX_DOSE_ORDERED_UNIT varchar (50) NULL,
 	RX_QUANTITY numeric (15,8) NULL,
-    RX_QUANTITY_UNIT varchar (2) NULL,
+    RX_DOSE_FORM varchar (50) NULL, --replaced RX_QUANTITY_UNIT in CDM v4.0
 	RX_REFILLS numeric (15,8) NULL,
 	RX_DAYS_SUPPLY numeric (15,8) NULL,
 	RX_FREQUENCY varchar (2) NULL, -- Data type error, fixed 1/11/16 jgk
-	RX_BASIS varchar (2) NULL,
+    RX_PRN_FLAG varchar (1) NULL,
+    RX_ROUTE varchar (50) NULL,
+    RX_BASIS varchar (2) NULL,
 	RXNORM_CUI varchar (8) NULL,
+    RX_SOURCE varchar (2) NULL,
+    RX_DISPENSE_AS_WRITTEN varchar (2) NULL,
 	RAW_RX_MED_NAME varchar (50) NULL,
 	RAW_RX_FREQUENCY varchar (50) NULL,
 	RAW_RXNORM_CUI varchar (50) NULL,
     RAW_RX_QUANTITY varchar (50) NULL,
-    RAW_RX_NDC varchar (50) NULL
+    RAW_RX_NDC varchar (50) NULL,
+    RAW_RX_DOSE_ORDERED varchar (50) NULL,
+    RAW_RX_DOSE_ORDERED_UNIT varchar (50) NULL,
+    RAW_RX_ROUTE varchar (50) NULL,
+    RAW_RX_REFILLS varchar (50) NULL
 )
 /
 
@@ -703,16 +724,30 @@ CREATE TABLE pmnpro_cm(
 	PRO_CM_ID NUMBER(19)  primary key,
 	PATID varchar(50) NOT NULL,
 	ENCOUNTERID  varchar(50) NULL,
-	PRO_ITEM varchar (20) NOT NULL,
 	PRO_LOINC varchar (10) NULL,
 	PRO_DATE date NOT NULL,
 	PRO_TIME varchar (5) NULL,
-	PRO_RESPONSE numeric (15, 8) NOT NULL,
+    PRO_TYPE varchar (2) NULL,
+    PRO_ITEM_NAME varchar (50) NULL,
+    PRO_ITEM_LOINC varchar (10) NULL,
+    PRO_RESPONSE_TEXT varchar (50) NULL,
+	PRO_RESPONSE_NUM numeric (15, 8) NOT NULL,
 	PRO_METHOD varchar (2) NULL,
 	PRO_MODE varchar (2) NULL,
 	PRO_CAT varchar (2) NULL,
-	RAW_PRO_CODE varchar (50) NULL,
-	RAW_PRO_RESPONSE varchar (50) NULL
+    PRO_ITEM_VERSION varchar (50) NULL,
+    PRO_MEASURE_NAME varchar (50) NULL,
+    PRO_MEASURE_SEQ varchar (50) NULL,
+    PRO_MEASURE_SCORE numeric (15, 8) NULL,
+    PRO_MEASURE_THETA numeric (15, 8) NULL,
+    PRO_MEASURE_SCALED_TSCORE numeric (15, 8) NULL,
+    PRO_MEASURE_STANDARD_ERROR numeric (15, 8) NULL,
+    PRO_MEASURE_COUNT_SCORED numeric (15, 8) NULL,
+    PRO_MEASURE_LOINC varchar (10) NULL,
+    PRO_MEASURE_VERSION varchar (50) NULL,
+    PRO_ITEM_FULLNAME varchar (50) NULL,
+    PRO_ITEM_TEXT varchar (50) NULL,
+    PRO_MEASURE_FULLNAME varchar (50) NULL
 )
 /
 
@@ -762,6 +797,11 @@ CREATE TABLE pmnharvest(
 	REPORT_DATE_MGMT varchar(2) NULL,
 	RESOLVE_DATE_MGMT varchar(2) NULL,
 	PRO_DATE_MGMT varchar(2) NULL,
+    DEATH_DATE_MGMT varchar (2) NULL,
+    MEDADMIN_START_DATE_MGMT varchar (2) NULL,
+    MEDADMIN_STOP_DATE_MGMT varchar (2) NULL,
+    OBSCLIN_DATE_MGMT varchar (2) NULL,
+    OBSGEN_DATE_MGMT varchar (2) NULL,
 	REFRESH_DEMOGRAPHIC_DATE date NULL,
 	REFRESH_ENROLLMENT_DATE date NULL,
 	REFRESH_ENCOUNTER_DATE date NULL,
@@ -775,7 +815,11 @@ CREATE TABLE pmnharvest(
 	REFRESH_PRESCRIBING_DATE date NULL,
 	REFRESH_PCORNET_TRIAL_DATE date NULL,
 	REFRESH_DEATH_DATE date NULL,
-	REFRESH_DEATH_CAUSE_DATE date NULL
+	REFRESH_DEATH_CAUSE_DATE date NULL,
+    REFRESH_MED_ADMIN_DATE date NULL,
+    REFRESH_OBS_CLIN_DATE date NULL,
+    REFRESH_PROVIDER_DATE date NULL,
+    REFRESH_OBS_GEN_DATE date NULL
 )
 /
 
@@ -801,12 +845,22 @@ CREATE TABLE pmnENCOUNTER(
 	DRG varchar(3) NULL,
 	DRG_TYPE varchar(2) NULL,
 	ADMITTING_SOURCE varchar(2) NULL,
-	RAW_SITEID varchar (50) NULL,
+	PAYER_TYPE_PRIMARY varchar(5) NULL,
+	PAYER_TYPE_SECONDARY varchar(5) NULL,
+    FACILITY_TYPE varchar(50) NULL,
+    RAW_SITEID varchar (50) NULL,
 	RAW_ENC_TYPE varchar(50) NULL,
 	RAW_DISCHARGE_DISPOSITION varchar(50) NULL,
 	RAW_DISCHARGE_STATUS varchar(50) NULL,
 	RAW_DRG_TYPE varchar(50) NULL,
-	RAW_ADMITTING_SOURCE varchar(50) NULL
+	RAW_ADMITTING_SOURCE varchar(50) NULL,
+    RAW_FACILITY_TYPE varchar(50) NULL,
+    RAW_PAYER_TYPE_PRIMARY varchar(50) NULL,
+    RAW_PAYER_NAME_PRIMARY varchar(50) NULL,
+    RAW_PAYER_ID_PRIMARY varchar(50) NULL,
+    RAW_PAYER_TYPE_SECONDARY varchar(50) NULL,
+    RAW_PAYER_NAME_SECONDARY varchar(50) NULL,
+    RAW_PAYER_ID_SECONDARY varchar(50) NULL
 )
 /
 
@@ -830,13 +884,123 @@ CREATE TABLE pmndemographic(
 	HISPANIC varchar(2) NULL,
 	BIOBANK_FLAG varchar(1) DEFAULT 'N',
 	RACE varchar(2) NULL,
+    PAT_PREF_LANGUAGE_SPOKEN varchar(3) NULL,
 	RAW_SEX varchar(50) NULL,
 	RAW_HISPANIC varchar(50) NULL,
 	RAW_RACE varchar(50) NULL,
     RAW_SEXUAL_ORIENTATION varchar(50) NULL,
-    RAW_GENDER_IDENTITY varchar(50) NULL
+    RAW_GENDER_IDENTITY varchar(50) NULL,
+    RAW_PAT_PREF_LANGUAGE_SPOKEN varchar (50) NULL
 )
 /
+
+
+
+----------------------------------------------------------New tables for CDM V4 BELOW------------------------------------------------------------
+
+BEGIN
+PMN_DROPSQL('DROP TABLE MED_ADMIN');
+END;
+/
+
+CREATE TABLE MED_ADMIN (
+    MEDADMINID varchar (50) NOT NULL,
+    PATID varchar (50) NOT NULL,
+    ENCOUNTERID varchar (50) NOT NULL,
+    PRESCRIBINGID varchar (50) NULL,
+    MEDADMIN_PROVIDERID varchar (50) NULL,
+    MEDADMIN_START_DATE date NULL,
+    MEDADMIN_START_TIME varchar (5) NULL,
+    MEDADMIN_STOP_DATE date NULL,
+    MEDADMIN_STOP_TIME varchar (5) NULL,
+    MEDADMIN_TYPE varchar (2) NULL,
+    MEDADMIN_CODE varchar (50) NULL,
+    MEDADMIN_DOSE_ADMIN numeric (15, 8) NULL,
+    MEDADMIN_DOSE_ADMIN_UNIT varchar (50) NULL,
+    MEDADMIN_ROUTE varchar (50) NULL,
+    MEDADMIN_SOURCE varchar (2) NULL,
+    RAW_MEDADMIN_MED_NAME varchar (50) NULL,
+    RAW_MEDADMIN_CODE varchar (50) NULL,
+    RAW_MEDADMIN_DOSE_ADMIN varchar (50) NUll,
+    RAW_MEDADMIN_DOSE_ADMIN_UNIT varchar (50) NUll,
+    RAW_MEDADMIN_ROUTE varchar (50) NUll
+)
+/
+
+
+BEGIN
+PMN_DROPSQL('DROP TABLE PROVIDER');
+END;
+/
+
+CREATE TABLE PROVIDER (
+    PROVIDERID varchar (50) NULL,
+    PROVIDER_SEX varchar (2) NULL,
+    PROVIDER_SPECIALTY_PRIMARY varchar (50) NULL,
+    PROVIDER_NPI numeric (15, 8) NULL,
+    PROVIDER_NPI_FLAG varchar (1) NULL,
+    RAW_PROVIDER_SPECIALTY_PRIMARY varchar (50) NULL
+)
+/
+
+BEGIN
+PMN_DROPSQL('DROP TABLE OBS_CLIN');
+END;
+/
+
+CREATE TABLE OBS_CLIN (
+    OBSCLINID varchar (50) NOT NULL,
+    PATID varchar (50) NOT NULL,
+    ENCOUNTERID varchar (50) NULL,
+    OBSCLIN_PROVIDERID varchar (50) NULL,
+    OBSCLIN_DATE date NULL,
+    OBSCLIN_TIME varchar (5) NULL,
+    OBSCLIN_TYPE varchar (2) NULL,
+    OBSCLIN_CODE varchar (50) NULL,
+    OBSCLIN_RESULT_QUAL varchar (50) NULL,
+    OBSCLIN_RESULT_TEXT varchar (50) NULL,
+    OBSCLIN_RESULT_SNOMED varchar (50) NULL,
+    OBSLCIN_RESULT_NUM numeric (15, 8) NULL,
+    OBSCLIN_RESULT_MODIFIER varchar (2) NULL,
+    OBSCLIN_RESULT_UNIT varchar (50) NULL,
+    RAW_OBSCLIN_NAME varchar (50) NULL,
+    RAW_OBSCLIN_CODE varchar (50) NULL,
+    RAW_OBSCLIN_TYPE varchar (50) NULL,
+    RAW_OBSCLIN_RESULT varchar (50) NULL,
+    RAW_OBSCLIN_MODIFER varchar (50) NULL,
+    RAW_OBSCLIN_UNIT varchar (50) NULL
+)
+/
+
+BEGIN
+PMN_DROPSQL('DROP TABLE OBS_GEN');
+END;
+/
+
+CREATE TABLE OBS_GEN (
+    OBSGENID varchar (50) NOT NULL,
+    PATID varchar (50) NOT NULL,
+    ENCOUNTERID varchar (50) NULL,
+    OBSGEN_PROVIDERID varchar (50) NULL,
+    OBSGEN_DATE date NULL,
+    OBSGEN_TIME varchar (5) NULL,
+    OBSGEN_TYPE varchar (30) NULL,
+    OBSGEN_CODE varchar (50) NULL,
+    OBSGEN_RESULT_QUAL varchar (50) NULL,
+    OBSGEN_RESULT_TEXT varchar (50) NULL,
+    OBSGEN_RESULT_NUM numeric (15, 8) NULL,
+    OBSGEN_RESULT_MODIFIER varchar (2) NULL,
+    OBSGEN_RESULT_UNIT varchar (50) NULL,
+    OBSGEN_TABLE_MODIFIER varchar (3) NULL,
+    OBSGEN_ID_MODIFIED varchar (50) NULL,
+    RAW_OBSGEN_NAME varchar (50) NULL,
+    RAW_OBSGEN_CODE varchar (50) NULL,
+    RAW_OBSGEN_TYPE varchar (50) NULL,
+    RAW_OBSGEN_RESULT varchar (50) NULL,
+    RAW_OBSGEN_UNIT varchar (50) NULL
+)
+/
+
 
 
 -- create the reporting table - don't do this once you are running stuff and you want to track loads
@@ -1130,24 +1294,55 @@ end PCORNetDemographic;
 ----------------------------------------------------------------------------------------------------------------------------------------
 
 
+BEGIN
+PMN_DROPSQL('DROP TABLE max_payor_type');
+END;
+/
+
+CREATE TABLE max_payor_type  ( 
+	patient_num  	int NOT NULL,
+	encounter_num	int NOT NULL,
+	payor        	varchar(3) NULL
+	)
+/
+
 
 create or replace procedure PCORNetEncounter as
 
 sqltext varchar2(4000);
 begin
 
+PMN_DROPSQL('DELETE FROM max_payor_type'); -- clear data from temp table
+
+sqltext := 'insert into max_payor_type '||
+	'select patient_num,encounter_num,max(payor_type) payor '||
+    'from ( select distinct f.patient_num,encounter_num,SUBSTR(pcori_basecode,INSTR(pcori_basecode, '':'')+1,3) payor_type '||
+	'from i2b2fact f '||
+    'inner join pmndemographic d on f.patient_num=d.patid '||
+    'inner join pcornet_enc enc on enc.c_basecode  = f.concept_cd '||
+	'and enc.c_fullname like ''\PCORI\ENCOUNTER\PAYER_TYPE\%'' ) payor '||
+    'group by patient_num,encounter_num ';
+PMN_EXECUATESQL(sqltext);
+
+
+--sqltext := 'CREATE INDEX max_payor_pat_enc ON max_payor_type (patient_num,encounter_num) INCLUDE (payor)';
+--PMN_EXECUATESQL(sqltext);
+
+
 insert into pmnencounter(PATID,ENCOUNTERID,admit_date ,ADMIT_TIME , 
 		DISCHARGE_DATE ,DISCHARGE_TIME ,PROVIDERID ,FACILITY_LOCATION  
 		,ENC_TYPE ,FACILITYID ,DISCHARGE_DISPOSITION , 
-		DISCHARGE_STATUS ,DRG ,DRG_TYPE ,ADMITTING_SOURCE) 
+		DISCHARGE_STATUS ,DRG ,DRG_TYPE ,ADMITTING_SOURCE, PAYER_TYPE_PRIMARY) 
 select distinct v.patient_num, v.encounter_num,  
 	start_Date, 
 	to_char(start_Date,'HH24:MI'), 
 	end_Date, 
 	to_char(end_Date,'HH24:MI'), 
 	providerid,location_zip, 
-(case when pcori_enctype is not null then pcori_enctype else 'UN' end) enc_type, facility_id,  CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE  discharge_disposition END , CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE discharge_status END  , drg.drg, drg_type, CASE WHEN admitting_source IS NULL THEN 'NI' ELSE admitting_source END  
-from i2b2visit v inner join pmndemographic d on v.patient_num=d.patid
+(case when pcori_enctype is not null then pcori_enctype else 'UN' end) enc_type, facility_id,  CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE  discharge_disposition END , CASE WHEN pcori_enctype='AV' THEN 'NI' ELSE discharge_status END  , drg.drg, drg_type, CASE WHEN admitting_source IS NULL THEN 'NI' ELSE admitting_source END,
+payor   -- TODO only supporting primary payer right now
+from i2b2visit v 
+inner join pmndemographic d on v.patient_num=d.patid
 left outer join 
    (select * from
    (select patient_num,encounter_num,drg_type, drg,row_number() over (partition by  patient_num, encounter_num order by drg_type desc) AS rn from 
@@ -1158,6 +1353,10 @@ left outer join
       and enc.c_fullname like '\PCORI\ENCOUNTER\DRG\%') drg1 group by patient_num,encounter_num,drg_type) drg) drg
      where rn=1) drg -- This section is bugfixed to only include 1 drg if multiple DRG types exist in a single encounter...
   on drg.patient_num=v.patient_num and drg.encounter_num=v.encounter_num
+-- 7/16/18 - CDMv4.1 payer data - jklann
+  left outer join max_payor_type pay
+    on pay.patient_num=v.patient_num and pay.encounter_num=v.encounter_num
+--end cdm v4.1 payer data
 left outer join 
 -- Encounter type. Note that this requires a full table scan on the ontology table, so it is not particularly efficient.
 (select patient_num, encounter_num, inout_cd,SUBSTR(pcori_basecode,INSTR(pcori_basecode, ':')+1,2) pcori_enctype from i2b2visit v
@@ -1165,6 +1364,8 @@ left outer join
   on enctype.patient_num=v.patient_num and enctype.encounter_num=v.encounter_num;
 
 Commit;
+
+PMN_DROPSQL('DELETE FROM max_payor_type'); -- clear data from temp table
 
 end PCORNetEncounter;
 /
@@ -1591,6 +1792,24 @@ CREATE TABLE LOCATION  (
 	)
 /
 
+BEGIN
+PMN_DROPSQL('DROP TABLE pcornet_lab2');
+END;
+/
+
+CREATE TABLE pcornet_lab2  ( 
+	pcori_basecode       	varchar2(450) NULL,
+    c_basecode           	varchar2(450) NULL,
+	pcori_specimen_source	varchar2(50) NULL,
+	parent_basecode      	varchar2(450) NULL,
+	LAB_NAME             	varchar2(150) NULL,
+	NORM_RANGE_LOW       	varchar2(10) NULL,
+	NORM_MODIFIER_LOW    	varchar2(2) NULL,
+	NORM_RANGE_HIGH      	varchar2(10) NULL,
+	NORM_MODIFIER_HIGH  	varchar2(2) NULL 
+	)
+/
+
 
 
 
@@ -1621,6 +1840,22 @@ sqltext := 'insert into location '||
 
 PMN_EXECUATESQL(sqltext);
 
+
+-- Optimization - build temp ont table
+PMN_DROPSQL('DELETE FROM pcornet_lab2 ');
+
+sqltext := 'insert into pcornet_lab2 '||
+'select distinct lab.pcori_basecode,lab.c_basecode,lab.pcori_specimen_source,ont_parent.c_basecode parent_basecode,norm.* '||
+'from pcornet_lab lab '|| 
+'inner join pcornet_lab ont_loinc on lab.pcori_basecode=ont_loinc.pcori_basecode and ont_loinc.c_basecode like ''LOINC:%'' '|| --NOTE: You will need to change 'LOINC:' to our local term.
+'inner JOIN pcornet_lab ont_parent on ont_loinc.c_path=ont_parent.c_fullname '||
+'left outer join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME '||
+'where lab.c_fullname like ''\PCORI\LAB_RESULT_CM\%'' ';
+
+PMN_EXECUATESQL(sqltext);
+
+--sqltext := 'CREATE INDEX IDX_pcornetlab2_1 ON pcornet_lab2(c_basecode)';
+--PMN_EXECUATESQL(sqltext);
 
 INSERT INTO pmnlab_result_cm
       (PATID
@@ -1658,12 +1893,13 @@ INSERT INTO pmnlab_result_cm
 
 SELECT DISTINCT  M.patient_num patid,
 M.encounter_num encounterid,
-CASE WHEN ont_parent.C_BASECODE LIKE 'LAB_NAME%' then SUBSTR (ont_parent.c_basecode,10, 10) ELSE 'NI' END LAB_NAME,
-CASE WHEN lab.pcori_specimen_source like '%or SR_PLS' THEN 'SR_PLS' WHEN lab.pcori_specimen_source is null then 'NI' ELSE lab.pcori_specimen_source END specimen_source, -- (Better way would be to fix the column in the ontology but this will work)
-NVL(lab.pcori_basecode, 'NI') LAB_LOINC,
+CASE WHEN parent_basecode LIKE 'LAB_NAME%' then SUBSTR (parent_basecode,10, 10) ELSE 'NI' END LAB_NAME,
+CASE WHEN lab.pcori_specimen_source like '%or SR_PLS' THEN 'SR_PLS' WHEN lab.pcori_specimen_source is null then 'NI' WHEN lab.pcori_specimen_source='' THEN 'NI' ELSE lab.pcori_specimen_source END specimen_source, -- (Better way would be to fix the column in the ontology but this will work)
+NVL(SUBSTR(lab.pcori_basecode,INSTR(lab.pcori_basecode, ':')+1,10), 'NI') LAB_LOINC,
+ -- TODO: Prefix (LOINC vs SNOMED) should actually be checked so it SNOMED doesn't go in LAB_LOINC. Our network doesn't have any SNOMED right now yet though.
 NVL(p.PRIORITY,'NI') PRIORITY,
 NVL(l.RESULT_LOC,'NI') RESULT_LOC,
-NVL(lab.pcori_basecode, 'NI') LAB_PX,
+NVL(SUBSTR(lab.pcori_basecode, INSTR(lab.pcori_basecode, ':')+1,11), 'NI') LAB_PX,
 'LC'  LAB_PX_TYPE,
 m.start_date LAB_ORDER_DATE, 
 m.start_date SPECIMEN_DATE,
@@ -1671,13 +1907,13 @@ to_char(m.start_date,'HH24:MI') SPECIMEN_TIME,
 NVL(m.end_date, m.start_date) RESULT_DATE,    -- Bug fix MJ 10/06/16
 to_char(m.end_date,'HH24:MI') RESULT_TIME,
 CASE WHEN m.ValType_Cd='T' THEN CASE WHEN m.Tval_Char IS NOT NULL THEN 'OT' ELSE 'NI' END END RESULT_QUAL, -- TODO: Should be a standardized value -- bug fix translated by MJ from JK's MSSQL fix 11/30/16
-CASE WHEN m.ValType_Cd='N' THEN m.NVAL_NUM ELSE null END RESULT_NUM,
+CASE WHEN m.ValType_Cd='N' AND m.NVAL_NUM<9999999 THEN m.NVAL_NUM ELSE null END RESULT_NUM,  --  BUGFIX 4/9/18 don't allow extreme values
 CASE WHEN m.ValType_Cd='N' THEN (CASE NVL(nullif(m.TVal_Char,''),'NI') WHEN 'E' THEN 'EQ' WHEN 'NE' THEN 'OT' WHEN 'L' THEN 'LT' WHEN 'LE' THEN 'LE' WHEN 'G' THEN 'GT' WHEN 'GE' THEN 'GE' ELSE 'NI' END)  ELSE 'TX' END RESULT_MODIFIER,
 NVL(m.Units_CD,'NI') RESULT_UNIT, -- TODO: Should be standardized units
-nullif(norm.NORM_RANGE_LOW,'') NORM_RANGE_LOW
-,norm.NORM_MODIFIER_LOW,
-nullif(norm.NORM_RANGE_HIGH,'') NORM_RANGE_HIGH
-,norm.NORM_MODIFIER_HIGH,
+nullif(lab.NORM_RANGE_LOW,'') NORM_RANGE_LOW
+,lab.NORM_MODIFIER_LOW,
+nullif(lab.NORM_RANGE_HIGH,'') NORM_RANGE_HIGH
+,lab.NORM_MODIFIER_HIGH,
 CASE NVL(nullif(m.VALUEFLAG_CD,''),'NI') WHEN 'H' THEN 'AH' WHEN 'L' THEN 'AL' WHEN 'A' THEN 'AB' ELSE 'NI' END ABN_IND,
 NULL RAW_LAB_NAME,
 NULL RAW_LAB_CODE,
@@ -1690,12 +1926,7 @@ NULL RAW_FACILITY_CODE
 
 FROM i2b2fact M   --JK bug fix 10/7/16
 inner join pmnENCOUNTER enc on enc.patid = m.patient_num and enc.encounterid = m.encounter_Num -- Constraint to selected encounters
-inner join pcornet_lab lab on lab.c_basecode  = M.concept_cd and lab.c_fullname like '\PCORI\LAB_RESULT_CM\%'
-inner join pcornet_lab ont_loinc on lab.pcori_basecode=ont_loinc.pcori_basecode and ont_loinc.c_basecode like 'LOINC:%'  --NOTE: You will need to change 'LOINC:' to our local term.
-inner JOIN pcornet_lab ont_parent on ont_loinc.c_path=ont_parent.c_fullname
-inner join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
-
-
+inner join pcornet_lab2 lab on lab.c_basecode  = M.concept_cd
 
 
 LEFT OUTER JOIN priority p
@@ -1715,7 +1946,7 @@ and M.concept_cd=l.concept_Cd
 and M.start_date=l.start_Date
  
 WHERE m.ValType_Cd in ('N','T')
-and ont_parent.C_BASECODE LIKE 'LAB_NAME%' -- Exclude non-pcori labs
+--and parent_basecode LIKE 'LAB_NAME%' -- 4/5/18 - no longer exclude non-pcori labs, supporting SNOW LAB ontology
 and m.MODIFIER_CD='@';
 
 Commit;
@@ -1736,8 +1967,8 @@ END PCORNetLabResultCM;
 create or replace procedure PCORNetHarvest as
 begin
 
-INSERT INTO pmnharvest(NETWORKID, NETWORK_NAME, DATAMARTID, DATAMART_NAME, DATAMART_PLATFORM, CDM_VERSION, DATAMART_CLAIMS, DATAMART_EHR, BIRTH_DATE_MGMT, ENR_START_DATE_MGMT, ENR_END_DATE_MGMT, ADMIT_DATE_MGMT, DISCHARGE_DATE_MGMT, PX_DATE_MGMT, RX_ORDER_DATE_MGMT, RX_START_DATE_MGMT, RX_END_DATE_MGMT, DISPENSE_DATE_MGMT, LAB_ORDER_DATE_MGMT, SPECIMEN_DATE_MGMT, RESULT_DATE_MGMT, MEASURE_DATE_MGMT, ONSET_DATE_MGMT, REPORT_DATE_MGMT, RESOLVE_DATE_MGMT, PRO_DATE_MGMT, REFRESH_DEMOGRAPHIC_DATE, REFRESH_ENROLLMENT_DATE, REFRESH_ENCOUNTER_DATE, REFRESH_DIAGNOSIS_DATE, REFRESH_PROCEDURES_DATE, REFRESH_VITAL_DATE, REFRESH_DISPENSING_DATE, REFRESH_LAB_RESULT_CM_DATE, REFRESH_CONDITION_DATE, REFRESH_PRO_CM_DATE, REFRESH_PRESCRIBING_DATE, REFRESH_PCORNET_TRIAL_DATE, REFRESH_DEATH_DATE, REFRESH_DEATH_CAUSE_DATE) 
-	VALUES('C1', 'SCILHS', getDataMartID(), getDataMartName(), getDataMartPlatform(), 3.1, '01', '02', '01','01','02','01','02','01','02','01','02','01','01','02','02','01','01','01','02','01',current_date,current_date,current_date,current_date,current_date,current_date,current_date,current_date,current_date,null,current_date,null,null,null);
+INSERT INTO pmnharvest(NETWORKID, NETWORK_NAME, DATAMARTID, DATAMART_NAME, DATAMART_PLATFORM, CDM_VERSION, DATAMART_CLAIMS, DATAMART_EHR, BIRTH_DATE_MGMT, ENR_START_DATE_MGMT, ENR_END_DATE_MGMT, ADMIT_DATE_MGMT, DISCHARGE_DATE_MGMT, PX_DATE_MGMT, RX_ORDER_DATE_MGMT, RX_START_DATE_MGMT, RX_END_DATE_MGMT, DISPENSE_DATE_MGMT, LAB_ORDER_DATE_MGMT, SPECIMEN_DATE_MGMT, RESULT_DATE_MGMT, MEASURE_DATE_MGMT, ONSET_DATE_MGMT, REPORT_DATE_MGMT, RESOLVE_DATE_MGMT, PRO_DATE_MGMT, REFRESH_DEMOGRAPHIC_DATE, REFRESH_ENROLLMENT_DATE, REFRESH_ENCOUNTER_DATE, REFRESH_DIAGNOSIS_DATE, REFRESH_PROCEDURES_DATE, REFRESH_VITAL_DATE, REFRESH_DISPENSING_DATE, REFRESH_LAB_RESULT_CM_DATE, REFRESH_CONDITION_DATE, REFRESH_PRO_CM_DATE, REFRESH_PRESCRIBING_DATE, REFRESH_PCORNET_TRIAL_DATE, REFRESH_DEATH_DATE, REFRESH_DEATH_CAUSE_DATE, MEDADMIN_START_DATE_MGMT, MEDADMIN_STOP_DATE_MGMT, REFRESH_MED_ADMIN_DATE, REFRESH_OBS_CLIN_DATE, REFRESH_PROVIDER_DATE, REFRESH_OBS_GEN_DATE) 
+	VALUES('C1', 'SCILHS', getDataMartID(), getDataMartName(), getDataMartPlatform(), 4.1, '01', '02', '01','01','02','01','02','01','02','01','02','01','01','02','02','01','01','01','02','01',current_date,current_date,current_date,current_date,current_date,current_date,current_date,current_date,current_date,null,current_date,null,null,null, '01', '02', current_date, current_date, current_date, current_date);
 
 Commit;
 
@@ -1928,7 +2159,7 @@ sqltext := 'insert into unit '||
 '        inner join pmnENCOUNTER enc on enc.patid = unit.patient_num and enc.encounterid = unit.encounter_Num '||
 '     join pcornet_med unitcode  '||
 '        on unit.modifier_cd = unitcode.c_basecode '||
-'        and unitcode.c_fullname like ''\PCORI_MOD\RX_QUANTITY_UNIT\''';
+'        and unitcode.c_fullname like ''\PCORI_MOD\RX_DOSE_FORM\'''; --Change RX_QUANTITY_UNIT to RX_DOSE_FORM
 
 PMN_EXECUATESQL(sqltext);
 
@@ -1949,12 +2180,13 @@ insert into pmnprescribing (
     ,RX_FREQUENCY --modifier with basecode lookup
     ,RX_BASIS --modifier with basecode lookup
     ,RAW_RX_MED_NAME --not filling these right now
-    ,RX_QUANTITY_UNIT --cdm 3.1
+    ,RX_DOSE_FORM --renamed from RX_QUANTITY_UNIT, cdm 4.1
+    ,RX_SOURCE --hardcoding to 'OD'
 --    ,RAW_RX_FREQUENCY,
 --    ,RAW_RXNORM_CUI
 )
 select distinct  m.patient_num, m.Encounter_Num,m.provider_id,  m.start_date order_date,  to_char(m.start_date,'HH24:MI'), m.start_date start_date, m.end_date, mo.pcori_cui -- Changed HH to HH24, Matthew Joss 8/25/16
-    ,quantity.nval_num quantity, refills.nval_num refills, supply.nval_num supply, substr(freq.pcori_basecode, instr(freq.pcori_basecode, ':') + 1, 2) frequency, substr(basis.pcori_basecode, instr(freq.pcori_basecode, ':') + 1, 2) basis, substr(mo.c_name, 0, 50), unit.pcori_basecode
+    ,quantity.nval_num quantity, refills.nval_num refills, supply.nval_num supply, substr(freq.pcori_basecode, instr(freq.pcori_basecode, ':') + 1, 2) frequency, substr(basis.pcori_basecode, instr(freq.pcori_basecode, ':') + 1, 2) basis, substr(mo.c_name, 0, 50), unit.pcori_basecode, 'OD'
  from i2b2fact m inner join pcornet_med mo on m.concept_cd = mo.c_basecode 
 inner join pmnENCOUNTER enc on enc.encounterid = m.encounter_Num       
 -- TODO: This join adds several minutes to the load - must be debugged
@@ -2139,9 +2371,71 @@ where (pat.death_date is not null or vital_status_cd like 'Z%') and pat.patient_
 end;
 /
 
+----------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------
+-- 12. Provider - by Matthew Joss and Jeff Klann, PhD
+--7/23/18 - Version fixes orphan providerid by just inserting the providerid from the other tables - nothing else was coming from provider_dimension at the moment anyway
+--
+----------------------------------------------------------------------------------------------------------------------------------------
+BEGIN
+PMN_DROPSQL('DROP TABLE pv_e');
+END;
+/
+
+CREATE TABLE pv_e  ( 
+	providerid	varchar(50) NULL 
+	)
+/
+
+
+BEGIN
+PMN_DROPSQL('DROP TABLE pv_r');
+END;
+/
+
+CREATE TABLE pv_r  ( 
+	rx_providerid	varchar(50) NULL 
+	)
+/
+
+
+
+create or replace procedure PCORNetProvider as
+sqltext varchar2(4000);
+begin
+
+
+-- 7/23/18: This only needs to derive from encounter and prescribing at present because that's where we're sourcing providerid from
+
+PMN_DROPSQL('DELETE FROM pv_e');
+sqltext := 'insert into pv_e select distinct providerid from pmnencounter'; 
+PMN_EXECUATESQL(sqltext);
+
+-- select distinct providerid into #pv_d from pmndiagnosis
+
+PMN_DROPSQL('DELETE FROM pv_r');
+sqltext := 'insert into pv_r select distinct rx_providerid from pmnprescribing'; 
+PMN_EXECUATESQL(sqltext);
+
+-- select distinct providerid into #pv_p from pmnprocedures
+-- select distinct medadmin_providerid into #pv_ma from pmnmed_admin
+-- select distinct obsclin_providerid into #pv_oc from pmnobs_clin
+
+insert into provider (providerid)
+select  providerid 
+from pv_e UNION 
+-- select * from #pv_d UNION 
+select * from pv_r;  
+-- select * from #pv_p UNION 
+-- select * from #pv_ma UNION 
+-- select * from #pv_oc 
+
+end;
+/
+
 
 ----------------------------------------------------------------------------------------------------------------------------------------
--- 12. Report Results - Original authors: by Aaron Abend and Jeff Klann
+-- 13. Report Results - Original authors: by Aaron Abend and Jeff Klann
 -- This version is useful to check against i2b2, but consider running the more detailed annotated data dictionary tool also.
 ----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -2267,7 +2561,7 @@ end;
 ----------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------------
--- 13. clear Program - includes all tables
+-- 14. clear Program - includes all tables
 ----------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -2286,17 +2580,19 @@ DELETE FROM pmndeath;
 DELETE FROM pmnencounter;
 DELETE FROM pmndemographic;
 DELETE FROM pmnharvest;
+DELETE FROM provider;
 
 end;
 /
 
 ----------------------------------------------------------------------------------------------------------------------------------------
--- 14. Load and Run Program
+-- 15. Load and Run Program
 ----------------------------------------------------------------------------------------------------------------------------------------
 
 create or replace procedure pcornetloader as
 begin
 ---pcornetclear;
+
 PCORNetHarvest;
 PCORNetDemographic;
 PCORNetEncounter;
@@ -2309,6 +2605,7 @@ PCORNetLabResultCM;
 PCORNetPrescribing;
 PCORNetDispensing;
 PCORNetDeath;
+PCORNetProvider;
 end;
 /
 --new run script executes pcornet clear and pcornet loader. 
