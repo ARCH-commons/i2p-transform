@@ -960,14 +960,14 @@ CREATE TABLE OBS_CLIN (
     OBSCLIN_RESULT_QUAL varchar (50) NULL,
     OBSCLIN_RESULT_TEXT varchar (50) NULL,
     OBSCLIN_RESULT_SNOMED varchar (50) NULL,
-    OBSLCIN_RESULT_NUM numeric (15, 8) NULL,
+    OBSCLIN_RESULT_NUM numeric (15, 8) NULL,
     OBSCLIN_RESULT_MODIFIER varchar (2) NULL,
     OBSCLIN_RESULT_UNIT varchar (50) NULL,
     RAW_OBSCLIN_NAME varchar (50) NULL,
     RAW_OBSCLIN_CODE varchar (50) NULL,
     RAW_OBSCLIN_TYPE varchar (50) NULL,
     RAW_OBSCLIN_RESULT varchar (50) NULL,
-    RAW_OBSCLIN_MODIFER varchar (50) NULL,
+    RAW_OBSCLIN_MODIFIER varchar (50) NULL,
     RAW_OBSCLIN_UNIT varchar (50) NULL
 )
 /
@@ -991,7 +991,7 @@ CREATE TABLE OBS_GEN (
     OBSGEN_RESULT_NUM numeric (15, 8) NULL,
     OBSGEN_RESULT_MODIFIER varchar (2) NULL,
     OBSGEN_RESULT_UNIT varchar (50) NULL,
-    OBSGEN_TABLE_MODIFIER varchar (3) NULL,
+    OBSGEN_TABLE_MODIFIED varchar (3) NULL,
     OBSGEN_ID_MODIFIED varchar (50) NULL,
     RAW_OBSGEN_NAME varchar (50) NULL,
     RAW_OBSGEN_CODE varchar (50) NULL,
@@ -2591,7 +2591,7 @@ end;
 
 create or replace procedure pcornetloader as
 begin
----pcornetclear;
+pcornetclear;
 
 PCORNetHarvest;
 PCORNetDemographic;
