@@ -76,7 +76,7 @@ left join drg on drg.patient_num = en.patid and drg.encounter_num = en.encounter
 
 create table encounter_w_type as
 select en.*
-, case when SUBSTR(pcori_basecode, INSTR(pcori_basecode, ':') + 1, 2) is not null then SUBSTR(pcori_basecode, INSTR(pcori_basecode, ':') + 1, 2) else 'UN' end ENC_TYPE
+, nvl(SUBSTR(pcori_basecode, INSTR(pcori_basecode, ':') + 1, 2), 'UN') ENC_TYPE
 , case when SUBSTR(pcori_basecode, INSTR(pcori_basecode, ':') + 1, 2) = 'AV' then 'NI' else raw_discharge_disposition end DISCHARGE_DISPOSITION
 , case when SUBSTR(pcori_basecode, INSTR(pcori_basecode, ':') + 1, 2) = 'AV' then 'NI' else raw_discharge_status end DISCHARGE_STATUS
 from encounter_w_drg en
@@ -88,7 +88,7 @@ select en.*
 , f.instance_num
 , f.tval_char RAW_PAYER_NAME_PRIMARY
 , f.concept_cd RAW_PAYER_ID_PRIMARY
-from pcornet_cdm.encounter_w_type en
+from encounter_w_type en
 left join i2b2fact f on f.patient_num = en.patid and f.encounter_num = en.encounterid and f.concept_cd like 'O2|PAYER_PRIMARY:%'
 -- IDX fails, as multiple payers are mapped to a single encounter_num.
 -- TODO: determine the rollup logic used in heron to identify the primary encounter.
@@ -99,9 +99,9 @@ create table encounter_w_fin as
 select en.*
 , pm.code PAYER_TYPE_PRIMARY
 , sf.tval_char RAW_PAYER_TYPE_PRIMARY
-from pcornet_cdm.encounter_w_pay en
-left join blueherondata.supplemental_fact sf on en.instance_num = sf.instance_num
-left join pcornet_cdm.payer_map pm on (pm.payer_name = en.raw_payer_name_primary and en.raw_payer_id_primary like 'O2|PAYER_PRIMARY:%'
+from encounter_w_pay en
+left join &&i2b2_data_schema.supplemental_fact sf on en.instance_num = sf.instance_num
+left join payer_map pm on (pm.payer_name = en.raw_payer_name_primary and en.raw_payer_id_primary like 'O2|PAYER_PRIMARY:%'
 and pm.financial_class = sf.tval_char)
 -- IDX doesn't provide a financial class.  Could be eliminated from the O2 mapping but it's actually more informative than
 -- the payer name for deciding the payer type.
