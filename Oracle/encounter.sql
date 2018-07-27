@@ -116,9 +116,9 @@ select cast(patid as varchar(50)) PATID
 , en.discharge_date
 , to_char(en.discharge_date,'HH24:MI') DISCHARGE_TIME
 , en.providerid
-, cast(null as varchar(3)) FACILITY_LOCATION
+, cast('NI' as varchar(3)) FACILITY_LOCATION
 , en.enc_type
-, cast(null as varchar(50)) FACILITYID
+, cast('NI' as varchar(50)) FACILITYID
 , cast(en.discharge_disposition as varchar(2)) DISCHARGE_DISPOSITION
 , cast(en.discharge_status as varchar(2)) DISCHARGE_STATUS
 , en.drg
@@ -126,7 +126,7 @@ select cast(patid as varchar(50)) PATID
 , cast(en.admitting_source as varchar(2))
 , cast(en.payer_type_primary as varchar(5)) PAYER_TYPE_PRIMARY
 , cast(null as varchar(5)) PAYER_TYPE_SECONDARY
-, cast(null as varchar(50)) FACILITY_TYPE
+, cast('NI' as varchar(50)) FACILITY_TYPE
 , cast(null as varchar(50)) RAW_SITEID
 , cast(null as varchar(50)) RAW_ENC_TYPE
 , cast(null as varchar(50)) RAW_DISCHARGE_DISPOSITION
