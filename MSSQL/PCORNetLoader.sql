@@ -1847,11 +1847,12 @@ inner join pcornet_lab lsource on i2b2fact.modifier_cd =lsource.c_basecode
 where c_fullname LIKE '\PCORI_MOD\RESULT_LOC\%'
 
 -- Optimization - build temp ont table
-select lab.pcori_basecode,lab.c_basecode,lab.pcori_specimen_source,ont_parent.c_basecode parent_basecode,norm.* into #pcornet_lab2
+select lab.pcori_basecode,lab.c_basecode,lab.pcori_specimen_source,ont_parent.c_basecode parent_basecode--,norm.* 
+into #pcornet_lab2
 from pcornet_lab lab 
 inner join pcornet_lab ont_loinc on lab.pcori_basecode=ont_loinc.pcori_basecode and ont_loinc.c_basecode like 'LOINC:%' --NOTE: You will need to change 'LOINC:' to our local term.
 inner JOIN pcornet_lab ont_parent on ont_loinc.c_path=ont_parent.c_fullname
-left outer join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
+--left outer join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
 where lab.c_fullname like '\PCORI\LAB_RESULT_CM\%'
 
 ---CREATE INDEX IDX_pcornetlab2_1 ON #pcornet_lab2(c_basecode) ---pretty fast without it, and it was tripping MJ up so I commented it out. 
@@ -1895,7 +1896,8 @@ INSERT INTO dbo.[pmnlabresults_cm] WITH (TABLOCK)
 SELECT DISTINCT  M.patient_num patid,
 M.encounter_num encounterid,
 CASE WHEN parent_basecode LIKE 'LAB_NAME%' then SUBSTRING (parent_basecode,10, 10) ELSE 'UN' END LAB_NAME, --re-adding lab_name support for now.
-CASE WHEN lab.pcori_specimen_source like '%or SR_PLS' THEN 'SR_PLS' WHEN lab.pcori_specimen_source is null then 'NI' WHEN lab.pcori_specimen_source='' THEN 'NI' ELSE lab.pcori_specimen_source END specimen_source, -- (Better way would be to fix the column in the ontology but this will work)
+CASE WHEN lab.pcori_specimen_source like '%or SR_PLS' THEN 'SER_PLAS' WHEN lab.pcori_specimen_source like 'BLOOD' THEN 'BLD'  WHEN lab.pcori_specimen_source is null then 'NI' WHEN lab.pcori_specimen_source='' THEN 'NI' ELSE lab.pcori_specimen_source  END specimen_source, --bug fix with help from Snehil Gupta from Washington University 
+--CASE WHEN lab.pcori_specimen_source like '%or SR_PLS' THEN 'SR_PLS' WHEN lab.pcori_specimen_source is null then 'NI' WHEN lab.pcori_specimen_source='' THEN 'NI' ELSE lab.pcori_specimen_source END specimen_source, -- (Better way would be to fix the column in the ontology but this will work)
 isnull(substring(lab.pcori_basecode,charindex(':',lab.pcori_basecode)+1,10), 'NI') LAB_LOINC, 
  -- TODO: Prefix (LOINC vs SNOMED) should actually be checked so it SNOMED doesn't go in LAB_LOINC. Our network doesn't have any SNOMED right now yet though.
 isnull(p.PRIORITY,'NI') PRIORITY,
@@ -1911,10 +1913,14 @@ CASE WHEN m.ValType_Cd='T' THEN CASE WHEN m.Tval_Char IS NOT NULL THEN 'OT' ELSE
 CASE WHEN m.ValType_Cd='N' AND m.NVAL_NUM<9999999 THEN m.NVAL_NUM ELSE null END RESULT_NUM, --  BUGFIX 4/9/18 don't allow extreme values
 CASE WHEN m.ValType_Cd='N' THEN (CASE isnull(nullif(m.TVal_Char,''),'NI') WHEN 'E' THEN 'EQ' WHEN 'NE' THEN 'OT' WHEN 'L' THEN 'LT' WHEN 'LE' THEN 'LE' WHEN 'G' THEN 'GT' WHEN 'GE' THEN 'GE' ELSE 'NI' END)  ELSE 'TX' END RESULT_MODIFIER,
 isnull(m.Units_CD,'NI') RESULT_UNIT, -- TODO: Should be standardized units
-nullif(lab.NORM_RANGE_LOW,'') NORM_RANGE_LOW
-,isnull(lab.NORM_MODIFIER_LOW, 'UN') NORM_MODIFIER_LOW,
-nullif(lab.NORM_RANGE_HIGH,'') NORM_RANGE_HIGH
-,isnull(lab.NORM_MODIFIER_HIGH, 'UN') NORM_MODIFIER_HIGH,
+--nullif(lab.NORM_RANGE_LOW,'') NORM_RANGE_LOW
+--,isnull(lab.NORM_MODIFIER_LOW, 'UN') NORM_MODIFIER_LOW,
+--nullif(lab.NORM_RANGE_HIGH,'') NORM_RANGE_HIGH
+--,isnull(lab.NORM_MODIFIER_HIGH, 'UN') NORM_MODIFIER_HIGH,
+NULL as NORM_RANGE_LOW, --the next 4 rows have a temporary fix.... still need a better solution 7/27/18 MJ with Snehil  Gupta's help from WU.
+'UN' as norm_modifier_low,
+NULL as NORM_RANGE_HIGH,
+'UN' as norm_modifier_high,
 CASE isnull(nullif(m.VALUEFLAG_CD,''),'NI') WHEN 'H' THEN 'AH' WHEN 'L' THEN 'AL' WHEN 'A' THEN 'AB' ELSE 'NI' END ABN_IND,
 NULL [RAW_LAB_NAME],
 NULL [RAW_LAB_CODE],
