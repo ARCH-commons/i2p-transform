@@ -123,7 +123,7 @@ select cast(patid as varchar(50)) PATID
 , cast(en.discharge_status as varchar(2)) DISCHARGE_STATUS
 , en.drg
 , en.drg_type
-, cast(en.admitting_source as varchar(2))
+, cast(en.admitting_source as varchar(2)) ADMITTING_SOURCE
 , cast(en.payer_type_primary as varchar(5)) PAYER_TYPE_PRIMARY
 , cast(null as varchar(5)) PAYER_TYPE_SECONDARY
 , cast('NI' as varchar(50)) FACILITY_TYPE
