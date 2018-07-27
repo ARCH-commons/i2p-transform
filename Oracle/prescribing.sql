@@ -149,7 +149,13 @@ left join
 
 create table prescribing_w_freq as
 select rx.*
-, substr(freq.pcori_basecode, instr(freq.pcori_basecode, ':') + 1, 2) rx_frequency
+-- '09' as PRN has been eliminated from the list of valid frequencies and replaced with a PRN flag.
+-- For backward compatibility and simplified mapping, '09' has been retained in frequency mapping
+-- (see heron:med_freq_mod_map.csv) and overridden here.
+, case
+    when substr(freq.pcori_basecode, instr(freq.pcori_basecode, ':') + 1, 2) = '09' then 'OT'
+    else substr(freq.pcori_basecode, instr(freq.pcori_basecode, ':') + 1, 2)
+  end rx_frequency
 from prescribing_w_refills rx
 left join
   (select instance_num
@@ -210,12 +216,18 @@ left join
 
 create table prescribing_w_prn as
 select rx.*
-, nvl(prn.tval_char, 'NO') rx_prn_flag
+-- PRN is determined by a specific source system fact or a frequency of '09'.
+-- Note that '09' is now mapped to a frequency of other.  See comments in
+-- 'create table prescribing_w_freq as' for related logic.
+, case
+    when prn.tval_char = 'Y' or rx.rx_frequency = '09' then 'Y'
+    else 'N'
+  end rx_prn_flag
 from prescribing_w_basis rx
 left join
   (select instance_num
   , concept_cd
-  , 'YES' as tval_char
+  , 'Y' as tval_char
   from &&i2b2_data_schema.observation_fact
   where modifier_cd = 'MedObs:PRN'
     /* aka:
@@ -240,7 +252,7 @@ left join route_map rm on lower(rt.tval_char) = lower(rm.route_name)
 
 create table prescribing_w_daw as
 select rx.*
-, nvl(tval_char, 'NI') rx_dispense_as_written
+, cast(nvl(tval_char, 'NI') as varchar(2)) rx_dispense_as_written
 from prescribing_w_route rx
 left join
   (select instance_num

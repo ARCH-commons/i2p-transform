@@ -138,10 +138,10 @@ select distinct cast(lab.LAB_RESULT_CM_ID as varchar(19)) LAB_RESULT_CM_ID
 , cast(lab.PATID as varchar(50)) PATID
 , cast(lab.ENCOUNTERID as varchar(50)) ENCOUNTERID
 , lab.SPECIMEN_SOURCE
-, nvl(lab.LAB_LOINC, 'NI') LAB_LOINC
+, cast(nvl(lab.LAB_LOINC, 'NI') as varchar(10)) LAB_LOINC
 , 'NI' PRIORITY
 , 'NI' RESULT_LOC
-, nvl(lab.LAB_LOINC, 'NI') LAB_PX
+, cast(nvl(lab.LAB_LOINC, 'NI') as varchar(11)) LAB_PX
 , 'LC'  LAB_PX_TYPE
 , lab.LAB_ORDER_DATE LAB_ORDER_DATE
 , lab.LAB_ORDER_DATE SPECIMEN_DATE
@@ -158,14 +158,20 @@ select distinct cast(lab.LAB_RESULT_CM_ID as varchar(19)) LAB_RESULT_CM_ID
   when length(lab.RESULT_UNIT) > 11 then substr(lab.RESULT_UNIT, 1, 11)
   else trim(replace(upper(lab.RESULT_UNIT), '(CALC)', ''))
   end RESULT_UNIT
-, lab.NORM_RANGE_LOW
+, cast(lab.NORM_RANGE_LOW as varchar(10)) NORM_RANGE_LOW
 , case
   when lab.NORM_RANGE_LOW is not null and lab.NORM_RANGE_HIGH is not null then 'EQ'
   when lab.NORM_RANGE_LOW is not null and lab.NORM_RANGE_HIGH is null then 'GE'
   when lab.NORM_RANGE_LOW is null and lab.NORM_RANGE_HIGH is not null then 'NO'
   else 'NI'
   end NORM_MODIFIER_LOW
-, lab.NORM_RANGE_HIGH
+, cast(lab.NORM_RANGE_HIGH as varchar(10)) NORM_RANGE_HIGH
+, case
+    when lab.NORM_RANGE_LOW is not null and lab.NORM_RANGE_HIGH is not null then 'EQ'
+    when lab.NORM_RANGE_LOW is not null and lab.NORM_RANGE_HIGH is null then 'NO'
+    when lab.NORM_RANGE_LOW is null and lab.NORM_RANGE_HIGH is not null then 'LE'
+    else 'NI'
+  end NORM_MODIFIER_HIGH
 , case nvl(nullif(lab.ABN_IND, ''), 'NI') when 'H' then 'AH' when 'L' then 'AL' when 'A' then 'AB' else 'NI' end ABN_IND
 , cast(null as varchar(50)) RAW_LAB_NAME
 , cast(null as varchar(50)) RAW_LAB_CODE

@@ -58,7 +58,7 @@ select patient_num PATID
 , start_date ADMIT_DATE
 , end_Date DISCHARGE_DATE
 , providerid PROVIDERID
-, admitting_source
+, admitting_source ADMITTING_SOURCE
 , discharge_disposition RAW_DISCHARGE_DISPOSITION
 , discharge_status RAW_DISCHARGE_STATUS
 , inout_cd
@@ -109,8 +109,8 @@ and pm.financial_class = sf.tval_char)
 /
 
 create table encounter as
-select en.patid
-, en.encounterid
+select cast(patid as varchar(50)) PATID
+, cast(encounterid as varchar(50)) ENCOUNTERID
 , en.admit_date
 , to_char(en.admit_date, 'HH24:MI') ADMIT_TIME
 , en.discharge_date
@@ -119,12 +119,12 @@ select en.patid
 , cast(null as varchar(3)) FACILITY_LOCATION
 , en.enc_type
 , cast(null as varchar(50)) FACILITYID
-, en.discharge_disposition
-, en.discharge_status
+, cast(en.discharge_disposition as varchar(2)) DISCHARGE_DISPOSITION
+, cast(en.discharge_status as varchar(2)) DISCHARGE_STATUS
 , en.drg
 , en.drg_type
-, en.admitting_source
-, en.payer_type_primary
+, cast(en.admitting_source as varchar(2))
+, cast(en.payer_type_primary as varchar(5)) PAYER_TYPE_PRIMARY
 , cast(null as varchar(5)) PAYER_TYPE_SECONDARY
 , cast(null as varchar(50)) FACILITY_TYPE
 , cast(null as varchar(50)) RAW_SITEID
