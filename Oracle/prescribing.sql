@@ -94,7 +94,7 @@ select cast(prescribing_seq.nextval as varchar(19)) prescribingid
 , units_cd raw_rx_dose_ordered_unit
 from &&i2b2_data_schema.observation_fact rx
 join encounter en on rx.encounter_num = en.encounterid
-join unit_map um on rx.units_cd = um.unit_name
+left join unit_map um on rx.units_cd = um.unit_name
 where rx.modifier_cd in ('MedObs:Inpatient', 'MedObs:Outpatient')
 /
 
