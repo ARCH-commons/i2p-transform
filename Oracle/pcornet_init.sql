@@ -17,6 +17,12 @@ select case when qty = 0 then 1/0 else 1 end inout_cd_populated from (
 select rxcui from "&&i2b2_etl_schema".clarity_med_id_to_rxcui@id where 1=0
 /
 
+BEGIN
+dbms_stats.gather_table_stats( OWNNAME => '"BLUEHERONDATA"', TABNAME => '"SUPPLEMENTAL_FACT"',
+ESTIMATE_PERCENT => DBMS_STATS.AUTO_SAMPLE_SIZE, DEGREE => 16, CASCADE => TRUE );
+END;
+/
+
 create or replace PROCEDURE GATHER_TABLE_STATS(table_name VARCHAR2) AS
   BEGIN
   DBMS_STATS.GATHER_TABLE_STATS (
