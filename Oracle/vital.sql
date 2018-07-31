@@ -113,7 +113,7 @@ from (
         select '\PCORI\VITAL\TOBACCO\' concept_path FROM DUAL
         ) bp, pcornet_vital pm
       where pm.c_fullname like bp.concept_path || '%'
-      ) codes on codes.concept_cd = obs.concept_cd or obs.concept_cd = 'KUH|FLO_MEAS_ID:5_DIASTOLIC'
+      ) codes on codes.concept_cd = obs.concept_cd
     ) vit on vit.patid = pd.patid
   join encounter enc on enc.encounterid = vit.encounterid
   ) x
