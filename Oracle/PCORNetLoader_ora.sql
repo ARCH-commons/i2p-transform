@@ -1845,11 +1845,10 @@ PMN_EXECUATESQL(sqltext);
 PMN_DROPSQL('DELETE FROM pcornet_lab2 ');
 
 sqltext := 'insert into pcornet_lab2 '||
-'select distinct lab.pcori_basecode,lab.c_basecode,lab.pcori_specimen_source,ont_parent.c_basecode parent_basecode '||--,norm.* '||
+'select distinct lab.pcori_basecode,lab.c_basecode,lab.pcori_specimen_source,ont_parent.c_basecode parent_basecode, '''' '||
 'from pcornet_lab lab '|| 
 'inner join pcornet_lab ont_loinc on lab.pcori_basecode=ont_loinc.pcori_basecode and ont_loinc.c_basecode like ''LOINC:%'' '|| --NOTE: You will need to change 'LOINC:' to our local term.
 'inner JOIN pcornet_lab ont_parent on ont_loinc.c_path=ont_parent.c_fullname '||
---'left outer join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME '||
 'where lab.c_fullname like ''\PCORI\LAB_RESULT_CM\%'' ';
 
 PMN_EXECUATESQL(sqltext);
@@ -2595,7 +2594,7 @@ end;
 
 create or replace procedure pcornetloader as
 begin
-pcornetclear;
+--pcornetclear;
 
 PCORNetHarvest;
 PCORNetDemographic;
@@ -2613,9 +2612,3 @@ PCORNetProvider;
 end;
 /
 --new run script executes pcornet clear and pcornet loader. 
-
-begin
-
-PCORNetLabResultCM;
-end;
-/
