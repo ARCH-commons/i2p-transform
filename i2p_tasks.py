@@ -119,7 +119,7 @@ class med_admin(I2PScriptTask):
     script = Script.med_admin
 
     def requires(self) -> List[luigi.Task]:
-        return [pcornet_init(), loadRouteMap(), loadUnitMap()]
+        return [encounter(), loadRouteMap(), loadUnitMap()]
 
 
 class obs_clin(I2PScriptTask):
