@@ -70,7 +70,8 @@ insert into med_admin(patid
   , raw_medadmin_route)
 with med_start as (
     select patient_num, encounter_num, provider_id, start_date, end_date, concept_cd, modifier_cd, instance_num
-    from &&i2b2_data_schema.observation_fact
+    from &&i2b2_data_schema.observation_fact f
+    join encounter enc on enc.patid = f.patient_num and enc.encounterid = f.encounter_num
     where modifier_cd = 'MedObs|MAR:New Bag'
     or modifier_cd = 'MedObs|MAR:Downtime Given - New Bag'
     or modifier_cd = 'MedObs|MAR:Given -  Without Order'
@@ -96,7 +97,7 @@ with med_start as (
 select med_start.patient_num
   , med_start.encounter_num
   , null
-  , med_start.provider_id
+  , null
   , med_start.start_date
   , to_char(med_start.start_date, 'HH24:MI')
   , med_start.end_date
