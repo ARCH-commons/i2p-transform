@@ -83,29 +83,40 @@ from encounter_w_drg en
 left join pcornet_enc e on e.c_dimcode like '%'''||inout_cd||'''%' and e.c_fullname like '\PCORI\ENCOUNTER\ENC_TYPE\%'
 /
 
+-- pay_order was added as a quick fix for the problem of multiple payers mapping to the same encounterid.
+-- The partition / order by operation selects the primary payer by alphabetical order (not good).
+-- Other options considered were precedence by encounter type, by financial class or by CDM code but
+-- none proved clear and expedient.
+-- TODO: rework payer selection to align with encounter rollup logic or determine a clear precedence from other criteria.
 create table encounter_w_pay as
 select en.*
-, f.instance_num
-, f.tval_char RAW_PAYER_NAME_PRIMARY
-, f.concept_cd RAW_PAYER_ID_PRIMARY
+, pay.instance_num
+, pay.tval_char RAW_PAYER_NAME_PRIMARY
+, pay.concept_cd RAW_PAYER_ID_PRIMARY
 from encounter_w_type en
-left join i2b2fact f on f.patient_num = en.patid and f.encounter_num = en.encounterid and f.concept_cd like 'O2|PAYER_PRIMARY:%'
--- IDX fails, as multiple payers are mapped to a single encounter_num.
--- TODO: determine the rollup logic used in heron to identify the primary encounter.
--- and (f.concept_cd like 'O2|PAYER_PRIMARY:%' or 'IDX|PAYER_PRIMARY:%')
+left join
+  (select encounter_num
+  , patient_num
+  , instance_num
+  , concept_cd
+  , tval_char
+  , row_number() over (partition by patient_num, encounter_num order by tval_char) as pay_order
+  from i2b2fact
+  where concept_cd like 'O2|PAYER_PRIMARY:%' or concept_cd like 'IDX|PAYER_PRIMARY:%'
+  ) pay on en.patid = pay.patient_num and en.encounterid = pay.encounter_num and pay_order = 1
 /
 
-create table encounter_w_fin as
+-- IDX does not provide a financial class, hence the abbreviated condition.  However, the payer type code can be
+-- inferred from the payer name, particularly were IDX names and O2 names coincide.  This might challenge the
+-- do not impute rule specified in the CDM spec, but doesn't seem unreasonable.
 select en.*
 , pm.code PAYER_TYPE_PRIMARY
 , sf.tval_char RAW_PAYER_TYPE_PRIMARY
 from encounter_w_pay en
-left join &&i2b2_data_schema.supplemental_fact sf on en.instance_num = sf.instance_num
-left join payer_map pm on (pm.payer_name = en.raw_payer_name_primary and en.raw_payer_id_primary like 'O2|PAYER_PRIMARY:%'
-and pm.financial_class = sf.tval_char)
--- IDX doesn't provide a financial class.  Could be eliminated from the O2 mapping but it's actually more informative than
--- the payer name for deciding the payer type.
---or (pm.payer_name = en.raw_payer_name_primary and en.raw_payer_id_primary like 'IDX|PAYER_PRIMARY:%')
+left join &&i2b2_data_schema.supplemental_fact sf on en.instance_num = sf.instance_num and sf.source_column = 'FINANCIAL_CLASS'
+left join payer_map pm on pm.payer_name = en.raw_payer_name_primary
+and (en.raw_payer_id_primary like 'O2|PAYER_PRIMARY:%' and pm.financial_class = sf.tval_char)
+or (en.raw_payer_id_primary like 'IDX|PAYER_PRIMARY:%')
 /
 
 create table encounter as
