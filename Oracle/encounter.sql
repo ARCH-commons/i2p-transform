@@ -109,6 +109,7 @@ left join
 -- IDX does not provide a financial class, hence the abbreviated condition.  However, the payer type code can be
 -- inferred from the payer name, particularly were IDX names and O2 names coincide.  This might challenge the
 -- do not impute rule specified in the CDM spec, but doesn't seem unreasonable.
+create table encounter_w_fin as
 select en.*
 , pm.code PAYER_TYPE_PRIMARY
 , sf.tval_char RAW_PAYER_TYPE_PRIMARY
