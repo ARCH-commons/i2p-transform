@@ -71,8 +71,7 @@ insert into med_admin(patid
 with med_start as (
     select patient_num, encounter_num, provider_id, start_date, end_date, concept_cd, modifier_cd, instance_num
     from &&i2b2_data_schema.observation_fact f
-    join encounter enc on enc.patid = f.patient_num and enc.encounterid = f.encounter_num
-    where modifier_cd = 'MedObs|MAR:New Bag'
+    where (modifier_cd = 'MedObs|MAR:New Bag'
     or modifier_cd = 'MedObs|MAR:Downtime Given - New Bag'
     or modifier_cd = 'MedObs|MAR:Given -  Without Order'
     or modifier_cd = 'MedObs|MAR:Downtime Given'
@@ -92,7 +91,8 @@ with med_start as (
     or modifier_cd = 'MedObs|MAR:See OR/Proc Flowsheet'
     or modifier_cd = 'MedObs|MAR:Patch Applied'
     or modifier_cd = 'MedObs|MAR:Bolus from Syringe'
-    or modifier_cd = 'MedObs|MAR:Bolus.'
+    or modifier_cd = 'MedObs|MAR:Bolus.')
+    and encounter_num in (select encounterid from encounter)
 )
 select med_start.patient_num
   , med_start.encounter_num
@@ -125,6 +125,9 @@ or med_dose.modifier_cd = 'MedObs:MAR_Dose|tab'
 or med_dose.modifier_cd = 'MedObs:MAR_Dose|units'
 or med_dose.modifier_cd = 'MedObs:MAR_Dose|l'
 or med_dose.modifier_cd = 'MedObs:MAR_Dose|mg'
+-- MedObs:Dose modifiers are for days supply, not discrete dose.  Early designs used these values
+-- but were dropped to comply with the CDM specs do not impute rule.  Revisit this decision for
+-- future CDM builds and restore or drop permanently.
 --or med_dose.modifier_cd = 'MedObs:Dose|puff'
 --or med_dose.modifier_cd = 'MedObs:Dose|drop'
 --or med_dose.modifier_cd = 'MedObs:Dose|cap'
