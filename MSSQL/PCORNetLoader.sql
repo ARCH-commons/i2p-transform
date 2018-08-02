@@ -1518,6 +1518,7 @@ from (
 	inner join pmndemographic d on f.patient_num=d.patid
 	inner join pcornet_enc enc on enc.c_basecode  = f.concept_cd   
 		and enc.c_fullname like '\PCORI\ENCOUNTER\PAYER_TYPE\%'
+		and enc.pcori_basecode not like 'A%' -- jgk 8/2/18 - exclude the codes ARCH added, so the DCQ doesn't complain
 ) payor
 group by patient_num,encounter_num;
 
