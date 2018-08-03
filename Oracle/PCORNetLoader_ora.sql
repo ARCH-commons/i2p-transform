@@ -1320,7 +1320,9 @@ sqltext := 'insert into max_payor_type '||
 	'from i2b2fact f '||
     'inner join pmndemographic d on f.patient_num=d.patid '||
     'inner join pcornet_enc enc on enc.c_basecode  = f.concept_cd '||
-	'and enc.c_fullname like ''\PCORI\ENCOUNTER\PAYER_TYPE\%'' ) payor '||
+	'and enc.c_fullname like ''\PCORI\ENCOUNTER\PAYER_TYPE\%'' '||
+    'and enc.pcori_basecode not like ''A%'' '|| -- jgk 8/2/18 - exclude the codes ARCH added, so the DCQ doesn't complain
+    ') payor '||
     'group by patient_num,encounter_num ';
 PMN_EXECUATESQL(sqltext);
 
@@ -1893,7 +1895,7 @@ INSERT INTO pmnlab_result_cm
 SELECT DISTINCT  M.patient_num patid,
 M.encounter_num encounterid,
 CASE WHEN parent_basecode LIKE 'LAB_NAME%' then SUBSTR (parent_basecode,10, 10) ELSE 'NI' END LAB_NAME,
-CASE WHEN lab.pcori_specimen_source like '%or SR_PLS' THEN 'SR_PLS' WHEN lab.pcori_specimen_source is null then 'NI' WHEN lab.pcori_specimen_source='' THEN 'NI' ELSE lab.pcori_specimen_source END specimen_source, -- (Better way would be to fix the column in the ontology but this will work)
+CASE WHEN lab.pcori_specimen_source like '%SR_PLS' THEN 'SR_PLS' WHEN lab.pcori_specimen_source is null then 'NI' WHEN lab.pcori_specimen_source='' THEN 'NI' ELSE lab.pcori_specimen_source END specimen_source, -- (Better way would be to fix the column in the ontology but this will work)
 NVL(SUBSTR(lab.pcori_basecode,INSTR(lab.pcori_basecode, ':')+1,10), 'NI') LAB_LOINC,
  -- TODO: Prefix (LOINC vs SNOMED) should actually be checked so it SNOMED doesn't go in LAB_LOINC. Our network doesn't have any SNOMED right now yet though.
 NVL(p.PRIORITY,'NI') PRIORITY,
