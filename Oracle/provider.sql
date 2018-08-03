@@ -18,22 +18,6 @@ CREATE TABLE provider(
 )
 /
 
-BEGIN
-PMN_DROPSQL('DROP sequence provider_seq');
-END;
-/
-
-create sequence provider_seq cache 2000
-/
-
-create or replace trigger provider_trg
-before insert on provider
-for each row
-begin
-  select provider_seq.nextval into :new.PROVIDERID from dual;
-end;
-/
-
 create or replace procedure PCORNetProvider as
 begin
 
