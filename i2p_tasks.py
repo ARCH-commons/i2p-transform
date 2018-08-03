@@ -82,14 +82,14 @@ class dispensing(I2PScriptTask):
     script = Script.dispensing
 
     def requires(self) -> List[luigi.Task]:
-        return [encounter()]
+        return [encounter(), loadRouteMap(), loadUnitMap()]
 
 
 class encounter(I2PScriptTask):
     script = Script.encounter
 
     def requires(self) -> List[luigi.Task]:
-        return [demographic()]
+        return [demographic(), loadPayerMap()]
 
 
 class enrollment(I2PScriptTask):
@@ -112,14 +112,14 @@ class lab_result_cm(I2PScriptTask):
     script = Script.lab_result_cm
 
     def requires(self) -> List[luigi.Task]:
-        return [encounter(), loadLabNormal()]
+        return [encounter(), loadLabNormal(), loadSpecimenSourceMap()]
 
 
 class med_admin(I2PScriptTask):
     script = Script.med_admin
 
     def requires(self) -> List[luigi.Task]:
-        return [pcornet_init()]
+        return [encounter(), loadRouteMap(), loadUnitMap()]
 
 
 class obs_clin(I2PScriptTask):
@@ -203,7 +203,13 @@ class patient_chunks_survey(SqlScriptTask):
             except DatabaseError:
                 return []
 
-
+# TODO: pcornet_init drops and recreates the cdm_status table, forcing all tasks to wait until init is done.
+# Moving this operation to a distinct task would allow some other tasks (e.g. mapping tasks) to proceed, while init
+# performs other labor intensive SQL operations.
+# In the mean time, don't forget to make all tasks that use the status table dependent on pcornet_init.
+# TODO: On a related matter, if the cdm_status table is missing (e.g. on a db where CDM has never been run), running
+# the full pipeline, starting at pcornet_loader, will fail.  It would be nice to detect this situation and first
+# build the status table before attempting other tasks.
 class pcornet_init(I2PScriptTask):
     script = Script.pcornet_init
 
@@ -229,7 +235,7 @@ class prescribing(I2PScriptTask):
     script = Script.prescribing
 
     def requires(self) -> List[luigi.Task]:
-        return [encounter()]
+        return [encounter(), loadRouteMap(), loadUnitMap()]
 
 
 class pro_cm(I2PScriptTask):
@@ -310,9 +316,30 @@ class loadSpecimenSourceMap(LoadCSV):
         return [pcornet_init()]
 
 
+class loadRouteMap(LoadCSV):
+    taskName = 'ROUTE_MAP'
+    # route_map.csv matches values in the CDM spec's _route spreadsheet
+    # to route values from Epic's zc_admin_route table.
+    csvname = 'curated_data/route_map.csv'
+
+    def requires(self) -> List[luigi.Task]:
+        return [pcornet_init()]
+
+
+class loadUnitMap(LoadCSV):
+    taskName = 'UNIT_MAP'
+    # unit_map.csv matches values in the CDM spec's _unit spreadsheet
+    # to unit values from Epic's zc_med_unit table.
+    csvname = 'curated_data/unit_map.csv'
+
+    def requires(self) -> List[luigi.Task]:
+        return [pcornet_init()]
+
+
 class NPIDownloadConfig(luigi.Config):
     # The configured 'path' and 'npi' variables are used by the downloadNPI method to fetch and
     # store the NPPES zip file.  Changes to these may require changes to the file system.
+    # TODO: Update code to discover the npi_csv automatically.
     dl_path = StrParam(description='Path where the NPPES zip file will be stored and unzipped.')
     extract_path = StrParam(description='Path where the extract')
     npi_csv = StrParam(description='CSV file in the NPPES zip that contains NPI data.')
@@ -322,6 +349,7 @@ class NPIDownloadConfig(luigi.Config):
     # The configured 'col' and 'ct' variables reflect the layout of the NPI data file.
     # The extracNPI method uses these values to parse the NPI data file.
     # Changes to these may require code changes.
+    # Complete overkill making these configurable.  Consider reverting to hard coded values.
     taxonomy_col = StrParam(description='Header for the taxonomy columns in the NPI data file.')
     switch_col = StrParam(description='Header for the switch columns in the NPI data file.')
     npi_col = StrParam(description='Header for the NPI column in the NPI data file.')
@@ -343,6 +371,9 @@ class loadSpecialtyCode(LoadCSV):
     # provider_specialty_code.csv is a copy of the CDM spec's provider_primary_specialty spreadsheet.
     # It maps a provider specialty code to a descriptive text and grouping.
     csvname = 'curated_data/provider_specialty_code.csv'
+
+    def requires(self) -> List[luigi.Task]:
+        return [pcornet_init()]
 
 
 class downloadNPI(CDMStatusTask):
@@ -370,6 +401,9 @@ class downloadNPI(CDMStatusTask):
 
     def unzip(self) -> None:
         subprocess.call(['unzip', '-o', self.dl_path + self.npi_zip, '-d', self.dl_path])  # ISSUE: ambient
+
+    def requires(self) -> List[luigi.Task]:
+        return [pcornet_init()]
 
 
 class extractNPI(CDMStatusTask):

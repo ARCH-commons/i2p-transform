@@ -14,7 +14,13 @@ CREATE TABLE dispensing(
 	NDC varchar (11) NOT NULL,
 	DISPENSE_SUP number(18) NULL,
 	DISPENSE_AMT number(18) NULL,
-	RAW_NDC varchar (50) NULL
+	DISPENSE_DOSE_DISP number(18) NULL,
+    DISPENSE_DOSE_DISP_UNIT  varchar(50) NULL,
+    DISPENSE_ROUTE  varchar(50) NULL,
+	RAW_NDC varchar (50) NULL,
+	RAW_DISPENSE_DOSE_DISP  varchar(50) NULL,
+    RAW_DISPENSE_DOSE_DISP_UNIT varchar(50) NULL,
+    RAW_DISPENSE_ROUTE varchar(50) NULL
 )
 /
 
@@ -91,7 +97,13 @@ insert into dispensing (
   ,NDC --using pcornet_med pcori_ndc - new column!
   ,DISPENSE_SUP ---- modifier nval_num
   ,DISPENSE_AMT  -- modifier nval_num
---    ,RAW_NDC
+  ,DISPENSE_DOSE_DISP
+  ,DISPENSE_DOSE_DISP_UNIT
+  ,DISPENSE_ROUTE
+  ,RAW_NDC
+  ,RAW_DISPENSE_DOSE_DISP
+  ,RAW_DISPENSE_DOSE_DISP_UNIT
+  ,RAW_DISPENSE_ROUTE
 )
 /* Below is the Cycle 2 fix for populating the DISPENSING table  */
 with disp_status as (
@@ -118,13 +130,45 @@ with disp_status as (
     on ibf.modifier_cd=pnm.c_basecode
   where pnm.c_fullname like '\PCORI_MOD\RX_DAYS_SUPPLY\%'
 )
+, disp_dose as (
+  select encounter_num
+  , instance_num
+  , to_number(tval_char) dose
+  from &&i2b2_data_schema.supplemental_fact
+  where source_column = 'DISCRETE_DOSE'
+)
+, disp_unit as (
+  select sf.encounter_num
+  , sf.instance_num
+  , nvl(um.code, 'OT') code
+  , sf.tval_char
+  from &&i2b2_data_schema.supplemental_fact sf
+  left join unit_map um on sf.tval_char = um.unit_name
+  where sf.source_column = 'DOSE_UNITS'
+)
+, disp_route as (
+  select sf.encounter_num
+  , sf.instance_num
+  , rm.code
+  , sf.tval_char
+  from &&i2b2_data_schema.supplemental_fact sf
+  left join route_map rm on lower(sf.tval_char) = lower(rm.route_name)
+  where sf.source_column = 'ADMIN_ROUTE'
+)
 select distinct
   st.patient_num patid,
   null prescribingid,
   st.start_date dispense_date,
   replace(st.concept_cd, 'NDC:', '') ndc, -- TODO: Generalize this for other sites.
   ds.nval_num dispense_sup,
-  qt.nval_num dispense_amt
+  qt.nval_num dispense_amt,
+  dd.dose dispense_dose_disp,
+  du.code dispense_dose_disp_unit,
+  dr.code dispense_route,
+  null raw_ndc,
+  dd.dose raw_dispense_dose_disp,
+  du.tval_char raw_dispense_dose_disp_unit,
+  dr.tval_char raw_dispense_route
 from disp_status st
 left outer join disp_quantity qt
   on st.patient_num=qt.patient_num
@@ -138,6 +182,15 @@ left outer join disp_supply ds
   and st.concept_cd=ds.concept_cd
   and st.instance_num=ds.instance_num
   and st.start_date=ds.start_date
+left outer join disp_dose dd
+  on st.encounter_num = dd.encounter_num
+  and st.instance_num = dd.instance_num
+left outer join disp_unit du
+  on st.encounter_num = du.encounter_num
+  and st.instance_num = du.instance_num
+left outer join disp_route dr
+  on st.encounter_num = dr.encounter_num
+  and st.instance_num = dr.instance_num
 ;
 
 /* NOTE: The original SCILHS transformation is below.

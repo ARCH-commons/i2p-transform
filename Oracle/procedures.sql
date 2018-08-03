@@ -17,8 +17,10 @@ CREATE TABLE procedures(
 	PX varchar(11) NOT NULL,
 	PX_TYPE varchar(2) NOT NULL,
 	PX_SOURCE varchar(2) NULL,
+	PPX varchar(2) NULL,
 	RAW_PX varchar(50) NULL,
-	RAW_PX_TYPE varchar(50) NULL
+	RAW_PX_TYPE varchar(50) NULL,
+	RAW_PPX varchar(50) NULL
 )
 /
 BEGIN

@@ -16,11 +16,13 @@ select case when qty = 0 then 1/0 else 1 end inout_cd_populated from (
 -- Make sure the RXNorm mapping table exists
 select rxcui from "&&i2b2_etl_schema".clarity_med_id_to_rxcui@id where 1=0
 /
--- Make sure the observation fact medication table is populated
-select case when qty > 0 then 1 else 1/0 end obs_fact_meds_populated from (
-  select count(*) qty from observation_fact_meds
-  )
+
+BEGIN
+dbms_stats.gather_table_stats( OWNNAME => '"BLUEHERONDATA"', TABNAME => '"SUPPLEMENTAL_FACT"',
+ESTIMATE_PERCENT => DBMS_STATS.AUTO_SAMPLE_SIZE, DEGREE => 16, CASCADE => TRUE );
+END;
 /
+
 create or replace PROCEDURE GATHER_TABLE_STATS(table_name VARCHAR2) AS
   BEGIN
   DBMS_STATS.GATHER_TABLE_STATS (

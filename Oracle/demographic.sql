@@ -21,7 +21,8 @@ CREATE TABLE demographic(
     RAW_SEXUAL_ORIENTATION varchar(50) NULL,
     RAW_GENDER_IDENTITY varchar(50) NULL,
     RAW_HISPANIC varchar(50) NULL,
-    RAW_RACE varchar(50) NULL
+    RAW_RACE varchar(50) NULL,
+    RAW_PAT_PREF_LANGUAGE_SPOKEN varchar(50) NULL
 )
 /
 create or replace procedure PCORNetDemographic as
@@ -202,7 +203,8 @@ using (
 ) l
 on (d.patid = l.patient_num)
 when matched then update
-set d.PAT_PREF_LANGUAGE_SPOKEN = l.code;
+set d.PAT_PREF_LANGUAGE_SPOKEN = l.code,
+d.RAW_PAT_PREF_LANGUAGE_SPOKEN = l.language_cd;
 
 execute immediate 'create unique index demographic_pk on demographic (PATID)';
 GATHER_TABLE_STATS('DEMOGRAPHIC');

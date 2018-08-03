@@ -30,6 +30,7 @@ END;
 BEGIN
 PMN_DROPSQL('drop table lab_result_w_source');
 END;
+/
 
 BEGIN
 PMN_DROPSQL('DROP SEQUENCE lab_result_cm_seq');
@@ -66,7 +67,7 @@ select lab_result_cm_seq.nextval LAB_RESULT_CM_ID
 , valueflag_cd ABN_IND
 , valtype_cd RAW_RESULT
 , concept_cd RAW_FACILITY_CODE
-from blueherondata.observation_fact m
+from &&i2b2_data_schema.observation_fact m
 join encounter enc on enc.patid = m.patient_num and enc.encounterid = m.encounter_Num
 where concept_cd between 'KUH|COMPONENT_ID:' and 'KUH|COMPONENT_ID:~'
 and modifier_cd in ('@')  -- exclude analyitics: Labs|Aggregate:Median, ...
@@ -136,12 +137,11 @@ create table lab_result_cm as
 select distinct cast(lab.LAB_RESULT_CM_ID as varchar(19)) LAB_RESULT_CM_ID
 , cast(lab.PATID as varchar(50)) PATID
 , cast(lab.ENCOUNTERID as varchar(50)) ENCOUNTERID
-, case when lab.LAB_NAME like 'LAB_NAME%' then substr(lab.LAB_NAME, 10, 10) else 'UN' end LAB_NAME
 , lab.SPECIMEN_SOURCE
-, nvl(lab.LAB_LOINC, 'NI') LAB_LOINC
+, cast(nvl(lab.LAB_LOINC, 'NI') as varchar(10)) LAB_LOINC
 , 'NI' PRIORITY
 , 'NI' RESULT_LOC
-, nvl(lab.LAB_LOINC, 'NI') LAB_PX
+, cast(nvl(lab.LAB_LOINC, 'NI') as varchar(11)) LAB_PX
 , 'LC'  LAB_PX_TYPE
 , lab.LAB_ORDER_DATE LAB_ORDER_DATE
 , lab.LAB_ORDER_DATE SPECIMEN_DATE
@@ -149,6 +149,7 @@ select distinct cast(lab.LAB_RESULT_CM_ID as varchar(19)) LAB_RESULT_CM_ID
 , lab.RESULT_DATE
 , to_char(lab.RESULT_DATE, 'HH24:MI') RESULT_TIME
 , 'NI' RESULT_QUAL
+, cast(null as varchar(50)) RESULT_SNOMED
 , case when lab.RAW_RESULT = 'N' then lab.RESULT_NUM else null end RESULT_NUM
 , case when lab.RAW_RESULT = 'N' then (case nvl(nullif(lab.RESULT_MODIFIER, ''),'NI') when 'E' then 'EQ' when 'NE' then 'OT' when 'L' then 'LT' when 'LE' then 'LE' when 'G' then 'GT' when 'GE' then 'GE' else 'NI' end)  else 'TX' end RESULT_MODIFIER
 , case
@@ -157,14 +158,20 @@ select distinct cast(lab.LAB_RESULT_CM_ID as varchar(19)) LAB_RESULT_CM_ID
   when length(lab.RESULT_UNIT) > 11 then substr(lab.RESULT_UNIT, 1, 11)
   else trim(replace(upper(lab.RESULT_UNIT), '(CALC)', ''))
   end RESULT_UNIT
-, lab.NORM_RANGE_LOW
+, cast(lab.NORM_RANGE_LOW as varchar(10)) NORM_RANGE_LOW
 , case
   when lab.NORM_RANGE_LOW is not null and lab.NORM_RANGE_HIGH is not null then 'EQ'
   when lab.NORM_RANGE_LOW is not null and lab.NORM_RANGE_HIGH is null then 'GE'
   when lab.NORM_RANGE_LOW is null and lab.NORM_RANGE_HIGH is not null then 'NO'
   else 'NI'
   end NORM_MODIFIER_LOW
-, lab.NORM_RANGE_HIGH
+, cast(lab.NORM_RANGE_HIGH as varchar(10)) NORM_RANGE_HIGH
+, case
+    when lab.NORM_RANGE_LOW is not null and lab.NORM_RANGE_HIGH is not null then 'EQ'
+    when lab.NORM_RANGE_LOW is not null and lab.NORM_RANGE_HIGH is null then 'NO'
+    when lab.NORM_RANGE_LOW is null and lab.NORM_RANGE_HIGH is not null then 'LE'
+    else 'NI'
+  end NORM_MODIFIER_HIGH
 , case nvl(nullif(lab.ABN_IND, ''), 'NI') when 'H' then 'AH' when 'L' then 'AL' when 'A' then 'AB' else 'NI' end ABN_IND
 , cast(null as varchar(50)) RAW_LAB_NAME
 , cast(null as varchar(50)) RAW_LAB_CODE

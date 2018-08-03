@@ -35,7 +35,15 @@ PMN_DROPSQL('drop table prescribing_w_basis');
 END;
 /
 BEGIN
-PMN_DROPSQL('drop table prescribing_w_dose');
+PMN_DROPSQL('drop table prescribing_w_prn');
+END;
+/
+BEGIN
+PMN_DROPSQL('drop table prescribing_w_route');
+END;
+/
+BEGIN
+PMN_DROPSQL('drop table prescribing_w_daw');
 END;
 /
 BEGIN
@@ -73,19 +81,24 @@ from dual
 create table prescribing_key as
 select cast(prescribing_seq.nextval as varchar(19)) prescribingid
 , instance_num
-, cast(patient_num as varchar(50)) patient_num
-, cast(encounter_num as varchar(50)) encounter_num
-, provider_id
+, cast(patient_num as varchar(50)) patid
+, cast(encounter_num as varchar(50)) encounterid
+, provider_id rx_providerid
 , start_date
 , end_date
 , concept_cd
 , modifier_cd
-from blueherondata.observation_fact rx
+, case when trim(translate(tval_char, '0123456789.', ' ')) is null then tval_char else null end rx_dose_ordered
+, case when trim(translate(tval_char, '0123456789.', ' ')) is null then um.code else null end rx_dose_ordered_unit
+, tval_char raw_rx_dose_ordered
+, units_cd raw_rx_dose_ordered_unit
+from &&i2b2_data_schema.observation_fact rx
 join encounter en on rx.encounter_num = en.encounterid
+left join unit_map um on rx.units_cd = um.unit_name
 where rx.modifier_cd in ('MedObs:Inpatient', 'MedObs:Outpatient')
 /
 
-alter table prescribing_key modify (provider_id null)
+alter table prescribing_key modify (rx_providerid null)
 /
 
 /** prescribing_w_cui
@@ -126,7 +139,7 @@ left join
   (select instance_num
   , concept_cd
   , nval_num
-  from blueherondata.observation_fact
+  from &&i2b2_data_schema.observation_fact
   where modifier_cd = 'RX_REFILLS'
     /* aka:
     select c_basecode from pcornet_med refillscode
@@ -136,13 +149,19 @@ left join
 
 create table prescribing_w_freq as
 select rx.*
-, substr(freq.pcori_basecode, instr(freq.pcori_basecode, ':') + 1, 2) rx_frequency
+-- '09' as PRN has been eliminated from the list of valid frequencies and replaced with a PRN flag.
+-- For backward compatibility and simplified mapping, '09' has been retained in frequency mapping
+-- (see heron:med_freq_mod_map.csv) and overridden here.
+, case
+    when substr(freq.pcori_basecode, instr(freq.pcori_basecode, ':') + 1, 2) = '09' then 'OT'
+    else substr(freq.pcori_basecode, instr(freq.pcori_basecode, ':') + 1, 2)
+  end rx_frequency
 from prescribing_w_refills rx
 left join
   (select instance_num
   , concept_cd
   , pcori_basecode
-  from blueherondata.observation_fact
+  from &&i2b2_data_schema.observation_fact
   join pcornet_med on modifier_cd = c_basecode
   and c_fullname like '\PCORI_MOD\RX_FREQUENCY\%'
   ) freq on freq.instance_num = rx.instance_num and freq.concept_cd = rx.concept_cd
@@ -156,7 +175,7 @@ left join
   (select instance_num
   , concept_cd
   , nval_num
-  from blueherondata.observation_fact
+  from &&i2b2_data_schema.observation_fact
   where modifier_cd = 'RX_QUANTITY'
     /* aka:
     select c_basecode from pcornet_med refillscode
@@ -172,7 +191,7 @@ left join
   (select instance_num
   , concept_cd
   , nval_num
-  from blueherondata.observation_fact
+  from &&i2b2_data_schema.observation_fact
   where modifier_cd = 'RX_DAYS_SUPPLY'
     /* aka:
     select c_basecode from pcornet_med refillscode
@@ -188,54 +207,96 @@ left join
   (select instance_num
   , concept_cd
   , pcori_basecode
-  from blueherondata.observation_fact
+  from &&i2b2_data_schema.observation_fact
   join pcornet_med on modifier_cd = c_basecode
   and c_fullname like '\PCORI_MOD\RX_BASIS\%'
   and modifier_cd in ('MedObs:Inpatient', 'MedObs:Outpatient')
   ) basis on basis.instance_num = rx.instance_num and basis.concept_cd = rx.concept_cd
 /
 
-create table prescribing_w_dose as
+create table prescribing_w_prn as
 select rx.*
-, units_cd rx_dose_ordered
-, nval_num rx_dose_ordered_unit
+-- PRN is determined by a specific source system fact or a frequency of '09'.
+-- Note that '09' is now mapped to a frequency of other.  See comments in
+-- 'create table prescribing_w_freq as' for related logic.
+, case
+    when prn.tval_char = 'Y' or rx.rx_frequency = '09' then 'Y'
+    else 'N'
+  end rx_prn_flag
 from prescribing_w_basis rx
 left join
   (select instance_num
   , concept_cd
-  , case when units_cd = 'mcg' then 'ug' when units_cd = 'l' then 'ml' else units_cd end units_cd
-  , case when units_cd = 'l' then nval_num * 1000 else nval_num end nval_num
-  from blueherondata.observation_fact
-  where modifier_cd in ('MedObs:Dose|mg', 'MedObs:Dose|meq', 'MedObs:Dose|l')
-  ) dose on dose.instance_num = rx.instance_num and dose.concept_cd = rx.concept_cd
+  , 'Y' as tval_char
+  from &&i2b2_data_schema.observation_fact
+  where modifier_cd = 'MedObs:PRN'
+    /* aka:
+    select c_basecode from pcornet_med code
+    where code.c_fullname like '\PCORI_MOD\RX_BASIS\PR\02\MedObs:PRN\' */
+  ) prn on prn.instance_num = rx.instance_num and prn.concept_cd = rx.concept_cd
+/
+
+create table prescribing_w_route as
+select rx.*
+, nvl(rm.code, 'NI') rx_route
+, rt.tval_char raw_rx_route
+from prescribing_w_prn rx
+left join
+  (select instance_num
+  , tval_char
+  from &&i2b2_data_schema.supplemental_fact
+  where source_column = 'PRESCRIBING_ROUTE'
+  ) rt on rt.instance_num = rx.instance_num
+left join route_map rm on lower(rt.tval_char) = lower(rm.route_name)
+/
+
+create table prescribing_w_daw as
+select rx.*
+, cast(nvl(tval_char, 'NI') as varchar(2)) rx_dispense_as_written
+from prescribing_w_route rx
+left join
+  (select instance_num
+  , tval_char
+  from &&i2b2_data_schema.supplemental_fact
+  where source_column = 'DISPENSE_AS_WRITTEN'
+  ) daw on daw.instance_num = rx.instance_num
 /
 
 create table prescribing as
 select rx.prescribingid
-, rx.patient_num patid
-, rx.encounter_num encounterid
-, rx.provider_id rx_providerid
+, rx.patid
+, rx.encounterid
+, rx.rx_providerid
 , trunc(rx.start_date) rx_order_date
 , to_char(rx.start_date, 'HH24:MI') rx_order_time
 , trunc(rx.start_date) rx_start_date
 , trunc(rx.end_date) rx_end_date
-, rx.rx_dose_ordered
+, to_number(rx.rx_dose_ordered) rx_dose_ordered
 , rx.rx_dose_ordered_unit
 , rx.rx_quantity
-, 'NI' rx_quantity_unit
+, 'NI' rx_dose_form
 , rx.rx_refills
 , rx.rx_days_supply
 , rx.rx_frequency
+, rx.rx_prn_flag
+, rx.rx_route
 , decode(rx.modifier_cd, 'MedObs:Inpatient', '01', 'MedObs:Outpatient', '02') rx_basis
 , rx.rxnorm_cui
+, 'OD' rx_source
+, rx.rx_dispense_as_written
 , rx.raw_rx_med_name
 , cast(null as varchar(50)) raw_rx_frequency
+, rx.raw_rxnorm_cui
 , cast(null as varchar(50)) raw_rx_quantity
 , cast(null as varchar(50)) raw_rx_ndc
-, rx.raw_rxnorm_cui
+, rx.raw_rx_dose_ordered
+, rx.raw_rx_dose_ordered_unit
+, rx.raw_rx_route
+, cast(null as varchar(50)) raw_rx_refills
+
 /* ISSUE: HERON should have an actual order time.
    idea: store real difference between order date start data, possibly using the update date */
-from prescribing_w_dose rx
+from prescribing_w_daw rx
 /
 
 create index prescribing_idx on prescribing (PATID, ENCOUNTERID)
