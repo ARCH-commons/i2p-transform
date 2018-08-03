@@ -26,7 +26,7 @@ Instructions:
 
 libname sql_cdm odbc datasrc='PopMedNet'; 
 /* optionally add a password above: e.g., libname sql_cdm odbc datasrc='ORACLE_PMN' password=myPassWord; */
-libname cdm "E:\maj60\CDM_july_test_no_indexes";
+libname cdm "E:\maj60\CDM_july_redo";
 
 
 proc sql noprint; 
@@ -510,10 +510,10 @@ SELECT NETWORKID ,
 	   MEDADMIN_STOP_DATE_MGMT ,
 	   OBSCLIN_DATE_MGMT ,
 	   OBSGEN_DATE_MGMT ,
-	   REFRESH_MED_ADMIN_DATE ,
-	   REFRESH_OBS_CLIN_DATE ,
-	   REFRESH_OBS_GEN_DATE ,
-	   REFRESH_PROVIDER_DATE ,
+	   DATEPART( REFRESH_MED_ADMIN_DATE ) AS REFRESH_MED_ADMIN_DATE format date9.,
+	   DATEPART( REFRESH_OBS_CLIN_DATE ) AS REFRESH_OBS_CLIN_DATE format date9.,
+	   DATEPART( REFRESH_OBS_GEN_DATE ) AS REFRESH_OBS_GEN_DATE format date9.,
+	   DATEPART( REFRESH_PROVIDER_DATE ) AS REFRESH_PROVIDER_DATE format date9.,
 	   DATEPART( REFRESH_DEMOGRAPHIC_DATE ) AS REFRESH_DEMOGRAPHIC_DATE format date9.,
 	   DATEPART( REFRESH_ENROLLMENT_DATE ) AS REFRESH_ENROLLMENT_DATE format date9.,
 	   DATEPART( REFRESH_ENCOUNTER_DATE ) AS REFRESH_ENCOUNTER_DATE format date9.,
