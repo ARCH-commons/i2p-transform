@@ -1847,14 +1847,14 @@ inner join pmnENCOUNTER enc on enc.patid = i2b2fact.patient_num and enc.encounte
 inner join pcornet_lab lsource on i2b2fact.modifier_cd =lsource.c_basecode
 where c_fullname LIKE '\PCORI_MOD\RESULT_LOC\%'
 
--- Optimization - build temp ont table
-select lab.pcori_basecode,lab.c_basecode,lab.pcori_specimen_source,ont_parent.c_basecode parent_basecode--,norm.* 
-into #pcornet_lab2
-from pcornet_lab lab 
-inner join pcornet_lab ont_loinc on lab.pcori_basecode=ont_loinc.pcori_basecode and ont_loinc.c_basecode like 'LOINC:%' --NOTE: You will need to change 'LOINC:' to our local term.
-inner JOIN pcornet_lab ont_parent on ont_loinc.c_path=ont_parent.c_fullname
---left outer join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME
-where lab.c_fullname like '\PCORI\LAB_RESULT_CM\%'
+-- Optimization - build temp ont table - 8/13/18 jgk - new version that doesn't have duplicate entries
+select * into #pcornet_lab2 from 
+(select *, row_number() over (partition by c_basecode order by (case when parent_basecode like 'LAB_NAME:%' then 0 when parent_basecode like 'LOINC:%' then 1 else 2 end), pcori_specimen_source desc) k -- Griffin Weber's code to pick one row per basecode with preference for one with a lab_name in parent_basecode and with specimen source
+from (select lab.pcori_basecode,lab.c_basecode,lab.pcori_specimen_source,ont_parent.c_basecode parent_basecode, NORM_RANGE_LOW, NORM_MODIFIER_LOW, NORM_RANGE_HIGH,NORM_MODIFIER_HIGH
+from pcornet_lab lab -- the actual leaf entry (local basecode)
+inner join pcornet_lab ont_loinc on lab.pcori_basecode=ont_loinc.pcori_basecode and ont_loinc.c_basecode like 'LOINC:%' -- the entry with a LOINC code (could be the same or the parent row, depending on the mapping)
+left outer join (select c_fullname, c_basecode, norm.* from pcornet_lab ont_parent inner join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME where c_fullname like '\PCORI\LAB_RESULT_CM\LAB_NAME\%' and c_basecode like 'LAB_NAME:%') ont_parent on ont_loinc.c_path=ont_parent.c_fullname -- labnormal table plus c_fullname corresponding to it
+where lab.c_fullname like '\PCORI\LAB_RESULT_CM\%') x) x where k=1
 
 ---CREATE INDEX IDX_pcornetlab2_1 ON #pcornet_lab2(c_basecode) ---pretty fast without it, and it was tripping MJ up so I commented it out. 
 
@@ -1914,14 +1914,10 @@ CASE WHEN m.ValType_Cd='T' THEN CASE WHEN m.Tval_Char IS NOT NULL THEN 'OT' ELSE
 CASE WHEN m.ValType_Cd='N' AND m.NVAL_NUM<9999999 THEN m.NVAL_NUM ELSE null END RESULT_NUM, --  BUGFIX 4/9/18 don't allow extreme values
 CASE WHEN m.ValType_Cd='N' THEN (CASE isnull(nullif(m.TVal_Char,''),'NI') WHEN 'E' THEN 'EQ' WHEN 'NE' THEN 'OT' WHEN 'L' THEN 'LT' WHEN 'LE' THEN 'LE' WHEN 'G' THEN 'GT' WHEN 'GE' THEN 'GE' ELSE 'NI' END)  ELSE 'TX' END RESULT_MODIFIER,
 isnull(m.Units_CD,'NI') RESULT_UNIT, -- TODO: Should be standardized units
---nullif(lab.NORM_RANGE_LOW,'') NORM_RANGE_LOW
---,isnull(lab.NORM_MODIFIER_LOW, 'UN') NORM_MODIFIER_LOW,
---nullif(lab.NORM_RANGE_HIGH,'') NORM_RANGE_HIGH
---,isnull(lab.NORM_MODIFIER_HIGH, 'UN') NORM_MODIFIER_HIGH,
-NULL as NORM_RANGE_LOW, --the next 4 rows have a temporary fix.... still need a better solution 7/27/18 MJ with Snehil  Gupta's help from WU.
-'UN' as norm_modifier_low,
-NULL as NORM_RANGE_HIGH,
-'UN' as norm_modifier_high,
+nullif(lab.NORM_RANGE_LOW,'') NORM_RANGE_LOW
+,isnull(lab.NORM_MODIFIER_LOW, 'UN') NORM_MODIFIER_LOW,
+nullif(lab.NORM_RANGE_HIGH,'') NORM_RANGE_HIGH
+,isnull(lab.NORM_MODIFIER_HIGH, 'UN') NORM_MODIFIER_HIGH,
 CASE isnull(nullif(m.VALUEFLAG_CD,''),'NI') WHEN 'H' THEN 'AH' WHEN 'L' THEN 'AL' WHEN 'A' THEN 'AB' ELSE 'NI' END ABN_IND,
 NULL [RAW_LAB_NAME],
 NULL [RAW_LAB_CODE],
