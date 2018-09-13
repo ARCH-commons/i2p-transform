@@ -1913,7 +1913,7 @@ CAST(CONVERT(char(5), M.end_date, 108) as TIME) RESULT_TIME,
 CASE WHEN m.ValType_Cd='T' THEN CASE WHEN m.Tval_Char IS NOT NULL THEN 'OT' ELSE 'NI' END END RESULT_QUAL, -- TODO: Should be a standardized value
 CASE WHEN m.ValType_Cd='N' AND m.NVAL_NUM<9999999 THEN m.NVAL_NUM ELSE null END RESULT_NUM, --  BUGFIX 4/9/18 don't allow extreme values
 CASE WHEN m.ValType_Cd='N' THEN (CASE isnull(nullif(m.TVal_Char,''),'NI') WHEN 'E' THEN 'EQ' WHEN 'NE' THEN 'OT' WHEN 'L' THEN 'LT' WHEN 'LE' THEN 'LE' WHEN 'G' THEN 'GT' WHEN 'GE' THEN 'GE' ELSE 'NI' END)  ELSE 'TX' END RESULT_MODIFIER,
-isnull(m.Units_CD,'NI') RESULT_UNIT, -- TODO: Should be standardized units
+'OT' RESULT_UNIT, -- TODO: Should be standardized units
 --nullif(lab.NORM_RANGE_LOW,'') NORM_RANGE_LOW
 --,isnull(lab.NORM_MODIFIER_LOW, 'UN') NORM_MODIFIER_LOW,
 --nullif(lab.NORM_RANGE_HIGH,'') NORM_RANGE_HIGH
@@ -1927,7 +1927,7 @@ NULL [RAW_LAB_NAME],
 NULL [RAW_LAB_CODE],
 NULL [RAW_PANEL],
 CASE WHEN m.ValType_Cd='T' THEN substring(m.TVal_Char,1,50) ELSE substring(cast(m.NVal_Num as varchar),1,50) END RAW_RESULT,
-NULL [RAW_UNIT],
+m.Units_CD [RAW_UNIT],
 NULL [RAW_ORDER_DEPT],
 NULL [RAW_FACILITY_CODE]
 

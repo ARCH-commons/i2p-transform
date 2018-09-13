@@ -1804,11 +1804,11 @@ CREATE TABLE pcornet_lab2  (
     c_basecode           	varchar2(450) NULL,
 	pcori_specimen_source	varchar2(50) NULL,
 	parent_basecode      	varchar2(450) NULL,
-	LAB_NAME             	varchar2(150) NULL--,
---	NORM_RANGE_LOW       	varchar2(10) NULL,
---	NORM_MODIFIER_LOW    	varchar2(2) NULL,
---	NORM_RANGE_HIGH      	varchar2(10) NULL,
---	NORM_MODIFIER_HIGH  	varchar2(2) NULL 
+	LAB_NAME             	varchar2(150) NULL,
+	NORM_RANGE_LOW       	varchar2(10) NULL,
+	NORM_MODIFIER_LOW    	varchar2(10) NULL,
+	NORM_RANGE_HIGH      	varchar2(10) NULL,
+	NORM_MODIFIER_HIGH  	varchar2(10) NULL 
 	)
 /
 
@@ -1843,15 +1843,18 @@ sqltext := 'insert into location '||
 PMN_EXECUATESQL(sqltext);
 
 
--- Optimization - build temp ont table
+-- Optimization - build temp ont table - 8/13/18 jgk - new version that doesn't have duplicate entries
+
 PMN_DROPSQL('DELETE FROM pcornet_lab2 ');
 
 sqltext := 'insert into pcornet_lab2 '||
-'select distinct lab.pcori_basecode,lab.c_basecode,lab.pcori_specimen_source,ont_parent.c_basecode parent_basecode, '''' '||
-'from pcornet_lab lab '|| 
-'inner join pcornet_lab ont_loinc on lab.pcori_basecode=ont_loinc.pcori_basecode and ont_loinc.c_basecode like ''LOINC:%'' '|| --NOTE: You will need to change 'LOINC:' to our local term.
-'inner JOIN pcornet_lab ont_parent on ont_loinc.c_path=ont_parent.c_fullname '||
-'where lab.c_fullname like ''\PCORI\LAB_RESULT_CM\%'' ';
+'select * from '||
+'(select pcori_basecode,c_basecode,pcori_specimen_source, parent_basecode, NORM_RANGE_LOW, NORM_MODIFIER_LOW, NORM_RANGE_HIGH,NORM_MODIFIER_HIGH, row_number() over (partition by c_basecode order by (case when parent_basecode like ''LAB_NAME:%'' then 0 when parent_basecode like ''LOINC:%'' then 1 else 2 end), pcori_specimen_source desc) k '||-- Griffin Weber's code to pick one row per basecode with preference for one with a lab_name in parent_basecode and with specimen source
+'from (select lab.pcori_basecode,lab.c_basecode,lab.pcori_specimen_source,ont_parent.c_basecode parent_basecode, NORM_RANGE_LOW, NORM_MODIFIER_LOW, NORM_RANGE_HIGH,NORM_MODIFIER_HIGH '||
+'from pcornet_lab lab '|| -- the actual leaf entry (local basecode)
+'inner join pcornet_lab ont_loinc on lab.pcori_basecode=ont_loinc.pcori_basecode and ont_loinc.c_basecode like ''LOINC:%'' '|| --NOTE: You will need to change 'LOINC:' to our local term. -- the entry with a LOINC code (could be the same or the parent row, depending on the mapping)
+'left outer join (select c_fullname, c_basecode, norm.* from pcornet_lab ont_parent inner join pmn_labnormal norm on ont_parent.c_basecode=norm.LAB_NAME where c_fullname like ''\PCORI\LAB_RESULT_CM\LAB_NAME\%'' and c_basecode like ''LAB_NAME:%'') ont_parent on ont_loinc.c_path=ont_parent.c_fullname '|| -- labnormal table plus c_fullname corresponding to it
+'where lab.c_fullname like ''\PCORI\LAB_RESULT_CM\%'' )x)x where k=1 ';
 
 PMN_EXECUATESQL(sqltext);
 
@@ -1910,7 +1913,7 @@ to_char(m.end_date,'HH24:MI') RESULT_TIME,
 CASE WHEN m.ValType_Cd='T' THEN CASE WHEN m.Tval_Char IS NOT NULL THEN 'OT' ELSE 'NI' END END RESULT_QUAL, -- TODO: Should be a standardized value -- bug fix translated by MJ from JK's MSSQL fix 11/30/16
 CASE WHEN m.ValType_Cd='N' AND m.NVAL_NUM<9999999 THEN m.NVAL_NUM ELSE null END RESULT_NUM,  --  BUGFIX 4/9/18 don't allow extreme values
 CASE WHEN m.ValType_Cd='N' THEN (CASE NVL(nullif(m.TVal_Char,''),'NI') WHEN 'E' THEN 'EQ' WHEN 'NE' THEN 'OT' WHEN 'L' THEN 'LT' WHEN 'LE' THEN 'LE' WHEN 'G' THEN 'GT' WHEN 'GE' THEN 'GE' ELSE 'NI' END)  ELSE 'TX' END RESULT_MODIFIER,
-NVL(m.Units_CD,'NI') RESULT_UNIT, -- TODO: Should be standardized units
+'OT' RESULT_UNIT, -- TODO: Should be standardized units
 --nullif(lab.NORM_RANGE_LOW,'') NORM_RANGE_LOW
 --,lab.NORM_MODIFIER_LOW,
 --nullif(lab.NORM_RANGE_HIGH,'') NORM_RANGE_HIGH
@@ -1924,7 +1927,7 @@ NULL RAW_LAB_NAME,
 NULL RAW_LAB_CODE,
 NULL RAW_PANEL,
 CASE WHEN m.ValType_Cd='T' THEN SUBSTR(m.TVal_Char,1,50) ELSE SUBSTR(to_char(m.NVal_Num),1,50) END RAW_RESULT, --bug fix MJ 10/17/16 translated from JK's MSSQL fix
-NULL RAW_UNIT,
+m.Units_CD RAW_UNIT,
 NULL RAW_ORDER_DEPT,
 NULL RAW_FACILITY_CODE
 
