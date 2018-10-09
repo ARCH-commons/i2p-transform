@@ -115,9 +115,8 @@ select en.*
 , sf.tval_char RAW_PAYER_TYPE_PRIMARY
 from encounter_w_pay en
 left join &&i2b2_data_schema.supplemental_fact sf on en.instance_num = sf.instance_num and sf.source_column = 'FINANCIAL_CLASS'
-left join payer_map pm on pm.payer_name = en.raw_payer_name_primary
-and (en.raw_payer_id_primary like 'O2|PAYER_PRIMARY:%' and pm.financial_class = sf.tval_char)
-or (en.raw_payer_id_primary like 'IDX|PAYER_PRIMARY:%')
+left join payer_map pm on pm.payer_name = en.raw_payer_name_primary and (en.raw_payer_id_primary like 'O2|PAYER_PRIMARY:%'  and pm.financial_class = sf.tval_char)
+      or(  pm.payer_name = en.raw_payer_name_primary and (en.raw_payer_id_primary like 'IDX|PAYER_PRIMARY:%'))
 /
 
 create table encounter as
