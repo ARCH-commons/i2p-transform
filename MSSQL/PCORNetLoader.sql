@@ -2294,9 +2294,9 @@ begin
 
 
 -- 7/23/18: This only needs to derive from encounter and prescribing at present because that's where we're sourcing providerid from
- select distinct providerid into #pv_e from pmnencounter
+ select distinct providerid into #pv_e from pmnencounter where providerid is not null
 -- select distinct providerid into #pv_d from pmndiagnosis
- select distinct rx_providerid into #pv_r from pmnprescribing
+ select distinct rx_providerid into #pv_r from pmnprescribing where rx_providerid is not null
 -- select distinct providerid into #pv_p from pmnprocedures
 -- select distinct medadmin_providerid into #pv_ma from pmnmed_admin
 -- select distinct obsclin_providerid into #pv_oc from pmnobs_clin
