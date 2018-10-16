@@ -660,11 +660,7 @@ CREATE TABLE [dbo].[pmnharvest](
 	[PRO_DATE_MGMT] [varchar](2) NULL,
     [DEATH_DATE_MGMT] [varchar] (2) NULL,
     [MEDADMIN_START_DATE_MGMT] [varchar] (2) NULL,
-<<<<<<< HEAD
     [MEDADMIN_STOP_DATE_MGMT] [varchar] (2) NULL,
-=======
-    [MEDADMIN_END_DATE_MGMT] [varchar] (2) NULL,
->>>>>>> 50bfbfc... Updated to v4 DDL. Also added a few index optimizations to a few stored procs.
     [OBSCLIN_DATE_MGMT] [varchar] (2) NULL,
     [OBSGEN_DATE_MGMT] [varchar] (2) NULL,
 	[REFRESH_DEMOGRAPHIC_DATE] [datetime] NULL,
@@ -714,13 +710,8 @@ CREATE TABLE [dbo].[pmnENCOUNTER](
 	[DRG] [varchar](3) NULL,
 	[DRG_TYPE] [varchar](2) NULL,
 	[ADMITTING_SOURCE] [varchar](2) NULL,
-<<<<<<< HEAD
 	[PAYER_TYPE_PRIMARY] [varchar](5) NULL,
 	[PAYER_TYPE_SECONDARY] [varchar](5) NULL,
-=======
-	[PAYER_TYPE_PRIMARY] [varchar](4) NULL,
-	[PAYER_TYPE_SECONDARY] [varchar](4) NULL,
->>>>>>> 50bfbfc... Updated to v4 DDL. Also added a few index optimizations to a few stored procs.
     [FACILITY_TYPE] [varchar](50) NULL,
     [RAW_SITEID] [varchar] (50) NULL,
 	[RAW_ENC_TYPE] [varchar](50) NULL,
@@ -839,23 +830,11 @@ CREATE CLUSTERED INDEX medadmin_clustered_index
 ON MED_ADMIN (MEDADMINID)   
 go
 
-
-
-<<<<<<< HEAD
-
-
-
-=======
->>>>>>> 50bfbfc... Updated to v4 DDL. Also added a few index optimizations to a few stored procs.
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[PROVIDER]') AND type in (N'U'))
 DROP TABLE [dbo].[PROVIDER]
 GO
 CREATE TABLE [dbo].[PROVIDER](
-<<<<<<< HEAD
     [PROVIDERID] [varchar] (50) NOT NULL,
-=======
-    [PROVIDERID] [varchar] (50) NULL,
->>>>>>> 50bfbfc... Updated to v4 DDL. Also added a few index optimizations to a few stored procs.
     [PROVIDER_SEX] [varchar] (2) NULL,
     [PROVIDER_SPECIALTY_PRIMARY] [varchar] (50) NULL,
     [PROVIDER_NPI] [numeric] (15, 8) NULL,
@@ -873,13 +852,6 @@ CREATE CLUSTERED INDEX provider_clustered_index
 ON PROVIDER (PROVIDERID)   
 go
 
-
-
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 50bfbfc... Updated to v4 DDL. Also added a few index optimizations to a few stored procs.
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[OBS_CLIN]') AND type in (N'U'))
 DROP TABLE [dbo].[OBS_CLIN]
 GO
@@ -887,11 +859,7 @@ CREATE TABLE [dbo].[OBS_CLIN](
     [OBSCLINID] [varchar] (50) NOT NULL,
     [PATID] [varchar] (50) NOT NULL,
     [ENCOUNTERID] [varchar] (50) NULL,
-<<<<<<< HEAD
     [OBSCLIN_PROVIDERID] [varchar] (50) NULL,
-=======
-    [OBSCLIN_PROVIDERID] [varchr] (50) NULL,
->>>>>>> 50bfbfc... Updated to v4 DDL. Also added a few index optimizations to a few stored procs.
     [OBSCLIN_DATE] [datetime] NULL,
     [OBSCLIN_TIME] [varchar] (5) NULL,
     [OBSCLIN_TYPE] [varchar] (2) NULL,
@@ -899,22 +867,14 @@ CREATE TABLE [dbo].[OBS_CLIN](
     [OBSCLIN_RESULT_QUAL] [varchar] (50) NULL,
     [OBSCLIN_RESULT_TEXT] [varchar] (50) NULL,
     [OBSCLIN_RESULT_SNOMED] [varchar] (50) NULL,
-<<<<<<< HEAD
     [OBSCLIN_RESULT_NUM] [numeric] (15, 8) NULL,
-=======
-    [OBSLCIN_RESULT_NUM] [numeric] (15, 8) NULL,
->>>>>>> 50bfbfc... Updated to v4 DDL. Also added a few index optimizations to a few stored procs.
     [OBSCLIN_RESULT_MODIFIER] [varchar] (2) NULL,
     [OBSCLIN_RESULT_UNIT] [varchar] (50) NULL,
     [RAW_OBSCLIN_NAME] [varchar] (50) NULL,
     [RAW_OBSCLIN_CODE] [varchar] (50) NULL,
     [RAW_OBSCLIN_TYPE] [varchar] (50) NULL,
     [RAW_OBSCLIN_RESULT] [varchar] (50) NULL,
-<<<<<<< HEAD
     [RAW_OBSCLIN_MODIFIER] [varchar] (50) NULL,
-=======
-    [RAW_OBSCLIN_MODIFER] [varchar] (50) NULL,
->>>>>>> 50bfbfc... Updated to v4 DDL. Also added a few index optimizations to a few stored procs.
     [RAW_OBSCLIN_UNIT] [varchar] (50) NULL,
 
 PRIMARY KEY NONCLUSTERED 
@@ -928,16 +888,6 @@ CREATE CLUSTERED INDEX obsclin_clustered_index
 ON OBS_CLIN (OBSCLINID)   
 go
 
-
-
-<<<<<<< HEAD
-
-
-
-
-
-=======
->>>>>>> 50bfbfc... Updated to v4 DDL. Also added a few index optimizations to a few stored procs.
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[OBS_GEN]') AND type in (N'U'))
 DROP TABLE [dbo].[OBS_GEN]
 GO
@@ -945,11 +895,7 @@ CREATE TABLE [dbo].[OBS_GEN](
     [OBSGENID] [varchar] (50) NOT NULL,
     [PATID] [varchar] (50) NOT NULL,
     [ENCOUNTERID] [varchar] (50) NULL,
-<<<<<<< HEAD
     [OBSGEN_PROVIDERID] [varchar] (50) NULL,
-=======
-    [OBSGEN_PROVIDERID] [varchr] (50) NULL,
->>>>>>> 50bfbfc... Updated to v4 DDL. Also added a few index optimizations to a few stored procs.
     [OBSGEN_DATE] [datetime] NULL,
     [OBSGEN_TIME] [varchar] (5) NULL,
     [OBSGEN_TYPE] [varchar] (30) NULL,
@@ -959,11 +905,7 @@ CREATE TABLE [dbo].[OBS_GEN](
     [OBSGEN_RESULT_NUM] [numeric] (15, 8) NULL,
     [OBSGEN_RESULT_MODIFIER] [varchar] (2) NULL,
     [OBSGEN_RESULT_UNIT] [varchar] (50) NULL,
-<<<<<<< HEAD
     [OBSGEN_TABLE_MODIFIED] [varchar] (3) NULL,
-=======
-    [OBSGEN_TABLE_MODIFIER] [varchar] (3) NULL,
->>>>>>> 50bfbfc... Updated to v4 DDL. Also added a few index optimizations to a few stored procs.
     [OBSGEN_ID_MODIFIED] [varchar] (50) NULL,
     [RAW_OBSGEN_NAME] [varchar] (50) NULL,
     [RAW_OBSGEN_CODE] [varchar] (50) NULL,
@@ -982,16 +924,6 @@ CREATE CLUSTERED INDEX obsgen_clustered_index
 ON OBS_GEN (OBSGENID)   
 go
 
-
-
-
-<<<<<<< HEAD
-
-
-
-
-=======
->>>>>>> 50bfbfc... Updated to v4 DDL. Also added a few index optimizations to a few stored procs.
 /****** Object:  ForeignKey [FK__pmndiagno__ENCOU__0AD2A005]    Script Date: 10/02/2014 15:59:37 ******/
 ALTER TABLE [dbo].[pmndiagnosis]  WITH CHECK ADD FOREIGN KEY([ENCOUNTERID])
 REFERENCES [dbo].[pmnENCOUNTER] ([ENCOUNTERID])
@@ -1562,7 +1494,6 @@ create procedure PCORNetEncounter as
 DECLARE @sqltext NVARCHAR(4000);
 begin
 
-<<<<<<< HEAD
 select patient_num,encounter_num,max(payor_type) payor
 into #max_payor_type
 from (
@@ -1575,20 +1506,13 @@ from (
 group by patient_num,encounter_num;
 
 CREATE INDEX max_payor_pat_enc ON #max_payor_type (patient_num,encounter_num) INCLUDE (payor);
-
-insert into pmnencounter(PATID,ENCOUNTERID,admit_date ,ADMIT_TIME , 
-		DISCHARGE_DATE ,DISCHARGE_TIME ,PROVIDERID ,FACILITY_LOCATION  
-		,ENC_TYPE ,FACILITYID ,DISCHARGE_DISPOSITION , 
-		DISCHARGE_STATUS ,DRG ,DRG_TYPE ,ADMITTING_SOURCE,PAYER_TYPE_PRIMARY) 
-=======
 ALTER INDEX index_patid ON pmnencounter DISABLE; 
 ALTER INDEX encounter_encounterid_index ON pmnencounter DISABLE;
 
-insert into pmnencounter WITH (TABLOCK) (PATID,ENCOUNTERID,admit_date ,ADMIT_TIME , 
+insert into pmnencounter  WITH (TABLOCK) (PATID,ENCOUNTERID,admit_date ,ADMIT_TIME , 
 		DISCHARGE_DATE ,DISCHARGE_TIME ,PROVIDERID ,FACILITY_LOCATION  
 		,ENC_TYPE ,FACILITYID ,DISCHARGE_DISPOSITION , 
-		DISCHARGE_STATUS ,DRG ,DRG_TYPE ,ADMITTING_SOURCE)  
->>>>>>> 94d46e2... TABLOCK optimizations. (needs more detailed testing)
+		DISCHARGE_STATUS ,DRG ,DRG_TYPE ,ADMITTING_SOURCE,PAYER_TYPE_PRIMARY) 
 select distinct v.patient_num, v.encounter_num,  
 	start_Date, 
 	substring(convert(varchar,start_Date,20),12,5), 
@@ -1618,15 +1542,10 @@ left outer join
  inner join pcornet_enc e on c_dimcode like '%'''+inout_cd+'''%' and e.c_fullname like '\PCORI\ENCOUNTER\ENC_TYPE\%') enctype
   on enctype.patient_num=v.patient_num and enctype.encounter_num=v.encounter_num
 
-<<<<<<< HEAD
+
 drop table #max_payor_type;
-=======
 ALTER INDEX index_patid ON pmnencounter REBUILD; 
-<<<<<<< HEAD
->>>>>>> 94d46e2... TABLOCK optimizations. (needs more detailed testing)
-=======
 ALTER INDEX encounter_encounterid_index ON pmnencounter REBUILD; 
->>>>>>> 50bfbfc... Updated to v4 DDL. Also added a few index optimizations to a few stored procs.
 
 end
 go
