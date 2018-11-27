@@ -1,0 +1,162 @@
+FREQ,RESULT_UNIT,UCUM_CODE,UCUM_DESCRIPTIVE_TEXT
+1123,#,OT,Other
+2221154,/HPF,OT,Other
+46026,/LPF,OT,Other
+80338,/UL,OT,Other
+18887,[IU]/ML,[IU]/mL,international unit per milliliter
+10151,10*3/UL,10*3/uL,thousand per microliter
+2140,10*6/UL,10*6/uL,million per microliter
+2419,10^3,OT,Other
+6451,10^3/UL,10*3/uL,thousand per microliter
+1992,1000/UL,10*3/uL,thousand per microliter
+10563,10E9/L,OT,Other
+11642,AI,OT,Other
+3141,AU,OT,Other
+174064,BPM,OT,Other
+2842,CC,OT,Other
+689040,CELLS/UL,OT,Other
+1366532,CM,OT,Other
+5972,CM (<=0.5),OT,Other
+68355,CM (<=4.4),OT,Other
+73132,CM (<=5.3),OT,Other
+5161,cm (2.0-2.8,OT,Other
+77157,cm (2.0-3.5,OT,Other
+77545,cm (2.4-4.2,OT,Other
+5148,cm (2.7-3.3,OT,Other
+76747,cm (5.6-8.6,OT,Other
+5149,cm (7.1-7.9,OT,Other
+74761,CM2,OT,Other
+83688,CM2 (<=18),OT,Other
+26975,CM3,OT,Other
+1010,CMM,OT,Other
+14348,COPIES/ML,OT,Other
+7561,DEG,OT,Other
+3020,E10 CELLS,OT,Other
+3018,E6 CELLS,OT,Other
+3018,E6 CELLS/KG,OT,Other
+6314023,FL,fL,femtoliter
+7565,G,g,gram
+1577,G/24 H,g/(24.h),gram per 24 hour
+8288964,G/DL,g/dL,gram per deciliter
+7412,G/M2,OT,Other
+3149751,GM/DL,g/dL,gram per deciliter
+1153,GMS,OT,Other
+1122,GPL,g/L,gram per liter
+8459,GPL/ML,OT,Other
+1678,H,h,hour
+1678,H,H,Henry
+11111,IN,OT,Other
+7319,INDEX,OT,Other
+2123,INDEX VALUE,OT,Other
+1756,INR,OT,Other
+20221,IU/L,OT,Other
+120014,IU/ML,OT,Other
+3099,K/CMM,OT,Other
+4645,K/CUMM,OT,Other
+1376,K/MM3,OT,Other
+15274855,K/UL,OT,Other
+4353,KG,kg,kilogram
+39896,KU/L,OT,Other
+11408,LBS,OT,Other
+1210,LOG IU/ML,OT,Other
+1325,M,OT,Other
+1118508,M/S,OT,Other
+3045285,M/UL,mU/L,milli enzyme unit per liter
+169686,M2,m2,square meter
+1183,MCG/24 H,OT,Other
+280255,MCG/DL,OT,Other
+4738,mcg/dL (cal,OT,Other
+2570,MCG/KG/MIN,OT,Other
+9586,MCG/L,OT,Other
+16459,mcg/mg crea,OT,Other
+162148,MCG/ML,OT,Other
+101181,MCI,OT,Other
+21359,MCMOL/L,OT,Other
+311906,MCU/ML,OT,Other
+39352,MEG/L,OT,Other
+150846,MEQ/L,OT,Other
+2984,METER,OT,Other
+29104,METS,OT,Other
+1192,MG/24 H,mg/(24.h),milligram per 24 hour
+15652,MG/24 HRS,mg/(24.h),milligram per 24 hour
+2007,MG/24HR,mg/(24.h),milligram per 24 hour
+24352219,MG/DL,mg/dL,milligram per deciliter
+267299,mg/dL (calc,mg/dL,milligram per deciliter
+2975,MG/G CREAT,mg/g{creat},milligram per gram of creatinine
+8998,MG/GRAM,mg/g,milligram per gram
+24634,MG/L,mg/L,milligram per liter
+3017,MIL/UL,m[IU]/mL,milli  international unit per milliliter
+167079,MILLION/UL,OT,Other
+61834,MIN,min,minute
+116367,MIU/L,m[IU]/L,milli international unit per liter
+61043,MIU/ML,m[IU]/mL,milli  international unit per milliliter
+151959,ML,mL,milliliter
+4050252,ML/MIN,mL/min,milliliter per minute
+6362259,ML/MIN/1.73,OT,Other
+460610,mL/min/1.73,OT,Other
+1517,ml/min/1.73,OT,Other
+17822,MLS,OT,Other
+8022,MM,OT,Other
+14015,MM/H,mm/h,millimeter per hour
+98074,MM/HR,mm/h,millimeter per hour
+1285125,MMHG,mm[Hg],millimeter of mercury
+3923,MMOL/24 HRS,mmol/(24.h),millimole per 24 hour
+14747546,MMOL/L,mmol/L,millimole per liter
+20357,MOS/KG,mosm/kg,milliosmole per kilogram
+23350,MOSMOL/KG,mosm/kg,milliosmole per kilogram
+1536,MPH,OT,Other
+1071,MPL,OT,Other
+8108,MPL/ML,OT,Other
+26039,MS,OT,Other
+152378,MSEC,OT,Other
+21140,MU/ML,mU/mL,milli  enzyme unit per milliliter
+148859,NG/DL,ng/dL,nanogram per deciliter
+1181293,NG/ML,ng/mL,nanogram per millliiter
+37283,NG/ML DDU,OT,Other
+1658,NG/ML FEU,OT,Other
+26640416,NI,NI,No information
+1628,NMBCE/L,OT,Other
+11552,NMOL/L,nmol/L,nanomole per liter
+25756,NMOL/ML,nmol/mL,nanomole per milliliter
+1123,NMOLES,OT,Other
+19633313,PERCENT,%,percent
+3233164,PG,pg,picogram
+273580,PG/ML,pg/mL,picogram per milliliter
+8363,RATIO,OT,Other
+10252,RNA COPIES/,OT,Other
+33807,S,S,Siemens
+33807,S,s,second
+505524,SEC,s,second
+1184,SECONDS,s,second
+5070,SECS,s,second
+4564,SGU,OT,Other
+4340,SMU,OT,Other
+1647,T/CMM,OT,Other
+1529,TH/CMM,OT,Other
+5180,TH/UL,OT,Other
+2212,THOU/UL,OT,Other
+2239,THOUS,OT,Other
+4073,THOUS/UL,OT,Other
+335245,THOUSAND/UL,OT,Other
+134897,TITER,OT,Other
+7394762,U/L,U/L,enzyme unit per liter
+90061,U/ML,U/mL,enzyme unit per milliliter
+9425,UG/DL,ug/dL,microgram per deciliter
+1636,UG/L,ug/L,microgram per liter
+5618,UG/MG,OT,Other
+1874,UG/ML,ug/mL,microgram per milliliter
+34358,UIU/ML,u[IU]/mL,micro international unit per milliliter
+39742,UL,U/L,enzyme unit per liter
+28578,UMOL/L,umol/L,micromole per liter
+5970,UNIT/L,U/L,enzyme unit per liter
+2793,UNITS,OT,Other
+4069,UNITS/L,U/L,enzyme unit per liter
+2341,WEEKS,wk,week
+1707,X10 3/UL,OT,Other
+1205,X10.E3/UL,OT,Other
+4231,X10^3,OT,Other
+6873,X10^3/UL,OT,Other
+2409,X1000,OT,Other
+1333,X10-3/UL,OT,Other
+15873,X10E3/UL,OT,Other
+2272,X10E6/UL,OT,Other
