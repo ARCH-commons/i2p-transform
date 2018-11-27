@@ -190,7 +190,15 @@ BEGIN
 GATHER_TABLE_STATS('LAB_RESULT_CM');
 END;
 /
+update pcornet_cdm.lab_result_cm
+set lab_loinc='48642-3'
+where raw_facility_code like '%KUH|COMPONENT_ID:191'
 
+
+update pcornet_cdm.lab_result_cm
+set lab_loinc='48643-1'
+where raw_facility_code like '%KUH|COMPONENT_ID:200'
+                       
 update cdm_status
 set end_time = sysdate, records = (select count(*) from lab_result_cm)
 where task = 'lab_result_cm'
