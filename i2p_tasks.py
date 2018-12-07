@@ -286,7 +286,7 @@ class loadLabNormal(LoadCSV):
     def requires(self) -> List[luigi.Task]:
         return [pcornet_init()]
     
- class loadLabRUnit(LoadCSV):
+class loadLabRUnit(LoadCSV):
     taskName = 'LABRUNIT'
     csvname = 'curated_data/resultunit_manualcuration.csv'
 
