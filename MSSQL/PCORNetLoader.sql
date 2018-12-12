@@ -3,7 +3,7 @@
 -- PCORNetLoader Script
 -- Current version will not transform: Death_Condition, PCORnet_Trial, PRO_CM 
 -- Contributors: Jeff Klann, PhD; Aaron Abend; Arturo Torres; Matt Joss
--- Version now managed by changelog. Last update 5/24/17@5pm
+-- Version now managed by changelog. 
 --
 -- MSSQL version
 -- NOW RUN.SQL is largely merged with PCORnetLoader!
@@ -1567,19 +1567,19 @@ ALTER INDEX diagnosis_encounterid_index ON pmndiagnosis DISABLE;
 select  patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode dxsource, dxsource.c_fullname
  into #sourcefact
 from i2b2fact factline
-inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num
+--inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num
 inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode  
 where dxsource.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\%'
 
 select  patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode pdxsource,dxsource.c_fullname 
 into #pdxfact from i2b2fact factline 
-inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num 
+--inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num 
 inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode  
 and dxsource.c_fullname like '\PCORI_MOD\PDX\%'
 
 select  patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode originsource,dxsource.c_fullname 
 into #originfact from i2b2fact factline 
-inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num 
+--inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num 
 inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode  
 and dxsource.c_fullname like '\PCORI_MOD\DX_ORIGIN\%'
 
@@ -1642,7 +1642,7 @@ begin
 -- TODO: Could be further optimized to use the same temp table as diagnosis
 select  patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode dxsource, dxsource.c_fullname
 into #sourcefact from i2b2fact factline 
-inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num
+--inner join pmnENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num
 inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode 
 where dxsource.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\%'
 
@@ -1830,13 +1830,13 @@ begin
 -- Optimized to use temp tables; also, removed "distinct" - much faster and seems unnecessary - 12/9/15
 select patient_num, encounter_num, provider_id, concept_cd, start_date, lsource.pcori_basecode  PRIORITY 
 into #priority from i2b2fact
-inner join pmnENCOUNTER enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num
+--inner join pmnENCOUNTER enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num
 inner join pcornet_lab lsource on i2b2fact.modifier_cd =lsource.c_basecode
 where c_fullname LIKE '\PCORI_MOD\PRIORITY\%'
  
 select  patient_num, encounter_num, provider_id, concept_cd, start_date, lsource.pcori_basecode  RESULT_LOC
 into #location from i2b2fact
-inner join pmnENCOUNTER enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num
+--inner join pmnENCOUNTER enc on enc.patid = i2b2fact.patient_num and enc.encounterid = i2b2fact.encounter_Num
 inner join pcornet_lab lsource on i2b2fact.modifier_cd =lsource.c_basecode
 where c_fullname LIKE '\PCORI_MOD\RESULT_LOC\%'
 
@@ -1986,7 +1986,7 @@ begin
     select pcori_basecode,c_fullname,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd
 		into #basis
 		from i2b2fact basis
-			inner join pmnENCOUNTER enc on enc.patid = basis.patient_num and enc.encounterid = basis.encounter_Num
+			--inner join pmnENCOUNTER enc on enc.patid = basis.patient_num and enc.encounterid = basis.encounter_Num
 		 join pcornet_med basiscode 
 			on basis.modifier_cd = basiscode.c_basecode
 			and basiscode.c_fullname like '\PCORI_MOD\RX_BASIS\%'
@@ -1994,7 +1994,7 @@ begin
     select pcori_basecode,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd 
 		into #freq
 		from i2b2fact freq
-			inner join pmnENCOUNTER enc on enc.patid = freq.patient_num and enc.encounterid = freq.encounter_Num
+			--inner join pmnENCOUNTER enc on enc.patid = freq.patient_num and enc.encounterid = freq.encounter_Num
 		 join pcornet_med freqcode 
 			on freq.modifier_cd = freqcode.c_basecode
 			and freqcode.c_fullname like '\PCORI_MOD\RX_FREQUENCY\%'
@@ -2002,7 +2002,7 @@ begin
     select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd
 		into #quantity
 		from i2b2fact quantity
-			inner join pmnENCOUNTER enc on enc.patid = quantity.patient_num and enc.encounterid = quantity.encounter_Num
+			--inner join pmnENCOUNTER enc on enc.patid = quantity.patient_num and enc.encounterid = quantity.encounter_Num
 		 join pcornet_med quantitycode 
 			on quantity.modifier_cd = quantitycode.c_basecode
 			and quantitycode.c_fullname like '\PCORI_MOD\RX_QUANTITY\'
@@ -2010,7 +2010,7 @@ begin
 	select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd 
 		into #refills
 		from i2b2fact refills
-			inner join pmnENCOUNTER enc on enc.patid = refills.patient_num and enc.encounterid = refills.encounter_Num
+			--inner join pmnENCOUNTER enc on enc.patid = refills.patient_num and enc.encounterid = refills.encounter_Num
 		 join pcornet_med refillscode 
 			on refills.modifier_cd = refillscode.c_basecode
 			and refillscode.c_fullname like '\PCORI_MOD\RX_REFILLS\'
@@ -2018,7 +2018,7 @@ begin
     select nval_num,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd 
 		into #supply
 		from i2b2fact supply
-			inner join pmnENCOUNTER enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num
+			--inner join pmnENCOUNTER enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num
 		 join pcornet_med supplycode 
 			on supply.modifier_cd = supplycode.c_basecode
 			and supplycode.c_fullname like '\PCORI_MOD\RX_DAYS_SUPPLY\'
@@ -2026,7 +2026,7 @@ begin
     select pcori_basecode,instance_num,start_date,provider_id,concept_cd,encounter_num,modifier_cd 
 		into #unit
 		from i2b2fact unit
-			inner join pmnENCOUNTER enc on enc.patid = unit.patient_num and enc.encounterid = unit.encounter_Num
+			--inner join pmnENCOUNTER enc on enc.patid = unit.patient_num and enc.encounterid = unit.encounter_Num
 		 join pcornet_med unitcode 
 			on unit.modifier_cd = unitcode.c_basecode
 			and unitcode.c_fullname like '\PCORI_MOD\RX_DOSE_FORM\%' ---changed RX_QUANTITY_UNIT to RX_DOSE_FORM
@@ -2204,7 +2204,7 @@ begin
 select nval_num,encounter_num,concept_cd 
     into #supply
     from i2b2fact supply
-        inner join pmnENCOUNTER enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num
+        --inner join pmnENCOUNTER enc on enc.patid = supply.patient_num and enc.encounterid = supply.encounter_Num
       join pcornet_med supplycode 
         on supply.modifier_cd = supplycode.c_basecode
         and supplycode.c_fullname like '\PCORI_MOD\RX_DAYS_SUPPLY\'
