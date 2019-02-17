@@ -347,8 +347,8 @@ with codes as (
     replace(pe.pcori_basecode, 'ADMITTING_SOURCE:', '') pcori_code 
   from 
     pcornet_mapping pm 
-  join blueherondata.concept_dimension cd on cd.concept_path like pm.local_path || '%'
-  join blueheronmetadata.pcornet_enc pe on pe.c_fullname = pm.pcori_path
+  join "&&i2b2_data_schema".concept_dimension cd on cd.concept_path like pm.local_path || '%'
+  join "&&i2b2_meta_data_schema".pcornet_enc pe on pe.c_fullname = pm.pcori_path
   where pm.pcori_path like '\PCORI\ENCOUNTER\ADMITTING_SOURCE\%'
   )
 select 
@@ -356,7 +356,7 @@ select
   -- Prioritize status: Last OT, UN, NI
   decode(codes.pcori_code, 'AF',0,'AL',1,'AV',2,'ED',3,'HH',4,'HO',5,'HS',6,'IP',7,
                            'NH',8,'RH',9,'RS',10,'SN',11,'OT',12,'UN',13,'NI',14, 99) as_rank 
-from blueherondata.observation_fact obs
+from "&&i2b2_data_schema".observation_fact obs
 join codes on codes.concept_cd = obs.concept_cd;
 
 create index admit_source_enc_rank_idx on admit_source_enc_code_rank(encounter_num, as_rank);
