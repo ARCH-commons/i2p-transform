@@ -348,7 +348,7 @@ with codes as (
   from 
     pcornet_mapping pm 
   join "&&i2b2_data_schema".concept_dimension cd on cd.concept_path like pm.local_path || '%'
-  join "&&i2b2_meta_data_schema".pcornet_enc pe on pe.c_fullname = pm.pcori_path
+  join "&&i2b2_meta_schema".pcornet_enc pe on pe.c_fullname = pm.pcori_path
   where pm.pcori_path like '\PCORI\ENCOUNTER\ADMITTING_SOURCE\%'
   )
 select 
