@@ -18,7 +18,7 @@ select rxcui from "&&i2b2_etl_schema".clarity_med_id_to_rxcui@id where 1=0
 /
 
 BEGIN
-dbms_stats.gather_table_stats( OWNNAME => '"BLUEHERONDATA"', TABNAME => '"SUPPLEMENTAL_FACT"',
+dbms_stats.gather_table_stats( OWNNAME => '"&&i2b2_data_schema"', TABNAME => '"SUPPLEMENTAL_FACT"',
 ESTIMATE_PERCENT => DBMS_STATS.AUTO_SAMPLE_SIZE, DEGREE => 16, CASCADE => TRUE );
 END;
 /
