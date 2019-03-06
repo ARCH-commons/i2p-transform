@@ -130,7 +130,7 @@ IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[pcorn
 DROP TABLE [dbo].[pcornet_codelist]
 GO
 
-create table pcornet_codelist (codetype varchar(20), code varchar(20))
+create table pcornet_codelist (codetype varchar(20), code varchar(50))
 go
 
 
