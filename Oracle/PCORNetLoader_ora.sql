@@ -235,7 +235,7 @@ end pcornet_parsecode;
 create or replace procedure pcornet_popcodelist as
 
 codedata varchar(2000);
-onecode varchar(20);
+onecode varchar(50);
 codetype varchar(20);
 
 cursor getcodesql is

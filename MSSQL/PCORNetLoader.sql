@@ -1212,7 +1212,7 @@ declare @tex varchar(2000)
 declare @pos int
 declare @readstate char(1) 
 declare @nextchar char(1) 
-declare @val varchar(20)
+declare @val varchar(50)
 
 begin
 
@@ -1253,7 +1253,7 @@ GO
 create procedure pcornet_popcodelist as
 
 declare @codedata varchar(2000)
-declare @onecode varchar(20)
+declare @onecode varchar(50)
 declare @codetype varchar(20)
 
 declare getcodesql cursor local for
