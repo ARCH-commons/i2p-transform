@@ -256,7 +256,7 @@ class provider(I2PScriptTask):
     script = Script.provider
 
     def requires(self) -> List[luigi.Task]:
-        return [loadSpecialtyMap(), loadSpecialtyCode(), encounter()]
+        return [loadSpecialtyCode(), encounter()]
 
 
 class vital(I2PScriptTask):
