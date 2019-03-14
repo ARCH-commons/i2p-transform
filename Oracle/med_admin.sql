@@ -137,7 +137,7 @@ or med_dose.modifier_cd = 'MedObs:MAR_Dose|mg'
 --or med_dose.modifier_cd = 'MedObs:Dose|tab'
 --or med_dose.modifier_cd = 'MedObs:Dose|mg'
 )
-left join BLUEHERONMETADATA.pcornet_med med_p on med_p.c_basecode = med_start.concept_cd
+left join &&i2b2_data_schema.pcornet_med med_p on med_p.c_basecode = med_start.concept_cd
 left join unit_map um on um.unit_name = med_dose.units_cd
 ;
 
