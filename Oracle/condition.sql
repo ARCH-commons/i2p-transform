@@ -73,7 +73,7 @@ insert into sourcefact2
 execute immediate 'create index sourcefact2_idx on sourcefact2 (patient_num, encounter_num, provider_id, concept_cd, start_date)';
 GATHER_TABLE_STATS('SOURCEFACT2');
 
-create_error_table('CONDITION');
+/*create_error_table('CONDITION');*/
 
 insert into condition (patid, encounterid, report_date, resolve_date, condition, condition_type, condition_status, condition_source)
 select distinct factline.patient_num, min(factline.encounter_num) encounterid, min(factline.start_date) report_date, NVL(max(factline.end_date),null) resolve_date, diag.pcori_basecode,
@@ -92,7 +92,7 @@ and factline.start_date=sf.start_Date
 where diag.c_fullname like '\PCORI\DIAGNOSIS\%'
 and sf.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\CONDITION_SOURCE\%'
 group by factline.patient_num, diag.pcori_basecode, diag.c_fullname
-log errors into ERR$_CONDITION reject limit unlimited
+/*log errors into ERR$_CONDITION reject limit unlimited*/
 ;
 
 execute immediate 'create index condition_idx on condition (PATID, ENCOUNTERID)';
