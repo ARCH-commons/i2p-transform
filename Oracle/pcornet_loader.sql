@@ -32,6 +32,11 @@ begin
   The CDM wants height in inches and weight in pounds. */
   update vital v set v.ht = v.ht / 2.54;
   update vital v set v.wt = v.wt / 16;
+  
+  /* Result units used by KUH are mg/dL but the CDM spec requires a gm/dL*/
+  update pcornet_cdm.lab_result_cm
+  set result_num=result_num/1000
+  where lab_loinc in('2862-1','26474-7');
 
   /* Remove rows from the PRESCRIBING table where RX_* fields are null
      TODO: Remove this when fixed in HERON
