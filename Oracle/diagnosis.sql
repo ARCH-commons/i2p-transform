@@ -12,6 +12,7 @@ CREATE TABLE diagnosis(
 	ENCOUNTERID varchar(50) NOT NULL,
 	ENC_TYPE varchar(2) NULL,
 	ADMIT_DATE date NULL,
+    DX_DATE date NULL,
 	PROVIDERID varchar(50) NULL,
 	DX varchar(18) NOT NULL,
 	DX_TYPE varchar(2) NOT NULL,
@@ -177,7 +178,7 @@ insert into poafact
 execute immediate 'create index poafact_idx on poafact (patient_num, encounter_num, provider_id, concept_cd, start_date)';
 GATHER_TABLE_STATS('POAFACT');
 
-insert into diagnosis (patid, encounterid, enc_type, admit_date, providerid, dx, dx_type, dx_source, dx_origin, pdx, dx_poa, raw_dx_poa)
+insert into diagnosis (patid, encounterid, enc_type, admit_date,dx_date, providerid, dx, dx_type, dx_source, dx_origin, pdx, dx_poa, raw_dx_poa)
 /* KUMC started billing with ICD10 on Oct 1, 2015. */
 with icd10_transition as (
   select date '2015-10-01' as cutoff from dual
@@ -252,7 +253,7 @@ with icd10_transition as (
  select * from diag_fact_merge where unique_row = 1
 )
 
-select distinct factline.patient_num, factline.encounter_num encounterid,	enc_type, enc.admit_date, enc.providerid
+select distinct factline.patient_num, factline.encounter_num encounterid, enc_type, enc.admit_date, factline.start_date, enc.providerid
      , factline.pcori_basecode dx
      , factline.dx_type dxtype,
 	CASE WHEN enc_type='AV' THEN 'FI' ELSE nvl(SUBSTR(dxsource,INSTR(dxsource,':')+1,2) ,'NI') END dx_source,
