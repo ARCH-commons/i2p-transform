@@ -181,6 +181,7 @@ select distinct cast(lab.LAB_RESULT_CM_ID as varchar(19)) LAB_RESULT_CM_ID
 , cast(null as varchar(50)) RAW_ORDER_DEPT
 , lab.RAW_FACILITY_CODE RAW_FACILITY_CODE
 , 'PC' as lab_loinc_source
+, 'OD' as lab_result_source
 from lab_result_w_source lab
 /
 
