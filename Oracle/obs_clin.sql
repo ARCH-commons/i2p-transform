@@ -16,7 +16,32 @@ where ceap.proc_name like '%ECHOCARDIOGRAM%';
 
 create sequence  obs_clin_seq cache 2000;
 
-create table pcornet_cdm.obs_clin as
+CREATE TABLE obs_clin(
+    OBSCLINID varchar(50) NOT NULL,
+    PATID varchar(50) NOT NULL,
+    ENCOUNTERID varchar(50) NULL,
+    OBSCLIN_PROVIDERID varchar(50) NULL,
+    OBSCLIN_DATE date NULL,
+    OBSCLIN_TIME varchar(5) NULL,
+    OBSCLIN_TYPE varchar(2) NULL,
+    OBSCLIN_CODE varchar(50) NULL,
+    OBSCLIN_RESULT_QUAL varchar(50) NULL,
+    OBSCLIN_RESULT_TEXT varchar(50) NULL,
+    OBSCLIN_RESULT_SNOMED varchar(50) NULL,
+    OBSCLIN_RESULT_NUM NUMBER(18, 0) NULL, -- (8,0)
+    OBSCLIN_RESULT_MODIFIER varchar(2) NULL,
+    OBSCLIN_RESULT_UNIT varchar(50) NULL,
+    RAW_OBSCLIN_NAME varchar(50) NULL,
+    RAW_OBSCLIN_CODE varchar(50) NULL,
+    RAW_OBSCLIN_TYPE varchar(50) NULL,
+    RAW_OBSCLIN_RESULT varchar(50) NULL,
+    RAW_OBSCLIN_MODIFIER varchar(50) NULL,
+    RAW_OBSCLIN_UNIT varchar(50) NULL
+);
+
+insert into obs_clin(obsclinid,patid,encounterid,obsclin_providerid,obsclin_date,obsclin_time,obsclin_type,obsclin_code,obsclin_result_qual,
+                    obsclin_result_text,obsclin_result_snomed,obsclin_result_num,obsclin_result_modifier,obsclin_result_unit,raw_obsclin_name,
+                    raw_obsclin_code,raw_obsclin_type,raw_obsclin_result,raw_obsclin_modifier,raw_obsclin_unit)
 select obs_clin_seq.nextval obsclinid
 , lab.patid
 ,lab.encounterid
@@ -53,3 +78,5 @@ update cdm_status
 set end_time = sysdate, records = (select count(*) from obs_clin)
 where task = 'obs_clin'
 /
+
+select records + 1 from cdm_status where task = 'obs_clin'
