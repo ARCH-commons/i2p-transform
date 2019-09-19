@@ -136,7 +136,7 @@ select en.*
 , sf.tval_char facility_type
 , sf.tval_char raw_facility_type
 from encounter_w_fac_id en
-left join &&i2b2_data_schema.supplemental_fact sf on en.instance_num = sf.instance_num and sf.source_column = 'FACILITY_TYPE'
+left join &&i2b2_data_schema.supplemental_fact sf on en.instance_num = sf.instance_num and sf.source_column = 'FACILITYTYPE'
 /
 
 create table encounter as
