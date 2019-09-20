@@ -38,6 +38,20 @@ PMN_DROPSQL('drop table encounter_w_fin');
 END;
 /
 
+BEGIN
+PMN_DROPSQL('drop table encounter_w_fac_zip');
+END;
+/
+
+BEGIN
+PMN_DROPSQL('drop table encounter_w_fac_id');
+END;
+/
+
+BEGIN
+PMN_DROPSQL('drop table encounter_w_fac_type');
+END;
+/
 create table drg as
 select * from
 (select patient_num,encounter_num,drg_type, drg,row_number() over (partition by  patient_num, encounter_num order by drg_type desc) AS rn from
@@ -118,6 +132,26 @@ left join &&i2b2_data_schema.supplemental_fact sf on en.instance_num = sf.instan
 left join payer_map pm on pm.payer_name = en.raw_payer_name_primary and (en.raw_payer_id_primary like 'O2|PAYER_PRIMARY:%'  and pm.financial_class = sf.tval_char)
       or(  pm.payer_name = en.raw_payer_name_primary and (en.raw_payer_id_primary like 'IDX|PAYER_PRIMARY:%'))
 /
+create table encounter_w_fac_zip as
+select en.*
+sf.tval_char facility_location
+from encounter_w_fin en
+left join &&i2b2_data_schema.supplemental_fact sf on en.instance_num = sf.instance_num and sf.source_column = 'FACILITY_ZIP'
+/
+create table encounter_w_fac_id as
+select en.*
+, sf.tval_char facilityid
+, sf.tval_char raw_facility_code
+from encounter_w_fac_zip en
+left join &&i2b2_data_schema.supplemental_fact sf on en.instance_num = sf.instance_num and sf.source_column = 'FACILITY_ID'
+/
+create table encounter_w_fac_type as
+select en.*
+, sf.tval_char facility_type
+, sf.tval_char raw_facility_type
+from encounter_w_fac_id en
+left join &&i2b2_data_schema.supplemental_fact sf on en.instance_num = sf.instance_num and sf.source_column = 'FACILITYTYPE'
+/
 
 create table encounter as
 select cast(patid as varchar(50)) PATID
@@ -127,9 +161,9 @@ select cast(patid as varchar(50)) PATID
 , en.discharge_date
 , to_char(en.discharge_date,'HH24:MI') DISCHARGE_TIME
 , en.providerid
-, cast('NI' as varchar(3)) FACILITY_LOCATION
+, en.FACILITY_LOCATION
 , en.enc_type
-, cast('NI' as varchar(50)) FACILITYID
+, en.FACILITYID
 , cast(en.discharge_disposition as varchar(2)) DISCHARGE_DISPOSITION
 , cast(en.discharge_status as varchar(2)) DISCHARGE_STATUS
 , en.drg
@@ -137,21 +171,22 @@ select cast(patid as varchar(50)) PATID
 , cast(en.admitting_source as varchar(2)) ADMITTING_SOURCE
 , cast(en.payer_type_primary as varchar(5)) PAYER_TYPE_PRIMARY
 , cast(null as varchar(5)) PAYER_TYPE_SECONDARY
-, cast('NI' as varchar(50)) FACILITY_TYPE
+, en.FACILITY_TYPE
 , cast(null as varchar(50)) RAW_SITEID
 , cast(null as varchar(50)) RAW_ENC_TYPE
 , cast(null as varchar(50)) RAW_DISCHARGE_DISPOSITION
 , cast(null as varchar(50)) RAW_DISCHARGE_STATUS
 , cast(null as varchar(50)) RAW_DRG_TYPE
 , cast(null as varchar(50)) RAW_ADMITTING_SOURCE
-, cast(null as varchar(50)) RAW_FACILITY_TYPE
+, en.RAW_FACILITY_TYPE
+, en.raw_facility_code
 , en.raw_payer_type_primary
 , en.raw_payer_name_primary
 , en.raw_payer_id_primary
 , cast(null as varchar(50)) RAW_PAYER_TYPE_SECONDARY
 , cast(null as varchar(50)) RAW_PAYER_NAME_SECONDARY
 , cast(null as varchar(50)) RAW_PAYER_ID_SECONDARY
-from encounter_w_fin en
+from encounter_w_fac_type en
 /
 
 create unique index encounter_pk on encounter (ENCOUNTERID)
