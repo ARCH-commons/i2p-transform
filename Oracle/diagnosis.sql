@@ -309,4 +309,4 @@ update cdm_status
 set end_time = sysdate, records = (select count(*) from diagnosis)
 where task = 'diagnosis'
 /
-select records from cdm_status where task = 'diagnosis'
+select records from cdm_status where task = 'diagnosis';
