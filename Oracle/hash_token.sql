@@ -28,4 +28,3 @@ update cdm_status
 set end_time = sysdate, records = (select count(*) from hash_token)
 where task = 'hash_token'
 /
-select records from cdm_status where task = 'hash_token';
