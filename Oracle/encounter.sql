@@ -38,6 +38,20 @@ PMN_DROPSQL('drop table encounter_w_fin');
 END;
 /
 
+BEGIN
+PMN_DROPSQL('drop table encounter_w_fac_zip');
+END;
+/
+
+BEGIN
+PMN_DROPSQL('drop table encounter_w_fac_id');
+END;
+/
+
+BEGIN
+PMN_DROPSQL('drop table encounter_w_fac_type');
+END;
+/
 create table drg as
 select * from
 (select patient_num,encounter_num,drg_type, drg,row_number() over (partition by  patient_num, encounter_num order by drg_type desc) AS rn from
