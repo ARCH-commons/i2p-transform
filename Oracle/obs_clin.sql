@@ -1,14 +1,14 @@
 insert into cdm_status (task, start_time) select 'obs_clin', sysdate from dual
 /
 BEGIN
-PMN_DROPSQL('DROP TABLE pcornet_cdm.obs_clin');
+PMN_DROPSQL('DROP TABLE obs_clin');
 END;
 /
 BEGIN
-PMN_DROPSQL('pcornet_cdm.cardiolabcomponents');
+PMN_DROPSQL('cardiolabcomponents');
 END;
 
-create table pcornet_cdm.cardiolabcomponents as
+create table cardiolabcomponents as
 select distinct cor.component_id,ceap.proc_name from clarity.order_results cor
 left join clarity.order_proc cop on cop.order_proc_id=cor.order_proc_id
 left join clarity.clarity_eap ceap on cop.proc_id=ceap.proc_id
@@ -62,11 +62,11 @@ select obs_clin_seq.nextval obsclinid
 ,lab.raw_result raw_obsclin_result
 ,'  ' raw_obsclin_modifier
 ,'  ' raw_obsclin_unit
-from pcornet_cdm.lab_result_cm lab
-left join pcornet_cdm.cardiolabcomponents card on substr(lab.raw_facility_code,18)=card.component_id; 
+from lab_result_cm lab
+left join cardiolabcomponents card on substr(lab.raw_facility_code,18)=card.component_id; 
 /
 
-create index obs_clin_idx on pcornet_cdm.obs_clin (PATID, ENCOUNTERID)
+create index obs_clin_idx on obs_clin (PATID, ENCOUNTERID)
 /
 
 BEGIN
