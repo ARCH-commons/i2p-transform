@@ -7,7 +7,7 @@ END;
 /
 
 create sequence  obs_gen_seq cache 2000;
-
+/
 CREATE TABLE obs_gen(
     OBSGENID varchar(50) NOT NULL,
     PATID varchar(50) NOT NULL,
@@ -30,15 +30,15 @@ CREATE TABLE obs_gen(
     RAW_OBSGEN_RESULT varchar(50) NULL,
     RAW_OBSGEN_UNIT varchar(50) NULL
 )
-
+/
 
 drop table pcornet_cdm.obsgen_naaccr;
-
+/
 create table pcornet_cdm.obsgen_naaccr as
 select patient_num, encounter_num,provider_id,start_date,tval_char,nval_num,substr(concept_cd, instr(concept_cd, '|') + 1,
                      instr(concept_cd, ':') - instr(concept_cd, '|') - 1) as code_value,concept_cd from &&i2b2_data_schema.observation_fact
                      where concept_cd like '%NAACCR%';
-                     
+/                     
 insert into obs_gen(obsgenid,patid,encounterid,obsgen_providerid,obsgen_date,obsgen_code,obsgen_result_text,
                     obsgen_result_num,obsgen_source,raw_obsgen_code)                     
 select
@@ -55,7 +55,7 @@ obs.concept_cd raw_obsgen_code
 from pcornet_cdm.obsgen_naaccr obs
 left join pcornet_cdm.loinc_naaccr lc on obs.code_value =lc.code_value
 ;
-
+/
 create index obs_gen_idx on obs_gen(PATID, ENCOUNTERID);
 /
 update cdm_status
