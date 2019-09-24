@@ -134,7 +134,7 @@ left join payer_map pm on pm.payer_name = en.raw_payer_name_primary and (en.raw_
 /
 create table encounter_w_fac_zip as
 select en.*
-sf.tval_char facility_location
+, sf.tval_char facility_location
 from encounter_w_fin en
 left join &&i2b2_data_schema.supplemental_fact sf on en.instance_num = sf.instance_num and sf.source_column = 'FACILITY_ZIP'
 /
