@@ -203,6 +203,7 @@ class patient_chunks_survey(SqlScriptTask):
             except DatabaseError:
                 return []
 
+
 # TODO: pcornet_init drops and recreates the cdm_status table, forcing all tasks to wait until init is done.
 # Moving this operation to a distinct task would allow some other tasks (e.g. mapping tasks) to proceed, while init
 # performs other labor intensive SQL operations.
@@ -285,13 +286,14 @@ class loadLabNormal(LoadCSV):
 
     def requires(self) -> List[luigi.Task]:
         return [pcornet_init()]
-    
+
+
 class loadLabRUnit(LoadCSV):
     taskName = 'LABRUNIT'
     csvname = 'curated_data/resultunit_manualcuration.csv'
 
     def requires(self) -> List[luigi.Task]:
-        return [pcornet_init()]  
+        return [pcornet_init()]
 
 
 class loadHarvestLocal(LoadCSV):

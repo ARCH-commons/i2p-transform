@@ -388,7 +388,7 @@ class CDMStatusTask(DBAccessTask):
 
             # If true, the task has not been logged in the CDM status table or has been logged and is in an
             # inconsistent state with the number of records set to null.
-            if statusTableRecordCount == None:
+            if statusTableRecordCount is None:
                 return False
 
             log.info('task %s has %d rows', self.taskName, statusTableRecordCount)
@@ -407,16 +407,19 @@ class CDMStatusTask(DBAccessTask):
         '''
         Updates the taskName entry in the CDM status table with an end time of now and a count of records.
         '''
-        statusTable = Table("cdm_status", MetaData(), Column('TASK'), Column('START_TIME'), Column('END_TIME'), Column('RECORDS'))
+        statusTable = Table("cdm_status", MetaData(),
+                            Column('TASK'), Column('START_TIME'), Column('END_TIME'), Column('RECORDS'))
 
         db = self._dbtarget().engine
-        db.execute(statusTable.update().where(statusTable.c.TASK == self.taskName), [{'END_TIME': datetime.now(), 'RECORDS': rowCount}])
+        db.execute(statusTable.update().where(statusTable.c.TASK == self.taskName),
+                   [{'END_TIME': datetime.now(), 'RECORDS': rowCount}])
 
     def setTaskStart(self) -> None:
         '''
         Adds taskName to the CDM status table with a start time of now.
         '''
-        statusTable = Table("cdm_status", MetaData(), Column('TASK'), Column('START_TIME'), Column('END_TIME'), Column('RECORDS'))
+        statusTable = Table("cdm_status", MetaData(),
+                            Column('TASK'), Column('START_TIME'), Column('END_TIME'), Column('RECORDS'))
 
         db = self._dbtarget().engine
         db.execute(statusTable.insert(), [{'TASK': self.taskName, 'START_TIME': datetime.now()}])
