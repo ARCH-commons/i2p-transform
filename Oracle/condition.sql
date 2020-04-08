@@ -1,7 +1,5 @@
 /** condition - create and populate the condition table.
 */
-insert into cdm_status (task, start_time) select 'condition', sysdate from dual
-/
 BEGIN
 PMN_DROPSQL('DROP TABLE condition');
 END;

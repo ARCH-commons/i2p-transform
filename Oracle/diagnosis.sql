@@ -1,7 +1,5 @@
 /** diagnosis - create and populate the diagnosis table.
 */
-insert into cdm_status (task, start_time) select 'diagnosis', sysdate from dual
-/
 BEGIN
 PMN_DROPSQL('DROP TABLE diagnosis');
 END;
@@ -309,4 +307,4 @@ update cdm_status
 set end_time = sysdate, records = (select count(*) from diagnosis)
 where task = 'diagnosis'
 /
-select records from cdm_status where task = 'diagnosis';
+select records from cdm_status where task = 'diagnosis'
