@@ -379,6 +379,9 @@ class CDMStatusTask(DBAccessTask):
     # Basic status check, assume the typical task produces at least one record.
     expectedRecords = IntParam(default=1)
 
+    statusTable = Table("cdm_status", MetaData(),
+                        Column('TASK'), Column('START_TIME'), Column('END_TIME'), Column('RECORDS'))
+
     def complete(self) -> bool:
         '''
         Complete when the CDM status table reports at least as many records as expected for the task.
@@ -407,22 +410,21 @@ class CDMStatusTask(DBAccessTask):
         '''
         Updates the taskName entry in the CDM status table with an end time of now and a count of records.
         '''
-        statusTable = Table("cdm_status", MetaData(),
-                            Column('TASK'), Column('START_TIME'), Column('END_TIME'), Column('RECORDS'))
-
+        st = self.statusTable
         db = self._dbtarget().engine
-        db.execute(statusTable.update().where(statusTable.c.TASK == self.taskName),
+        db.execute(st.update().where(st.c.TASK == self.taskName),
                    [{'END_TIME': datetime.now(), 'RECORDS': rowCount}])
 
     def setTaskStart(self) -> None:
         '''
         Adds taskName to the CDM status table with a start time of now.
         '''
-        statusTable = Table("cdm_status", MetaData(),
-                            Column('TASK'), Column('START_TIME'), Column('END_TIME'), Column('RECORDS'))
-
+        st = self.statusTable
         db = self._dbtarget().engine
-        db.execute(statusTable.insert(), [{'TASK': self.taskName, 'START_TIME': datetime.now()}])
+        # prune any failed attempt
+        db.execute(st.delete().where(sqla.and_(st.c.TASK == self.taskName,
+                                               st.c.END_TIME == None)))  # noqa
+        db.execute(st.insert(), [{'TASK': self.taskName, 'START_TIME': datetime.now()}])
 
 
 def log_plan(lc: LoggedConnection, event: str, params: Dict[str, Any],
