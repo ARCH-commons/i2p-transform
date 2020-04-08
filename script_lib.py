@@ -187,7 +187,7 @@ class SQLMixin(enum.Enum):
         if not m:
             return []
         name, ext = m.group(1).rsplit('.', 1)
-        choices = Script if ext == 'sql' else []
+        choices = list(Script) if ext == 'sql' else []
         deps = [cast(SQLMixin, s) for s in choices if s.name == name]
         if not deps:
             raise KeyError(name)

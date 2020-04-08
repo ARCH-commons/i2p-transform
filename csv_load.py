@@ -4,7 +4,7 @@ from etl_tasks import CDMStatusTask
 from param_val import StrParam
 from typing import Dict
 
-from sqlalchemy import MetaData, Table, Column  # type: ignore
+from sqlalchemy import MetaData, Table, Column
 from sqlalchemy.types import String  # type: ignore
 
 

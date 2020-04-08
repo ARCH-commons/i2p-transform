@@ -12,7 +12,7 @@ import csv
 import logging
 
 from luigi.contrib.sqla import SQLAlchemyTarget
-from sqlalchemy import text as sql_text, Column, func, MetaData, Table  # type: ignore
+from sqlalchemy import text as sql_text, Column, func, MetaData, Table
 from sqlalchemy.engine import Connection, Engine
 from sqlalchemy.engine.result import ResultProxy
 from sqlalchemy.engine.url import make_url
@@ -401,7 +401,7 @@ class CDMStatusTask(DBAccessTask):
         # This op is out of sync with the rest of the class, in that it assumes
         # the task must represent the creation of a table in the db.
         with self.connection() as q:
-            return q.scalar(sqla.select([func.count()]).select_from(self.taskName))
+            return q.scalar(sqla.select([func.count()]).select_from(self.taskName))  # type: ignore
 
     def setTaskEnd(self, rowCount: int) -> None:
         '''
@@ -447,7 +447,7 @@ def explain_plan(work: LoggedConnection, statement: SQL) -> List[str]:
     # https://docs.oracle.com/cd/B19306_01/server.102/b14211/ex_plan.htm
     plan = work.execute(
         'SELECT PLAN_TABLE_OUTPUT line FROM TABLE(DBMS_XPLAN.DISPLAY())')
-    return [row.line for row in plan]  # type: ignore  # sqla
+    return [row.line for row in plan]
 
 
 def maybe_ora_err(exc: Exception) -> Opt[Ora_Error]:
@@ -759,7 +759,7 @@ class ConnectionProblem(DatabaseError):
             raise ConnectionProblem.refine(exc, str(engine)) from None
 
     @classmethod
-    def refine(cls, exc: Exception, conn_label: str) -> Exception:
+    def refine(cls, exc: DatabaseError, conn_label: str) -> Exception:
         '''Recognize known connection problems.
 
         :returns: customized exception for known
