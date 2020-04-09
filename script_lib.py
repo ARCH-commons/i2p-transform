@@ -18,9 +18,8 @@ We can separate the script into statements::
     >>> statements = Script.med_admin.statements()
     >>> print(next(s for s in statements if 'insert' in s))
     ... #doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-    create or replace trigger med_admin_trg
-    before insert on med_admin
-    ...
+    /** ... */
+    insert into cdm_status (task, start_time) select 'med_admin', sysdate from dual
 
 A bit of sqlplus syntax is supported for ignoring errors in just part
 of a script:
@@ -37,7 +36,7 @@ signal that the script is complete:
 
     >>> print(statements[-1])
     ... #doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-    select 1 from cdm_status where status = 'med_admin'
+    select records from cdm_status where task = 'med_admin'
 
 The completion test may depend on a digest of the script and its dependencies:
 
@@ -188,7 +187,7 @@ class SQLMixin(enum.Enum):
         if not m:
             return []
         name, ext = m.group(1).rsplit('.', 1)
-        choices = Script if ext == 'sql' else []
+        choices = list(Script) if ext == 'sql' else []
         deps = [cast(SQLMixin, s) for s in choices if s.name == name]
         if not deps:
             raise KeyError(name)

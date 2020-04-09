@@ -337,11 +337,8 @@ class TIMESTAMP(_BASEVARTYPE): ...
 
 class Timestamp(date):
     hour = ... # type: Any
-    max = ... # type: Any
     microsecond = ... # type: Any
-    min = ... # type: Any
     minute = ... # type: Any
-    resolution = ... # type: Any
     second = ... # type: Any
     tzinfo = ... # type: Any
     def __init__(self, *args, **kwargs): ...

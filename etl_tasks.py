@@ -12,7 +12,7 @@ import csv
 import logging
 
 from luigi.contrib.sqla import SQLAlchemyTarget
-from sqlalchemy import text as sql_text, Column, func, MetaData, Table  # type: ignore
+from sqlalchemy import text as sql_text, Column, func, MetaData, Table
 from sqlalchemy.engine import Connection, Engine
 from sqlalchemy.engine.result import ResultProxy
 from sqlalchemy.engine.url import make_url
@@ -379,6 +379,9 @@ class CDMStatusTask(DBAccessTask):
     # Basic status check, assume the typical task produces at least one record.
     expectedRecords = IntParam(default=1)
 
+    statusTable = Table("cdm_status", MetaData(),
+                        Column('TASK'), Column('START_TIME'), Column('END_TIME'), Column('RECORDS'))
+
     def complete(self) -> bool:
         '''
         Complete when the CDM status table reports at least as many records as expected for the task.
@@ -388,7 +391,7 @@ class CDMStatusTask(DBAccessTask):
 
             # If true, the task has not been logged in the CDM status table or has been logged and is in an
             # inconsistent state with the number of records set to null.
-            if statusTableRecordCount == None:
+            if statusTableRecordCount is None:
                 return False
 
             log.info('task %s has %d rows', self.taskName, statusTableRecordCount)
@@ -401,25 +404,27 @@ class CDMStatusTask(DBAccessTask):
         # This op is out of sync with the rest of the class, in that it assumes
         # the task must represent the creation of a table in the db.
         with self.connection() as q:
-            return q.scalar(sqla.select([func.count()]).select_from(self.taskName))
+            return q.scalar(sqla.select([func.count()]).select_from(self.taskName))  # type: ignore
 
     def setTaskEnd(self, rowCount: int) -> None:
         '''
         Updates the taskName entry in the CDM status table with an end time of now and a count of records.
         '''
-        statusTable = Table("cdm_status", MetaData(), Column('TASK'), Column('START_TIME'), Column('END_TIME'), Column('RECORDS'))
-
+        st = self.statusTable
         db = self._dbtarget().engine
-        db.execute(statusTable.update().where(statusTable.c.TASK == self.taskName), [{'END_TIME': datetime.now(), 'RECORDS': rowCount}])
+        db.execute(st.update().where(st.c.TASK == self.taskName),
+                   [{'END_TIME': datetime.now(), 'RECORDS': rowCount}])
 
     def setTaskStart(self) -> None:
         '''
         Adds taskName to the CDM status table with a start time of now.
         '''
-        statusTable = Table("cdm_status", MetaData(), Column('TASK'), Column('START_TIME'), Column('END_TIME'), Column('RECORDS'))
-
+        st = self.statusTable
         db = self._dbtarget().engine
-        db.execute(statusTable.insert(), [{'TASK': self.taskName, 'START_TIME': datetime.now()}])
+        # prune any failed attempt
+        db.execute(st.delete().where(sqla.and_(st.c.TASK == self.taskName,
+                                               st.c.END_TIME == None)))  # noqa
+        db.execute(st.insert(), [{'TASK': self.taskName, 'START_TIME': datetime.now()}])
 
 
 def log_plan(lc: LoggedConnection, event: str, params: Dict[str, Any],
@@ -444,7 +449,7 @@ def explain_plan(work: LoggedConnection, statement: SQL) -> List[str]:
     # https://docs.oracle.com/cd/B19306_01/server.102/b14211/ex_plan.htm
     plan = work.execute(
         'SELECT PLAN_TABLE_OUTPUT line FROM TABLE(DBMS_XPLAN.DISPLAY())')
-    return [row.line for row in plan]  # type: ignore  # sqla
+    return [row.line for row in plan]
 
 
 def maybe_ora_err(exc: Exception) -> Opt[Ora_Error]:
@@ -756,7 +761,7 @@ class ConnectionProblem(DatabaseError):
             raise ConnectionProblem.refine(exc, str(engine)) from None
 
     @classmethod
-    def refine(cls, exc: Exception, conn_label: str) -> Exception:
+    def refine(cls, exc: DatabaseError, conn_label: str) -> Exception:
         '''Recognize known connection problems.
 
         :returns: customized exception for known

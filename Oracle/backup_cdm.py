@@ -9,7 +9,7 @@ from sys import stderr
 # Allow --dry run even without cx_Oracle
 try:
     from cx_Oracle import DatabaseError
-except:
+except ImportError:
     pass
 
 CDM_SPEC = '../2015-06-01-PCORnet-Common-Data-Model-v3dot0-parseable-fields.csv'  # noqa
@@ -60,7 +60,7 @@ def count_rows(cursor, schema_table):
         cursor.execute('select count(*) from %(schema_table)s' %
                        dict(schema_table=schema_table))
         ret = int(cursor.fetchall()[0][0])
-    except:
+    except:  # noqa
         pass
     return ret
 

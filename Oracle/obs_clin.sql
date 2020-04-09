@@ -1,20 +1,22 @@
-insert into cdm_status (task, start_time) select 'obs_clin', sysdate from dual
-/
 BEGIN
-PMN_DROPSQL('DROP TABLE obs_clin');
-END;
-/
-BEGIN
-PMN_DROPSQL('cardiolabcomponents');
+PMN_DROPSQL('drop table cardiolabcomponents');
 END;
 /
 create table cardiolabcomponents as
 select distinct cor.component_id,ceap.proc_name from clarity.order_results cor
 left join clarity.order_proc cop on cop.order_proc_id=cor.order_proc_id
 left join clarity.clarity_eap ceap on cop.proc_id=ceap.proc_id
-where ceap.proc_name like '%ECHOCARDIOGRAM%';
+where ceap.proc_name like '%ECHOCARDIOGRAM%'
 /
-create sequence  obs_clin_seq cache 2000;
+BEGIN
+PMN_DROPSQL('DROP SEQUENCE obs_clin_seq');
+END;
+/
+create sequence  obs_clin_seq cache 2000
+/
+BEGIN
+PMN_DROPSQL('DROP TABLE obs_clin');
+END;
 /
 CREATE TABLE obs_clin(
     OBSCLINID varchar(50) NOT NULL,
@@ -37,7 +39,7 @@ CREATE TABLE obs_clin(
     RAW_OBSCLIN_RESULT varchar(50) NULL,
     RAW_OBSCLIN_MODIFIER varchar(50) NULL,
     RAW_OBSCLIN_UNIT varchar(50) NULL
-);
+)
 /
 insert into obs_clin(obsclinid,patid,encounterid,obsclin_providerid,obsclin_date,obsclin_time,obsclin_type,obsclin_code,obsclin_result_qual,
                     obsclin_result_text,obsclin_result_snomed,obsclin_result_num,obsclin_result_modifier,obsclin_result_unit,raw_obsclin_name,
@@ -63,7 +65,7 @@ select obs_clin_seq.nextval obsclinid
 ,'  ' raw_obsclin_modifier
 ,'  ' raw_obsclin_unit
 from lab_result_cm lab
-left join cardiolabcomponents card on substr(lab.raw_facility_code,18)=card.component_id; 
+left join cardiolabcomponents card on substr(lab.raw_facility_code,18)=card.component_id
 /
 
 create index obs_clin_idx on obs_clin (PATID, ENCOUNTERID)

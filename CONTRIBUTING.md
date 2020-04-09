@@ -99,7 +99,7 @@ pass tests, style checks, and static type checking:
 
     $ nosetests && flake8 . && mypy .
 
-_tested with mypy-0.521_
+_tested with mypy-0.720_
 
 ### Checking in emacs
 

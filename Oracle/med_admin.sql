@@ -155,3 +155,4 @@ set end_time = sysdate, records = (select count(*) from med_admin)
 where task = 'med_admin'
 /
 select records from cdm_status where task = 'med_admin'
+/

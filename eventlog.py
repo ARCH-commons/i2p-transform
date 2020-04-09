@@ -111,7 +111,7 @@ class EventLogger(logging.LoggerAdapter):
         outcome = logging.INFO
         try:
             yield LogState(msgparts, argobj, extra)
-        except:
+        except:  # noqa
             outcome = logging.ERROR
             raise
         finally:
