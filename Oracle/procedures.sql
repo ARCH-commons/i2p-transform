@@ -1,5 +1,7 @@
 /** procedures - create and populate the procedures table.
 */
+insert into cdm_status (task, start_time) select 'prescribing', sysdate from dual
+/
 
 BEGIN
 PMN_DROPSQL('DROP TABLE procedures');
