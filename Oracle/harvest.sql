@@ -20,7 +20,7 @@ CREATE TABLE harvest(
 	ENR_END_DATE_MGMT varchar(2) NULL,
 	ADMIT_DATE_MGMT varchar(2) NULL,
 	DISCHARGE_DATE_MGMT varchar(2) NULL,
-    DX_DATE_MGMT varchar92) NULL,
+    DX_DATE_MGMT varchar(2) NULL,
 	PX_DATE_MGMT varchar(2) NULL,
 	RX_ORDER_DATE_MGMT varchar(2) NULL,
 	RX_START_DATE_MGMT varchar(2) NULL,
