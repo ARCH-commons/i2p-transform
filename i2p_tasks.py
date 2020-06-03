@@ -222,7 +222,7 @@ class pcornet_loader(I2PScriptTask):
     script = Script.pcornet_loader
 
     def requires(self) -> List[luigi.Task]:
-        return [harvest()]
+        return [pcornet_init(), harvest()]
 
 
 class pcornet_trial(I2PScriptTask):
