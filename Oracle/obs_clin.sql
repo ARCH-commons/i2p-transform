@@ -1,3 +1,5 @@
+insert into cdm_status (task, start_time) select 'obs_clin', sysdate from dual
+/
 BEGIN
 PMN_DROPSQL('drop table cardiolabcomponents');
 END;

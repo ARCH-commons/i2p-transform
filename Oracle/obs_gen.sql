@@ -1,5 +1,6 @@
 /* obs_gen - create the obs_gen table.*/
-
+insert into cdm_status (task, start_time) select 'obs_gen', sysdate from dual
+/
 BEGIN
 PMN_DROPSQL('drop sequence obs_gen_seq');
 END;
