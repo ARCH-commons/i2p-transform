@@ -20,7 +20,7 @@ CREATE TABLE harvest(
 	ENR_END_DATE_MGMT varchar(2) NULL,
 	ADMIT_DATE_MGMT varchar(2) NULL,
 	DISCHARGE_DATE_MGMT varchar(2) NULL,
-    DX_DATE_MGMT varchar92) NULL,
+    DX_DATE_MGMT varchar(2) NULL,
 	PX_DATE_MGMT varchar(2) NULL,
 	RX_ORDER_DATE_MGMT varchar(2) NULL,
 	RX_START_DATE_MGMT varchar(2) NULL,
@@ -80,8 +80,7 @@ INSERT INTO harvest(NETWORKID, NETWORK_NAME, DATAMARTID, DATAMART_NAME, DATAMART
     VX_ADMIN_DATE_MGMT,VX_EXP_DATE_MGMT,REFRESH_HASH_TOKEN_DATE, REFRESH_DEMOGRAPHIC_DATE, REFRESH_ENROLLMENT_DATE,
     REFRESH_ENCOUNTER_DATE, REFRESH_DIAGNOSIS_DATE, REFRESH_PROCEDURES_DATE, REFRESH_VITAL_DATE, REFRESH_DISPENSING_DATE,
     REFRESH_LAB_RESULT_CM_DATE, REFRESH_CONDITION_DATE, REFRESH_PRO_CM_DATE, REFRESH_PRESCRIBING_DATE, REFRESH_PCORNET_TRIAL_DATE,
-    REFRESH_DEATH_DATE, REFRESH_DEATH_CAUSE_DATE, REFRESH_MED_ADMIN_DATE, REFRESH_OBS_CLIN_DATE, REFRESH_PROVIDER_DATE, REFRESH_OBS_GEN_DATE,
-    REFRESH_HASH_TOKEN_DATE
+    REFRESH_DEATH_DATE, REFRESH_DEATH_CAUSE_DATE, REFRESH_MED_ADMIN_DATE, REFRESH_OBS_CLIN_DATE, REFRESH_PROVIDER_DATE, REFRESH_OBS_GEN_DATE
 )
 	select '&&network_id', '&&network_name', getDataMartID(), getDataMartName(), getDataMartPlatform(), 4.1, hl.DATAMART_CLAIMS, hl.DATAMART_EHR,
 	hl.BIRTH_DATE_MGMT, hl.ENR_START_DATE_MGMT, hl.ENR_END_DATE_MGMT, hl.ADMIT_DATE_MGMT, hl.DISCHARGE_DATE_MGMT, hl.DX_DATE_MGMT, hl.PX_DATE_MGMT,
@@ -89,6 +88,7 @@ INSERT INTO harvest(NETWORKID, NETWORK_NAME, DATAMARTID, DATAMART_NAME, DATAMART
 	hl.RESULT_DATE_MGMT, hl.MEASURE_DATE_MGMT, hl.ONSET_DATE_MGMT, hl.REPORT_DATE_MGMT, hl.RESOLVE_DATE_MGMT, hl.PRO_DATE_MGMT,
 	hl.DEATH_DATE_MGMT, hl.MEDADMIN_START_DATE_MGMT, hl.MEDADMIN_STOP_DATE_MGMT, hl.OBSCLIN_DATE_MGMT, hl.OBSGEN_DATE_MGMT,
     hl.ADDRESS_PERIOD_START_MGMT, hl.ADDRESS_PERIOD_END_MGMT, hl.VX_RECORD_DATE_MGMT, hl.VX_ADMIN_DATE_MGMT, hl.VX_EXP_DATE_MGMT,
+  case when (select records from cdm_status where task = 'hash_token') > 0 then current_date else null end REFRESH_HASH_TOKEN,
   case when (select records from cdm_status where task = 'demographic') > 0 then current_date else null end REFRESH_DEMOGRAPHIC_DATE,
   case when (select records from cdm_status where task = 'enrollment') > 0 then current_date else null end REFRESH_ENROLLMENT_DATE,
   case when (select records from cdm_status where task = 'encounter') > 0 then current_date else null end REFRESH_ENCOUNTER_DATE,
@@ -106,8 +106,7 @@ INSERT INTO harvest(NETWORKID, NETWORK_NAME, DATAMARTID, DATAMART_NAME, DATAMART
   case when (select records from cdm_status where task = 'med_admin') > 0 then current_date else null end REFRESH_MED_ADMIN_DATE,
   case when (select records from cdm_status where task = 'obs_clin') > 0 then current_date else null end REFRESH_OBS_CLIN_DATE,
   case when (select records from cdm_status where task = 'provider') > 0 then current_date else null end REFRESH_PROVIDER_DATE,
-  case when (select records from cdm_status where task = 'obs_gen') > 0 then current_date else null end REFRESH_OBS_GEN_DATE,
-  case when (select records from cdm_status where task = 'hash_token') > 0 then current_date else null end REFRESH_HASH_TOKEN
+  case when (select records from cdm_status where task = 'obs_gen') > 0 then current_date else null end REFRESH_OBS_GEN_DATE
 
   from harvest_local hl;
 

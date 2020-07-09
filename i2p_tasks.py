@@ -108,6 +108,15 @@ class harvest(I2PScriptTask):
                 prescribing(), pro_cm(), procedures(), provider(), vital()]
 
 
+class Covid19a(I2PScriptTask):
+    script = Script.harvest
+
+    def requires(self) -> List[luigi.Task]:
+        return [death(), death_cause(), diagnosis(), dispensing(), enrollment(),
+                lab_result_cm(), loadHarvestLocal(), med_admin(), pcornet_trial(),
+                prescribing(), pro_cm(), procedures(), provider(), vital()]
+
+
 class lab_result_cm(I2PScriptTask):
     script = Script.lab_result_cm
 

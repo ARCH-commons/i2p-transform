@@ -1,5 +1,7 @@
 /** diagnosis - create and populate the diagnosis table.
 */
+insert into cdm_status (task, start_time) select 'diagnosis', sysdate from dual
+/
 BEGIN
 PMN_DROPSQL('DROP TABLE diagnosis');
 END;
