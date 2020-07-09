@@ -20,7 +20,8 @@ CREATE TABLE dispensing(
 	RAW_NDC varchar (50) NULL,
 	RAW_DISPENSE_DOSE_DISP  varchar(50) NULL,
     RAW_DISPENSE_DOSE_DISP_UNIT varchar(50) NULL,
-    RAW_DISPENSE_ROUTE varchar(50) NULL
+    RAW_DISPENSE_ROUTE varchar(50) NULL,
+    DISPENSE_SOURCE varchar(2) NULL
 )
 /
 
@@ -104,6 +105,7 @@ insert into dispensing (
   ,RAW_DISPENSE_DOSE_DISP
   ,RAW_DISPENSE_DOSE_DISP_UNIT
   ,RAW_DISPENSE_ROUTE
+  ,DISPENSE_SOURCE
 )
 /* Below is the Cycle 2 fix for populating the DISPENSING table  */
 with disp_status as (
@@ -168,7 +170,8 @@ select distinct
   null raw_ndc,
   dd.dose raw_dispense_dose_disp,
   du.tval_char raw_dispense_dose_disp_unit,
-  dr.tval_char raw_dispense_route
+  dr.tval_char raw_dispense_route,
+  'PM' dispense_source
 from disp_status st
 left outer join disp_quantity qt
   on st.patient_num=qt.patient_num
