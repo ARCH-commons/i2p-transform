@@ -1,5 +1,6 @@
 /* obs_gen - create the obs_gen table.*/
-
+insert into cdm_status (task, start_time) select 'obs_gen', sysdate from dual
+/
 BEGIN
 PMN_DROPSQL('drop sequence obs_gen_seq');
 END;
@@ -30,7 +31,8 @@ CREATE TABLE obs_gen(
     RAW_OBSGEN_CODE varchar(50) NULL,
     RAW_OBSGEN_TYPE varchar(50) NULL,
     RAW_OBSGEN_RESULT varchar(50) NULL,
-    RAW_OBSGEN_UNIT varchar(50) NULL
+    RAW_OBSGEN_UNIT varchar(50) NULL,
+    OBSGEN_SOURCE varchar(2) NULL
 )
 /
 

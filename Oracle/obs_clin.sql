@@ -1,3 +1,5 @@
+insert into cdm_status (task, start_time) select 'obs_clin', sysdate from dual
+/
 BEGIN
 PMN_DROPSQL('drop table cardiolabcomponents');
 END;
@@ -33,7 +35,7 @@ CREATE TABLE obs_clin(
     OBSCLIN_RESULT_NUM NUMBER(18, 0) NULL, -- (8,0)
     OBSCLIN_RESULT_MODIFIER varchar(2) NULL,
     OBSCLIN_RESULT_UNIT varchar(50) NULL,
-    RAW_OBSCLIN_NAME varchar(50) NULL,
+    RAW_OBSCLIN_NAME varchar(250) NULL,
     RAW_OBSCLIN_CODE varchar(50) NULL,
     RAW_OBSCLIN_TYPE varchar(50) NULL,
     RAW_OBSCLIN_RESULT varchar(50) NULL,
