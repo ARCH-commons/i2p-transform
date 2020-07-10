@@ -1,5 +1,7 @@
 /** condition - create and populate the condition table.
 */
+insert into cdm_status (task, start_time) select 'condition', sysdate from dual
+/
 BEGIN
 PMN_DROPSQL('DROP TABLE condition');
 END;
@@ -87,7 +89,7 @@ and factline.encounter_num=sf.encounter_num
 and factline.provider_id=sf.provider_id
 and factline.concept_cd=sf.concept_Cd
 and factline.start_date=sf.start_Date
-where diag.c_fullname like '\PCORI\DIAGNOSIS\%'
+where diag.c_fullname like '\PCORI\DIAGNOSIS\%' and diag.pcori_basecode is not NULL
 and sf.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\CONDITION_SOURCE\%'
 group by factline.patient_num, diag.pcori_basecode, diag.c_fullname
 /*log errors into ERR$_CONDITION reject limit unlimited*/
