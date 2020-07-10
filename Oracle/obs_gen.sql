@@ -31,7 +31,8 @@ CREATE TABLE obs_gen(
     RAW_OBSGEN_CODE varchar(50) NULL,
     RAW_OBSGEN_TYPE varchar(50) NULL,
     RAW_OBSGEN_RESULT varchar(50) NULL,
-    RAW_OBSGEN_UNIT varchar(50) NULL
+    RAW_OBSGEN_UNIT varchar(50) NULL,
+    OBSGEN_SOURCE varchar(2) NULL
 )
 /
 
