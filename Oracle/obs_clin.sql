@@ -40,14 +40,12 @@ CREATE TABLE obs_clin(
     RAW_OBSCLIN_TYPE varchar(50) NULL,
     RAW_OBSCLIN_RESULT varchar(50) NULL,
     RAW_OBSCLIN_MODIFIER varchar(50) NULL,
-    RAW_OBSCLIN_UNIT varchar(50) NULL
+    RAW_OBSCLIN_UNIT varchar(50) NULL,
+    OBSCLIN_SOURCE varchar(5)
 )
 /
-insert into obs_clin(obsclinid,patid,encounterid,obsclin_providerid,obsclin_date,obsclin_time,obsclin_type,obsclin_code,obsclin_result_qual,
-                    obsclin_result_text,obsclin_result_snomed,obsclin_result_num,obsclin_result_modifier,obsclin_result_unit,raw_obsclin_name,
-                    raw_obsclin_code,raw_obsclin_type,raw_obsclin_result,raw_obsclin_modifier,raw_obsclin_unit)
-select obs_clin_seq.nextval obsclinid
-, lab.patid
+create table pcornet_cdm.obs_clin_all as
+select distinct lab.patid
 ,lab.encounterid
 ,'  ' obsclin_providerid
 ,lab.lab_order_date obsclin_date
@@ -66,10 +64,35 @@ select obs_clin_seq.nextval obsclinid
 ,lab.raw_result raw_obsclin_result
 ,'  ' raw_obsclin_modifier
 ,'  ' raw_obsclin_unit
-from lab_result_cm lab
-left join cardiolabcomponents card on substr(lab.raw_facility_code,18)=card.component_id
+from pcornet_cdm.lab_result_cm lab
+join pcornet_cdm.cardiolabcomponents card on substr(lab.raw_facility_code,18)=card.component_id
 /
-
+insert into obs_clin(obsclinid,patid,encounterid,obsclin_providerid,obsclin_date,obsclin_time,obsclin_type,obsclin_code,obsclin_result_qual,
+                    obsclin_result_text,obsclin_result_snomed,obsclin_result_num,obsclin_result_modifier,obsclin_result_unit,raw_obsclin_name,
+                    raw_obsclin_code,raw_obsclin_type,raw_obsclin_result,raw_obsclin_modifier,raw_obsclin_unit,obsclin_source)
+select obs_clin_seq.nextval obsclinid
+,patid
+,encounterid
+,obsclin_providerid
+,obsclin_date
+,obsclin_time
+,obsclin_type
+,obsclin_code
+,obsclin_result_qual
+,obsclin_result_text
+,obsclin_result_snomed
+,obsclin_result_num
+,obsclin_result_modifier
+,obsclin_result_unit
+,raw_obsclin_name
+,raw_obsclin_code
+,raw_obsclin_type
+,raw_obsclin_result
+,raw_obsclin_modifier
+,raw_obsclin_unit
+,'OD' obsclin_source
+from pcornet_cdm.obs_clin_all 
+/
 create index obs_clin_idx on obs_clin (PATID, ENCOUNTERID)
 /
 
