@@ -51,6 +51,10 @@ begin
   
   update pcornet_cdm.obs_clin lab
   set lab.obsclin_result_unit = (SELECT mc.ucum_code FROM pcornet_cdm.resultunit_manualcuration mc WHERE lab.obsclin_result_unit = mc.result_unit);
+  
+  update pcornet_cdm.obs_gen
+  set obsgen_type='LC'
+  where obsgen_code is not null;
 
   /* Remove rows from the PRESCRIBING table where RX_* fields are null
      TODO: Remove this when fixed in HERON

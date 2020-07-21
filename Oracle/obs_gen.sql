@@ -41,9 +41,13 @@ PMN_DROPSQL('drop table pcornet_cdm.obsgen_naaccr');
 END;
 /
 create table pcornet_cdm.obsgen_naaccr as
-select patient_num, encounter_num,provider_id,start_date,tval_char,nval_num,substr(concept_cd, instr(concept_cd, '|') + 1,
-                     instr(concept_cd, ':') - instr(concept_cd, '|') - 1) as code_value,concept_cd from &&i2b2_data_schema.observation_fact
-                     where concept_cd like '%NAACCR%'
+select naaccrfact.patient_num, naaccrfact.encounter_num,naaccrfact.provider_id,
+naaccrfact.start_date,naaccrfact.tval_char,naaccrfact.nval_num,
+substr(naaccrfact.concept_cd, instr(naaccrfact.concept_cd, '|') + 1,
+instr(naaccrfact.concept_cd, ':') - instr(naaccrfact.concept_cd, '|') - 1) as code_value,
+naaccrfact.concept_cd from &&i2b2_data_schema.observation_fact naaccrfact
+                     join pcornet_cdm.demographic dem on naaccrfact.patient_num=dem.patid
+                     where naaccrfact.concept_cd like '%NAACCR%'
 /
 
 insert into obs_gen(obsgenid,patid,encounterid,obsgen_providerid,obsgen_date,obsgen_code,obsgen_result_text,
