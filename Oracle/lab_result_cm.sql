@@ -183,6 +183,7 @@ select distinct cast(lab.LAB_RESULT_CM_ID as varchar(19)) LAB_RESULT_CM_ID
 , 'PC' as lab_loinc_source
 , 'OD' as lab_result_source
 from lab_result_w_source lab
+where LAB_LOINC is not null;
 /
 
 create index lab_result_cm_idx on lab_result_cm (PATID, ENCOUNTERID)
