@@ -4,9 +4,10 @@ BEGIN
 PMN_DROPSQL('drop table cardiolabcomponents');
 END;
 /
-create table cardiolabcomponents as
-select distinct cor.component_id,ceap.proc_name from clarity.order_results cor
+create table pcornet_cdm.cardiolabcomponents as
+select distinct cor.component_id,cc.name as componentname from clarity.order_results cor
 left join clarity.order_proc cop on cop.order_proc_id=cor.order_proc_id
+join clarity.clarity_component cc on cc.component_id=cor.component_id
 left join clarity.clarity_eap ceap on cop.proc_id=ceap.proc_id
 where ceap.proc_name like '%ECHOCARDIOGRAM%'
 /
@@ -15,6 +16,13 @@ PMN_DROPSQL('DROP SEQUENCE obs_clin_seq');
 END;
 /
 create sequence  obs_clin_seq cache 2000
+/
+create or replace trigger obsclin_trg
+before insert on obs_clin
+for each row
+begin
+  select obs_clin_seq.nextval into :new.OBSCLINID from dual;
+end;
 /
 BEGIN
 PMN_DROPSQL('DROP TABLE obs_clin');
@@ -58,7 +66,7 @@ select distinct lab.patid
 ,lab.result_num obsclin_result_num
 ,lab.result_modifier obsclin_result_modifier
 ,lab.result_unit obsclin_result_unit
-,card.proc_name raw_obsclin_name
+,card.componentname raw_obsclin_name
 ,'  ' raw_obsclin_code
 ,'  ' raw_obsclin_type
 ,lab.raw_result raw_obsclin_result
