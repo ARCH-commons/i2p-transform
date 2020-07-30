@@ -138,7 +138,9 @@ select distinct cast(lab.LAB_RESULT_CM_ID as varchar(19)) LAB_RESULT_CM_ID
 , cast(lab.PATID as varchar(50)) PATID
 , cast(lab.ENCOUNTERID as varchar(50)) ENCOUNTERID
 , lab.SPECIMEN_SOURCE
-, cast(nvl(lab.LAB_LOINC, 'NI') as varchar(10)) LAB_LOINC
+, lab.LAB_LOINC LAB_LOINC
+/*CDM 5.1-Do not populate the LOINC field with dummy codes. If the LOINC code for a result is
+unknown, leave blank.*/
 , 'NI' PRIORITY
 , 'NI' RESULT_LOC
 , cast(nvl(lab.LAB_LOINC, 'NI') as varchar(11)) LAB_PX
