@@ -28,6 +28,10 @@ BEGIN
 PMN_DROPSQL('DROP TABLE obs_clin');
 END;
 /
+BEGIN
+PMN_DROPSQL('DROP TABLE obs_clin_all');
+END;
+/
 CREATE TABLE obs_clin(
     OBSCLINID varchar(50) NOT NULL,
     PATID varchar(50) NOT NULL,
