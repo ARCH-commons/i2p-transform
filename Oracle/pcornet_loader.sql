@@ -27,6 +27,11 @@ begin
   update pcornet_cdm.prescribing
   set rx_providerid = null where
   rx_providerid = '@';
+  
+  merge into prescribing p
+  using pcornet_cdm.rxnorm_mapping e
+     on (p.raw_rxnorm_cui = e.raw_rxnorm_cui)
+  when matched then update set p.rxnorm_cui = e.rxnorm_cui;
 
   /* Currently in HERON, we have height in cm and weight in oz (from visit vitals).
   The CDM wants height in inches and weight in pounds. */
@@ -52,6 +57,10 @@ begin
   update pcornet_cdm.obs_clin lab
   set lab.obsclin_result_unit = (SELECT mc.ucum_code FROM pcornet_cdm.resultunit_manualcuration mc WHERE lab.obsclin_result_unit = mc.result_unit);
   
+  update pcornet_cdm.obs_clin lab
+  set lab.obsclin_code=null
+  where obsclin_type='NI';
+  
   update pcornet_cdm.obs_gen
   set obsgen_type='LC'
   where obsgen_code is not null;
@@ -72,6 +81,19 @@ begin
   delete from dispensing
   where ndc in ('00000000000', '99999999999') or length(ndc)<11 or ndc like '00NDL%' or ndc like '00SYR%'
   ;
+
+ alter table pcornet_cdm.encounter
+ modify facility_location varchar2(5);
+ 
+ alter table pcornet_cdm.lab_loinc
+ modify lab_loinc varchar2(10);
+ 
+ update pcornet_cdm.diagnosis
+ set pdx='NI'
+ where pdx='1';
+ 
+ delete from pcornet_cdm.death
+ where patid not in(select patid from pcornet_cdm.demographic);
 
 end PCORNetPostProc;
 /
