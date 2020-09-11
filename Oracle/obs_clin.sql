@@ -53,7 +53,7 @@ CREATE TABLE obs_clin(
     RAW_OBSCLIN_RESULT varchar(50) NULL,
     RAW_OBSCLIN_MODIFIER varchar(50) NULL,
     RAW_OBSCLIN_UNIT varchar(50) NULL,
-    OBSCLIN_SOURCE varchar(5)
+    OBSCLIN_SOURCE varchar(2)
 )
 /
 create table pcornet_cdm.obs_clin_all as

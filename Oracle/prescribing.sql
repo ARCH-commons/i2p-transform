@@ -281,7 +281,7 @@ select rx.prescribingid
 , rx.rx_prn_flag
 , rx.rx_route
 , decode(rx.modifier_cd, 'MedObs:Inpatient', '01', 'MedObs:Outpatient', '02') rx_basis
-, rx.rxnorm_cui
+, cast(rx.rxnorm_cui as varchar2(8)) as rxnorm_cui
 , 'OD' rx_source
 , rx.rx_dispense_as_written
 , rx.raw_rx_med_name
