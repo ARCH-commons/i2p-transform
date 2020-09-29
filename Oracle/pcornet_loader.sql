@@ -85,7 +85,7 @@ begin
  EXECUTE IMMEDIATE 'alter table pcornet_cdm.encounter
  modify facility_location varchar2(5)';
  
- EXECUTE IMMEDIATE 'alter table pcornet_cdm.lab_loinc
+ EXECUTE IMMEDIATE 'alter table pcornet_cdm.lab_result_cm
  modify lab_loinc varchar2(10)';
  
  update pcornet_cdm.diagnosis
