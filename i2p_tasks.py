@@ -135,7 +135,7 @@ class obs_clin(I2PScriptTask):
     script = Script.obs_clin
 
     def requires(self) -> List[luigi.Task]:
-        return [pcornet_init()]
+        return [lab_result_cm(), pcornet_init()]
 
 
 class obs_gen(I2PScriptTask):
