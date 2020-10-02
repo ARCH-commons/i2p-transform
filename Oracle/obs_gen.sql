@@ -48,6 +48,7 @@ instr(naaccrfact.concept_cd, ':') - instr(naaccrfact.concept_cd, '|') - 1) as co
 naaccrfact.concept_cd from &&i2b2_data_schema.observation_fact naaccrfact
                      join pcornet_cdm.demographic dem on naaccrfact.patient_num=dem.patid
                      where naaccrfact.concept_cd like '%NAACCR%'
+                     and naaccrfact.start_date <= sysdate and naaccrfact.start_date >= date '1800-01-01'; -- hospital was founded in 1906 
 /
 
 insert into obs_gen(obsgenid,patid,encounterid,obsgen_providerid,obsgen_date,obsgen_code,obsgen_result_text,
