@@ -75,6 +75,22 @@ begin
     and rx_frequency is null
     and rx_refills is null
   ;
+  
+   /* Remove ICD-9 rows from the procedures table that don't follow CDM specifications
+   ICD-9-CM (09): 3-4 numbers, including a decimal
+   */
+    delete 
+    from procedures
+    where PX_type = '09'
+    and  not regexp_like(px, '[.?0-9-]{3,4}'); 
+
+    /* Remove ICD-10 rows from the procedures table that don't follow CDM specifications
+   ICD-10-CM (09): 7 alphanumeric characters
+   */
+    delete 
+    from procedures
+    where PX_type = '10'
+    and not regexp_like(px, '[A-Za-z0-9-]{7}') ; 
 
   /* Removed bad NDC code which make their way in from the source system
      (i.e 00000000000 and 99999999999) */
