@@ -62,7 +62,7 @@ select distinct lab.patid
 ,'  ' obsclin_providerid
 ,lab.lab_order_date obsclin_date
 ,lab.result_time obsclin_time
-,lab.lab_px_type obsclin_type
+, case when lab.lab_px != 'NI' then lab.lab_px_type else 'OT' end obsclin_type
 ,lab.lab_px obsclin_code
 ,lab.result_qual obsclin_result_qual
 ,'  ' obsclin_result_text
