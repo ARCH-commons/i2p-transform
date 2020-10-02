@@ -57,7 +57,7 @@ select
 obs_gen_seq.nextval obsgenid,
 obs.patient_num patid,
 obs.encounter_num encounterid,
-obs.provider_id obsgen_providerid,
+case when obs.provider_id = '@' then NULL else obs.provider_id end obsgen_providerid,
 obs.start_date obsgen_date,
 lc.loinc_num obsgen_code,
 obs.tval_char obsgen_result_text,
