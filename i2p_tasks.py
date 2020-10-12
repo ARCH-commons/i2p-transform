@@ -142,7 +142,7 @@ class obs_gen(I2PScriptTask):
     script = Script.obs_gen
 
     def requires(self) -> List[luigi.Task]:
-        return [demographic(), pcornet_init()]
+        return [encounter(), demographic(), pcornet_init()]
 
 
 class I2PPatientGroupTask(I2PScriptTask):
