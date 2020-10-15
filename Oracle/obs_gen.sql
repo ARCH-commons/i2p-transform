@@ -56,7 +56,7 @@ insert into obs_gen(obsgenid,patid,encounterid,obsgen_providerid,obsgen_date,obs
 select
 obs_gen_seq.nextval obsgenid,
 obs.patient_num patid,
-obs.encounter_num encounterid,
+case when obs.encounter_num not in (select  encounterid from pcornet_cdm.encounter) then NULL else obs.encounter_num end encounterid,
 case when obs.provider_id = '@' then NULL else obs.provider_id end obsgen_providerid,
 obs.start_date obsgen_date,
 lc.loinc_num obsgen_code,
