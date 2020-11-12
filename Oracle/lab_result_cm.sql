@@ -63,12 +63,13 @@ select lab_result_cm_seq.nextval LAB_RESULT_CM_ID
 , end_date RESULT_DATE
 , nval_num RESULT_NUM
 , tval_char RESULT_MODIFIER
-, units_cd RESULT_UNIT
+, nvl(mc.ucum_code, 'NI') as RESULT_UNIT
 , valueflag_cd ABN_IND
 , valtype_cd RAW_RESULT
 , concept_cd RAW_FACILITY_CODE
 from &&i2b2_data_schema.observation_fact m
 join encounter enc on enc.patid = m.patient_num and enc.encounterid = m.encounter_Num
+left join pcornet_cdm.resultunit_manualcuration mc on m.units_cd = mc.result_unit
 where concept_cd between 'KUH|COMPONENT_ID:' and 'KUH|COMPONENT_ID:~'
 and modifier_cd in ('@')  -- exclude analyitics: Labs|Aggregate:Median, ...
 and m.valtype_cd in ('N','T')
@@ -154,12 +155,7 @@ unknown, leave blank.*/
 , cast(null as varchar(50)) RESULT_SNOMED
 , case when lab.RAW_RESULT = 'N' then lab.RESULT_NUM else null end RESULT_NUM
 , case when lab.RAW_RESULT = 'N' then (case nvl(nullif(lab.RESULT_MODIFIER, ''),'NI') when 'E' then 'EQ' when 'NE' then 'OT' when 'L' then 'LT' when 'LE' then 'LE' when 'G' then 'GT' when 'GE' then 'GE' else 'NI' end)  else 'TX' end RESULT_MODIFIER
-, case
-  when instr(lab.RESULT_UNIT, '%') > 0 then 'PERCENT'
-  when lab.RESULT_UNIT is null then nvl(lab.RESULT_UNIT, 'NI')
-  when length(lab.RESULT_UNIT) > 11 then substr(lab.RESULT_UNIT, 1, 11)
-  else trim(replace(upper(lab.RESULT_UNIT), '(CALC)', ''))
-  end RESULT_UNIT
+, RESULT_UNIT
 , cast(lab.NORM_RANGE_LOW as varchar(10)) NORM_RANGE_LOW
 , case
   when lab.NORM_RANGE_LOW is not null and lab.NORM_RANGE_HIGH is not null then 'EQ'
