@@ -94,12 +94,6 @@ begin
   delete from dispensing
   where ndc in ('00000000000', '99999999999') or length(ndc)<11 or ndc like '00NDL%' or ndc like '00SYR%'
   ;
-
- EXECUTE IMMEDIATE 'alter table pcornet_cdm.encounter
- modify facility_location varchar2(5)';
- 
- EXECUTE IMMEDIATE 'alter table pcornet_cdm.lab_result_cm
- modify lab_loinc varchar2(10)';
  
  update pcornet_cdm.diagnosis
  set pdx='NI'

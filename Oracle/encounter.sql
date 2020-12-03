@@ -161,7 +161,7 @@ select cast(patid as varchar(50)) PATID
 , en.discharge_date
 , to_char(en.discharge_date,'HH24:MI') DISCHARGE_TIME
 , en.providerid
-, en.FACILITY_LOCATION
+, cast(en.FACILITY_LOCATION as varchar2(5)) FACILITY_LOCATION
 , en.enc_type
 , en.FACILITYID
 , cast(en.discharge_disposition as varchar(2)) DISCHARGE_DISPOSITION
