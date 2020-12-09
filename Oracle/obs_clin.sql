@@ -102,7 +102,7 @@ select obs_clin_seq.nextval obsclinid
 ,raw_obsclin_result
 ,raw_obsclin_modifier
 ,raw_obsclin_unit
-,'OD' obsclin_source
+,'HC' obsclin_source
 from pcornet_cdm.obs_clin_all 
 /
 create index obs_clin_idx on obs_clin (PATID, ENCOUNTERID)
