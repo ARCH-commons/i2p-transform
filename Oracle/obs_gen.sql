@@ -16,7 +16,7 @@ CREATE TABLE obs_gen(
     PATID varchar(50) NOT NULL,
     ENCOUNTERID varchar(50) NULL,
     OBSGEN_PROVIDERID varchar(50) NULL,
-    OBSGEN_DATE date NULL,
+    OBSGEN_START_DATE date NULL,
     OBSGEN_TIME varchar(5) NULL,
     OBSGEN_TYPE varchar(30) NULL,
     OBSGEN_CODE varchar(50) NULL,
