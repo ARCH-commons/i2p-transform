@@ -20,7 +20,6 @@ CREATE TABLE provider(
 
 create or replace procedure PCORNetProvider as
 begin
-
 PMN_DROPSQL('drop index provider_idx');
 
 execute immediate 'truncate table provider';
@@ -35,7 +34,7 @@ select pd.provider_id
   , pd.provider_npi
   , case when pd.provider_npi is not null then 'Y' else 'N' end as provider_npi_flag
   , substr(sp.descriptive_text, 1, 50)
-  from &&i2b2_data_schema.provider_dimension pd
+  from "&&i2b2_data_schema".provider_dimension pd
   left join provider_specialty_map sm on sm.npi = pd.provider_npi
   left join provider_specialty_code sp on sm.specialty = sp.code;
 

@@ -124,8 +124,8 @@ execute immediate 'truncate table pdxfact';
 execute immediate 'truncate table originfact';
 execute immediate 'truncate table poafact';
 
-insert into sourcefact
-	select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode dxsource, dxsource.c_fullname
+INSERT /*+ APPEND */ into sourcefact
+	select /*+ parallel(6) */ distinct patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode dxsource, dxsource.c_fullname
 	from i2b2fact factline
     inner join encounter enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num
     inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode
@@ -134,8 +134,8 @@ insert into sourcefact
 execute immediate 'create index sourcefact_idx on sourcefact (patient_num, encounter_num, provider_id, concept_cd, start_date)';
 GATHER_TABLE_STATS('SOURCEFACT');
 
-insert into pdxfact
-	select distinct patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode pdxsource,dxsource.c_fullname
+INSERT /*+ APPEND */ into pdxfact
+	select  /*+ parallel(6) */ distinct patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode pdxsource,dxsource.c_fullname
 	from i2b2fact factline
     inner join encounter enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num
     inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode
@@ -144,8 +144,8 @@ insert into pdxfact
 execute immediate 'create index pdxfact_idx on pdxfact (patient_num, encounter_num, provider_id, concept_cd, start_date)';
 GATHER_TABLE_STATS('PDXFACT');
 
-insert into originfact --CDM 3.1 addition
-	select patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode originsource, dxsource.c_fullname
+INSERT /*+ APPEND */ into originfact --CDM 3.1 addition
+	select  /*+ parallel(6) */ patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode originsource, dxsource.c_fullname
 	from i2b2fact factline
     inner join ENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num
     inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode
@@ -154,8 +154,8 @@ insert into originfact --CDM 3.1 addition
 execute immediate 'create index originfact_idx on originfact (patient_num, encounter_num, provider_id, concept_cd, start_date)';
 GATHER_TABLE_STATS('ORIGINFACT');
 
-insert into poafact
-	select patient_num, encounter_num, provider_id, concept_cd, start_date, 'Y' poasource, 'Yes' rawpoasource, dxsource.c_fullname
+INSERT /*+ APPEND */ into poafact
+	select  /*+ parallel(6) */ patient_num, encounter_num, provider_id, concept_cd, start_date, 'Y' poasource, 'Yes' rawpoasource, dxsource.c_fullname
 	from i2b2fact factline
     inner join ENCOUNTER enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num
     inner join pcornet_diag dxsource on factline.modifier_cd = dxsource.c_basecode
@@ -173,12 +173,12 @@ insert into poafact
 	end poasource,
 	sf.tval_char rawpoasource, '@'
 	from i2b2fact factline
-	join &&i2b2_data_schema.supplemental_fact sf on factline.instance_num = sf.instance_num and sf.source_column = 'POA_ALT';
+	join "&&i2b2_data_schema".supplemental_fact sf on factline.instance_num = sf.instance_num and sf.source_column = 'POA_ALT';
 
 execute immediate 'create index poafact_idx on poafact (patient_num, encounter_num, provider_id, concept_cd, start_date)';
 GATHER_TABLE_STATS('POAFACT');
 
-insert into diagnosis (patid, encounterid, enc_type, admit_date, dx_date, providerid, dx, dx_type, dx_source, dx_origin, pdx, dx_poa, raw_dx_poa)
+INSERT /*+ APPEND */ into diagnosis (patid, encounterid, enc_type, admit_date, dx_date, providerid, dx, dx_type, dx_source, dx_origin, pdx, dx_poa, raw_dx_poa)
 /* KUMC started billing with ICD10 on Oct 1, 2015. */
 with icd10_transition as (
   select date '2015-10-01' as cutoff from dual
@@ -253,7 +253,7 @@ with icd10_transition as (
  select * from diag_fact_merge where unique_row = 1
 )
 
-select distinct factline.patient_num, factline.encounter_num encounterid, enc_type, enc.admit_date, factline.start_date, enc.providerid
+select  /*+ parallel(6) */ distinct factline.patient_num, factline.encounter_num encounterid, enc_type, enc.admit_date, factline.start_date, enc.providerid
      , factline.pcori_basecode dx
      , factline.dx_type dxtype,
 	CASE WHEN enc_type='AV' THEN 'FI' ELSE nvl(SUBSTR(dxsource,INSTR(dxsource,':')+1,2) ,'NI') END dx_source,
