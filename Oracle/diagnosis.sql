@@ -109,6 +109,109 @@ CREATE TABLE POAFACT  (
 	)
 /
 
+----------------------------------------------------------------------------------------
+-- reducing the size of obsfact so join can be speed up.
+----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
+-- sourcefact_obsfact
+----------------------------------------------------------------------------------------
+
+BEGIN
+PMN_DROPSQL('DROP TABLE sourcefact_obsfact');
+PMN_DROPSQL('DROP index sfact_obsfact_modifier_cd');
+PMN_DROPSQL('DROP index sfact_obsfact_encounter_num');
+PMN_DROPSQL('DROP index sfact_obsfact_patient_num');
+END;
+/
+
+create table sourcefact_obsfact
+nologging
+parallel 6
+as
+select *
+from i2b2fact factline
+where factline.modifier_cd in
+(
+select distinct c_basecode from pcornet_diag dxsource where dxsource.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\%'
+)
+/
+
+CREATE BITMAP INDEX sfact_obsfact_modifier_cd ON sourcefact_obsfact (modifier_cd ASC)
+/
+CREATE BITMAP INDEX sfact_obsfact_encounter_num ON sourcefact_obsfact (encounter_Num ASC)
+/
+CREATE BITMAP INDEX sfact_obsfact_patient_num ON sourcefact_obsfact (patient_num ASC)
+/
+
+commit
+/
+
+----------------------------------------------------------------------------------------
+-- pdxfact_obsfact
+----------------------------------------------------------------------------------------
+BEGIN
+PMN_DROPSQL('DROP TABLE pdxfact_obsfact');
+PMN_DROPSQL('DROP index pdxfact_obsfact_modifier_cd');
+PMN_DROPSQL('DROP index pdxfact_obsfact_encounter_Num');
+PMN_DROPSQL('DROP index pdxfact_obsfact_patient_num');
+END;
+/
+
+create table pdxfact_obsfact
+nologging
+parallel 6
+as
+select *
+from i2b2fact factline
+where factline.modifier_cd in
+(
+select distinct c_basecode from pcornet_diag dxsource where dxsource.c_fullname like '\PCORI_MOD\PDX\%'
+)
+/
+
+CREATE BITMAP INDEX pdxfact_obsfact_modifier_cd ON pdxfact_obsfact (modifier_cd ASC)
+/
+CREATE BITMAP INDEX pdxfact_obsfact_encounter_Num ON pdxfact_obsfact (encounter_Num ASC)
+/
+CREATE BITMAP INDEX pdxfact_obsfact_patient_num ON pdxfact_obsfact (patient_num ASC)
+/
+
+commit
+/
+----------------------------------------------------------------------------------------
+-- originfact_obsfact
+----------------------------------------------------------------------------------------
+BEGIN
+PMN_DROPSQL('DROP TABLE originfact_obsfact');
+PMN_DROPSQL('DROP index ofact_obsfact_modifier_cd');
+PMN_DROPSQL('DROP index ofact_obsfact_encounter_Num');
+PMN_DROPSQL('DROP index ofact_obsfact_patient_num');
+END;
+/
+
+create table originfact_obsfact
+nologging
+parallel 6
+as
+select *
+from i2b2fact factline
+where factline.modifier_cd in
+(
+select distinct c_basecode from pcornet_diag dxsource where dxsource.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\%'
+)
+/
+
+CREATE BITMAP INDEX ofact_obsfact_modifier_cd ON originfact_obsfact (modifier_cd ASC)
+/
+CREATE BITMAP INDEX ofact_obsfact_encounter_Num ON originfact_obsfact (encounter_Num ASC)
+/
+CREATE BITMAP INDEX ofact_obsfact_patient_num ON originfact_obsfact (patient_num ASC)
+/
+
+commit
+/
+
 create or replace procedure PCORNetDiagnosis as
 begin
 
@@ -126,7 +229,7 @@ execute immediate 'truncate table poafact';
 
 INSERT /*+ APPEND */ into sourcefact
 	select /*+ parallel(6) */ distinct patient_num, encounter_num, provider_id, concept_cd, start_date, dxsource.pcori_basecode dxsource, dxsource.c_fullname
-	from i2b2fact factline
+	from sourcefact_obsfact factline
     inner join encounter enc on enc.patid = factline.patient_num and enc.encounterid = factline.encounter_Num
     inner join pcornet_diag dxsource on factline.modifier_cd =dxsource.c_basecode
 	where dxsource.c_fullname like '\PCORI_MOD\CONDITION_OR_DX\%';

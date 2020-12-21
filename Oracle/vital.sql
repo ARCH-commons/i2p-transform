@@ -33,6 +33,8 @@ CREATE TABLE vital (
 	Raw_TOBACCO_TYPE varchar (50)
 )
 /
+alter table vital nologging
+/
 
 BEGIN
 PMN_DROPSQL('DROP SEQUENCE vital_seq');
@@ -48,6 +50,47 @@ begin
   select vital_seq.nextval into :new.VITALID from dual;
 end;
 /
+
+BEGIN
+PMN_DROPSQL('DROP table i2b2fact_vital');
+PMN_DROPSQL('drop index I2B2FACT_VITAL_PAT');
+END;
+/
+create table i2b2fact_vital
+nologging parallel 
+as
+select
+  obs.patient_num patid, obs.encounter_num encounterid,
+  to_char(obs.start_Date,'YYYY-MM-DD') measure_date,
+  to_char(obs.start_Date,'HH24:MI') measure_time,
+  nval_num, pcori_basecode, codes.pcori_code
+from i2b2fact obs
+inner join (
+            select c_basecode concept_cd, c_fullname pcori_code, pcori_basecode
+              from (
+                select '\PCORI\VITAL\BP\DIASTOLIC\' concept_path  FROM DUAL
+                union all
+                select '\PCORI\VITAL\BP\SYSTOLIC\' concept_path  FROM DUAL
+                union all
+                select '\PCORI\VITAL\HT\' concept_path FROM DUAL
+                union all
+                select '\PCORI\VITAL\WT\' concept_path FROM DUAL
+                union all
+                select '\PCORI\VITAL\ORIGINAL_BMI\' concept_path FROM DUAL
+                union all
+                select '\PCORI_MOD\BP_POSITION\' concept_path FROM DUAL
+                union all
+                select '\PCORI_MOD\VITAL_SOURCE\' concept_path FROM DUAL
+                union all
+                select '\PCORI\VITAL\TOBACCO\' concept_path FROM DUAL
+                ) bp, pcornet_vital pm
+              where pm.c_fullname like bp.concept_path || '%'
+          ) codes
+                on codes.concept_cd = obs.concept_cd
+/
+
+CREATE BITMAP INDEX I2B2FACT_VITAL_PAT ON I2B2FACT_VITAL (PATID)
+/
 create or replace procedure PCORNetVital as
 begin
 
@@ -56,7 +99,7 @@ PMN_DROPSQL('drop index vital_idx');
 execute immediate 'truncate table vital';
 
 -- jgk: I took out admit_date - it doesn't appear in the scheme. Now in SQLServer format - date, substring, name on inner select, no nested with. Added modifiers and now use only pathnames, not codes.
-insert into vital(patid, encounterid, measure_date, measure_time,vital_source,ht, wt, diastolic, systolic, original_bmi, bp_position,smoking,tobacco,tobacco_type)
+INSERT /*+ APPEND */ into vital(patid, encounterid, measure_date, measure_time,vital_source,ht, wt, diastolic, systolic, original_bmi, bp_position,smoking,tobacco,tobacco_type)
 select patid, encounterid, to_date(measure_date,'rrrr-mm-dd') measure_date, measure_time,vital_source,ht, wt, diastolic, systolic, original_bmi, bp_position,smoking,tobacco,
 case when tobacco in ('02','03','04') then -- no tobacco
     case when smoking in ('03','04') then '04' -- no smoking
@@ -88,32 +131,7 @@ from (
     , enc.admit_date
   from demographic pd
   left join (
-    select
-      obs.patient_num patid, obs.encounter_num encounterid,
-	to_char(obs.start_Date,'YYYY-MM-DD') measure_date,
-	to_char(obs.start_Date,'HH24:MI') measure_time,
-      nval_num, pcori_basecode, codes.pcori_code
-    from i2b2fact obs
-    inner join (select c_basecode concept_cd, c_fullname pcori_code, pcori_basecode
-      from (
-        select '\PCORI\VITAL\BP\DIASTOLIC\' concept_path  FROM DUAL
-        union all
-        select '\PCORI\VITAL\BP\SYSTOLIC\' concept_path  FROM DUAL
-        union all
-        select '\PCORI\VITAL\HT\' concept_path FROM DUAL
-        union all
-        select '\PCORI\VITAL\WT\' concept_path FROM DUAL
-        union all
-        select '\PCORI\VITAL\ORIGINAL_BMI\' concept_path FROM DUAL
-        union all
-        select '\PCORI_MOD\BP_POSITION\' concept_path FROM DUAL
-        union all
-        select '\PCORI_MOD\VITAL_SOURCE\' concept_path FROM DUAL
-        union all
-        select '\PCORI\VITAL\TOBACCO\' concept_path FROM DUAL
-        ) bp, pcornet_vital pm
-      where pm.c_fullname like bp.concept_path || '%'
-      ) codes on codes.concept_cd = obs.concept_cd
+    select patid,encounterid, measure_date, measure_time,nval_num, pcori_basecode, pcori_code from i2b2fact_vital
     ) vit on vit.patid = pd.patid
   join encounter enc on enc.encounterid = vit.encounterid
   ) x
