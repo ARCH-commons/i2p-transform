@@ -28,6 +28,7 @@ class I2PConfig(luigi.Config):
     min_visit_date_dd_mon_rrrr = StrParam(description='see client.cfg')
     network_id = StrParam(description='see client.cfg')
     network_name = StrParam(description='see client.cfg')
+    token_encryption_key = StrParam(description='see client.cfg')
 
 
 class I2PScriptTask(SqlScriptTask):
@@ -40,7 +41,8 @@ class I2PScriptTask(SqlScriptTask):
                     min_visit_date_dd_mon_rrrr=I2PConfig().min_visit_date_dd_mon_rrrr,
                     i2b2_meta_schema=I2PConfig().i2b2_meta_schema,
                     enrollment_months_back=I2PConfig().enrollment_months_back, network_id=I2PConfig().network_id,
-                    network_name=I2PConfig().network_name, i2b2_etl_schema=I2PConfig().i2b2_etl_schema)
+                    network_name=I2PConfig().network_name, i2b2_etl_schema=I2PConfig().i2b2_etl_schema,
+                    token_encryption_key=I2PConfig().token_encryption_key)
 
 
 class condition(I2PScriptTask):
