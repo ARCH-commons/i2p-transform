@@ -301,6 +301,10 @@ data sasdata.OBS_CLIN / view=sasdata.OBS_CLIN;
     OBSCLIN_TIME = input(_OBSCLIN_TIME, hhmmss.);
 	format OBSCLIN_TIME hhmm.;
 	drop _OBSCLIN_TIME;
+
+    OBSCLIN_STOP_DATE = datepart(OBSCLIN_STOP_DATE);
+    format OBSCLIN_STOP_DATE mmddyy10.;
+
 run;
 
 
@@ -321,6 +325,10 @@ data sasdata.OBS_GEN / view=sasdata.OBS_GEN;
     OBSGEN_TIME = input(_OBSGEN_TIME, hhmmss.);
 	format OBSGEN_TIME hhmm.;
 	drop _OBSGEN_TIME;
+
+	OBSGEN_STOP_DATE = datepart(OBSGEN_STOP_DATE);
+    format OBSGEN_STOP_DATE mmddyy10.;
+	
 run;
 
 
