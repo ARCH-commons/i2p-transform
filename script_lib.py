@@ -260,7 +260,8 @@ class Script(ScriptMixin, enum.Enum):
         pro_cm,
         procedures,
         provider,
-        vital
+        vital,
+        lab_history
     ] = [
         pkg.resource_string(__name__,
                             'Oracle/' + fname).decode('utf-8')
@@ -289,7 +290,8 @@ class Script(ScriptMixin, enum.Enum):
                 'pro_cm.sql',
                 'procedures.sql',
                 'provider.sql',
-                'vital.sql'
+                'vital.sql',
+                'lab_history.sql'
         ]
     ]
 

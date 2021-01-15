@@ -107,7 +107,7 @@ class harvest(I2PScriptTask):
     def requires(self) -> List[luigi.Task]:
         return [condition(), death(), death_cause(), diagnosis(), dispensing(), enrollment(),
                 lab_result_cm(), loadHarvestLocal(), med_admin(), obs_clin(), obs_gen(), pcornet_trial(),
-                prescribing(), pro_cm(), procedures(), provider(), vital()]
+                prescribing(), pro_cm(), procedures(), provider(), vital(), lab_history()]
 
 
 class Covid19a(I2PScriptTask):
@@ -116,7 +116,7 @@ class Covid19a(I2PScriptTask):
     def requires(self) -> List[luigi.Task]:
         return [death(), death_cause(), diagnosis(), dispensing(), enrollment(),
                 lab_result_cm(), loadHarvestLocal(), med_admin(), pcornet_trial(),
-                prescribing(), pro_cm(), procedures(), provider(), vital()]
+                prescribing(), pro_cm(), procedures(), provider(), vital(), lab_history()]
 
 
 class lab_result_cm(I2PScriptTask):
@@ -146,7 +146,13 @@ class obs_gen(I2PScriptTask):
     def requires(self) -> List[luigi.Task]:
         return [encounter(), demographic(), pcornet_init()]
 
+class lab_history(I2PScriptTask):
+    script = Script.lab_history
 
+    def requires(self) -> List[luigi.Task]:
+        return [lab_result_cm(), pcornet_init()]
+        
+        
 class I2PPatientGroupTask(I2PScriptTask):
     patient_num_first = IntParam()
     patient_num_last = IntParam()
