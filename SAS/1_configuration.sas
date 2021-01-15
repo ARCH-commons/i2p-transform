@@ -19,9 +19,9 @@
 ***************************************************************;
 * Oracle database connection information
 ***************************************************************;
-libname oracdata oracle schema=ORC_SCHEMA user=ORC_USERNAME pw=ORC_PASSWORD 
-  path="(DESCRIPTION = 
-    (ADDRESS = 
+libname oracdata oracle user=ORC_USERNAME pw="ORC_PASSWORD"
+path="(DESCRIPTION =
+    (ADDRESS =
       (PROTOCOL = TCP)
       (HOST = ORC_HOSTNAME)
       (PORT = 1521)

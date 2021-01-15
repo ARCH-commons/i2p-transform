@@ -28,6 +28,7 @@ class I2PConfig(luigi.Config):
     min_visit_date_dd_mon_rrrr = StrParam(description='see client.cfg')
     network_id = StrParam(description='see client.cfg')
     network_name = StrParam(description='see client.cfg')
+    token_encryption_key = StrParam(description='see client.cfg')
 
 
 class I2PScriptTask(SqlScriptTask):
@@ -40,7 +41,8 @@ class I2PScriptTask(SqlScriptTask):
                     min_visit_date_dd_mon_rrrr=I2PConfig().min_visit_date_dd_mon_rrrr,
                     i2b2_meta_schema=I2PConfig().i2b2_meta_schema,
                     enrollment_months_back=I2PConfig().enrollment_months_back, network_id=I2PConfig().network_id,
-                    network_name=I2PConfig().network_name, i2b2_etl_schema=I2PConfig().i2b2_etl_schema)
+                    network_name=I2PConfig().network_name, i2b2_etl_schema=I2PConfig().i2b2_etl_schema,
+                    token_encryption_key=I2PConfig().token_encryption_key)
 
 
 class condition(I2PScriptTask):
@@ -105,7 +107,7 @@ class harvest(I2PScriptTask):
     def requires(self) -> List[luigi.Task]:
         return [condition(), death(), death_cause(), diagnosis(), dispensing(), enrollment(),
                 lab_result_cm(), loadHarvestLocal(), med_admin(), obs_clin(), obs_gen(), pcornet_trial(),
-                prescribing(), pro_cm(), procedures(), provider(), vital()]
+                prescribing(), pro_cm(), procedures(), provider(), vital(), lab_history()]
 
 
 class Covid19a(I2PScriptTask):
@@ -114,7 +116,7 @@ class Covid19a(I2PScriptTask):
     def requires(self) -> List[luigi.Task]:
         return [death(), death_cause(), diagnosis(), dispensing(), enrollment(),
                 lab_result_cm(), loadHarvestLocal(), med_admin(), pcornet_trial(),
-                prescribing(), pro_cm(), procedures(), provider(), vital()]
+                prescribing(), pro_cm(), procedures(), provider(), vital(), lab_history()]
 
 
 class lab_result_cm(I2PScriptTask):
@@ -144,7 +146,13 @@ class obs_gen(I2PScriptTask):
     def requires(self) -> List[luigi.Task]:
         return [encounter(), demographic(), pcornet_init()]
 
+class lab_history(I2PScriptTask):
+    script = Script.lab_history
 
+    def requires(self) -> List[luigi.Task]:
+        return [lab_result_cm(), pcornet_init()]
+        
+        
 class I2PPatientGroupTask(I2PScriptTask):
     patient_num_first = IntParam()
     patient_num_last = IntParam()

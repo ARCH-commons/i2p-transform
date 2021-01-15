@@ -12,13 +12,15 @@ ODS HTML;
 
 
 ***************************************************************;
-* Include configurable SAS libraies
+* Include configurable SAS libraries
 ***************************************************************;
 %let fpath=%sysget(SAS_EXECFILEPATH);
 %let fname=%sysget(SAS_EXECFILENAME);
 %let path= %sysfunc(tranwrd(&fpath,&fname,''));
 %put &path;
-%include '&path/configuration.sas';
+%include '&path/1_configuration.sas';
+
+%include 'FILE_TO_PATH/dsv';
 
 
 ***************************************************************;
@@ -92,6 +94,10 @@ data sasdata.DIAGNOSIS / view=sasdata.DIAGNOSIS;
 
 	ADMIT_DATE = datepart(ADMIT_DATE);
     format ADMIT_DATE mmddyy10.;
+
+	DX_DATE = datepart(DX_DATE);
+    format DX_DATE mmddyy10.;
+
 run;
 
 
@@ -271,6 +277,136 @@ run;
 
 
 ***************************************************************;
+* Create data step view for PROVIDER
+***************************************************************;
+data sasdata.PROVIDER / view=sasdata.PROVIDER;
+	set oracdata.PROVIDER;
+run;
+
+
+***************************************************************;
+* Create data step view for OBS_CLIN
+***************************************************************;
+data sasdata.OBS_CLIN / view=sasdata.OBS_CLIN;
+	set oracdata.OBS_CLIN(
+	    rename = (
+	        OBSCLIN_TIME = _OBSCLIN_TIME
+	    )
+	)
+	;
+
+	OBSCLIN_DATE = datepart(OBSCLIN_DATE);
+    format OBSCLIN_DATE mmddyy10.;
+
+    OBSCLIN_TIME = input(_OBSCLIN_TIME, hhmmss.);
+	format OBSCLIN_TIME hhmm.;
+	drop _OBSCLIN_TIME;
+
+    OBSCLIN_STOP_DATE = datepart(OBSCLIN_STOP_DATE);
+    format OBSCLIN_STOP_DATE mmddyy10.;
+
+run;
+
+
+***************************************************************;
+* Create data step view for OBS_GEN
+***************************************************************;
+data sasdata.OBS_GEN / view=sasdata.OBS_GEN;
+	set oracdata.OBS_GEN(
+	    rename = (
+	        OBSGEN_TIME = _OBSGEN_TIME
+	    )
+	)
+	;
+
+	OBSGEN_DATE = datepart(OBSGEN_DATE);
+    format OBSGEN_DATE mmddyy10.;
+
+    OBSGEN_TIME = input(_OBSGEN_TIME, hhmmss.);
+	format OBSGEN_TIME hhmm.;
+	drop _OBSGEN_TIME;
+
+	OBSGEN_STOP_DATE = datepart(OBSGEN_STOP_DATE);
+    format OBSGEN_STOP_DATE mmddyy10.;
+	
+run;
+
+
+***************************************************************;
+* Create data step view for MED_ADMIN
+***************************************************************;
+data sasdata.MED_ADMIN / view=sasdata.MED_ADMIN;
+	set oracdata.MED_ADMIN(
+		rename = (
+			MEDADMIN_START_TIME = _MEDADMIN_START_TIME
+			MEDADMIN_STOP_TIME = _MEDADMIN_STOP_TIME
+		)
+	)
+	;
+
+	MEDADMIN_START_DATE = datepart(MEDADMIN_START_DATE);
+    format MEDADMIN_START_DATE mmddyy10.;
+
+	MEDADMIN_START_TIME = input(_MEDADMIN_START_TIME, hhmmss.);
+	format MEDADMIN_START_TIME hhmm.;
+	drop _MEDADMIN_START_TIME;
+
+	MEDADMIN_STOP_DATE = datepart(MEDADMIN_STOP_DATE);
+    format MEDADMIN_STOP_DATE mmddyy10.;
+
+	MEDADMIN_STOP_TIME = input(_MEDADMIN_STOP_TIME, hhmmss.);
+	format MEDADMIN_STOP_TIME hhmm.;
+	drop _MEDADMIN_STOP_TIME;
+run;
+
+
+***************************************************************;
+* Create data step view for HASH_TOKEN
+***************************************************************;
+data sasdata.HASH_TOKEN / view=sasdata.HASH_TOKEN;
+	set oracdata.HASH_TOKEN;
+run;
+
+***************************************************************;
+* Create data step view for LDS_ADDRESS_HISTORY
+***************************************************************;
+data sasdata.LDS_ADDRESS_HISTORY / view=sasdata.LDS_ADDRESS_HISTORY
+;
+	set oracdata.LDS_ADDRESS_HISTORY
+	;
+
+	ADDRESS_PERIOD_START = datepart(ADDRESS_PERIOD_START);
+    format ADDRESS_PERIOD_START mmddyy10.;
+
+	ADDRESS_PERIOD_END = datepart(ADDRESS_PERIOD_END);
+    format ADDRESS_PERIOD_END mmddyy10.;
+
+
+
+run;
+
+***************************************************************;
+* Create data step view for IMMUNIZATION
+***************************************************************;
+data sasdata.IMMUNIZATION / view=sasdata.IMMUNIZATION
+;
+	set oracdata.IMMUNIZATION
+	;
+
+	VX_RECORD_DATE = datepart(VX_RECORD_DATE);
+    format VX_RECORD_DATE mmddyy10.;
+
+	VX_ADMIN_DATE= datepart(VX_ADMIN_DATE);
+    format VX_ADMIN_DATE mmddyy10.;
+
+	VX_EXP_DATE = datepart(VX_RECORD_DATE);
+    format VX_RECORD_DATE mmddyy10.;
+
+
+
+run;
+
+***************************************************************;
 * Create data step view for HARVEST
 ***************************************************************;
 data sasdata.HARVEST / view=sasdata.HARVEST;
@@ -317,4 +453,26 @@ data sasdata.HARVEST / view=sasdata.HARVEST;
 
 	REFRESH_DEATH_CAUSE_DATE = datepart(REFRESH_DEATH_CAUSE_DATE);
     format REFRESH_DEATH_CAUSE_DATE mmddyy10.;
+
+    REFRESH_MED_ADMIN_DATE = datepart(REFRESH_MED_ADMIN_DATE);
+    format REFRESH_MED_ADMIN_DATE mmddyy10.;
+
+	REFRESH_OBS_CLIN_DATE = datepart(REFRESH_OBS_CLIN_DATE);
+    format REFRESH_OBS_CLIN_DATE mmddyy10.;
+
+	REFRESH_PROVIDER_DATE = datepart(REFRESH_PROVIDER_DATE);
+    format REFRESH_PROVIDER_DATE mmddyy10.;
+
+	REFRESH_OBS_GEN_DATE = datepart(REFRESH_OBS_GEN_DATE);
+    format REFRESH_OBS_GEN_DATE mmddyy10.;
+
+	REFRESH_HASH_TOKEN_DATE = datepart(REFRESH_HASH_TOKEN_DATE);
+    format REFRESH_HASH_TOKEN_DATE mmddyy10.;
+
+	REFRESH_IMMUNIZATION_DATE = datepart(REFRESH_IMMUNIZATION_DATE);
+    format REFRESH_IMMUNIZATION_DATE mmddyy10.;
+
+	REFRESH_LDS_ADDRESS_HX_DATE = datepart(REFRESH_LDS_ADDRESS_HX_DATE);
+    format REFRESH_LDS_ADDRESS_HX_DATE mmddyy10.;
+
 run;
