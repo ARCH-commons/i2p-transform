@@ -1,18 +1,6 @@
 insert into cdm_status (task, start_time) select 'lab_history', sysdate from dual
 /
-BEGIN
-PMN_DROPSQL('DROP SEQUENCE lab_history_seq');
-END;
-/
-create sequence  lab_history_seq cache 2000
-/
-create or replace trigger lab_history_trg
-before insert on lab_history
-for each row
-begin
-  select lab_history_seq.nextval into :new.LABHISTORYID from dual;
-end;
-/
+
 BEGIN
 PMN_DROPSQL('DROP TABLE lab_history');
 END;
@@ -41,9 +29,26 @@ CREATE TABLE lab_history(
 BEGIN
 GATHER_TABLE_STATS('LAB_HISTORY');
 END;
-/                  
+/
+
+BEGIN
+PMN_DROPSQL('DROP SEQUENCE lab_history_seq');
+END;
+/
+create sequence  lab_history_seq cache 2000
+/
+create or replace trigger lab_history_trg
+before insert on lab_history
+for each row
+begin
+  select lab_history_seq.nextval into :new.LABHISTORYID from dual;
+end;
+/
+
 update cdm_status
 set end_time = sysdate, records = (select count(*) from lab_history)
 where task = 'lab_history'
 /
-
+select records + 1 from cdm_status 
+where task = 'lab_history' and records is not NULL
+/
