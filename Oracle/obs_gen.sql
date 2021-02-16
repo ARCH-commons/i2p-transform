@@ -54,9 +54,9 @@ naaccrfact.concept_cd from &&i2b2_data_schema.observation_fact naaccrfact
                      and naaccrfact.start_date <= sysdate and naaccrfact.start_date >= date '1800-01-01' -- hospital was founded in 1906 
 /
 
-insert into obs_gen(obsgenid,patid,encounterid,obsgen_providerid,obsgen_start_date,obsgen_code,obsgen_result_text,
+insert /*+ APPEND */  into obs_gen(obsgenid,patid,encounterid,obsgen_providerid,obsgen_start_date,obsgen_code,obsgen_result_text,
                     obsgen_result_num,obsgen_source,raw_obsgen_code)                     
-select
+select /*+ parallel(6) */
 obs_gen_seq.nextval obsgenid,
 obs.patient_num patid,
 case when obs.encounter_num not in (select  encounterid from pcornet_cdm.encounter) then NULL else obs.encounter_num end encounterid,
