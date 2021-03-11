@@ -90,7 +90,7 @@ left join drg on drg.patient_num = en.patid and drg.encounter_num = en.encounter
 
 create table encounter_w_type as
 select en.*
-, nvl(SUBSTR(pcori_basecode, INSTR(pcori_basecode, ':') + 1, 2), 'UN') ENC_TYPE
+, case when pcori_basecode is null and inout_cd ='TH' then 'TH' else nvl(SUBSTR(pcori_basecode, INSTR(pcori_basecode, ':') + 1, 2), 'UN') end ENC_TYPE 
 , case when SUBSTR(pcori_basecode, INSTR(pcori_basecode, ':') + 1, 2) = 'AV' then 'NI' else raw_discharge_disposition end DISCHARGE_DISPOSITION
 , case when SUBSTR(pcori_basecode, INSTR(pcori_basecode, ':') + 1, 2) = 'AV' then 'NI' else raw_discharge_status end DISCHARGE_STATUS
 from encounter_w_drg en
