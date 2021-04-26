@@ -13,10 +13,17 @@ except ImportError:
     pass
 
 CDM_SPEC = '../2015-06-01-PCORnet-Common-Data-Model-v3dot0-parseable-fields.csv'  # noqa
+KUMC_ADDON_SPEC = 'backup_kumc_specific_tables.csv'
 
-CDM3_TABLES = sorted(set(f['TABLE_NAME']
-                         for f in csv.DictReader(
-                                 pkg.resource_stream(__name__, CDM_SPEC))))
+CDM3_TABLES = set(f['TABLE_NAME']
+                  for f in csv.DictReader(
+                                 pkg.resource_stream(__name__, CDM_SPEC)))
+
+KUMC_ADDON_TABLES = set(f['TABLE_NAME']
+                        for f in csv.DictReader(
+                                 pkg.resource_stream(__name__, KUMC_ADDON_SPEC)))
+
+CDM3_TABLES = sorted(CDM3_TABLES.union(KUMC_ADDON_TABLES))
 
 
 def main(get_cursor):

@@ -43,15 +43,39 @@ BEGIN
 PMN_DROPSQL('drop table pcornet_cdm.obsgen_naaccr');
 END;
 /
-create table pcornet_cdm.obsgen_naaccr as
+create table pcornet_cdm.obsgen_naaccr
+nologging parallel
+as
 select naaccrfact.patient_num, naaccrfact.encounter_num,naaccrfact.provider_id,
 naaccrfact.start_date,naaccrfact.tval_char,naaccrfact.nval_num,
 substr(naaccrfact.concept_cd, instr(naaccrfact.concept_cd, '|') + 1,
-instr(naaccrfact.concept_cd, ':') - instr(naaccrfact.concept_cd, '|') - 1) as code_value,
+to_number(instr(naaccrfact.concept_cd, ':') - instr(naaccrfact.concept_cd, '|') - 1)) as code_value,
 naaccrfact.concept_cd from &&i2b2_data_schema.observation_fact naaccrfact
                      join pcornet_cdm.demographic dem on naaccrfact.patient_num=dem.patid
                      where naaccrfact.concept_cd like '%NAACCR%'
                      and naaccrfact.start_date <= sysdate and naaccrfact.start_date >= date '1800-01-01' -- hospital was founded in 1906 
+/
+
+BEGIN
+PMN_DROPSQL('drop index PCORNET_CDM.IX_OBSGEN_NAACCR_CD');
+END;
+/
+BEGIN
+PMN_DROPSQL('drop index PCORNET_CDM.IX_OBSGEN_NAACCR_ENC');
+END;
+/
+BEGIN
+PMN_DROPSQL('drop index PCORNET_CDM.IX_LOINC_NAACCR_CD');
+END;
+/
+
+alter table obs_gen nologging
+/
+CREATE BITMAP INDEX PCORNET_CDM.IX_OBSGEN_NAACCR_CD ON PCORNET_CDM.OBSGEN_NAACCR (CODE_VALUE ASC) parallel nologging
+/
+CREATE BITMAP INDEX PCORNET_CDM.IX_OBSGEN_NAACCR_ENC ON PCORNET_CDM.OBSGEN_NAACCR (ENCOUNTER_NUM ASC) parallel nologging
+/
+CREATE BITMAP INDEX PCORNET_CDM.IX_LOINC_NAACCR_CD ON PCORNET_CDM.LOINC_NAACCR (CODE_VALUE ASC) parallel nologging
 /
 
 insert /*+ APPEND */  into obs_gen(obsgenid,patid,encounterid,obsgen_providerid,obsgen_start_date,obsgen_code,obsgen_result_text,
@@ -59,7 +83,8 @@ insert /*+ APPEND */  into obs_gen(obsgenid,patid,encounterid,obsgen_providerid,
 select /*+ parallel(6) */
 obs_gen_seq.nextval obsgenid,
 obs.patient_num patid,
-case when obs.encounter_num not in (select  encounterid from pcornet_cdm.encounter) then NULL else obs.encounter_num end encounterid,
+--case when obs.encounter_num not in (select  encounterid from pcornet_cdm.encounter) then NULL else obs.encounter_num end encounterid,
+enc.encounterid,
 case when obs.provider_id = '@' then NULL else obs.provider_id end obsgen_providerid,
 obs.start_date obsgen_start_date,
 lc.loinc_num obsgen_code,
@@ -69,6 +94,7 @@ obs.nval_num obsgen_result_num,
 obs.concept_cd raw_obsgen_code
 from pcornet_cdm.obsgen_naaccr obs
 left join pcornet_cdm.loinc_naaccr lc on obs.code_value =lc.code_value
+left join pcornet_cdm.encounter enc on  obs.encounter_num= enc.encounterid
 /
 create index obs_gen_idx on obs_gen(PATID, ENCOUNTERID)
 /
