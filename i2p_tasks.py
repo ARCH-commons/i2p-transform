@@ -52,6 +52,12 @@ class condition(I2PScriptTask):
         return [encounter()]
 
 
+class lds_address_history(I2PScriptTask):
+    script = Script.lds_address_history
+
+    def requires(self) -> List[luigi.Task]:
+        return [demographic()]
+
 class death(I2PScriptTask):
     script = Script.death
 
@@ -107,7 +113,7 @@ class harvest(I2PScriptTask):
     def requires(self) -> List[luigi.Task]:
         return [condition(), death(), death_cause(), diagnosis(), dispensing(), enrollment(),
                 lab_result_cm(), loadHarvestLocal(), med_admin(), obs_clin(), obs_gen(), pcornet_trial(),
-                prescribing(), pro_cm(), procedures(), provider(), vital(), lab_history()]
+                prescribing(), pro_cm(), procedures(), provider(), vital(), lab_history(), lds_address_history()]
 
 
 class Covid19a(I2PScriptTask):
@@ -116,7 +122,7 @@ class Covid19a(I2PScriptTask):
     def requires(self) -> List[luigi.Task]:
         return [death(), death_cause(), diagnosis(), dispensing(), enrollment(),
                 lab_result_cm(), loadHarvestLocal(), med_admin(), pcornet_trial(),
-                prescribing(), pro_cm(), procedures(), provider(), vital(), lab_history()]
+                prescribing(), pro_cm(), procedures(), provider(), vital(), lab_history(), lds_address_history()]
 
 
 class lab_result_cm(I2PScriptTask):
