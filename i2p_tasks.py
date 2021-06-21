@@ -129,7 +129,7 @@ class lab_result_cm(I2PScriptTask):
     script = Script.lab_result_cm
 
     def requires(self) -> List[luigi.Task]:
-        return [encounter(), loadLabNormal(), loadSpecimenSourceMap()]
+        return [encounter(), loadLabNormal(), loadSpecimenSourceMap(),loadCodesPotentialPpi()]
 
 
 class med_admin(I2PScriptTask):
@@ -363,6 +363,14 @@ class loadUnitMap(LoadCSV):
     # unit_map.csv matches values in the CDM spec's _unit spreadsheet
     # to unit values from Epic's zc_med_unit table.
     csvname = 'curated_data/unit_map.csv'
+
+    def requires(self) -> List[luigi.Task]:
+        return [pcornet_init()]
+
+
+class loadCodesPotentialPpi(LoadCSV):
+    taskName = 'CODES_POTENTIAL_PPI'
+    csvname = 'curated_data/codes_potential_ppi.csv'
 
     def requires(self) -> List[luigi.Task]:
         return [pcornet_init()]
