@@ -181,6 +181,7 @@ unknown, leave blank.*/
 , 'PC' as lab_loinc_source
 , 'OD' as lab_result_source
 from lab_result_w_source lab
+where lab.LAB_LOINC not in (select LOINC from codes_potential_ppi)
 /
 
 create index lab_result_cm_idx on lab_result_cm (PATID, ENCOUNTERID)
