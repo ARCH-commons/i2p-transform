@@ -1,4 +1,4 @@
-﻿LOINC,LongName,Component,Property,Timing,System,Scale,Method,exUCUMunits,exUnits,Lforms,Rank,SIRank,Class,ShortName,DisplayName,Type,OrderObs,Copyright
+LOINC,LongName,Component,Property,Timing,System,Scale,Method,exUCUMunits,exUnits,Lforms,Rank,SIRank,Class,ShortName,DisplayName,Type,OrderObs,Copyright
 11294-6,Current employment Narrative - Reported,Current employment,Find,Pt,^Patient,Nar,Reported,,,,,,ADMIN.PATIENT.DEMOG,Current employment Reported,,Clinical,, 
 11295-3,Current employment - Reported,Current employment,Find,Pt,^Patient,Nom,Reported,,,,,,ADMIN.PATIENT.DEMOG,Current employment Reported,,Clinical,, 
 11296-1,ED clinical finding practitioner identifier,ED clinical finding practitioner ID,ID,Pt,Provider,Nom,,,,,,,ADMIN.ID,ED clin find pract ID,,Clinical,, 
