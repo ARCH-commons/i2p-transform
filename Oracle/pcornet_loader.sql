@@ -99,6 +99,14 @@ begin
  set pdx='NI'
  where pdx='1';
  
+ update pcornet_cdm.lds_address_history
+ set address_zip5= null
+ where not regexp_like (address_zip5, '\d{5}');
+ 
+ update pcornet_cdm.lds_address_history
+ set address_zip9= null
+ where not regexp_like (address_zip9, '\d{9}');
+ 
  delete from pcornet_cdm.death
  where patid not in(select patid from pcornet_cdm.demographic);
 

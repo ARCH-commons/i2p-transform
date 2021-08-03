@@ -78,7 +78,7 @@ select
     , download_date ADDRESS_PERIOD_START 
     , null ADDRESS_PERIOD_END
         
-from NIGHTHERONDATA.patient_dimension pdim
+from "&&i2b2_data_schema".patient_dimension pdim
 left join pcornet_cdm.state_code scode 
     on upper(scode.state) = upper(pdim.state_cd)
 /
