@@ -151,7 +151,22 @@ unknown, leave blank.*/
 , to_char(lab.LAB_ORDER_DATE, 'HH24:MI')  SPECIMEN_TIME
 , lab.RESULT_DATE
 , to_char(lab.RESULT_DATE, 'HH24:MI') RESULT_TIME
-, 'NI' RESULT_QUAL
+, cast(
+  CASE
+      WHEN lower(raw_result) in ('detected', 'dectected', 'dectected (a)', 'positive', 'detected (a)','positive 2019-ncov') 
+          then 'DETECTED'
+      WHEN lower(raw_result) in ('none detected','no detected', 'not deteccted','non detected','not detected',
+                                 'presumptive negative','negative','neg','not deteced', 'not dectected', 'not detectable',
+                                 'negatvie','not derected','negative for sars-cov-w') 
+          then 'NOT DETECTED'
+      WHEN lower(raw_result) in ('result invalid','test invalid','test invalid, patient credited. afton g., rn, noti',
+                                 'invalid', 'invalid result','invalid,specimen should be recollected if clinical',
+                                 'invalid. specimen should be recollected if clinica',
+                                 'invalid.  specimen should be recollected if clinic') 
+          then 'INVALID'
+	    ElSE 'NI'
+  END 
+  as varchar(255)) result_qual,
 , cast(null as varchar(50)) RESULT_SNOMED
 , case when lab.RAW_RESULT = 'N' then lab.RESULT_NUM else null end RESULT_NUM
 , case when lab.RAW_RESULT = 'N' then (case nvl(nullif(lab.RESULT_MODIFIER, ''),'NI') when 'E' then 'EQ' when 'NE' then 'OT' when 'L' then 'LT' when 'LE' then 'LE' when 'G' then 'GT' when 'GE' then 'GE' else 'NI' end)  else 'TX' end RESULT_MODIFIER
@@ -183,6 +198,10 @@ unknown, leave blank.*/
 from lab_result_w_source lab
 -- where lab.LAB_LOINC not in (select LOINC from codes_potential_ppi)
 /
+
+update lab_result_cm
+set lab_loinc = '94309-2'
+WHERE raw_facility_code = 'KUH|COMPONENT_ID:6552'
 
 create index lab_result_cm_idx on lab_result_cm (PATID, ENCOUNTERID)
 /
