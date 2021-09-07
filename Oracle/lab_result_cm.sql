@@ -166,7 +166,7 @@ unknown, leave blank.*/
           then 'INVALID'
 	    ElSE 'NI'
   END 
-  as varchar(255)) result_qual,
+  as varchar(255)) result_qual
 , cast(null as varchar(50)) RESULT_SNOMED
 , case when lab.RAW_RESULT = 'N' then lab.RESULT_NUM else null end RESULT_NUM
 , case when lab.RAW_RESULT = 'N' then (case nvl(nullif(lab.RESULT_MODIFIER, ''),'NI') when 'E' then 'EQ' when 'NE' then 'OT' when 'L' then 'LT' when 'LE' then 'LE' when 'G' then 'GT' when 'GE' then 'GE' else 'NI' end)  else 'TX' end RESULT_MODIFIER
@@ -202,7 +202,7 @@ from lab_result_w_source lab
 update lab_result_cm
 set lab_loinc = '94309-2'
 WHERE raw_facility_code = 'KUH|COMPONENT_ID:6552'
-
+/
 create index lab_result_cm_idx on lab_result_cm (PATID, ENCOUNTERID)
 /
 

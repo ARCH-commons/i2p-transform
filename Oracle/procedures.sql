@@ -16,7 +16,7 @@ CREATE TABLE procedures(
 	PROVIDERID varchar(50) NULL,
 	PX_DATE date NULL,
 	PX varchar(11) NOT NULL,
-	PX_TYPE varchar(2) NOT NULL,
+	PX_TYPE varchar(3) NOT NULL,
 	PX_SOURCE varchar(2) NULL,
 	PPX varchar(2) NULL,
 	RAW_PX varchar(50) NULL,
