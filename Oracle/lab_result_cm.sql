@@ -134,7 +134,12 @@ left join
 on lab.instance_num = map.instance_num
 /
 
-create table lab_result_cm as
+create table lab_result_cm
+NOLOGGING parallel
+as
+with lab_result_cm_no_result_qual
+as
+(
 select distinct cast(lab.LAB_RESULT_CM_ID as varchar(19)) LAB_RESULT_CM_ID
 , cast(lab.PATID as varchar(50)) PATID
 , cast(lab.ENCOUNTERID as varchar(50)) ENCOUNTERID
@@ -151,22 +156,6 @@ unknown, leave blank.*/
 , to_char(lab.LAB_ORDER_DATE, 'HH24:MI')  SPECIMEN_TIME
 , lab.RESULT_DATE
 , to_char(lab.RESULT_DATE, 'HH24:MI') RESULT_TIME
-, cast(
-  CASE
-      WHEN lower(raw_result) in ('detected', 'dectected', 'dectected (a)', 'positive', 'detected (a)','positive 2019-ncov') 
-          then 'DETECTED'
-      WHEN lower(raw_result) in ('none detected','no detected', 'not deteccted','non detected','not detected',
-                                 'presumptive negative','negative','neg','not deteced', 'not dectected', 'not detectable',
-                                 'negatvie','not derected','negative for sars-cov-w') 
-          then 'NOT DETECTED'
-      WHEN lower(raw_result) in ('result invalid','test invalid','test invalid, patient credited. afton g., rn, noti',
-                                 'invalid', 'invalid result','invalid,specimen should be recollected if clinical',
-                                 'invalid. specimen should be recollected if clinica',
-                                 'invalid.  specimen should be recollected if clinic') 
-          then 'INVALID'
-	    ElSE 'NI'
-  END 
-  as varchar(255)) result_qual
 , cast(null as varchar(50)) RESULT_SNOMED
 , case when lab.RAW_RESULT = 'N' then lab.RESULT_NUM else null end RESULT_NUM
 , case when lab.RAW_RESULT = 'N' then (case nvl(nullif(lab.RESULT_MODIFIER, ''),'NI') when 'E' then 'EQ' when 'NE' then 'OT' when 'L' then 'LT' when 'LE' then 'LE' when 'G' then 'GT' when 'GE' then 'GE' else 'NI' end)  else 'TX' end RESULT_MODIFIER
@@ -196,6 +185,58 @@ unknown, leave blank.*/
 , 'PC' as lab_loinc_source
 , 'OD' as lab_result_source
 from lab_result_w_source lab
+)
+select
+LAB_RESULT_CM_ID ,
+PATID ,
+ENCOUNTERID ,
+SPECIMEN_SOURCE ,
+LAB_LOINC ,
+PRIORITY ,
+RESULT_LOC ,
+LAB_PX ,
+LAB_PX_TYPE ,
+LAB_ORDER_DATE ,
+SPECIMEN_DATE ,
+SPECIMEN_TIME ,
+RESULT_DATE ,
+RESULT_TIME ,
+cast(
+  CASE
+      WHEN lower(raw_result) in ('detected', 'dectected', 'dectected (a)', 'positive', 'detected (a)','positive 2019-ncov') 
+          then 'DETECTED'
+      WHEN lower(raw_result) in ('none detected','no detected', 'not deteccted','non detected','not detected',
+                                 'presumptive negative','negative','neg','not deteced', 'not dectected', 'not detectable',
+                                 'negatvie','not derected','negative for sars-cov-w') 
+          then 'NOT DETECTED'
+      WHEN lower(raw_result) in ('result invalid','test invalid','test invalid, patient credited. afton g., rn, noti',
+                                 'invalid', 'invalid result','invalid,specimen should be recollected if clinical',
+                                 'invalid. specimen should be recollected if clinica',
+                                 'invalid.  specimen should be recollected if clinic') 
+          then 'INVALID'
+	    ElSE 'NI'
+  END 
+  as varchar(255)) 
+result_qual,
+RESULT_SNOMED ,
+RESULT_NUM ,
+RESULT_MODIFIER ,
+RESULT_UNIT ,
+NORM_RANGE_LOW ,
+NORM_MODIFIER_LOW ,
+NORM_RANGE_HIGH ,
+NORM_MODIFIER_HIGH ,
+ABN_IND ,
+RAW_LAB_NAME ,
+RAW_LAB_CODE ,
+RAW_PANEL ,
+RAW_RESULT ,
+RAW_UNIT ,
+RAW_ORDER_DEPT ,
+RAW_FACILITY_CODE ,
+LAB_LOINC_SOURCE ,
+LAB_RESULT_SOURCE 
+from lab_result_cm_no_result_qual
 -- where lab.LAB_LOINC not in (select LOINC from codes_potential_ppi)
 /
 

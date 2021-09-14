@@ -16,7 +16,7 @@ CREATE TABLE procedures(
 	PROVIDERID varchar(50) NULL,
 	PX_DATE date NULL,
 	PX varchar(11) NOT NULL,
-	PX_TYPE varchar(3) NOT NULL,
+	PX_TYPE varchar(2) NOT NULL,
 	PX_SOURCE varchar(2) NULL,
 	PPX varchar(2) NULL,
 	RAW_PX varchar(50) NULL,
@@ -61,7 +61,7 @@ insert into procedures(patid, encounterid, enc_type, admit_date, px_date, provid
 select  distinct fact.patient_num, enc.encounterid,    enc.enc_type, enc.admit_date, fact.start_date,
         fact.provider_id, SUBSTR(pr.c_basecode,INSTR(pr.c_basecode, ':')+1,11) px,
     -- Decode can be eliminated if pcornet_proc is updated.
-        'CPT' pxtype,
+        'CH' pxtype,
     -- All are billing for now - see https://informatics.gpcnetwork.org/trac/Project/ticket/491
     'BI' px_source
 from i2b2fact fact
