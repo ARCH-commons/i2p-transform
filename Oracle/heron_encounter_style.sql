@@ -125,7 +125,7 @@ select * from pcornet_mapping pm where 1=0;
 
 whenever sqlerror continue;
 drop table enc_type;
-whenever sqlerror exit;
+whenever sqlerror exit SQL.SQLCODE;
 
 /* explore encounter mapping: where do our encounters come from? */
 /*
@@ -143,7 +143,7 @@ order by 1
 */
 whenever sqlerror continue;
 drop table enc_type_merge;
-whenever sqlerror exit;
+whenever sqlerror exit SQL.SQLCODE;
 
 create table enc_type_merge as
 with
@@ -213,7 +213,7 @@ alter table "&&i2b2_data_schema".visit_dimension add (
   );
 drop table enc_disp_facts;
 drop table discharge_disp;
-whenever sqlerror exit;
+whenever sqlerror exit SQL.SQLCODE;
 
 -- Two steps (tables) due to Oracle performance/picking bad plans when it's all one query
 create table enc_disp_facts as
@@ -272,7 +272,7 @@ alter table "&&i2b2_data_schema".visit_dimension add (
   );
 drop table enc_status_facts;
 drop table discharge_status;
-whenever sqlerror exit;
+whenever sqlerror exit SQL.SQLCODE;
 
 -- Two steps (tables) due to Oracle performance/picking bad plans when it's all one query
 create table enc_status_facts as
@@ -339,7 +339,7 @@ alter table "&&i2b2_data_schema".visit_dimension add (
   );
 drop table admit_source_enc_code_rank;
 drop table admit_source_priority_rank;
-whenever sqlerror exit;
+whenever sqlerror exit SQL.SQLCODE;
 
 create table admit_source_enc_code_rank as
 with codes as (

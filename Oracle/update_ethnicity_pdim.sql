@@ -18,7 +18,7 @@ alter table "&&i2b2_data_schema".patient_dimension add (
   ETHNICITY_CD  VARCHAR2(50 BYTE)
   );
 drop table hispanic_patients;
-whenever sqlerror exit;
+whenever sqlerror exit SQL.SQLCODE;
 
 create table hispanic_patients as
 with
