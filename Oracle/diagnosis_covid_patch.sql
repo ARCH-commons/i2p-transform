@@ -184,7 +184,7 @@ SELECT
     when raw_dx_source like '%PROF:NONPRIMARY%' then 'FI' -- DX_SOURCE:FI	DX|PROF:PRIMARY
     when raw_dx_source like '%MEDICAL_HX%' then 'OT' -- medical history -> other
     when raw_dx_source like '%PROBLEM_LIST%' then 'OT' -- ISSUE: source in case of PROBLEM_LIST?
-    -- ISSUE: else???
+    else 'UN' -- UN=Unknown 
     end dx_source,
     case
     when raw_dx_source like '%DX|BILL:%' then 'BI' -- billing
