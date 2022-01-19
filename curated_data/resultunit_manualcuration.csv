@@ -120,6 +120,7 @@ FREQ,RESULT_UNIT,UCUM_CODE,UCUM_DESCRIPTIVE_TEXT
 25756,NMOL/ML,nmol/mL,nanomole per milliliter
 1123,NMOLES,OT,Other
 19633313,PERCENT,%,percent
+187613951,%,%,percent
 3233164,PG,pg,picogram
 273580,PG/ML,pg/mL,picogram per milliliter
 8363,RATIO,OT,Other
