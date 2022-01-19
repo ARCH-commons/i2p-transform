@@ -53,7 +53,15 @@ and c_basecode not between 'KUH|COMPONENT_ID:' and 'KUH|COMPONENT_ID:~'
 and c_visualattributes like 'L_'
 ;
 */
-create table lab_result_key as
+with resultunit_manualcuration_1t1 as (
+select FREQ,           RESULT_UNIT, UCUM_CODE, UCUM_DESCRIPTIVE_TEXT from pcornet_cdm.resultunit_manualcuration
+union 
+select FREQ, UCUM_CODE RESULT_UNIT, UCUM_CODE, UCUM_DESCRIPTIVE_TEXT  from pcornet_cdm.resultunit_manualcuration
+)
+-- TODO: make sure all manualcuration mapping is unique
+, resultunit_manualcuration_1t1u as (
+  select distinct RESULT_UNIT, UCUM_CODE from resultunit_manualcuration_1t1
+)
 select lab_result_cm_seq.nextval LAB_RESULT_CM_ID
 , patient_num PATID
 , encounter_num ENCOUNTERID
@@ -69,7 +77,7 @@ select lab_result_cm_seq.nextval LAB_RESULT_CM_ID
 , concept_cd RAW_FACILITY_CODE
 from &&i2b2_data_schema.observation_fact m
 join encounter enc on enc.patid = m.patient_num and enc.encounterid = m.encounter_Num
-left join pcornet_cdm.resultunit_manualcuration mc on m.units_cd = mc.result_unit
+left join resultunit_manualcuration_1t1u mc on lower(trim(m.units_cd)) = lower(trim(mc.result_unit))
 where concept_cd between 'KUH|COMPONENT_ID:' and 'KUH|COMPONENT_ID:~'
 and modifier_cd in ('@')  -- exclude analyitics: Labs|Aggregate:Median, ...
 and m.valtype_cd in ('N','T')
