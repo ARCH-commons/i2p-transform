@@ -53,6 +53,7 @@ and c_basecode not between 'KUH|COMPONENT_ID:' and 'KUH|COMPONENT_ID:~'
 and c_visualattributes like 'L_'
 ;
 */
+create table lab_result_key as
 with resultunit_manualcuration_1t1 as (
 select FREQ,           RESULT_UNIT, UCUM_CODE, UCUM_DESCRIPTIVE_TEXT from pcornet_cdm.resultunit_manualcuration
 union 
