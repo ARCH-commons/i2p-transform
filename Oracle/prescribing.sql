@@ -115,7 +115,7 @@ order by c_basecode
 create table prescribing_w_cui as
 select rx.*
 , mo.pcori_cui rxnorm_cui
-, substr(mo.c_basecode, 1, 50) raw_rxnorm_cui
+, substr(rx.concept_cd, 1, 50) raw_rxnorm_cui -- always get raw_rxnorm_cui regadless it is mapped to rxnorm_cui
 , substr(mo.c_name, 1, 50) raw_rx_med_name
 from prescribing_key rx
 left join
